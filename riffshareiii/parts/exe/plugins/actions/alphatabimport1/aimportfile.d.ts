@@ -543,6 +543,19 @@ declare class ByteBuffer implements IWriteable, IReadable {
     toArray(): Uint8Array;
     copyTo(destination: IWriteable): void;
 }
+declare class BitReader {
+    private static readonly ByteSize;
+    private _currentByte;
+    private _position;
+    private _source;
+    constructor(source: IReadable);
+    readByte(): number;
+    readBytes(count: number): Uint8Array;
+    readBits(count: number): number;
+    readBitsReversed(count: number): number;
+    readBit(): number;
+    readAll(): Uint8Array;
+}
 declare class SynthConstants {
     static readonly DefaultChannelCount: number;
     static readonly MetronomeChannel: number;
@@ -605,6 +618,7 @@ declare class Score {
     tracks: Track[];
     defaultSystemsLayout: number;
     systemsLayout: number[];
+    backingTrack: BackingTrack | undefined;
     style?: ScoreStyle;
     rebuildRepeatGroups(): void;
     addMasterBar(bar: MasterBar): void;
@@ -1549,6 +1563,9 @@ declare class InstrumentArticulation {
     techniqueSymbolPlacement: TechniqueSymbolPlacement;
     outputMidiNumber: number;
 }
+declare class BackingTrack {
+    rawAudioFile: Uint8Array | undefined;
+}
 declare class MidiUtils {
     static readonly QuarterTime: number;
     private static readonly MinVelocity;
@@ -1581,11 +1598,573 @@ declare abstract class ScoreImporter {
 declare class UnsupportedFormatError extends AlphaTabError {
     constructor(message?: string | null, inner?: Error);
 }
+declare class GpxFile {
+    fileName: string;
+    fileSize: number;
+    data: Uint8Array | null;
+}
+declare class GpxFileSystem {
+    static readonly HeaderBcFs: string;
+    static readonly HeaderBcFz: string;
+    fileFilter: (fileName: string) => boolean;
+    files: GpxFile[];
+    constructor();
+    load(s: IReadable): void;
+    readHeader(src: BitReader): string;
+    decompress(src: BitReader, skipHeader?: boolean): Uint8Array;
+    private readBlock;
+    private readUncompressedBlock;
+    private getString;
+    private getInteger;
+}
+declare class GpifRhythm {
+    id: string;
+    dots: number;
+    tupletDenominator: number;
+    tupletNumerator: number;
+    value: Duration;
+}
+declare class GpifSound {
+    name: string;
+    path: string;
+    role: string;
+    get uniqueId(): string;
+    program: number;
+    bank: number;
+}
+declare class GpifParser {
+    private static readonly InvalidId;
+    private static readonly BendPointPositionFactor;
+    private static readonly BendPointValueFactor;
+    private static readonly SampleRate;
+    score: Score;
+    private _backingTrackAssetId;
+    private _masterTrackAutomations;
+    private _automationsPerTrackIdAndBarIndex;
+    private _sustainPedalsPerTrackIdAndBarIndex;
+    private _tracksMapping;
+    private _tracksById;
+    private _masterBars;
+    private _barsOfMasterBar;
+    private _barsById;
+    private _voicesOfBar;
+    private _voiceById;
+    private _beatsOfVoice;
+    private _rhythmOfBeat;
+    private _beatById;
+    private _rhythmById;
+    private _noteById;
+    private _notesOfBeat;
+    private _tappedNotes;
+    private _lyricsByTrack;
+    private _soundsByTrack;
+    private _hasAnacrusis;
+    private _articulationByName;
+    private _skipApplyLyrics;
+    private _backingTrackPadding;
+    private _doubleBars;
+    private _keySignatures;
+    loadAsset?: (fileName: string) => Uint8Array | undefined;
+    parseXml(xml: string, settings: Settings): void;
+    private parseDom;
+    private parseAssets;
+    private parseBackingTrackAsset;
+    private parseScoreNode;
+    private static parseIntSafe;
+    private static parseFloatSafe;
+    private static splitSafe;
+    private parseBackingTrackNode;
+    private parseMasterTrackNode;
+    private parseAutomations;
+    private parseAutomation;
+    private parseTracksNode;
+    private parseTrack;
+    private parseTrackAutomations;
+    private parseNotationPatch;
+    private parseInstrumentSet;
+    private parseElements;
+    private parseElement;
+    private parseArticulations;
+    private parseArticulation;
+    private parseTechniqueSymbol;
+    private parseNoteHead;
+    private parseStaves;
+    private parseStaff;
+    private parseStaffProperties;
+    private parseStaffProperty;
+    private parseLyrics;
+    private parseLyricsLine;
+    private parseDiagramCollectionForTrack;
+    private parseDiagramCollectionForStaff;
+    private parseDiagramItemForTrack;
+    private parseDiagramItemForStaff;
+    private parseDiagramItemForChord;
+    private parseTrackProperties;
+    private parseTrackProperty;
+    private parseGeneralMidi;
+    private parseSounds;
+    private parseSound;
+    private parseSoundMidi;
+    private parsePartSounding;
+    private _transposeKeySignaturePerTrack;
+    private parseTranspose;
+    private parseRSE;
+    private parseChannelStrip;
+    private parseChannelStripParameters;
+    private parseMasterBarsNode;
+    private parseMasterBar;
+    private parseDirections;
+    private parseFermatas;
+    private parseFermata;
+    private parseBars;
+    private parseBar;
+    private parseVoices;
+    private parseVoice;
+    private parseBeats;
+    private parseBeat;
+    private parseBeatLyrics;
+    private parseBeatXProperties;
+    private parseBarXProperties;
+    private parseMasterBarXProperties;
+    private parseBeatProperties;
+    private parseNotes;
+    private parseNote;
+    private parseNoteProperties;
+    private parseConcertPitch;
+    private toBendValue;
+    private toBendOffset;
+    private parseRhythms;
+    private parseRhythm;
+    private buildModel;
+}
+declare enum DataType {
+    Boolean = 0,
+    Integer = 1,
+    Float = 2,
+    String = 3,
+    Point = 4,
+    Size = 5,
+    Rectangle = 6,
+    Color = 7
+}
+declare class BinaryStylesheet {
+    readonly _types: Map<string, DataType>;
+    readonly raw: Map<string, unknown>;
+    constructor(data?: Uint8Array);
+    private read;
+    apply(score: Score): void;
+    addValue(key: string, value: unknown, type?: DataType): void;
+    writeTo(writer: IWriteable): void;
+    private getDataType;
+    private static addHeaderAndFooter;
+}
 declare class Lazy<T> {
     private _factory;
     private _value;
     constructor(factory: () => T);
     get value(): T;
+}
+declare enum XmlNodeType {
+    None = 0,
+    Element = 1,
+    Text = 2,
+    CDATA = 3,
+    Document = 4,
+    DocumentType = 5,
+    Comment = 6
+}
+declare class XmlNode {
+    nodeType: XmlNodeType;
+    localName: string | null;
+    value: string | null;
+    childNodes: XmlNode[];
+    attributes: Map<string, string>;
+    firstChild: XmlNode | null;
+    firstElement: XmlNode | null;
+    childElements(): Generator<XmlNode, void, unknown>;
+    addChild(node: XmlNode): void;
+    getAttribute(name: string, defaultValue?: string): string;
+    getElementsByTagName(name: string, recursive?: boolean): XmlNode[];
+    private searchElementsByTagName;
+    findChildElement(name: string): XmlNode | null;
+    addElement(name: string): XmlNode;
+    get innerText(): string;
+    set innerText(value: string);
+    setCData(s: string): void;
+}
+declare class XmlDocument extends XmlNode {
+    constructor();
+    parse(xml: string): void;
+    toString(): string;
+    toFormattedString(indention?: string, xmlHeader?: boolean): string;
+}
+declare class XmlError extends AlphaTabError {
+    xml: string;
+    pos: number;
+    constructor(message: string, xml: string, pos: number);
+}
+declare enum XmlState {
+    IgnoreSpaces = 0,
+    Begin = 1,
+    BeginNode = 2,
+    TagName = 3,
+    Body = 4,
+    AttribName = 5,
+    Equals = 6,
+    AttvalBegin = 7,
+    AttribVal = 8,
+    Childs = 9,
+    Close = 10,
+    WaitEnd = 11,
+    WaitEndRet = 12,
+    Pcdata = 13,
+    Header = 14,
+    Comment = 15,
+    Doctype = 16,
+    Cdata = 17,
+    Escape = 18
+}
+declare class XmlParser {
+    static readonly CharCodeLF: number;
+    static readonly CharCodeTab: number;
+    static readonly CharCodeCR: number;
+    static readonly CharCodeSpace: number;
+    static readonly CharCodeLowerThan: number;
+    static readonly CharCodeAmp: number;
+    static readonly CharCodeBrackedClose: number;
+    static readonly CharCodeBrackedOpen: number;
+    static readonly CharCodeGreaterThan: number;
+    static readonly CharCodeExclamation: number;
+    static readonly CharCodeUpperD: number;
+    static readonly CharCodeLowerD: number;
+    static readonly CharCodeMinus: number;
+    static readonly CharCodeQuestion: number;
+    static readonly CharCodeSlash: number;
+    static readonly CharCodeEquals: number;
+    static readonly CharCodeDoubleQuote: number;
+    static readonly CharCodeSingleQuote: number;
+    static readonly CharCodeSharp: number;
+    static readonly CharCodeLowerX: number;
+    static readonly CharCodeLowerA: number;
+    static readonly CharCodeLowerZ: number;
+    static readonly CharCodeUpperA: number;
+    static readonly CharCodeUpperZ: number;
+    static readonly CharCode0: number;
+    static readonly CharCode9: number;
+    static readonly CharCodeColon: number;
+    static readonly CharCodeDot: number;
+    static readonly CharCodeUnderscore: number;
+    static readonly CharCodeSemi: number;
+    private static Escapes;
+    static parse(str: string, p: number, parent: XmlNode): number;
+    private static isValidChar;
+}
+declare class XmlWriter {
+    private _result;
+    private _indention;
+    private _xmlHeader;
+    private _isStartOfLine;
+    private _currentIndention;
+    constructor(indention: string, xmlHeader: boolean);
+    writeNode(xml: XmlNode): void;
+    private unindend;
+    private indent;
+    private writeAttributeValue;
+    static write(xml: XmlNode, indention: string, xmlHeader: boolean): string;
+    private write;
+    private writeLine;
+    toString(): string;
+}
+declare class BeatCloner {
+    static clone(original: Beat): Beat;
+}
+declare class NoteCloner {
+    static clone(original: Note): Note;
+}
+declare class BendPointCloner {
+    static clone(original: BendPoint): BendPoint;
+}
+declare class AutomationCloner {
+    static clone(original: Automation): Automation;
+}
+declare class SyncPointDataCloner {
+    static clone(original: SyncPointData): SyncPointData;
+}
+declare class Adler32 {
+    private static readonly Base;
+    value: number;
+    constructor();
+    reset(): void;
+    update(data: Uint8Array, offset: number, count: number): void;
+}
+declare class Crc32 {
+    private static readonly Crc32Lookup;
+    private static buildCrc32Lookup;
+    private static readonly CrcInit;
+    private _checkValue;
+    get value(): number;
+    constructor();
+    update(data: Uint8Array, offset: number, count: number): void;
+    reset(): void;
+}
+declare class Deflater {
+    private static readonly IsFlushing;
+    private static readonly IsFinishing;
+    private static readonly BusyState;
+    private static readonly FlushingState;
+    private static readonly FinishingState;
+    private static readonly FinishedState;
+    private _state;
+    private _pending;
+    private _engine;
+    get inputCrc(): number;
+    constructor();
+    get isNeedingInput(): boolean;
+    get isFinished(): boolean;
+    reset(): void;
+    setInput(input: Uint8Array, offset: number, count: number): void;
+    deflate(output: Uint8Array, offset: number, length: number): number;
+    finish(): void;
+}
+declare class DeflaterConstants {
+    static readonly MAX_WBITS: number;
+    static readonly WSIZE: number;
+    static readonly WMASK: number;
+    static readonly MIN_MATCH: number;
+    static readonly MAX_MATCH: number;
+    static readonly DEFAULT_MEM_LEVEL: number;
+    static readonly PENDING_BUF_SIZE: number;
+    static readonly HASH_BITS: number;
+    static readonly HASH_SIZE: number;
+    static readonly HASH_SHIFT: number;
+    static readonly HASH_MASK: number;
+    static readonly MIN_LOOKAHEAD: number;
+    static readonly MAX_DIST: number;
+}
+declare class DeflaterEngine {
+    private static readonly TooFar;
+    private blockStart;
+    private maxChain;
+    private niceLength;
+    private goodLength;
+    private insertHashIndex;
+    private strstart;
+    private window;
+    private head;
+    private prev;
+    private lookahead;
+    private inputBuf;
+    private inputOff;
+    private inputEnd;
+    private prevAvailable;
+    private matchStart;
+    private matchLen;
+    private pending;
+    private huffman;
+    inputCrc: Crc32;
+    constructor(pending: PendingBuffer);
+    reset(): void;
+    private updateHash;
+    needsInput(): boolean;
+    setInput(buffer: Uint8Array, offset: number, count: number): void;
+    deflate(flush: boolean, finish: boolean): boolean;
+    private deflateSlow;
+    private findLongestMatch;
+    private insertString;
+    fillWindow(): void;
+    private slideWindow;
+}
+declare class Tree {
+    private static readonly Repeat3To6;
+    private static readonly Repeat3To10;
+    private static readonly Repeat11To138;
+    freqs: Int16Array;
+    length: Uint8Array | null;
+    minNumCodes: number;
+    numCodes: number;
+    private codes;
+    private readonly bitLengthCounts;
+    private readonly maxLength;
+    private huffman;
+    constructor(dh: DeflaterHuffman, elems: number, minCodes: number, maxLength: number);
+    reset(): void;
+    buildTree(): void;
+    private buildLength;
+    getEncodedLength(): number;
+    calcBLFreq(blTree: Tree): void;
+    setStaticCodes(staticCodes: Int16Array, staticLengths: Uint8Array): void;
+    buildCodes(): void;
+    writeTree(blTree: Tree): void;
+    writeSymbol(code: number): void;
+}
+declare class DeflaterHuffman {
+    private static readonly BUFSIZE;
+    private static readonly LITERAL_NUM;
+    static readonly STORED_BLOCK = 0;
+    static readonly STATIC_TREES = 1;
+    static readonly DYN_TREES = 2;
+    private static readonly DIST_NUM;
+    private static staticLCodes;
+    private static staticLLength;
+    private static staticDCodes;
+    private static staticDLength;
+    static staticInit(): void;
+    private static readonly BL_ORDER;
+    private static readonly bit4Reverse;
+    static bitReverse(toReverse: number): number;
+    private static readonly BITLEN_NUM;
+    private static readonly EOF_SYMBOL;
+    pending: PendingBuffer;
+    private literalTree;
+    private distTree;
+    private blTree;
+    private d_buf;
+    private l_buf;
+    private last_lit;
+    private extra_bits;
+    constructor(pending: PendingBuffer);
+    isFull(): boolean;
+    reset(): void;
+    flushStoredBlock(stored: Uint8Array, storedOffset: number, storedLength: number, lastBlock: boolean): void;
+    flushBlock(stored: Uint8Array, storedOffset: number, storedLength: number, lastBlock: boolean): void;
+    sendAllTrees(blTreeCodes: number): void;
+    compressBlock(): void;
+    tallyDist(distance: number, length: number): boolean;
+    tallyLit(literal: number): boolean;
+    private static Lcode;
+    private static Dcode;
+}
+declare class Huffman {
+}
+declare class Found extends Huffman {
+    readonly n: number;
+    constructor(n: number);
+}
+declare class NeedBit extends Huffman {
+    readonly left: Huffman;
+    readonly right: Huffman;
+    constructor(left: Huffman, right: Huffman);
+}
+declare class NeedBits extends Huffman {
+    readonly n: number;
+    readonly table: Huffman[];
+    constructor(n: number, table: Huffman[]);
+}
+declare class HuffTools {
+    static make(lengths: number[], pos: number, nlengths: number, maxbits: number): Huffman;
+    private static treeMake;
+    private static treeCompress;
+    private static treeWalk;
+    private static treeDepth;
+}
+declare enum InflateState {
+    Head = 0,
+    Block = 1,
+    CData = 2,
+    Flat = 3,
+    Crc = 4,
+    Dist = 5,
+    DistOne = 6,
+    Done = 7
+}
+declare class InflateWindow {
+    private static readonly Size;
+    private static readonly BufferSize;
+    buffer: Uint8Array;
+    pos: number;
+    slide(): void;
+    addBytes(b: Uint8Array, p: number, len: number): void;
+    addByte(c: number): void;
+    getLastChar(): number;
+    available(): number;
+}
+declare class Inflate {
+    private static LenExtraBitsTbl;
+    private static LenBaseValTbl;
+    private static DistExtraBitsTbl;
+    private static DistBaseValTbl;
+    private static CodeLengthsPos;
+    private static _fixedHuffman;
+    private static buildFixedHuffman;
+    private _nbits;
+    private _bits;
+    private _state;
+    private _isFinal;
+    private _huffman;
+    private _huffdist;
+    private _len;
+    private _dist;
+    private _needed;
+    private _output;
+    private _outpos;
+    private _input;
+    private _lengths;
+    private _window;
+    constructor(readable: IReadable);
+    readBytes(b: Uint8Array, pos: number, len: number): number;
+    private inflateLoop;
+    private addDistOne;
+    private addByte;
+    private addDist;
+    private getBit;
+    private getBits;
+    private getRevBits;
+    private resetBits;
+    private addBytes;
+    private inflateLengths;
+    private applyHuffman;
+}
+declare class PendingBuffer {
+    private _buffer;
+    private _start;
+    private _end;
+    private _bits;
+    bitCount: number;
+    get isFlushed(): boolean;
+    constructor(bufferSize: number);
+    reset(): void;
+    writeShortMSB(s: number): void;
+    writeShort(value: number): void;
+    writeBlock(block: Uint8Array, offset: number, length: number): void;
+    flush(output: Uint8Array, offset: number, length: number): number;
+    writeBits(b: number, count: number): void;
+    alignToByte(): void;
+}
+declare class ZipEntry {
+    static readonly OptionalDataDescriptorSignature: number;
+    static readonly CompressionMethodDeflate: number;
+    static readonly LocalFileHeaderSignature: number;
+    static readonly CentralFileHeaderSignature: number;
+    static readonly EndOfCentralDirSignature: number;
+    readonly fullName: string;
+    readonly fileName: string;
+    readonly data: Uint8Array;
+    constructor(fullName: string, data: Uint8Array);
+}
+declare class ZipReader {
+    private _readable;
+    constructor(readable: IReadable);
+    read(): ZipEntry[];
+    private readEntry;
+}
+declare class ZipCentralDirectoryHeader {
+    entry: ZipEntry;
+    localHeaderOffset: number;
+    compressedSize: number;
+    crc32: number;
+    compressionMode: number;
+    constructor(entry: ZipEntry, crc32: number, localHeaderOffset: number, compressionMode: number, compressedSize: number);
+}
+declare class ZipWriter {
+    private _data;
+    private _centralDirectoryHeaders;
+    private _deflater;
+    constructor(data: IWriteable);
+    writeEntry(entry: ZipEntry): void;
+    private compress;
+    end(): void;
+    private writeEndOfCentralDirectoryRecord;
+    private writeCentralDirectoryHeader;
 }
 declare class Gp3To5Importer extends ScoreImporter {
     constructor();
@@ -1653,6 +2232,14 @@ declare class MixTableChange {
     tempoName: string;
     tempo: number;
     duration: number;
+}
+declare class GpxImporter extends ScoreImporter {
+    get name(): string;
+    readScore(): Score;
+}
+declare class Gp7To8Importer extends ScoreImporter {
+    get name(): string;
+    readScore(): Score;
 }
 declare class AlphaTabImportMusicPlugin {
     callbackID: string;

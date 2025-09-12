@@ -1005,6 +1005,66 @@ class ByteBuffer {
         destination.write(this._buffer, 0, this.length);
     }
 }
+class BitReader {
+    constructor(source) {
+        this._currentByte = 0;
+        this._position = BitReader.ByteSize;
+        this._source = source;
+    }
+    readByte() {
+        return this.readBits(8);
+    }
+    readBytes(count) {
+        const bytes = new Uint8Array(count);
+        for (let i = 0; i < count; i++) {
+            bytes[i] = this.readByte() & 0xff;
+        }
+        return bytes;
+    }
+    readBits(count) {
+        let bits = 0;
+        let i = count - 1;
+        while (i >= 0) {
+            bits = bits | (this.readBit() << i);
+            i--;
+        }
+        return bits;
+    }
+    readBitsReversed(count) {
+        let bits = 0;
+        for (let i = 0; i < count; i++) {
+            bits = bits | (this.readBit() << i);
+        }
+        return bits;
+    }
+    readBit() {
+        if (this._position >= 8) {
+            this._currentByte = this._source.readByte();
+            if (this._currentByte === -1) {
+                throw new EndOfReaderError();
+            }
+            this._position = 0;
+        }
+        const value = (this._currentByte >> (BitReader.ByteSize - this._position - 1)) & 0x01;
+        this._position++;
+        return value;
+    }
+    readAll() {
+        const all = ByteBuffer.empty();
+        try {
+            while (true) {
+                all.writeByte(this.readByte() & 0xff);
+            }
+        }
+        catch (e) {
+            if (!(e instanceof EndOfReaderError)) {
+                throw e;
+            }
+        }
+        return all.toArray();
+    }
+}
+BitReader.ByteSize = 8;
 class SynthConstants {
 }
 SynthConstants.DefaultChannelCount = 16 + 1;
@@ -4518,6 +4578,8 @@ var TechniqueSymbolPlacement;
 })(TechniqueSymbolPlacement || (TechniqueSymbolPlacement = {}));
 class InstrumentArticulation {
 }
+class BackingTrack {
+}
 class MidiUtils {
     static ticksToMillis(ticks, tempo) {
         return (ticks * (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
@@ -4796,6 +4858,2661 @@ class UnsupportedFormatError extends AlphaTabError {
         Object.setPrototypeOf(this, UnsupportedFormatError.prototype);
     }
 }
+class GpxFile {
+    constructor() {
+        this.fileName = '';
+        this.fileSize = 0;
+        this.data = null;
+    }
+}
+class GpxFileSystem {
+    constructor() {
+        this.files = [];
+        this.files = [];
+        this.fileFilter = _ => {
+            return true;
+        };
+    }
+    load(s) {
+        const src = new BitReader(s);
+        this.readBlock(src);
+    }
+    readHeader(src) {
+        return this.getString(src.readBytes(4), 0, 4);
+    }
+    decompress(src, skipHeader = false) {
+        const uncompressed = ByteBuffer.empty();
+        let buffer;
+        const expectedLength = this.getInteger(src.readBytes(4), 0);
+        try {
+            while (uncompressed.length < expectedLength) {
+                const flag = src.readBits(1);
+                if (flag === 1) {
+                    const wordSize = src.readBits(4);
+                    const offset = src.readBitsReversed(wordSize);
+                    const size = src.readBitsReversed(wordSize);
+                    const sourcePosition = uncompressed.length - offset;
+                    const toRead = Math.min(offset, size);
+                    buffer = uncompressed.getBuffer();
+                    uncompressed.write(buffer, sourcePosition, toRead);
+                }
+                else {
+                    const size = src.readBitsReversed(2);
+                    for (let i = 0; i < size; i++) {
+                        uncompressed.writeByte(src.readByte());
+                    }
+                }
+            }
+        }
+        catch (e) {
+            if (!(e instanceof EndOfReaderError)) {
+                throw e;
+            }
+        }
+        buffer = uncompressed.getBuffer();
+        const resultOffset = skipHeader ? 4 : 0;
+        const resultSize = uncompressed.length - resultOffset;
+        const result = new Uint8Array(resultSize);
+        const count = resultSize;
+        result.set(buffer.subarray(resultOffset, resultOffset + count), 0);
+        return result;
+    }
+    readBlock(data) {
+        const header = this.readHeader(data);
+        if (header === 'BCFZ') {
+            this.readUncompressedBlock(this.decompress(data, true));
+        }
+        else if (header === 'BCFS') {
+            this.readUncompressedBlock(data.readAll());
+        }
+        else {
+            throw new UnsupportedFormatError('Unsupported format');
+        }
+    }
+    readUncompressedBlock(data) {
+        const sectorSize = 0x1000;
+        let offset = sectorSize;
+        while (offset + 3 < data.length) {
+            const entryType = this.getInteger(data, offset);
+            if (entryType === 2) {
+                const file = new GpxFile();
+                file.fileName = this.getString(data, offset + 0x04, 127);
+                file.fileSize = this.getInteger(data, offset + 0x8c);
+                const storeFile = !this.fileFilter || this.fileFilter(file.fileName);
+                if (storeFile) {
+                    this.files.push(file);
+                }
+                const dataPointerOffset = offset + 0x94;
+                let sector = 0;
+                let sectorCount = 0;
+                const fileData = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
+                while (true) {
+                    sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++);
+                    if (sector !== 0) {
+                        offset = sector * sectorSize;
+                        if (storeFile) {
+                            fileData.write(data, offset, sectorSize);
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+                if (storeFile) {
+                    file.data = new Uint8Array(Math.min(file.fileSize, fileData.length));
+                    const raw = fileData.toArray();
+                    file.data.set(raw.subarray(0, 0 + file.data.length), 0);
+                }
+            }
+            offset += sectorSize;
+        }
+    }
+    getString(data, offset, length) {
+        let buf = '';
+        for (let i = 0; i < length; i++) {
+            const code = data[offset + i] & 0xff;
+            if (code === 0) {
+                break;
+            }
+            buf += String.fromCharCode(code);
+        }
+        return buf;
+    }
+    getInteger(data, offset) {
+        return (data[offset + 3] << 24) | (data[offset + 2] << 16) | (data[offset + 1] << 8) | data[offset];
+    }
+}
+GpxFileSystem.HeaderBcFs = 'BCFS';
+GpxFileSystem.HeaderBcFz = 'BCFZ';
+class GpifRhythm {
+    constructor() {
+        this.id = '';
+        this.dots = 0;
+        this.tupletDenominator = -1;
+        this.tupletNumerator = -1;
+        this.value = Duration.Quarter;
+    }
+}
+class GpifSound {
+    constructor() {
+        this.name = '';
+        this.path = '';
+        this.role = '';
+        this.program = 0;
+        this.bank = 0;
+    }
+    get uniqueId() {
+        return `${this.path};${this.name};${this.role}`;
+    }
+}
+class GpifParser {
+    constructor() {
+        this._hasAnacrusis = false;
+        this._skipApplyLyrics = false;
+        this._backingTrackPadding = 0;
+        this._doubleBars = new Set();
+        this._keySignatures = new Map();
+        this._transposeKeySignaturePerTrack = new Map();
+    }
+    parseXml(xml, settings) {
+        this._masterTrackAutomations = new Map();
+        this._automationsPerTrackIdAndBarIndex = new Map();
+        this._sustainPedalsPerTrackIdAndBarIndex = new Map();
+        this._tracksMapping = [];
+        this._tracksById = new Map();
+        this._masterBars = [];
+        this._barsOfMasterBar = [];
+        this._voicesOfBar = new Map();
+        this._barsById = new Map();
+        this._voiceById = new Map();
+        this._beatsOfVoice = new Map();
+        this._beatById = new Map();
+        this._rhythmOfBeat = new Map();
+        this._rhythmById = new Map();
+        this._notesOfBeat = new Map();
+        this._noteById = new Map();
+        this._tappedNotes = new Map();
+        this._lyricsByTrack = new Map();
+        this._soundsByTrack = new Map();
+        this._skipApplyLyrics = false;
+        const dom = new XmlDocument();
+        try {
+            dom.parse(xml);
+        }
+        catch (e) {
+            throw new UnsupportedFormatError('Could not parse XML', e);
+        }
+        this.parseDom(dom);
+        this.buildModel();
+        ModelUtils.consolidate(this.score);
+        this.score.finish(settings);
+        if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
+            for (const [t, lyrics] of this._lyricsByTrack) {
+                const track = this._tracksById.get(t);
+                track.applyLyrics(lyrics);
+            }
+        }
+    }
+    parseDom(dom) {
+        const root = dom.firstElement;
+        if (!root) {
+            return;
+        }
+        if (root.localName === 'GPIF') {
+            this.score = new Score();
+            for (const n of root.childElements()) {
+                switch (n.localName) {
+                    case 'Score':
+                        this.parseScoreNode(n);
+                        break;
+                    case 'MasterTrack':
+                        this.parseMasterTrackNode(n);
+                        break;
+                    case 'BackingTrack':
+                        this.parseBackingTrackNode(n);
+                        break;
+                    case 'Tracks':
+                        this.parseTracksNode(n);
+                        break;
+                    case 'MasterBars':
+                        this.parseMasterBarsNode(n);
+                        break;
+                    case 'Bars':
+                        this.parseBars(n);
+                        break;
+                    case 'Voices':
+                        this.parseVoices(n);
+                        break;
+                    case 'Beats':
+                        this.parseBeats(n);
+                        break;
+                    case 'Notes':
+                        this.parseNotes(n);
+                        break;
+                    case 'Rhythms':
+                        this.parseRhythms(n);
+                        break;
+                    case 'Assets':
+                        this.parseAssets(n);
+                        break;
+                }
+            }
+        }
+        else {
+            throw new UnsupportedFormatError('Root node of XML was not GPIF');
+        }
+    }
+    parseAssets(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'Asset':
+                    if (c.getAttribute('id') === this._backingTrackAssetId) {
+                        this.parseBackingTrackAsset(c);
+                    }
+                    break;
+            }
+        }
+    }
+    parseBackingTrackAsset(element) {
+        let embeddedFilePath = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'EmbeddedFilePath':
+                    embeddedFilePath = c.innerText;
+                    break;
+            }
+        }
+        const loadAsset = this.loadAsset;
+        if (loadAsset) {
+            const assetData = loadAsset(embeddedFilePath);
+            if (assetData) {
+                this.score.backingTrack.rawAudioFile = assetData;
+            }
+            else {
+                this.score.backingTrack = undefined;
+            }
+        }
+    }
+    parseScoreNode(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'Title':
+                    this.score.title = c.innerText;
+                    break;
+                case 'SubTitle':
+                    this.score.subTitle = c.innerText;
+                    break;
+                case 'Artist':
+                    this.score.artist = c.innerText;
+                    break;
+                case 'Album':
+                    this.score.album = c.innerText;
+                    break;
+                case 'Words':
+                    this.score.words = c.innerText;
+                    break;
+                case 'Music':
+                    this.score.music = c.innerText;
+                    break;
+                case 'WordsAndMusic':
+                    const wordsAndMusic = c.innerText;
+                    if (wordsAndMusic !== '') {
+                        if (wordsAndMusic && !this.score.words) {
+                            this.score.words = wordsAndMusic;
+                        }
+                        if (wordsAndMusic && !this.score.music) {
+                            this.score.music = wordsAndMusic;
+                        }
+                    }
+                    break;
+                case 'Copyright':
+                    this.score.copyright = c.innerText;
+                    break;
+                case 'Tabber':
+                    this.score.tab = c.innerText;
+                    break;
+                case 'Instructions':
+                    this.score.instructions = c.innerText;
+                    break;
+                case 'Notices':
+                    this.score.notices = c.innerText;
+                    break;
+                case 'ScoreSystemsDefaultLayout':
+                    this.score.defaultSystemsLayout = GpifParser.parseIntSafe(c.innerText, 4);
+                    break;
+                case 'ScoreSystemsLayout':
+                    this.score.systemsLayout = GpifParser.splitSafe(c.innerText).map(i => GpifParser.parseIntSafe(i, 4));
+                    break;
+            }
+        }
+    }
+    static parseIntSafe(text, fallback) {
+        if (!text) {
+            return fallback;
+        }
+        const i = Number.parseInt(text, 10);
+        if (!Number.isNaN(i)) {
+            return i;
+        }
+        return fallback;
+    }
+    static parseFloatSafe(text, fallback) {
+        if (!text) {
+            return fallback;
+        }
+        const i = Number.parseFloat(text);
+        if (!Number.isNaN(i)) {
+            return i;
+        }
+        return fallback;
+    }
+    static splitSafe(text, separator = ' ') {
+        if (!text) {
+            return [];
+        }
+        return text
+            .split(separator)
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
+    }
+    parseBackingTrackNode(node) {
+        const backingTrack = new BackingTrack();
+        let enabled = false;
+        let source = '';
+        let assetId = '';
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Enabled':
+                    enabled = c.innerText === 'true';
+                    break;
+                case 'Source':
+                    source = c.innerText;
+                    break;
+                case 'AssetId':
+                    assetId = c.innerText;
+                    break;
+                case 'FramePadding':
+                    this._backingTrackPadding =
+                        (GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate) * 1000;
+                    break;
+            }
+        }
+        if (enabled && source === 'Local') {
+            this.score.backingTrack = backingTrack;
+            this._backingTrackAssetId = assetId;
+        }
+    }
+    parseMasterTrackNode(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Automations':
+                    this.parseAutomations(c, this._masterTrackAutomations, null, null);
+                    break;
+                case 'Tracks':
+                    this._tracksMapping = GpifParser.splitSafe(c.innerText);
+                    break;
+                case 'Anacrusis':
+                    this._hasAnacrusis = true;
+                    break;
+            }
+        }
+    }
+    parseAutomations(node, automations, sounds, sustainPedals) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Automation':
+                    this.parseAutomation(c, automations, sounds, sustainPedals);
+                    break;
+            }
+        }
+    }
+    parseAutomation(node, automations, sounds, sustainPedals) {
+        let type = null;
+        let isLinear = false;
+        let barIndex = -1;
+        let ratioPosition = 0;
+        let numberValue = 0;
+        let textValue = null;
+        let reference = 0;
+        let text = null;
+        let syncPointValue = undefined;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Type':
+                    type = c.innerText;
+                    break;
+                case 'Linear':
+                    isLinear = c.innerText.toLowerCase() === 'true';
+                    break;
+                case 'Bar':
+                    barIndex = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'Position':
+                    ratioPosition = GpifParser.parseFloatSafe(c.innerText, 0);
+                    break;
+                case 'Value':
+                    if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
+                        textValue = c.innerText;
+                    }
+                    else if (c.firstElement &&
+                        c.firstElement.nodeType === XmlNodeType.Element &&
+                        type === 'SyncPoint') {
+                        syncPointValue = new SyncPointData();
+                        for (const vc of c.childElements()) {
+                            switch (vc.localName) {
+                                case 'BarIndex':
+                                    barIndex = GpifParser.parseIntSafe(vc.innerText, 0);
+                                    break;
+                                case 'BarOccurrence':
+                                    syncPointValue.barOccurence = GpifParser.parseIntSafe(vc.innerText, 0);
+                                    break;
+                                case 'FrameOffset':
+                                    const frameOffset = GpifParser.parseFloatSafe(vc.innerText, 0);
+                                    syncPointValue.millisecondOffset = (frameOffset / GpifParser.SampleRate) * 1000;
+                                    break;
+                            }
+                        }
+                    }
+                    else {
+                        const parts = GpifParser.splitSafe(c.innerText);
+                        if (parts.length === 1) {
+                            numberValue = GpifParser.parseFloatSafe(parts[0], 0);
+                            reference = 1;
+                        }
+                        else {
+                            numberValue = GpifParser.parseFloatSafe(parts[0], 0);
+                            reference = GpifParser.parseIntSafe(parts[1], 0);
+                        }
+                    }
+                    break;
+                case 'Text':
+                    text = c.innerText;
+                    break;
+            }
+        }
+        if (!type) {
+            return;
+        }
+        const newAutomations = [];
+        switch (type) {
+            case 'Tempo':
+                newAutomations.push(Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference));
+                break;
+            case 'SyncPoint':
+                const syncPoint = new Automation();
+                syncPoint.type = AutomationType.SyncPoint;
+                syncPoint.isLinear = isLinear;
+                syncPoint.ratioPosition = ratioPosition;
+                syncPoint.syncPointValue = syncPointValue;
+                newAutomations.push(syncPoint);
+                break;
+            case 'Sound':
+                if (textValue && sounds && sounds.has(textValue)) {
+                    const bankChange = new Automation();
+                    bankChange.type = AutomationType.Bank;
+                    bankChange.ratioPosition = ratioPosition;
+                    bankChange.value = sounds.get(textValue).bank;
+                    newAutomations.push(bankChange);
+                    const programChange = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue).program);
+                    newAutomations.push(programChange);
+                }
+                break;
+            case 'SustainPedal':
+                if (sustainPedals) {
+                    let v;
+                    if (sustainPedals.has(barIndex)) {
+                        v = sustainPedals.get(barIndex);
+                    }
+                    else {
+                        v = [];
+                        sustainPedals.set(barIndex, v);
+                    }
+                    const sustain = new SustainPedalMarker();
+                    sustain.ratioPosition = ratioPosition;
+                    switch (reference) {
+                        case 1:
+                            sustain.pedalType = SustainPedalMarkerType.Down;
+                            break;
+                        case 3:
+                            sustain.pedalType = SustainPedalMarkerType.Up;
+                            break;
+                    }
+                    v.push(sustain);
+                }
+                break;
+        }
+        if (newAutomations.length) {
+            if (text) {
+                for (const a of newAutomations) {
+                    a.text = text;
+                }
+            }
+            if (barIndex >= 0) {
+                if (!automations.has(barIndex)) {
+                    automations.set(barIndex, []);
+                }
+                for (const a of newAutomations) {
+                    automations.get(barIndex).push(a);
+                }
+            }
+        }
+    }
+    parseTracksNode(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Track':
+                    this.parseTrack(c);
+                    break;
+            }
+        }
+    }
+    parseTrack(node) {
+        this._articulationByName = new Map();
+        const track = new Track();
+        track.ensureStaveCount(1);
+        const staff = track.staves[0];
+        staff.showStandardNotation = true;
+        const trackId = node.getAttribute('id');
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Name':
+                    track.name = c.innerText;
+                    break;
+                case 'Color':
+                    const parts = GpifParser.splitSafe(c.innerText);
+                    if (parts.length >= 3) {
+                        const r = GpifParser.parseIntSafe(parts[0], 0);
+                        const g = GpifParser.parseIntSafe(parts[1], 0);
+                        const b = GpifParser.parseIntSafe(parts[2], 0);
+                        track.color = new Color(r, g, b, 0xff);
+                    }
+                    break;
+                case 'Instrument':
+                    const instrumentName = c.getAttribute('ref');
+                    if (instrumentName.endsWith('-gs') || instrumentName.endsWith('GrandStaff')) {
+                        track.ensureStaveCount(2);
+                        track.staves[1].showStandardNotation = true;
+                    }
+                    break;
+                case 'InstrumentSet':
+                    this.parseInstrumentSet(track, c);
+                    break;
+                case 'NotationPatch':
+                    this.parseNotationPatch(track, c);
+                    break;
+                case 'ShortName':
+                    track.shortName = c.innerText;
+                    break;
+                case 'SystemsDefautLayout':
+                    track.defaultSystemsLayout = GpifParser.parseIntSafe(c.innerText, 4);
+                    break;
+                case 'SystemsLayout':
+                    track.systemsLayout = GpifParser.splitSafe(c.innerText).map(i => GpifParser.parseIntSafe(i, 4));
+                    break;
+                case 'Lyrics':
+                    this.parseLyrics(trackId, c);
+                    break;
+                case 'Properties':
+                    this.parseTrackProperties(track, c);
+                    break;
+                case 'GeneralMidi':
+                case 'MidiConnection':
+                case 'MIDISettings':
+                    this.parseGeneralMidi(track, c);
+                    break;
+                case 'Sounds':
+                    this.parseSounds(trackId, track, c);
+                    break;
+                case 'PlaybackState':
+                    const state = c.innerText;
+                    track.playbackInfo.isSolo = state === 'Solo';
+                    track.playbackInfo.isMute = state === 'Mute';
+                    break;
+                case 'PartSounding':
+                    this.parsePartSounding(trackId, track, c);
+                    break;
+                case 'Staves':
+                    this.parseStaves(track, c);
+                    break;
+                case 'Transpose':
+                    this.parseTranspose(trackId, track, c);
+                    break;
+                case 'RSE':
+                    this.parseRSE(track, c);
+                    break;
+                case 'Automations':
+                    this.parseTrackAutomations(trackId, c);
+                    break;
+            }
+        }
+        this._tracksById.set(trackId, track);
+    }
+    parseTrackAutomations(trackId, c) {
+        const trackAutomations = new Map();
+        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations);
+        const sustainPedals = new Map();
+        this._sustainPedalsPerTrackIdAndBarIndex.set(trackId, sustainPedals);
+        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId), sustainPedals);
+    }
+    parseNotationPatch(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'LineCount':
+                    const lineCount = GpifParser.parseIntSafe(c.innerText, 5);
+                    for (const staff of track.staves) {
+                        staff.standardNotationLineCount = lineCount;
+                    }
+                    break;
+                case 'Elements':
+                    this.parseElements(track, c);
+                    break;
+            }
+        }
+    }
+    parseInstrumentSet(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Type':
+                    if (c.innerText === 'drumKit') {
+                        for (const staff of track.staves) {
+                            staff.isPercussion = true;
+                        }
+                    }
+                    break;
+                case 'Elements':
+                    this.parseElements(track, c);
+                    break;
+                case 'LineCount':
+                    const lineCount = GpifParser.parseIntSafe(c.innerText, 5);
+                    for (const staff of track.staves) {
+                        staff.standardNotationLineCount = lineCount;
+                    }
+                    break;
+            }
+        }
+    }
+    parseElements(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Element':
+                    this.parseElement(track, c);
+                    break;
+            }
+        }
+    }
+    parseElement(track, node) {
+        const type = node.findChildElement('Type')?.innerText ?? '';
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Name':
+                case 'Articulations':
+                    this.parseArticulations(track, c, type);
+                    break;
+            }
+        }
+    }
+    parseArticulations(track, node, elementType) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Articulation':
+                    this.parseArticulation(track, c, elementType);
+                    break;
+            }
+        }
+    }
+    parseArticulation(track, node, elementType) {
+        const articulation = new InstrumentArticulation();
+        articulation.outputMidiNumber = -1;
+        articulation.elementType = elementType;
+        let name = '';
+        for (const c of node.childElements()) {
+            const txt = c.innerText;
+            switch (c.localName) {
+                case 'Name':
+                    name = c.innerText;
+                    break;
+                case 'OutputMidiNumber':
+                    articulation.outputMidiNumber = GpifParser.parseIntSafe(txt, 0);
+                    break;
+                case 'TechniqueSymbol':
+                    break;
+                case 'TechniquePlacement':
+                    switch (txt) {
+                        case 'outside':
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
+                            break;
+                        case 'inside':
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Inside;
+                            break;
+                        case 'above':
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Above;
+                            break;
+                        case 'below':
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Below;
+                            break;
+                    }
+                    break;
+                case 'Noteheads':
+                    break;
+                case 'StaffLine':
+                    articulation.staffLine = GpifParser.parseIntSafe(txt, 0);
+                    break;
+            }
+        }
+        if (articulation.outputMidiNumber !== -1) {
+            track.percussionArticulations.push(articulation);
+            if (name.length > 0) {
+                this._articulationByName.set(name, articulation);
+            }
+        }
+        else if (name.length > 0 && this._articulationByName.has(name)) {
+            this._articulationByName.get(name).staffLine = articulation.staffLine;
+        }
+    }
+    parseTechniqueSymbol(txt) {
+    }
+    parseNoteHead(txt) {
+    }
+    parseStaves(track, node) {
+        let staffIndex = 0;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Staff':
+                    track.ensureStaveCount(staffIndex + 1);
+                    const staff = track.staves[staffIndex];
+                    this.parseStaff(staff, c);
+                    staffIndex++;
+                    break;
+            }
+        }
+    }
+    parseStaff(staff, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Properties':
+                    this.parseStaffProperties(staff, c);
+                    break;
+            }
+        }
+    }
+    parseStaffProperties(staff, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Property':
+                    this.parseStaffProperty(staff, c);
+                    break;
+            }
+        }
+    }
+    parseStaffProperty(staff, node) {
+        const propertyName = node.getAttribute('name');
+        switch (propertyName) {
+            case 'Tuning':
+                for (const c of node.childElements()) {
+                    switch (c.localName) {
+                        case 'Pitches':
+                            const tuningParts = GpifParser.splitSafe(node.findChildElement('Pitches')?.innerText);
+                            const tuning = new Array(tuningParts.length);
+                            for (let i = 0; i < tuning.length; i++) {
+                                tuning[tuning.length - 1 - i] = GpifParser.parseIntSafe(tuningParts[i], 0);
+                            }
+                            staff.stringTuning.tunings = tuning;
+                            break;
+                        case 'Label':
+                            staff.stringTuning.name = c.innerText;
+                            break;
+                    }
+                }
+                if (!staff.isPercussion) {
+                    staff.showTablature = true;
+                }
+                break;
+            case 'DiagramCollection':
+            case 'ChordCollection':
+                this.parseDiagramCollectionForStaff(staff, node);
+                break;
+            case 'CapoFret':
+                const capo = GpifParser.parseIntSafe(node.findChildElement('Fret')?.innerText, 0);
+                staff.capo = capo;
+                break;
+        }
+    }
+    parseLyrics(trackId, node) {
+        const tracks = [];
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Line':
+                    tracks.push(this.parseLyricsLine(c));
+                    break;
+            }
+        }
+        this._lyricsByTrack.set(trackId, tracks);
+    }
+    parseLyricsLine(node) {
+        const lyrics = new Lyrics();
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Offset':
+                    lyrics.startBar = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'Text':
+                    lyrics.text = c.innerText;
+                    break;
+            }
+        }
+        return lyrics;
+    }
+    parseDiagramCollectionForTrack(track, node) {
+        const items = node.findChildElement('Items');
+        if (items) {
+            for (const c of items.childElements()) {
+                switch (c.localName) {
+                    case 'Item':
+                        this.parseDiagramItemForTrack(track, c);
+                        break;
+                }
+            }
+        }
+    }
+    parseDiagramCollectionForStaff(staff, node) {
+        const items = node.findChildElement('Items');
+        if (items) {
+            for (const c of items.childElements()) {
+                switch (c.localName) {
+                    case 'Item':
+                        this.parseDiagramItemForStaff(staff, c);
+                        break;
+                }
+            }
+        }
+    }
+    parseDiagramItemForTrack(track, node) {
+        const chord = new Chord();
+        const chordId = node.getAttribute('id');
+        for (const staff of track.staves) {
+            staff.addChord(chordId, chord);
+        }
+        this.parseDiagramItemForChord(chord, node);
+    }
+    parseDiagramItemForStaff(staff, node) {
+        const chord = new Chord();
+        const chordId = node.getAttribute('id');
+        staff.addChord(chordId, chord);
+        this.parseDiagramItemForChord(chord, node);
+    }
+    parseDiagramItemForChord(chord, node) {
+        chord.name = node.getAttribute('name');
+        const diagram = node.findChildElement('Diagram');
+        if (!diagram) {
+            chord.showDiagram = false;
+            chord.showFingering = false;
+            return;
+        }
+        const stringCount = GpifParser.parseIntSafe(diagram.getAttribute('stringCount'), 6);
+        const baseFret = GpifParser.parseIntSafe(diagram.getAttribute('baseFret'), 0);
+        chord.firstFret = baseFret + 1;
+        for (let i = 0; i < stringCount; i++) {
+            chord.strings.push(-1);
+        }
+        for (const c of diagram.childElements()) {
+            switch (c.localName) {
+                case 'Fret':
+                    const guitarString = GpifParser.parseIntSafe(c.getAttribute('string'), 0);
+                    chord.strings[stringCount - guitarString - 1] =
+                        baseFret + GpifParser.parseIntSafe(c.getAttribute('fret'), 0);
+                    break;
+                case 'Fingering':
+                    const existingFingers = new Map();
+                    for (const p of c.childElements()) {
+                        switch (p.localName) {
+                            case 'Position':
+                                let finger = Fingers.Unknown;
+                                const fret = baseFret + GpifParser.parseIntSafe(p.getAttribute('fret'), 0);
+                                switch (p.getAttribute('finger')) {
+                                    case 'Index':
+                                        finger = Fingers.IndexFinger;
+                                        break;
+                                    case 'Middle':
+                                        finger = Fingers.MiddleFinger;
+                                        break;
+                                    case 'Rank':
+                                        finger = Fingers.AnnularFinger;
+                                        break;
+                                    case 'Pinky':
+                                        finger = Fingers.LittleFinger;
+                                        break;
+                                    case 'Thumb':
+                                        finger = Fingers.Thumb;
+                                        break;
+                                    case 'None':
+                                        break;
+                                }
+                                if (finger !== Fingers.Unknown) {
+                                    if (existingFingers.has(finger)) {
+                                        chord.barreFrets.push(fret);
+                                    }
+                                    else {
+                                        existingFingers.set(finger, true);
+                                    }
+                                }
+                                break;
+                        }
+                    }
+                    break;
+                case 'Property':
+                    switch (c.getAttribute('name')) {
+                        case 'ShowName':
+                            chord.showName = c.getAttribute('value') === 'true';
+                            break;
+                        case 'ShowDiagram':
+                            chord.showDiagram = c.getAttribute('value') === 'true';
+                            break;
+                        case 'ShowFingering':
+                            chord.showFingering = c.getAttribute('value') === 'true';
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseTrackProperties(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Property':
+                    this.parseTrackProperty(track, c);
+                    break;
+            }
+        }
+    }
+    parseTrackProperty(track, node) {
+        const propertyName = node.getAttribute('name');
+        switch (propertyName) {
+            case 'Tuning':
+                const tuningParts = GpifParser.splitSafe(node.findChildElement('Pitches')?.innerText);
+                const tuning = new Array(tuningParts.length);
+                for (let i = 0; i < tuning.length; i++) {
+                    tuning[tuning.length - 1 - i] = GpifParser.parseIntSafe(tuningParts[i], 0);
+                }
+                for (const staff of track.staves) {
+                    staff.stringTuning.tunings = tuning;
+                    staff.showStandardNotation = true;
+                    staff.showTablature = true;
+                }
+                break;
+            case 'DiagramCollection':
+            case 'ChordCollection':
+                this.parseDiagramCollectionForTrack(track, node);
+                break;
+            case 'CapoFret':
+                const capo = GpifParser.parseIntSafe(node.findChildElement('Fret')?.innerText, 0);
+                for (const staff of track.staves) {
+                    staff.capo = capo;
+                }
+                break;
+        }
+    }
+    parseGeneralMidi(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Program':
+                    track.playbackInfo.program = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'Port':
+                    track.playbackInfo.port = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'PrimaryChannel':
+                    track.playbackInfo.primaryChannel = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'SecondaryChannel':
+                    track.playbackInfo.secondaryChannel = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+            }
+        }
+        const isPercussion = node.getAttribute('table') === 'Percussion';
+        if (isPercussion) {
+            for (const staff of track.staves) {
+                staff.isPercussion = true;
+            }
+        }
+    }
+    parseSounds(trackId, track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Sound':
+                    this.parseSound(trackId, track, c);
+                    break;
+            }
+        }
+    }
+    parseSound(trackId, track, node) {
+        const sound = new GpifSound();
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Name':
+                    sound.name = c.innerText;
+                    break;
+                case 'Path':
+                    sound.path = c.innerText;
+                    break;
+                case 'Role':
+                    sound.role = c.innerText;
+                    break;
+                case 'MIDI':
+                    this.parseSoundMidi(sound, c);
+                    break;
+            }
+        }
+        if (!this._soundsByTrack.has(trackId)) {
+            this._soundsByTrack.set(trackId, new Map());
+            track.playbackInfo.program = sound.program;
+            track.playbackInfo.bank = sound.bank;
+        }
+        this._soundsByTrack.get(trackId).set(sound.uniqueId, sound);
+    }
+    parseSoundMidi(sound, node) {
+        let bankMsb = 0;
+        let bankLsb = 0;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Program':
+                    sound.program = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'MSB':
+                    bankMsb = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'LSB':
+                    bankLsb = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+            }
+        }
+        sound.bank = ((bankMsb & 0x7f) << 7) | bankLsb;
+    }
+    parsePartSounding(trackId, track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'TranspositionPitch':
+                    for (const staff of track.staves) {
+                        staff.displayTranspositionPitch = GpifParser.parseIntSafe(c.innerText, 0);
+                    }
+                    break;
+                case 'NominalKey':
+                    const transposeIndex = Math.max(0, Tuning.noteNames.indexOf(c.innerText));
+                    this._transposeKeySignaturePerTrack.set(trackId, transposeIndex);
+                    break;
+            }
+        }
+    }
+    parseTranspose(trackId, track, node) {
+        let octave = 0;
+        let chromatic = 0;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Chromatic':
+                    chromatic = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'Octave':
+                    octave = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+            }
+        }
+        const pitch = octave * 12 + chromatic;
+        for (const staff of track.staves) {
+            staff.displayTranspositionPitch = pitch;
+        }
+        const transposeIndex = ModelUtils.flooredDivision(pitch, 12);
+        this._transposeKeySignaturePerTrack.set(trackId, transposeIndex);
+    }
+    parseRSE(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'ChannelStrip':
+                    this.parseChannelStrip(track, c);
+                    break;
+            }
+        }
+    }
+    parseChannelStrip(track, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Parameters':
+                    this.parseChannelStripParameters(track, c);
+                    break;
+            }
+        }
+    }
+    parseChannelStripParameters(track, node) {
+        if (node.firstChild && node.firstChild.value) {
+            const parameters = GpifParser.splitSafe(node.firstChild.value);
+            if (parameters.length >= 12) {
+                track.playbackInfo.balance = Math.floor(GpifParser.parseFloatSafe(parameters[11], 0.5) * 16);
+                track.playbackInfo.volume = Math.floor(GpifParser.parseFloatSafe(parameters[12], 0.9) * 16);
+            }
+        }
+    }
+    parseMasterBarsNode(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'MasterBar':
+                    this.parseMasterBar(c);
+                    break;
+            }
+        }
+    }
+    parseMasterBar(node) {
+        const masterBar = new MasterBar();
+        if (this._masterBars.length === 0 && this._hasAnacrusis) {
+            masterBar.isAnacrusis = true;
+        }
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Time':
+                    const timeParts = c.innerText.split('/');
+                    masterBar.timeSignatureNumerator = GpifParser.parseIntSafe(timeParts[0], 4);
+                    masterBar.timeSignatureDenominator = GpifParser.parseIntSafe(timeParts[1], 4);
+                    break;
+                case 'FreeTime':
+                    masterBar.isFreeTime = true;
+                    break;
+                case 'DoubleBar':
+                    masterBar.isDoubleBar = true;
+                    this._doubleBars.add(masterBar);
+                    break;
+                case 'Section':
+                    masterBar.section = new Section();
+                    masterBar.section.marker = c.findChildElement('Letter')?.innerText ?? '';
+                    masterBar.section.text = c.findChildElement('Text')?.innerText ?? '';
+                    break;
+                case 'Repeat':
+                    if (c.getAttribute('start').toLowerCase() === 'true') {
+                        masterBar.isRepeatStart = true;
+                    }
+                    if (c.getAttribute('end').toLowerCase() === 'true' && c.getAttribute('count')) {
+                        masterBar.repeatCount = GpifParser.parseIntSafe(c.getAttribute('count'), 1);
+                    }
+                    break;
+                case 'AlternateEndings':
+                    const alternateEndings = GpifParser.splitSafe(c.innerText);
+                    let i = 0;
+                    for (let k = 0; k < alternateEndings.length; k++) {
+                        i = i | (1 << (-1 + GpifParser.parseIntSafe(alternateEndings[k], 0)));
+                    }
+                    masterBar.alternateEndings = i;
+                    break;
+                case 'Bars':
+                    this._barsOfMasterBar.push(GpifParser.splitSafe(c.innerText));
+                    break;
+                case 'TripletFeel':
+                    switch (c.innerText) {
+                        case 'NoTripletFeel':
+                            masterBar.tripletFeel = TripletFeel.NoTripletFeel;
+                            break;
+                        case 'Triplet8th':
+                            masterBar.tripletFeel = TripletFeel.Triplet8th;
+                            break;
+                        case 'Triplet16th':
+                            masterBar.tripletFeel = TripletFeel.Triplet16th;
+                            break;
+                        case 'Dotted8th':
+                            masterBar.tripletFeel = TripletFeel.Dotted8th;
+                            break;
+                        case 'Dotted16th':
+                            masterBar.tripletFeel = TripletFeel.Dotted16th;
+                            break;
+                        case 'Scottish8th':
+                            masterBar.tripletFeel = TripletFeel.Scottish8th;
+                            break;
+                        case 'Scottish16th':
+                            masterBar.tripletFeel = TripletFeel.Scottish16th;
+                            break;
+                    }
+                    break;
+                case 'Key':
+                    const keySignature = GpifParser.parseIntSafe(c.findChildElement('AccidentalCount')?.innerText, 0);
+                    const mode = c.findChildElement('Mode');
+                    let keySignatureType = KeySignatureType.Major;
+                    if (mode) {
+                        switch (mode.innerText.toLowerCase()) {
+                            case 'major':
+                                keySignatureType = KeySignatureType.Major;
+                                break;
+                            case 'minor':
+                                keySignatureType = KeySignatureType.Minor;
+                                break;
+                        }
+                    }
+                    this._keySignatures.set(this._masterBars.length, [keySignature, keySignatureType]);
+                    break;
+                case 'Fermatas':
+                    this.parseFermatas(masterBar, c);
+                    break;
+                case 'XProperties':
+                    this.parseMasterBarXProperties(masterBar, c);
+                    break;
+                case 'Directions':
+                    this.parseDirections(masterBar, c);
+                    break;
+            }
+        }
+        this._masterBars.push(masterBar);
+    }
+    parseDirections(masterBar, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Target':
+                    switch (c.innerText) {
+                        case 'Coda':
+                            masterBar.addDirection(Direction.TargetCoda);
+                            break;
+                        case 'DoubleCoda':
+                            masterBar.addDirection(Direction.TargetDoubleCoda);
+                            break;
+                        case 'Segno':
+                            masterBar.addDirection(Direction.TargetSegno);
+                            break;
+                        case 'SegnoSegno':
+                            masterBar.addDirection(Direction.TargetSegnoSegno);
+                            break;
+                        case 'Fine':
+                            masterBar.addDirection(Direction.TargetFine);
+                            break;
+                    }
+                    break;
+                case 'Jump':
+                    switch (c.innerText) {
+                        case 'DaCapo':
+                            masterBar.addDirection(Direction.JumpDaCapo);
+                            break;
+                        case 'DaCapoAlCoda':
+                            masterBar.addDirection(Direction.JumpDaCapoAlCoda);
+                            break;
+                        case 'DaCapoAlDoubleCoda':
+                            masterBar.addDirection(Direction.JumpDaCapoAlDoubleCoda);
+                            break;
+                        case 'DaCapoAlFine':
+                            masterBar.addDirection(Direction.JumpDaCapoAlFine);
+                            break;
+                        case 'DaSegno':
+                            masterBar.addDirection(Direction.JumpDalSegno);
+                            break;
+                        case 'DaSegnoAlCoda':
+                            masterBar.addDirection(Direction.JumpDalSegnoAlCoda);
+                            break;
+                        case 'DaSegnoAlDoubleCoda':
+                            masterBar.addDirection(Direction.JumpDalSegnoAlDoubleCoda);
+                            break;
+                        case 'DaSegnoAlFine':
+                            masterBar.addDirection(Direction.JumpDalSegnoAlFine);
+                            break;
+                        case 'DaSegnoSegno':
+                            masterBar.addDirection(Direction.JumpDalSegnoSegno);
+                            break;
+                        case 'DaSegnoSegnoAlCoda':
+                            masterBar.addDirection(Direction.JumpDalSegnoSegnoAlCoda);
+                            break;
+                        case 'DaSegnoSegnoAlDoubleCoda':
+                            masterBar.addDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+                            break;
+                        case 'DaSegnoSegnoAlFine':
+                            masterBar.addDirection(Direction.JumpDalSegnoSegnoAlFine);
+                            break;
+                        case 'DaCoda':
+                            masterBar.addDirection(Direction.JumpDaCoda);
+                            break;
+                        case 'DaDoubleCoda':
+                            masterBar.addDirection(Direction.JumpDaDoubleCoda);
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseFermatas(masterBar, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Fermata':
+                    this.parseFermata(masterBar, c);
+                    break;
+            }
+        }
+    }
+    parseFermata(masterBar, node) {
+        let offset = 0;
+        const fermata = new Fermata();
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Type':
+                    switch (c.innerText) {
+                        case 'Short':
+                            fermata.type = FermataType.Short;
+                            break;
+                        case 'Medium':
+                            fermata.type = FermataType.Medium;
+                            break;
+                        case 'Long':
+                            fermata.type = FermataType.Long;
+                            break;
+                    }
+                    break;
+                case 'Length':
+                    fermata.length = GpifParser.parseFloatSafe(c.innerText, 0);
+                    break;
+                case 'Offset':
+                    const parts = c.innerText.split('/');
+                    if (parts.length === 2) {
+                        const numerator = GpifParser.parseIntSafe(parts[0], 4);
+                        const denominator = GpifParser.parseIntSafe(parts[1], 4);
+                        offset = ((numerator / denominator) * MidiUtils.QuarterTime) | 0;
+                    }
+                    break;
+            }
+        }
+        masterBar.addFermata(offset, fermata);
+    }
+    parseBars(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Bar':
+                    this.parseBar(c);
+                    break;
+            }
+        }
+    }
+    parseBar(node) {
+        const bar = new Bar();
+        const barId = node.getAttribute('id');
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Voices':
+                    this._voicesOfBar.set(barId, GpifParser.splitSafe(c.innerText));
+                    break;
+                case 'Clef':
+                    switch (c.innerText) {
+                        case 'Neutral':
+                            bar.clef = Clef.Neutral;
+                            break;
+                        case 'G2':
+                            bar.clef = Clef.G2;
+                            break;
+                        case 'F4':
+                            bar.clef = Clef.F4;
+                            break;
+                        case 'C4':
+                            bar.clef = Clef.C4;
+                            break;
+                        case 'C3':
+                            bar.clef = Clef.C3;
+                            break;
+                    }
+                    break;
+                case 'Ottavia':
+                    switch (c.innerText) {
+                        case '8va':
+                            bar.clefOttava = Ottavia._8va;
+                            break;
+                        case '15ma':
+                            bar.clefOttava = Ottavia._15ma;
+                            break;
+                        case '8vb':
+                            bar.clefOttava = Ottavia._8vb;
+                            break;
+                        case '15mb':
+                            bar.clefOttava = Ottavia._15mb;
+                            break;
+                    }
+                    break;
+                case 'SimileMark':
+                    switch (c.innerText) {
+                        case 'Simple':
+                            bar.simileMark = SimileMark.Simple;
+                            break;
+                        case 'FirstOfDouble':
+                            bar.simileMark = SimileMark.FirstOfDouble;
+                            break;
+                        case 'SecondOfDouble':
+                            bar.simileMark = SimileMark.SecondOfDouble;
+                            break;
+                    }
+                    break;
+                case 'XProperties':
+                    this.parseBarXProperties(c, bar);
+                    break;
+            }
+        }
+        this._barsById.set(barId, bar);
+    }
+    parseVoices(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Voice':
+                    this.parseVoice(c);
+                    break;
+            }
+        }
+    }
+    parseVoice(node) {
+        const voice = new Voice();
+        const voiceId = node.getAttribute('id');
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Beats':
+                    this._beatsOfVoice.set(voiceId, GpifParser.splitSafe(c.innerText));
+                    break;
+            }
+        }
+        this._voiceById.set(voiceId, voice);
+    }
+    parseBeats(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Beat':
+                    this.parseBeat(c);
+                    break;
+            }
+        }
+    }
+    parseBeat(node) {
+        const beat = new Beat();
+        const beatId = node.getAttribute('id');
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Notes':
+                    this._notesOfBeat.set(beatId, GpifParser.splitSafe(c.innerText));
+                    break;
+                case 'Rhythm':
+                    this._rhythmOfBeat.set(beatId, c.getAttribute('ref'));
+                    break;
+                case 'Fadding':
+                    switch (c.innerText) {
+                        case 'FadeIn':
+                            beat.fade = FadeType.FadeIn;
+                            break;
+                        case 'FadeOut':
+                            beat.fade = FadeType.FadeOut;
+                            break;
+                        case 'VolumeSwell':
+                            beat.fade = FadeType.VolumeSwell;
+                            break;
+                    }
+                    break;
+                case 'Tremolo':
+                    switch (c.innerText) {
+                        case '1/2':
+                            beat.tremoloSpeed = Duration.Eighth;
+                            break;
+                        case '1/4':
+                            beat.tremoloSpeed = Duration.Sixteenth;
+                            break;
+                        case '1/8':
+                            beat.tremoloSpeed = Duration.ThirtySecond;
+                            break;
+                    }
+                    break;
+                case 'Chord':
+                    beat.chordId = c.innerText;
+                    break;
+                case 'Hairpin':
+                    switch (c.innerText) {
+                        case 'Crescendo':
+                            beat.crescendo = CrescendoType.Crescendo;
+                            break;
+                        case 'Decrescendo':
+                            beat.crescendo = CrescendoType.Decrescendo;
+                            break;
+                    }
+                    break;
+                case 'Arpeggio':
+                    if (c.innerText === 'Up') {
+                        beat.brushType = BrushType.ArpeggioUp;
+                    }
+                    else {
+                        beat.brushType = BrushType.ArpeggioDown;
+                    }
+                    break;
+                case 'Properties':
+                    this.parseBeatProperties(c, beat);
+                    break;
+                case 'XProperties':
+                    this.parseBeatXProperties(c, beat);
+                    break;
+                case 'FreeText':
+                    beat.text = c.innerText;
+                    break;
+                case 'TransposedPitchStemOrientation':
+                    switch (c.innerText) {
+                        case 'Upward':
+                            break;
+                        case 'Downward':
+                            break;
+                    }
+                    break;
+                case 'Dynamic':
+                    switch (c.innerText) {
+                        case 'PPP':
+                            beat.dynamics = DynamicValue.PPP;
+                            break;
+                        case 'PP':
+                            beat.dynamics = DynamicValue.PP;
+                            break;
+                        case 'P':
+                            beat.dynamics = DynamicValue.P;
+                            break;
+                        case 'MP':
+                            beat.dynamics = DynamicValue.MP;
+                            break;
+                        case 'MF':
+                            beat.dynamics = DynamicValue.MF;
+                            break;
+                        case 'F':
+                            beat.dynamics = DynamicValue.F;
+                            break;
+                        case 'FF':
+                            beat.dynamics = DynamicValue.FF;
+                            break;
+                        case 'FFF':
+                            beat.dynamics = DynamicValue.FFF;
+                            break;
+                    }
+                    break;
+                case 'GraceNotes':
+                    switch (c.innerText) {
+                        case 'OnBeat':
+                            beat.graceType = GraceType.OnBeat;
+                            break;
+                        case 'BeforeBeat':
+                            beat.graceType = GraceType.BeforeBeat;
+                            break;
+                    }
+                    break;
+                case 'Legato':
+                    if (c.getAttribute('origin') === 'true') {
+                        beat.isLegatoOrigin = true;
+                    }
+                    break;
+                case 'Whammy':
+                    const whammyOrigin = new BendPoint(0, 0);
+                    whammyOrigin.value = this.toBendValue(GpifParser.parseFloatSafe(c.getAttribute('originValue'), 0));
+                    whammyOrigin.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.getAttribute('originOffset'), 0));
+                    beat.addWhammyBarPoint(whammyOrigin);
+                    const whammyMiddle1 = new BendPoint(0, 0);
+                    whammyMiddle1.value = this.toBendValue(GpifParser.parseFloatSafe(c.getAttribute('middleValue'), 0));
+                    whammyMiddle1.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.getAttribute('middleOffset1'), 0));
+                    beat.addWhammyBarPoint(whammyMiddle1);
+                    const whammyMiddle2 = new BendPoint(0, 0);
+                    whammyMiddle2.value = this.toBendValue(GpifParser.parseFloatSafe(c.getAttribute('middleValue'), 0));
+                    whammyMiddle2.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.getAttribute('middleOffset2'), 0));
+                    beat.addWhammyBarPoint(whammyMiddle2);
+                    const whammyDestination = new BendPoint(0, 0);
+                    whammyDestination.value = this.toBendValue(GpifParser.parseFloatSafe(c.getAttribute('destinationValue'), 0));
+                    whammyDestination.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.getAttribute('destinationOffset'), 0));
+                    beat.addWhammyBarPoint(whammyDestination);
+                    break;
+                case 'Ottavia':
+                    switch (c.innerText) {
+                        case '8va':
+                            beat.ottava = Ottavia._8va;
+                            break;
+                        case '8vb':
+                            beat.ottava = Ottavia._8vb;
+                            break;
+                        case '15ma':
+                            beat.ottava = Ottavia._15ma;
+                            break;
+                        case '15mb':
+                            beat.ottava = Ottavia._15mb;
+                            break;
+                    }
+                    break;
+                case 'Lyrics':
+                    beat.lyrics = this.parseBeatLyrics(c);
+                    this._skipApplyLyrics = true;
+                    break;
+                case 'Slashed':
+                    beat.slashed = true;
+                    break;
+                case 'DeadSlapped':
+                    beat.deadSlapped = true;
+                    break;
+                case 'Golpe':
+                    switch (c.innerText) {
+                        case 'Finger':
+                            beat.golpe = GolpeType.Finger;
+                            break;
+                        case 'Thumb':
+                            beat.golpe = GolpeType.Thumb;
+                            break;
+                    }
+                    break;
+                case 'Wah':
+                    switch (c.innerText) {
+                        case 'Open':
+                            beat.wahPedal = WahPedal.Open;
+                            break;
+                        case 'Closed':
+                            beat.wahPedal = WahPedal.Closed;
+                            break;
+                    }
+                    break;
+                case 'UserTransposedPitchStemOrientation':
+                    switch (c.innerText) {
+                        case 'Downward':
+                            break;
+                        case 'Upward':
+                            break;
+                    }
+                    break;
+                case 'Timer':
+                    beat.showTimer = true;
+                    beat.timer = GpifParser.parseIntSafe(c.innerText, -1);
+                    if (beat.timer < 0) {
+                        beat.timer = null;
+                    }
+                    break;
+            }
+        }
+        this._beatById.set(beatId, beat);
+    }
+    parseBeatLyrics(node) {
+        const lines = [];
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Line':
+                    lines.push(c.innerText);
+                    break;
+            }
+        }
+        return lines;
+    }
+    parseBeatXProperties(node, beat) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'XProperty':
+                    const id = c.getAttribute('id');
+                    let value = 0;
+                    switch (id) {
+                        case '1124204546':
+                            value = GpifParser.parseIntSafe(c.findChildElement('Int')?.innerText, 0);
+                            switch (value) {
+                                case 1:
+                                    beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                                    break;
+                                case 2:
+                                    beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
+                                    break;
+                            }
+                            break;
+                        case '1124204552':
+                            value = GpifParser.parseIntSafe(c.findChildElement('Int')?.innerText, 0);
+                            switch (value) {
+                                case 1:
+                                    if (beat.beamingMode !== BeatBeamingMode.ForceSplitToNext) {
+                                        beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
+                                    }
+                                    break;
+                            }
+                            break;
+                        case '1124204545':
+                            value = GpifParser.parseIntSafe(c.findChildElement('Int')?.innerText, 0);
+                            beat.invertBeamDirection = value === 1;
+                            break;
+                        case '687935489':
+                            value = GpifParser.parseIntSafe(c.findChildElement('Int')?.innerText, 0);
+                            beat.brushDuration = value;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseBarXProperties(node, bar) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'XProperty':
+                    const id = c.getAttribute('id');
+                    switch (id) {
+                        case '1124139520':
+                            const childNode = c.findChildElement('Double') ?? c.findChildElement('Float');
+                            bar.displayScale = GpifParser.parseFloatSafe(childNode?.innerText, 1);
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseMasterBarXProperties(masterBar, node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'XProperty':
+                    const id = c.getAttribute('id');
+                    switch (id) {
+                        case '1124073984':
+                            masterBar.displayScale = GpifParser.parseFloatSafe(c.findChildElement('Double')?.innerText, 1);
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseBeatProperties(node, beat) {
+        let isWhammy = false;
+        let whammyOrigin = null;
+        let whammyMiddleValue = null;
+        let whammyMiddleOffset1 = null;
+        let whammyMiddleOffset2 = null;
+        let whammyDestination = null;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Property':
+                    const name = c.getAttribute('name');
+                    switch (name) {
+                        case 'Brush':
+                            if (c.findChildElement('Direction')?.innerText === 'Up') {
+                                beat.brushType = BrushType.BrushUp;
+                            }
+                            else {
+                                beat.brushType = BrushType.BrushDown;
+                            }
+                            break;
+                        case 'PickStroke':
+                            if (c.findChildElement('Direction')?.innerText === 'Up') {
+                                beat.pickStroke = PickStroke.Up;
+                            }
+                            else {
+                                beat.pickStroke = PickStroke.Down;
+                            }
+                            break;
+                        case 'Slapped':
+                            if (c.findChildElement('Enable')) {
+                                beat.slap = true;
+                            }
+                            break;
+                        case 'Popped':
+                            if (c.findChildElement('Enable')) {
+                                beat.pop = true;
+                            }
+                            break;
+                        case 'VibratoWTremBar':
+                            switch (c.findChildElement('Strength')?.innerText) {
+                                case 'Wide':
+                                    beat.vibrato = VibratoType.Wide;
+                                    break;
+                                case 'Slight':
+                                    beat.vibrato = VibratoType.Slight;
+                                    break;
+                            }
+                            break;
+                        case 'WhammyBar':
+                            isWhammy = true;
+                            break;
+                        case 'WhammyBarExtend':
+                            break;
+                        case 'WhammyBarOriginValue':
+                            if (!whammyOrigin) {
+                                whammyOrigin = new BendPoint(0, 0);
+                            }
+                            whammyOrigin.value = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarOriginOffset':
+                            if (!whammyOrigin) {
+                                whammyOrigin = new BendPoint(0, 0);
+                            }
+                            whammyOrigin.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarMiddleValue':
+                            whammyMiddleValue = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarMiddleOffset1':
+                            whammyMiddleOffset1 = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarMiddleOffset2':
+                            whammyMiddleOffset2 = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarDestinationValue':
+                            if (!whammyDestination) {
+                                whammyDestination = new BendPoint(BendPoint.MaxPosition, 0);
+                            }
+                            whammyDestination.value = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'WhammyBarDestinationOffset':
+                            if (!whammyDestination) {
+                                whammyDestination = new BendPoint(0, 0);
+                            }
+                            whammyDestination.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BarreFret':
+                            beat.barreFret = GpifParser.parseIntSafe(c.findChildElement('Fret')?.innerText, 0);
+                            break;
+                        case 'BarreString':
+                            switch (c.findChildElement('String')?.innerText) {
+                                case '0':
+                                    beat.barreShape = BarreShape.Full;
+                                    break;
+                                case '1':
+                                    beat.barreShape = BarreShape.Half;
+                                    break;
+                            }
+                            break;
+                        case 'Rasgueado':
+                            switch (c.findChildElement('Rasgueado')?.innerText) {
+                                case 'ii_1':
+                                    beat.rasgueado = Rasgueado.Ii;
+                                    break;
+                                case 'mi_1':
+                                    beat.rasgueado = Rasgueado.Mi;
+                                    break;
+                                case 'mii_1':
+                                    beat.rasgueado = Rasgueado.MiiTriplet;
+                                    break;
+                                case 'mii_2':
+                                    beat.rasgueado = Rasgueado.MiiAnapaest;
+                                    break;
+                                case 'pmp_1':
+                                    beat.rasgueado = Rasgueado.PmpTriplet;
+                                    break;
+                                case 'pmp_2':
+                                    beat.rasgueado = Rasgueado.PmpAnapaest;
+                                    break;
+                                case 'pei_1':
+                                    beat.rasgueado = Rasgueado.PeiTriplet;
+                                    break;
+                                case 'pei_2':
+                                    beat.rasgueado = Rasgueado.PeiAnapaest;
+                                    break;
+                                case 'pai_1':
+                                    beat.rasgueado = Rasgueado.PaiTriplet;
+                                    break;
+                                case 'pai_2':
+                                    beat.rasgueado = Rasgueado.PaiAnapaest;
+                                    break;
+                                case 'ami_1':
+                                    beat.rasgueado = Rasgueado.AmiTriplet;
+                                    break;
+                                case 'ami_2':
+                                    beat.rasgueado = Rasgueado.AmiAnapaest;
+                                    break;
+                                case 'ppp_1':
+                                    beat.rasgueado = Rasgueado.Ppp;
+                                    break;
+                                case 'amii_1':
+                                    beat.rasgueado = Rasgueado.Amii;
+                                    break;
+                                case 'amip_1':
+                                    beat.rasgueado = Rasgueado.Amip;
+                                    break;
+                                case 'eami_1':
+                                    beat.rasgueado = Rasgueado.Eami;
+                                    break;
+                                case 'eamii_1':
+                                    beat.rasgueado = Rasgueado.Eamii;
+                                    break;
+                                case 'peami_1':
+                                    beat.rasgueado = Rasgueado.Peami;
+                                    break;
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
+        if (isWhammy) {
+            if (!whammyOrigin) {
+                whammyOrigin = new BendPoint(0, 0);
+            }
+            if (!whammyDestination) {
+                whammyDestination = new BendPoint(BendPoint.MaxPosition, 0);
+            }
+            beat.addWhammyBarPoint(whammyOrigin);
+            if (whammyMiddleOffset1 && whammyMiddleValue) {
+                beat.addWhammyBarPoint(new BendPoint(whammyMiddleOffset1, whammyMiddleValue));
+            }
+            if (whammyMiddleOffset2 && whammyMiddleValue) {
+                beat.addWhammyBarPoint(new BendPoint(whammyMiddleOffset2, whammyMiddleValue));
+            }
+            if (!whammyMiddleOffset1 && !whammyMiddleOffset2 && whammyMiddleValue) {
+                beat.addWhammyBarPoint(new BendPoint((BendPoint.MaxPosition / 2) | 0, whammyMiddleValue));
+            }
+            beat.addWhammyBarPoint(whammyDestination);
+        }
+    }
+    parseNotes(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Note':
+                    this.parseNote(c);
+                    break;
+            }
+        }
+    }
+    parseNote(node) {
+        const note = new Note();
+        const noteId = node.getAttribute('id');
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Properties':
+                    this.parseNoteProperties(c, note, noteId);
+                    break;
+                case 'AntiAccent':
+                    if (c.innerText.toLowerCase() === 'normal') {
+                        note.isGhost = true;
+                    }
+                    break;
+                case 'LetRing':
+                    note.isLetRing = true;
+                    break;
+                case 'Trill':
+                    note.trillValue = GpifParser.parseIntSafe(c.innerText, -1);
+                    note.trillSpeed = Duration.Sixteenth;
+                    break;
+                case 'Accent':
+                    const accentFlags = GpifParser.parseIntSafe(c.innerText, 0);
+                    if ((accentFlags & 0x01) !== 0) {
+                        note.isStaccato = true;
+                    }
+                    if ((accentFlags & 0x04) !== 0) {
+                        note.accentuated = AccentuationType.Heavy;
+                    }
+                    if ((accentFlags & 0x08) !== 0) {
+                        note.accentuated = AccentuationType.Normal;
+                    }
+                    if ((accentFlags & 0x10) !== 0) {
+                        note.accentuated = AccentuationType.Tenuto;
+                    }
+                    break;
+                case 'Tie':
+                    if (c.getAttribute('destination').toLowerCase() === 'true') {
+                        note.isTieDestination = true;
+                    }
+                    break;
+                case 'Vibrato':
+                    switch (c.innerText) {
+                        case 'Slight':
+                            note.vibrato = VibratoType.Slight;
+                            break;
+                        case 'Wide':
+                            note.vibrato = VibratoType.Wide;
+                            break;
+                    }
+                    break;
+                case 'LeftFingering':
+                    switch (c.innerText) {
+                        case 'P':
+                            note.leftHandFinger = Fingers.Thumb;
+                            break;
+                        case 'I':
+                            note.leftHandFinger = Fingers.IndexFinger;
+                            break;
+                        case 'M':
+                            note.leftHandFinger = Fingers.MiddleFinger;
+                            break;
+                        case 'A':
+                            note.leftHandFinger = Fingers.AnnularFinger;
+                            break;
+                        case 'C':
+                            note.leftHandFinger = Fingers.LittleFinger;
+                            break;
+                    }
+                    break;
+                case 'RightFingering':
+                    switch (c.innerText) {
+                        case 'P':
+                            note.rightHandFinger = Fingers.Thumb;
+                            break;
+                        case 'I':
+                            note.rightHandFinger = Fingers.IndexFinger;
+                            break;
+                        case 'M':
+                            note.rightHandFinger = Fingers.MiddleFinger;
+                            break;
+                        case 'A':
+                            note.rightHandFinger = Fingers.AnnularFinger;
+                            break;
+                        case 'C':
+                            note.rightHandFinger = Fingers.LittleFinger;
+                            break;
+                    }
+                    break;
+                case 'InstrumentArticulation':
+                    note.percussionArticulation = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'Ornament':
+                    switch (c.innerText) {
+                        case 'Turn':
+                            note.ornament = NoteOrnament.Turn;
+                            break;
+                        case 'InvertedTurn':
+                            note.ornament = NoteOrnament.InvertedTurn;
+                            break;
+                        case 'UpperMordent':
+                            note.ornament = NoteOrnament.UpperMordent;
+                            break;
+                        case 'LowerMordent':
+                            note.ornament = NoteOrnament.LowerMordent;
+                            break;
+                    }
+                    break;
+            }
+        }
+        this._noteById.set(noteId, note);
+    }
+    parseNoteProperties(node, note, noteId) {
+        let isBended = false;
+        let bendOrigin = null;
+        let bendMiddleValue = null;
+        let bendMiddleOffset1 = null;
+        let bendMiddleOffset2 = null;
+        let bendDestination = null;
+        let element = -1;
+        let variation = -1;
+        let hasTransposedPitch = false;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Property':
+                    const name = c.getAttribute('name');
+                    switch (name) {
+                        case 'ShowStringNumber':
+                            if (c.findChildElement('Enable')) {
+                                note.showStringNumber = true;
+                            }
+                            break;
+                        case 'String':
+                            note.string = GpifParser.parseIntSafe(c.findChildElement('String')?.innerText, 0) + 1;
+                            break;
+                        case 'Fret':
+                            note.fret = GpifParser.parseIntSafe(c.findChildElement('Fret')?.innerText, 0);
+                            break;
+                        case 'Element':
+                            element = GpifParser.parseIntSafe(c.findChildElement('Element')?.innerText, 0);
+                            break;
+                        case 'Variation':
+                            variation = GpifParser.parseIntSafe(c.findChildElement('Variation')?.innerText, 0);
+                            break;
+                        case 'Tapped':
+                            this._tappedNotes.set(noteId, true);
+                            break;
+                        case 'HarmonicType':
+                            const htype = c.findChildElement('HType');
+                            if (htype) {
+                                switch (htype.innerText) {
+                                    case 'NoHarmonic':
+                                        note.harmonicType = HarmonicType.None;
+                                        break;
+                                    case 'Natural':
+                                        note.harmonicType = HarmonicType.Natural;
+                                        break;
+                                    case 'Artificial':
+                                        note.harmonicType = HarmonicType.Artificial;
+                                        break;
+                                    case 'Pinch':
+                                        note.harmonicType = HarmonicType.Pinch;
+                                        break;
+                                    case 'Tap':
+                                        note.harmonicType = HarmonicType.Tap;
+                                        break;
+                                    case 'Semi':
+                                        note.harmonicType = HarmonicType.Semi;
+                                        break;
+                                    case 'Feedback':
+                                        note.harmonicType = HarmonicType.Feedback;
+                                        break;
+                                }
+                            }
+                            break;
+                        case 'HarmonicFret':
+                            const hfret = c.findChildElement('HFret');
+                            if (hfret) {
+                                note.harmonicValue = GpifParser.parseFloatSafe(hfret.innerText, 0);
+                            }
+                            break;
+                        case 'Muted':
+                            if (c.findChildElement('Enable')) {
+                                note.isDead = true;
+                            }
+                            break;
+                        case 'PalmMuted':
+                            if (c.findChildElement('Enable')) {
+                                note.isPalmMute = true;
+                            }
+                            break;
+                        case 'Octave':
+                            note.octave = GpifParser.parseIntSafe(c.findChildElement('Number')?.innerText, 0);
+                            if (note.tone === -1) {
+                                note.tone = 0;
+                            }
+                            break;
+                        case 'Tone':
+                            note.tone = GpifParser.parseIntSafe(c.findChildElement('Step')?.innerText, 0);
+                            break;
+                        case 'ConcertPitch':
+                            if (!hasTransposedPitch) {
+                                this.parseConcertPitch(c, note);
+                            }
+                            break;
+                        case 'TransposedPitch':
+                            note.accidentalMode = NoteAccidentalMode.Default;
+                            this.parseConcertPitch(c, note);
+                            hasTransposedPitch = true;
+                            break;
+                        case 'Bended':
+                            isBended = true;
+                            break;
+                        case 'BendOriginValue':
+                            if (!bendOrigin) {
+                                bendOrigin = new BendPoint(0, 0);
+                            }
+                            bendOrigin.value = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendOriginOffset':
+                            if (!bendOrigin) {
+                                bendOrigin = new BendPoint(0, 0);
+                            }
+                            bendOrigin.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendMiddleValue':
+                            bendMiddleValue = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendMiddleOffset1':
+                            bendMiddleOffset1 = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendMiddleOffset2':
+                            bendMiddleOffset2 = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendDestinationValue':
+                            if (!bendDestination) {
+                                bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
+                            }
+                            bendDestination.value = this.toBendValue(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'BendDestinationOffset':
+                            if (!bendDestination) {
+                                bendDestination = new BendPoint(0, 0);
+                            }
+                            bendDestination.offset = this.toBendOffset(GpifParser.parseFloatSafe(c.findChildElement('Float')?.innerText, 0));
+                            break;
+                        case 'HopoOrigin':
+                            if (c.findChildElement('Enable')) {
+                                note.isHammerPullOrigin = true;
+                            }
+                            break;
+                        case 'HopoDestination':
+                            break;
+                        case 'LeftHandTapped':
+                            note.isLeftHandTapped = true;
+                            break;
+                        case 'Slide':
+                            const slideFlags = GpifParser.parseIntSafe(c.findChildElement('Flags')?.innerText, 0);
+                            if ((slideFlags & 1) !== 0) {
+                                note.slideOutType = SlideOutType.Shift;
+                            }
+                            else if ((slideFlags & 2) !== 0) {
+                                note.slideOutType = SlideOutType.Legato;
+                            }
+                            else if ((slideFlags & 4) !== 0) {
+                                note.slideOutType = SlideOutType.OutDown;
+                            }
+                            else if ((slideFlags & 8) !== 0) {
+                                note.slideOutType = SlideOutType.OutUp;
+                            }
+                            if ((slideFlags & 16) !== 0) {
+                                note.slideInType = SlideInType.IntoFromBelow;
+                            }
+                            else if ((slideFlags & 32) !== 0) {
+                                note.slideInType = SlideInType.IntoFromAbove;
+                            }
+                            if ((slideFlags & 64) !== 0) {
+                                note.slideOutType = SlideOutType.PickSlideDown;
+                            }
+                            else if ((slideFlags & 128) !== 0) {
+                                note.slideOutType = SlideOutType.PickSlideUp;
+                            }
+                            break;
+                    }
+                    break;
+            }
+        }
+        if (isBended) {
+            if (!bendOrigin) {
+                bendOrigin = new BendPoint(0, 0);
+            }
+            if (!bendDestination) {
+                bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
+            }
+            note.addBendPoint(bendOrigin);
+            if (bendMiddleOffset1 && bendMiddleValue) {
+                note.addBendPoint(new BendPoint(bendMiddleOffset1, bendMiddleValue));
+            }
+            if (bendMiddleOffset2 && bendMiddleValue) {
+                note.addBendPoint(new BendPoint(bendMiddleOffset2, bendMiddleValue));
+            }
+            if (!bendMiddleOffset1 && !bendMiddleOffset2 && bendMiddleValue) {
+                note.addBendPoint(new BendPoint((BendPoint.MaxPosition / 2) | 0, bendMiddleValue));
+            }
+            note.addBendPoint(bendDestination);
+        }
+        if (element !== -1 && variation !== -1) {
+        }
+    }
+    parseConcertPitch(node, note) {
+        const pitch = node.findChildElement('Pitch');
+        if (pitch) {
+            for (const c of pitch.childElements()) {
+                switch (c.localName) {
+                    case 'Accidental':
+                        switch (c.innerText) {
+                            case 'x':
+                                note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                                break;
+                            case '#':
+                                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                                break;
+                            case 'b':
+                                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                                break;
+                            case 'bb':
+                                note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
+    }
+    toBendValue(gpxValue) {
+        return (gpxValue * GpifParser.BendPointValueFactor) | 0;
+    }
+    toBendOffset(gpxOffset) {
+        return gpxOffset * GpifParser.BendPointPositionFactor;
+    }
+    parseRhythms(node) {
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Rhythm':
+                    this.parseRhythm(c);
+                    break;
+            }
+        }
+    }
+    parseRhythm(node) {
+        const rhythm = new GpifRhythm();
+        const rhythmId = node.getAttribute('id');
+        rhythm.id = rhythmId;
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'NoteValue':
+                    switch (c.innerText) {
+                        case 'Long':
+                            rhythm.value = Duration.QuadrupleWhole;
+                            break;
+                        case 'DoubleWhole':
+                            rhythm.value = Duration.DoubleWhole;
+                            break;
+                        case 'Whole':
+                            rhythm.value = Duration.Whole;
+                            break;
+                        case 'Half':
+                            rhythm.value = Duration.Half;
+                            break;
+                        case 'Quarter':
+                            rhythm.value = Duration.Quarter;
+                            break;
+                        case 'Eighth':
+                            rhythm.value = Duration.Eighth;
+                            break;
+                        case '16th':
+                            rhythm.value = Duration.Sixteenth;
+                            break;
+                        case '32nd':
+                            rhythm.value = Duration.ThirtySecond;
+                            break;
+                        case '64th':
+                            rhythm.value = Duration.SixtyFourth;
+                            break;
+                        case '128th':
+                            rhythm.value = Duration.OneHundredTwentyEighth;
+                            break;
+                        case '256th':
+                            rhythm.value = Duration.TwoHundredFiftySixth;
+                            break;
+                    }
+                    break;
+                case 'PrimaryTuplet':
+                    rhythm.tupletNumerator = GpifParser.parseIntSafe(c.getAttribute('num'), -1);
+                    rhythm.tupletDenominator = GpifParser.parseIntSafe(c.getAttribute('den'), -1);
+                    break;
+                case 'AugmentationDot':
+                    rhythm.dots = GpifParser.parseIntSafe(c.getAttribute('count'), 0);
+                    break;
+            }
+        }
+        this._rhythmById.set(rhythmId, rhythm);
+    }
+    buildModel() {
+        for (let i = 0, j = this._masterBars.length; i < j; i++) {
+            const masterBar = this._masterBars[i];
+            this.score.addMasterBar(masterBar);
+        }
+        const lastMasterBar = this._masterBars[this._masterBars.length - 1];
+        if (this._doubleBars.has(lastMasterBar)) {
+            this._doubleBars.delete(lastMasterBar);
+            lastMasterBar.isDoubleBar = false;
+        }
+        const trackIndexToTrackId = [];
+        for (const trackId of this._tracksMapping) {
+            if (!trackId) {
+                continue;
+            }
+            const track = this._tracksById.get(trackId);
+            this.score.addTrack(track);
+            trackIndexToTrackId.push(trackId);
+        }
+        let keySignature;
+        for (const barIds of this._barsOfMasterBar) {
+            let staffIndex = 0;
+            let trackIndex = 0;
+            keySignature = [KeySignature.C, KeySignatureType.Major];
+            if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[0])) {
+                keySignature = [
+                    ModelUtils.transposeKey(keySignature[0], this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[0])),
+                    keySignature[1]
+                ];
+            }
+            for (let barIndex = 0; barIndex < barIds.length && trackIndex < this.score.tracks.length; barIndex++) {
+                const barId = barIds[barIndex];
+                if (barId !== GpifParser.InvalidId) {
+                    const bar = this._barsById.get(barId);
+                    const track = this.score.tracks[trackIndex];
+                    const staff = track.staves[staffIndex];
+                    staff.addBar(bar);
+                    const masterBarIndex = staff.bars.length - 1;
+                    if (this._keySignatures.has(masterBarIndex)) {
+                        keySignature = this._keySignatures.get(masterBarIndex);
+                        if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
+                            keySignature = [
+                                ModelUtils.transposeKey(keySignature[0], this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])),
+                                keySignature[1]
+                            ];
+                        }
+                    }
+                    bar.keySignature = keySignature[0];
+                    bar.keySignatureType = keySignature[1];
+                    if (this._doubleBars.has(bar.masterBar)) {
+                        bar.barLineRight = BarLineStyle.LightLight;
+                    }
+                    if (this._voicesOfBar.has(barId)) {
+                        for (const voiceId of this._voicesOfBar.get(barId)) {
+                            if (voiceId !== GpifParser.InvalidId) {
+                                const voice = this._voiceById.get(voiceId);
+                                bar.addVoice(voice);
+                                if (this._beatsOfVoice.has(voiceId)) {
+                                    for (const beatId of this._beatsOfVoice.get(voiceId)) {
+                                        if (beatId !== GpifParser.InvalidId) {
+                                            const beat = BeatCloner.clone(this._beatById.get(beatId));
+                                            voice.addBeat(beat);
+                                            const rhythmId = this._rhythmOfBeat.get(beatId);
+                                            const rhythm = this._rhythmById.get(rhythmId);
+                                            beat.duration = rhythm.value;
+                                            beat.dots = rhythm.dots;
+                                            beat.tupletNumerator = rhythm.tupletNumerator;
+                                            beat.tupletDenominator = rhythm.tupletDenominator;
+                                            if (this._notesOfBeat.has(beatId)) {
+                                                for (const noteId of this._notesOfBeat.get(beatId)) {
+                                                    if (noteId !== GpifParser.InvalidId) {
+                                                        const note = NoteCloner.clone(this._noteById.get(noteId));
+                                                        if (staff.isPercussion) {
+                                                            note.fret = -1;
+                                                            note.string = -1;
+                                                        }
+                                                        else {
+                                                            note.percussionArticulation = -1;
+                                                        }
+                                                        beat.addNote(note);
+                                                        if (this._tappedNotes.has(noteId)) {
+                                                            beat.tap = true;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                const voice = new Voice();
+                                bar.addVoice(voice);
+                                const beat = new Beat();
+                                beat.isEmpty = true;
+                                beat.duration = Duration.Quarter;
+                                voice.addBeat(beat);
+                            }
+                        }
+                    }
+                    if (staffIndex === track.staves.length - 1) {
+                        trackIndex++;
+                        staffIndex = 0;
+                    }
+                    else {
+                        staffIndex++;
+                    }
+                    keySignature = [KeySignature.C, KeySignatureType.Major];
+                    if (trackIndex < trackIndexToTrackId.length &&
+                        this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
+                        keySignature = [
+                            ModelUtils.transposeKey(keySignature[0], this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])),
+                            keySignature[1]
+                        ];
+                    }
+                }
+                else {
+                    trackIndex++;
+                }
+            }
+        }
+        for (const trackId of this._tracksMapping) {
+            if (!trackId) {
+                continue;
+            }
+            const track = this._tracksById.get(trackId);
+            let hasPercussion = false;
+            for (const staff of track.staves) {
+                if (staff.isPercussion) {
+                    hasPercussion = true;
+                    break;
+                }
+            }
+            if (!hasPercussion) {
+                track.percussionArticulations = [];
+            }
+            if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
+                const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId);
+                for (const [barNumber, automations] of trackAutomations) {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
+                            const beat = bar.voices[0].beats[0];
+                            for (const a of automations) {
+                                const skip = a.type === AutomationType.Bank && a.value === 0 && bar.index === 0;
+                                if (!skip) {
+                                    beat.automations.push(a);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if (this._sustainPedalsPerTrackIdAndBarIndex.has(trackId)) {
+                const sustainPedals = this._sustainPedalsPerTrackIdAndBarIndex.get(trackId);
+                for (const [barNumber, markers] of sustainPedals) {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        bar.sustainPedals = markers;
+                    }
+                }
+            }
+        }
+        for (const [barNumber, automations] of this._masterTrackAutomations) {
+            const masterBar = this.score.masterBars[barNumber];
+            for (let i = 0, j = automations.length; i < j; i++) {
+                const automation = automations[i];
+                switch (automation.type) {
+                    case AutomationType.Tempo:
+                        if (barNumber === 0) {
+                            this.score.tempo = automation.value | 0;
+                            if (automation.text) {
+                                this.score.tempoLabel = automation.text;
+                            }
+                        }
+                        masterBar.tempoAutomations.push(automation);
+                        break;
+                    case AutomationType.SyncPoint:
+                        automation.syncPointValue.millisecondOffset -= this._backingTrackPadding;
+                        masterBar.addSyncPoint(automation);
+                        break;
+                }
+            }
+        }
+    }
+}
+GpifParser.InvalidId = '-1';
+GpifParser.BendPointPositionFactor = BendPoint.MaxPosition / 100.0;
+GpifParser.BendPointValueFactor = 1 / 25.0;
+GpifParser.SampleRate = 44100;
+var DataType;
+(function (DataType) {
+    DataType[DataType["Boolean"] = 0] = "Boolean";
+    DataType[DataType["Integer"] = 1] = "Integer";
+    DataType[DataType["Float"] = 2] = "Float";
+    DataType[DataType["String"] = 3] = "String";
+    DataType[DataType["Point"] = 4] = "Point";
+    DataType[DataType["Size"] = 5] = "Size";
+    DataType[DataType["Rectangle"] = 6] = "Rectangle";
+    DataType[DataType["Color"] = 7] = "Color";
+})(DataType || (DataType = {}));
+class BinaryStylesheet {
+    constructor(data) {
+        this._types = new Map();
+        this.raw = new Map();
+        if (data) {
+            this.read(data);
+        }
+    }
+    read(data) {
+        const readable = ByteBuffer.fromBuffer(data);
+        const entryCount = IOHelper.readInt32BE(readable);
+        for (let i = 0; i < entryCount; i++) {
+            const key = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
+            const type = readable.readByte();
+            this._types.set(key, type);
+            switch (type) {
+                case DataType.Boolean:
+                    const flag = readable.readByte() === 1;
+                    this.addValue(key, flag);
+                    break;
+                case DataType.Integer:
+                    const ivalue = IOHelper.readInt32BE(readable);
+                    this.addValue(key, ivalue);
+                    break;
+                case DataType.Float:
+                    const fvalue = IOHelper.readFloat32BE(readable);
+                    this.addValue(key, fvalue);
+                    break;
+                case DataType.String:
+                    const s = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
+                    this.addValue(key, s);
+                    break;
+                case DataType.Point:
+                    const x = IOHelper.readInt32BE(readable);
+                    const y = IOHelper.readInt32BE(readable);
+                    this.addValue(key, new BendPoint(x, y));
+                    break;
+                case DataType.Size:
+                    const width = IOHelper.readInt32BE(readable);
+                    const height = IOHelper.readInt32BE(readable);
+                    this.addValue(key, new BendPoint(width, height));
+                    break;
+                case DataType.Rectangle:
+                    break;
+                case DataType.Color:
+                    const color = GpBinaryHelpers.gpReadColor(readable, true);
+                    this.addValue(key, color);
+                    break;
+            }
+        }
+    }
+    apply(score) {
+    }
+    addValue(key, value, type) {
+        this.raw.set(key, value);
+        if (type !== undefined) {
+            this._types.set(key, type);
+        }
+    }
+    writeTo(writer) {
+        IOHelper.writeInt32BE(writer, this.raw.size);
+        for (const [k, v] of this.raw) {
+            const dataType = this.getDataType(k, v);
+            GpBinaryHelpers.gpWriteString(writer, k);
+            writer.writeByte(dataType);
+            switch (dataType) {
+                case DataType.Boolean:
+                    writer.writeByte(v ? 1 : 0);
+                    break;
+                case DataType.Integer:
+                    IOHelper.writeInt32BE(writer, v);
+                    break;
+                case DataType.Float:
+                    IOHelper.writeFloat32BE(writer, v);
+                    break;
+                case DataType.String:
+                    const encoded = IOHelper.stringToBytes(v);
+                    IOHelper.writeInt16BE(writer, encoded.length);
+                    writer.write(encoded, 0, encoded.length);
+                    break;
+                case DataType.Point:
+                    IOHelper.writeInt32BE(writer, v.offset);
+                    IOHelper.writeInt32BE(writer, v.value);
+                    break;
+                case DataType.Size:
+                    IOHelper.writeInt32BE(writer, v.offset);
+                    IOHelper.writeInt32BE(writer, v.value);
+                    break;
+                case DataType.Rectangle:
+                    break;
+                case DataType.Color:
+                    writer.writeByte(v.r);
+                    writer.writeByte(v.g);
+                    writer.writeByte(v.b);
+                    writer.writeByte(v.a);
+                    break;
+            }
+        }
+    }
+    getDataType(key, value) {
+        if (this._types.has(key)) {
+            return this._types.get(key);
+        }
+        const type = typeof value;
+        switch (typeof value) {
+            case 'string':
+                return DataType.String;
+            case 'number':
+                const withoutFraction = value | 0;
+                return value === withoutFraction ? DataType.Integer : DataType.Float;
+            case 'object':
+                if (value instanceof BendPoint) {
+                    return DataType.Point;
+                }
+                if (value instanceof Color) {
+                    return DataType.Color;
+                }
+                break;
+        }
+        throw new AlphaTabError(AlphaTabErrorType.General, `Unknown value type in BinaryStylesheet: ${type}`);
+    }
+    static addHeaderAndFooter(binaryStylesheet, style, prefix, name) {
+        binaryStylesheet.addValue(`${prefix}${name}`, style.template, DataType.String);
+        if (style.isVisible !== undefined) {
+            binaryStylesheet.addValue(`${prefix}draw${name}`, style.isVisible, DataType.Boolean);
+        }
+    }
+}
 class Lazy {
     constructor(factory) {
         this._value = undefined;
@@ -4806,6 +7523,2408 @@ class Lazy {
             this._value = this._factory();
         }
         return this._value;
+    }
+}
+var XmlNodeType;
+(function (XmlNodeType) {
+    XmlNodeType[XmlNodeType["None"] = 0] = "None";
+    XmlNodeType[XmlNodeType["Element"] = 1] = "Element";
+    XmlNodeType[XmlNodeType["Text"] = 2] = "Text";
+    XmlNodeType[XmlNodeType["CDATA"] = 3] = "CDATA";
+    XmlNodeType[XmlNodeType["Document"] = 4] = "Document";
+    XmlNodeType[XmlNodeType["DocumentType"] = 5] = "DocumentType";
+    XmlNodeType[XmlNodeType["Comment"] = 6] = "Comment";
+})(XmlNodeType || (XmlNodeType = {}));
+class XmlNode {
+    constructor() {
+        this.nodeType = XmlNodeType.None;
+        this.localName = null;
+        this.value = null;
+        this.childNodes = [];
+        this.attributes = new Map();
+        this.firstChild = null;
+        this.firstElement = null;
+    }
+    *childElements() {
+        for (const c of this.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                yield c;
+            }
+        }
+    }
+    addChild(node) {
+        this.childNodes.push(node);
+        this.firstChild = node;
+        if (node.nodeType === XmlNodeType.Element || node.nodeType === XmlNodeType.CDATA) {
+            this.firstElement = node;
+        }
+    }
+    getAttribute(name, defaultValue = '') {
+        if (this.attributes.has(name)) {
+            return this.attributes.get(name);
+        }
+        return defaultValue;
+    }
+    getElementsByTagName(name, recursive = false) {
+        const tags = [];
+        this.searchElementsByTagName(this.childNodes, tags, name, recursive);
+        return tags;
+    }
+    searchElementsByTagName(all, result, name, recursive = false) {
+        for (const c of all) {
+            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
+                result.push(c);
+            }
+            if (recursive) {
+                this.searchElementsByTagName(c.childNodes, result, name, true);
+            }
+        }
+    }
+    findChildElement(name) {
+        for (const c of this.childNodes) {
+            if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
+                return c;
+            }
+        }
+        return null;
+    }
+    addElement(name) {
+        const newNode = new XmlNode();
+        newNode.nodeType = XmlNodeType.Element;
+        newNode.localName = name;
+        this.addChild(newNode);
+        return newNode;
+    }
+    get innerText() {
+        if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
+            if (this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
+                return this.firstElement.innerText;
+            }
+            let txt = '';
+            for (const c of this.childNodes) {
+                txt += c.innerText?.toString();
+            }
+            const s = txt;
+            return s.trim();
+        }
+        return this.value ?? '';
+    }
+    set innerText(value) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.Text;
+        textNode.value = value;
+        this.childNodes = [textNode];
+    }
+    setCData(s) {
+        const textNode = new XmlNode();
+        textNode.nodeType = XmlNodeType.CDATA;
+        textNode.value = s;
+        this.childNodes = [textNode];
+    }
+}
+class XmlDocument extends XmlNode {
+    constructor() {
+        super();
+        this.nodeType = XmlNodeType.Document;
+    }
+    parse(xml) {
+        XmlParser.parse(xml, 0, this);
+    }
+    toString() {
+        return this.toFormattedString();
+    }
+    toFormattedString(indention = '', xmlHeader = false) {
+        return XmlWriter.write(this, indention, xmlHeader);
+    }
+}
+class XmlError extends AlphaTabError {
+    constructor(message, xml, pos) {
+        super(AlphaTabErrorType.Format, message);
+        this.pos = 0;
+        this.xml = xml;
+        this.pos = pos;
+        Object.setPrototypeOf(this, XmlError.prototype);
+    }
+}
+var XmlState;
+(function (XmlState) {
+    XmlState[XmlState["IgnoreSpaces"] = 0] = "IgnoreSpaces";
+    XmlState[XmlState["Begin"] = 1] = "Begin";
+    XmlState[XmlState["BeginNode"] = 2] = "BeginNode";
+    XmlState[XmlState["TagName"] = 3] = "TagName";
+    XmlState[XmlState["Body"] = 4] = "Body";
+    XmlState[XmlState["AttribName"] = 5] = "AttribName";
+    XmlState[XmlState["Equals"] = 6] = "Equals";
+    XmlState[XmlState["AttvalBegin"] = 7] = "AttvalBegin";
+    XmlState[XmlState["AttribVal"] = 8] = "AttribVal";
+    XmlState[XmlState["Childs"] = 9] = "Childs";
+    XmlState[XmlState["Close"] = 10] = "Close";
+    XmlState[XmlState["WaitEnd"] = 11] = "WaitEnd";
+    XmlState[XmlState["WaitEndRet"] = 12] = "WaitEndRet";
+    XmlState[XmlState["Pcdata"] = 13] = "Pcdata";
+    XmlState[XmlState["Header"] = 14] = "Header";
+    XmlState[XmlState["Comment"] = 15] = "Comment";
+    XmlState[XmlState["Doctype"] = 16] = "Doctype";
+    XmlState[XmlState["Cdata"] = 17] = "Cdata";
+    XmlState[XmlState["Escape"] = 18] = "Escape";
+})(XmlState || (XmlState = {}));
+class XmlParser {
+    static parse(str, p, parent) {
+        let c = str.charCodeAt(p);
+        let state = XmlState.Begin;
+        let next = XmlState.Begin;
+        let start = 0;
+        let buf = '';
+        let escapeNext = XmlState.Begin;
+        let xml = null;
+        let aname = null;
+        let nbrackets = 0;
+        let attrValQuote = 0;
+        while (p < str.length) {
+            c = str.charCodeAt(p);
+            switch (state) {
+                case XmlState.IgnoreSpaces:
+                    switch (c) {
+                        case XmlParser.CharCodeLF:
+                        case XmlParser.CharCodeCR:
+                        case XmlParser.CharCodeTab:
+                        case XmlParser.CharCodeSpace:
+                            break;
+                        default:
+                            state = next;
+                            continue;
+                    }
+                    break;
+                case XmlState.Begin:
+                    switch (c) {
+                        case XmlParser.CharCodeLowerThan:
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.BeginNode;
+                            break;
+                        default:
+                            start = p;
+                            state = XmlState.Pcdata;
+                            continue;
+                    }
+                    break;
+                case XmlState.Pcdata:
+                    if (c === XmlParser.CharCodeLowerThan) {
+                        buf += str.substr(start, p - start);
+                        const child = new XmlNode();
+                        child.nodeType = XmlNodeType.Text;
+                        child.value = buf;
+                        buf = '';
+                        parent.addChild(child);
+                        state = XmlState.IgnoreSpaces;
+                        next = XmlState.BeginNode;
+                    }
+                    else if (c === XmlParser.CharCodeAmp) {
+                        buf += str.substr(start, p - start);
+                        state = XmlState.Escape;
+                        escapeNext = XmlState.Pcdata;
+                        start = p + 1;
+                    }
+                    break;
+                case XmlState.Cdata:
+                    if (c === XmlParser.CharCodeBrackedClose &&
+                        str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedClose &&
+                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan) {
+                        const child = new XmlNode();
+                        child.nodeType = XmlNodeType.CDATA;
+                        child.value = str.substr(start, p - start);
+                        parent.addChild(child);
+                        p += 2;
+                        state = XmlState.Begin;
+                    }
+                    break;
+                case XmlState.BeginNode:
+                    switch (c) {
+                        case XmlParser.CharCodeExclamation:
+                            if (str.charCodeAt(p + 1) === XmlParser.CharCodeBrackedOpen) {
+                                p += 2;
+                                if (str.substr(p, 6).toUpperCase() !== 'CDATA[') {
+                                    throw new XmlError('Expected <![CDATA[', str, p);
+                                }
+                                p += 5;
+                                state = XmlState.Cdata;
+                                start = p + 1;
+                            }
+                            else if (str.charCodeAt(p + 1) === XmlParser.CharCodeUpperD ||
+                                str.charCodeAt(p + 1) === XmlParser.CharCodeLowerD) {
+                                if (str.substr(p + 2, 6).toUpperCase() !== 'OCTYPE') {
+                                    throw new XmlError('Expected <!DOCTYPE', str, p);
+                                }
+                                p += 8;
+                                state = XmlState.Doctype;
+                                start = p + 1;
+                            }
+                            else if (str.charCodeAt(p + 1) !== XmlParser.CharCodeMinus ||
+                                str.charCodeAt(p + 2) !== XmlParser.CharCodeMinus) {
+                                throw new XmlError('Expected <!--', str, p);
+                            }
+                            else {
+                                p += 2;
+                                state = XmlState.Comment;
+                                start = p + 1;
+                            }
+                            break;
+                        case XmlParser.CharCodeQuestion:
+                            state = XmlState.Header;
+                            start = p;
+                            break;
+                        case XmlParser.CharCodeSlash:
+                            if (!parent) {
+                                throw new XmlError('Expected node name', str, p);
+                            }
+                            start = p + 1;
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.Close;
+                            break;
+                        default:
+                            state = XmlState.TagName;
+                            start = p;
+                            continue;
+                    }
+                    break;
+                case XmlState.TagName:
+                    if (!XmlParser.isValidChar(c)) {
+                        if (p === start) {
+                            throw new XmlError('Expected node name', str, p);
+                        }
+                        xml = new XmlNode();
+                        xml.nodeType = XmlNodeType.Element;
+                        xml.localName = str.substr(start, p - start);
+                        parent.addChild(xml);
+                        state = XmlState.IgnoreSpaces;
+                        next = XmlState.Body;
+                        continue;
+                    }
+                    break;
+                case XmlState.Body:
+                    switch (c) {
+                        case XmlParser.CharCodeSlash:
+                            state = XmlState.WaitEnd;
+                            break;
+                        case XmlParser.CharCodeGreaterThan:
+                            state = XmlState.Childs;
+                            break;
+                        default:
+                            state = XmlState.AttribName;
+                            start = p;
+                            continue;
+                    }
+                    break;
+                case XmlState.AttribName:
+                    if (!XmlParser.isValidChar(c)) {
+                        if (start === p) {
+                            throw new XmlError('Expected attribute name', str, p);
+                        }
+                        const tmp = str.substr(start, p - start);
+                        aname = tmp;
+                        if (xml.attributes.has(aname)) {
+                            throw new XmlError(`Duplicate attribute [${aname}]`, str, p);
+                        }
+                        state = XmlState.IgnoreSpaces;
+                        next = XmlState.Equals;
+                        continue;
+                    }
+                    break;
+                case XmlState.Equals:
+                    switch (c) {
+                        case XmlParser.CharCodeEquals:
+                            state = XmlState.IgnoreSpaces;
+                            next = XmlState.AttvalBegin;
+                            break;
+                        default:
+                            throw new XmlError('Expected =', str, p);
+                    }
+                    break;
+                case XmlState.AttvalBegin:
+                    switch (c) {
+                        case XmlParser.CharCodeDoubleQuote:
+                        case XmlParser.CharCodeSingleQuote:
+                            buf = '';
+                            state = XmlState.AttribVal;
+                            start = p + 1;
+                            attrValQuote = c;
+                            break;
+                    }
+                    break;
+                case XmlState.AttribVal:
+                    switch (c) {
+                        case XmlParser.CharCodeAmp:
+                            buf += str.substr(start, p - start);
+                            state = XmlState.Escape;
+                            escapeNext = XmlState.AttribVal;
+                            start = p + 1;
+                            break;
+                        default:
+                            if (c === attrValQuote) {
+                                buf += str.substr(start, p - start);
+                                const value = buf;
+                                buf = '';
+                                xml.attributes.set(aname, value);
+                                state = XmlState.IgnoreSpaces;
+                                next = XmlState.Body;
+                            }
+                            break;
+                    }
+                    break;
+                case XmlState.Childs:
+                    p = XmlParser.parse(str, p, xml);
+                    start = p;
+                    state = XmlState.Begin;
+                    break;
+                case XmlState.WaitEnd:
+                    switch (c) {
+                        case XmlParser.CharCodeGreaterThan:
+                            state = XmlState.Begin;
+                            break;
+                        default:
+                            throw new XmlError('Expected >', str, p);
+                    }
+                    break;
+                case XmlState.WaitEndRet:
+                    switch (c) {
+                        case XmlParser.CharCodeGreaterThan:
+                            return p;
+                        default:
+                            throw new XmlError('Expected >', str, p);
+                    }
+                case XmlState.Close:
+                    if (!XmlParser.isValidChar(c)) {
+                        if (start === p) {
+                            throw new XmlError('Expected node name', str, p);
+                        }
+                        const v = str.substr(start, p - start);
+                        if (v !== parent.localName) {
+                            throw new XmlError(`Expected </${parent.localName}>`, str, p);
+                        }
+                        state = XmlState.IgnoreSpaces;
+                        next = XmlState.WaitEndRet;
+                        continue;
+                    }
+                    break;
+                case XmlState.Comment:
+                    if (c === XmlParser.CharCodeMinus &&
+                        str.charCodeAt(p + 1) === XmlParser.CharCodeMinus &&
+                        str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan) {
+                        p += 2;
+                        state = XmlState.Begin;
+                    }
+                    break;
+                case XmlState.Doctype:
+                    if (c === XmlParser.CharCodeBrackedOpen) {
+                        nbrackets++;
+                    }
+                    else if (c === XmlParser.CharCodeBrackedClose) {
+                        nbrackets--;
+                    }
+                    else if (c === XmlParser.CharCodeGreaterThan && nbrackets === 0) {
+                        const node = new XmlNode();
+                        node.nodeType = XmlNodeType.DocumentType;
+                        node.value = str.substr(start, p - start);
+                        parent.addChild(node);
+                        state = XmlState.Begin;
+                    }
+                    break;
+                case XmlState.Header:
+                    if (c === XmlParser.CharCodeQuestion && str.charCodeAt(p + 1) === XmlParser.CharCodeGreaterThan) {
+                        p++;
+                        state = XmlState.Begin;
+                    }
+                    break;
+                case XmlState.Escape:
+                    if (c === XmlParser.CharCodeSemi) {
+                        const s = str.substr(start, p - start);
+                        if (s.charCodeAt(0) === XmlParser.CharCodeSharp) {
+                            const code = s.charCodeAt(1) === XmlParser.CharCodeLowerX
+                                ? Number.parseInt(`0${s.substr(1, s.length - 1)}`, 10)
+                                : Number.parseInt(s.substr(1, s.length - 1), 10);
+                            buf += String.fromCharCode(code);
+                        }
+                        else if (XmlParser.Escapes.has(s)) {
+                            buf += XmlParser.Escapes.get(s);
+                        }
+                        else {
+                            buf += `&${s};`?.toString();
+                        }
+                        start = p + 1;
+                        state = escapeNext;
+                    }
+                    else if (!XmlParser.isValidChar(c) && c !== XmlParser.CharCodeSharp) {
+                        buf += '&';
+                        buf += str.substr(start, p - start);
+                        p--;
+                        start = p + 1;
+                        state = escapeNext;
+                    }
+                    break;
+            }
+            p++;
+        }
+        if (state === XmlState.Begin) {
+            start = p;
+            state = XmlState.Pcdata;
+        }
+        if (state === XmlState.Pcdata) {
+            if (p !== start) {
+                buf += str.substr(start, p - start);
+                const node = new XmlNode();
+                node.nodeType = XmlNodeType.Text;
+                node.value = buf;
+                parent.addChild(node);
+            }
+            return p;
+        }
+        if (state === XmlState.Escape && escapeNext === XmlState.Pcdata) {
+            buf += '&';
+            buf += str.substr(start, p - start);
+            const node = new XmlNode();
+            node.nodeType = XmlNodeType.Text;
+            node.value = buf;
+            parent.addChild(node);
+            return p;
+        }
+        throw new XmlError('Unexpected end', str, p);
+    }
+    static isValidChar(c) {
+        return ((c >= XmlParser.CharCodeLowerA && c <= XmlParser.CharCodeLowerZ) ||
+            (c >= XmlParser.CharCodeUpperA && c <= XmlParser.CharCodeUpperZ) ||
+            (c >= XmlParser.CharCode0 && c <= XmlParser.CharCode9) ||
+            c === XmlParser.CharCodeColon ||
+            c === XmlParser.CharCodeDot ||
+            c === XmlParser.CharCodeUnderscore ||
+            c === XmlParser.CharCodeMinus);
+    }
+}
+XmlParser.CharCodeLF = 10;
+XmlParser.CharCodeTab = 9;
+XmlParser.CharCodeCR = 13;
+XmlParser.CharCodeSpace = 32;
+XmlParser.CharCodeLowerThan = 60;
+XmlParser.CharCodeAmp = 38;
+XmlParser.CharCodeBrackedClose = 93;
+XmlParser.CharCodeBrackedOpen = 91;
+XmlParser.CharCodeGreaterThan = 62;
+XmlParser.CharCodeExclamation = 33;
+XmlParser.CharCodeUpperD = 68;
+XmlParser.CharCodeLowerD = 100;
+XmlParser.CharCodeMinus = 45;
+XmlParser.CharCodeQuestion = 63;
+XmlParser.CharCodeSlash = 47;
+XmlParser.CharCodeEquals = 61;
+XmlParser.CharCodeDoubleQuote = 34;
+XmlParser.CharCodeSingleQuote = 39;
+XmlParser.CharCodeSharp = 35;
+XmlParser.CharCodeLowerX = 120;
+XmlParser.CharCodeLowerA = 97;
+XmlParser.CharCodeLowerZ = 122;
+XmlParser.CharCodeUpperA = 65;
+XmlParser.CharCodeUpperZ = 90;
+XmlParser.CharCode0 = 48;
+XmlParser.CharCode9 = 57;
+XmlParser.CharCodeColon = 58;
+XmlParser.CharCodeDot = 46;
+XmlParser.CharCodeUnderscore = 95;
+XmlParser.CharCodeSemi = 59;
+XmlParser.Escapes = new Map([
+    ['lt', '<'],
+    ['gt', '>'],
+    ['amp', '&'],
+    ['quot', '"'],
+    ['apos', "'"]
+]);
+class XmlWriter {
+    constructor(indention, xmlHeader) {
+        this._result = [];
+        this._indention = indention;
+        this._xmlHeader = xmlHeader;
+        this._currentIndention = '';
+        this._isStartOfLine = true;
+    }
+    writeNode(xml) {
+        switch (xml.nodeType) {
+            case XmlNodeType.None:
+                break;
+            case XmlNodeType.Element:
+                if (this._result.length > 0) {
+                    this.writeLine();
+                }
+                this.write(`<${xml.localName}`);
+                for (const [name, value] of xml.attributes) {
+                    this.write(` ${name}="`);
+                    this.writeAttributeValue(value);
+                    this.write('"');
+                }
+                if (xml.childNodes.length === 0) {
+                    this.write('/>');
+                }
+                else {
+                    this.write('>');
+                    if (xml.childNodes.length === 1 && !xml.firstElement) {
+                        this.writeNode(xml.childNodes[0]);
+                    }
+                    else {
+                        this.indent();
+                        for (const child of xml.childNodes) {
+                            if (child.nodeType === XmlNodeType.Element || child.nodeType === XmlNodeType.Comment) {
+                                this.writeNode(child);
+                            }
+                        }
+                        this.unindend();
+                        this.writeLine();
+                    }
+                    this.write(`</${xml.localName}>`);
+                }
+                break;
+            case XmlNodeType.Text:
+                if (xml.value) {
+                    this.write(xml.value);
+                }
+                break;
+            case XmlNodeType.CDATA:
+                if (xml.value !== null) {
+                    this.write(`<![CDATA[${xml.value}]]>`);
+                }
+                break;
+            case XmlNodeType.Document:
+                if (this._xmlHeader) {
+                    this.write('<?xml version="1.0" encoding="utf-8"?>');
+                }
+                for (const child of xml.childNodes) {
+                    this.writeNode(child);
+                }
+                break;
+            case XmlNodeType.DocumentType:
+                this.write(`<!DOCTYPE ${xml.value}>`);
+                break;
+            case XmlNodeType.Comment:
+                this.write(`<!-- ${xml.value} -->`);
+                break;
+        }
+    }
+    unindend() {
+        this._currentIndention = this._currentIndention.substr(0, this._currentIndention.length - this._indention.length);
+    }
+    indent() {
+        this._currentIndention += this._indention;
+    }
+    writeAttributeValue(value) {
+        for (let i = 0; i < value.length; i++) {
+            const c = value.charAt(i);
+            switch (c) {
+                case '<':
+                    this._result.push('&lt;');
+                    break;
+                case '>':
+                    this._result.push('&gt;');
+                    break;
+                case '&':
+                    this._result.push('&amp;');
+                    break;
+                case "'":
+                    this._result.push('&apos;');
+                    break;
+                case '"':
+                    this._result.push('&quot;');
+                    break;
+                default:
+                    this._result.push(c);
+                    break;
+            }
+        }
+    }
+    static write(xml, indention, xmlHeader) {
+        const writer = new XmlWriter(indention, xmlHeader);
+        writer.writeNode(xml);
+        return writer.toString();
+    }
+    write(s) {
+        if (this._isStartOfLine) {
+            this._result.push(this._currentIndention);
+        }
+        this._result.push(s);
+        this._isStartOfLine = false;
+    }
+    writeLine(s = null) {
+        if (s) {
+            this.write(s);
+        }
+        if (this._indention.length > 0 && !this._isStartOfLine) {
+            this._result.push('\n');
+            this._isStartOfLine = true;
+        }
+    }
+    toString() {
+        return this._result.join('').trimRight();
+    }
+}
+class BeatCloner {
+    static clone(original) {
+        const clone = new Beat();
+        clone.index = original.index;
+        clone.notes = [];
+        for (const i of original.notes) {
+            clone.addNote(NoteCloner.clone(i));
+        }
+        clone.isEmpty = original.isEmpty;
+        clone.whammyStyle = original.whammyStyle;
+        clone.ottava = original.ottava;
+        clone.isLegatoOrigin = original.isLegatoOrigin;
+        clone.duration = original.duration;
+        clone.isLetRing = original.isLetRing;
+        clone.isPalmMute = original.isPalmMute;
+        clone.automations = [];
+        for (const i of original.automations) {
+            clone.automations.push(AutomationCloner.clone(i));
+        }
+        clone.dots = original.dots;
+        clone.fade = original.fade;
+        clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
+        clone.pop = original.pop;
+        clone.slap = original.slap;
+        clone.tap = original.tap;
+        clone.text = original.text;
+        clone.slashed = original.slashed;
+        clone.deadSlapped = original.deadSlapped;
+        clone.brushType = original.brushType;
+        clone.brushDuration = original.brushDuration;
+        clone.tupletDenominator = original.tupletDenominator;
+        clone.tupletNumerator = original.tupletNumerator;
+        clone.isContinuedWhammy = original.isContinuedWhammy;
+        clone.whammyBarType = original.whammyBarType;
+        if (original.whammyBarPoints) {
+            clone.whammyBarPoints = [];
+            for (const i of original.whammyBarPoints) {
+                clone.addWhammyBarPoint(BendPointCloner.clone(i));
+            }
+        }
+        clone.vibrato = original.vibrato;
+        clone.chordId = original.chordId;
+        clone.graceType = original.graceType;
+        clone.pickStroke = original.pickStroke;
+        clone.tremoloSpeed = original.tremoloSpeed;
+        clone.crescendo = original.crescendo;
+        clone.displayStart = original.displayStart;
+        clone.playbackStart = original.playbackStart;
+        clone.displayDuration = original.displayDuration;
+        clone.playbackDuration = original.playbackDuration;
+        clone.overrideDisplayDuration = original.overrideDisplayDuration;
+        clone.golpe = original.golpe;
+        clone.dynamics = original.dynamics;
+        clone.invertBeamDirection = original.invertBeamDirection;
+        clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
+        clone.beamingMode = original.beamingMode;
+        clone.wahPedal = original.wahPedal;
+        clone.barreFret = original.barreFret;
+        clone.barreShape = original.barreShape;
+        clone.rasgueado = original.rasgueado;
+        clone.showTimer = original.showTimer;
+        clone.timer = original.timer;
+        return clone;
+    }
+}
+class NoteCloner {
+    static clone(original) {
+        const clone = new Note();
+        clone.index = original.index;
+        clone.accentuated = original.accentuated;
+        clone.bendType = original.bendType;
+        clone.bendStyle = original.bendStyle;
+        clone.isContinuedBend = original.isContinuedBend;
+        if (original.bendPoints) {
+            clone.bendPoints = [];
+            for (const i of original.bendPoints) {
+                clone.addBendPoint(BendPointCloner.clone(i));
+            }
+        }
+        clone.fret = original.fret;
+        clone.string = original.string;
+        clone.showStringNumber = original.showStringNumber;
+        clone.octave = original.octave;
+        clone.tone = original.tone;
+        clone.percussionArticulation = original.percussionArticulation;
+        clone.isVisible = original.isVisible;
+        clone.isLeftHandTapped = original.isLeftHandTapped;
+        clone.isHammerPullOrigin = original.isHammerPullOrigin;
+        clone.isSlurDestination = original.isSlurDestination;
+        clone.harmonicType = original.harmonicType;
+        clone.harmonicValue = original.harmonicValue;
+        clone.isGhost = original.isGhost;
+        clone.isLetRing = original.isLetRing;
+        clone.isPalmMute = original.isPalmMute;
+        clone.isDead = original.isDead;
+        clone.isStaccato = original.isStaccato;
+        clone.slideInType = original.slideInType;
+        clone.slideOutType = original.slideOutType;
+        clone.vibrato = original.vibrato;
+        clone.isTieDestination = original.isTieDestination;
+        clone.leftHandFinger = original.leftHandFinger;
+        clone.rightHandFinger = original.rightHandFinger;
+        clone.trillValue = original.trillValue;
+        clone.trillSpeed = original.trillSpeed;
+        clone.durationPercent = original.durationPercent;
+        clone.accidentalMode = original.accidentalMode;
+        clone.dynamics = original.dynamics;
+        clone.ornament = original.ornament;
+        return clone;
+    }
+}
+class BendPointCloner {
+    static clone(original) {
+        const clone = new BendPoint();
+        clone.offset = original.offset;
+        clone.value = original.value;
+        return clone;
+    }
+}
+class AutomationCloner {
+    static clone(original) {
+        const clone = new Automation();
+        clone.isLinear = original.isLinear;
+        clone.type = original.type;
+        clone.value = original.value;
+        clone.syncPointValue = original.syncPointValue ? SyncPointDataCloner.clone(original.syncPointValue) : undefined;
+        clone.ratioPosition = original.ratioPosition;
+        clone.text = original.text;
+        return clone;
+    }
+}
+class SyncPointDataCloner {
+    static clone(original) {
+        const clone = new SyncPointData();
+        clone.barOccurence = original.barOccurence;
+        clone.millisecondOffset = original.millisecondOffset;
+        return clone;
+    }
+}
+class Adler32 {
+    constructor() {
+        this.value = 1;
+        this.reset();
+    }
+    reset() {
+        this.value = 1;
+    }
+    update(data, offset, count) {
+        let s1 = this.value & 0xffff;
+        let s2 = this.value >> 16;
+        while (count > 0) {
+            let n = 3800;
+            if (n > count) {
+                n = count;
+            }
+            count -= n;
+            while (--n >= 0) {
+                s1 = s1 + (data[offset++] & 0xff);
+                s2 = s2 + s1;
+            }
+            s1 %= Adler32.Base;
+            s2 %= Adler32.Base;
+        }
+        this.value = (s2 << 16) | s1;
+    }
+}
+Adler32.Base = 65521;
+class Crc32 {
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
+    static buildCrc32Lookup() {
+        const poly = 0xedb88320;
+        const lookup = new Uint32Array(256);
+        for (let i = 0; i < lookup.length; i++) {
+            let crc = i;
+            for (let bit = 0; bit < 8; bit++) {
+                crc = (crc & 1) === 1 ? (crc >>> 1) ^ poly : crc >>> 1;
+            }
+            lookup[i] = crc;
+        }
+        return lookup;
+    }
+    get value() {
+        return ~this._checkValue;
+    }
+    update(data, offset, count) {
+        for (let i = 0; i < count; i++) {
+            this._checkValue =
+                Crc32.Crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
+        }
+    }
+    reset() {
+        this._checkValue = Crc32.CrcInit;
+    }
+}
+Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
+Crc32.CrcInit = 0xffffffff;
+class Deflater {
+    constructor() {
+        this._state = 0;
+        this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
+        this._engine = new DeflaterEngine(this._pending);
+        this.reset();
+    }
+    get inputCrc() {
+        return this._engine.inputCrc.value;
+    }
+    get isNeedingInput() {
+        return this._engine.needsInput();
+    }
+    get isFinished() {
+        return this._state === Deflater.FinishedState && this._pending.isFlushed;
+    }
+    reset() {
+        this._state = Deflater.BusyState;
+        this._pending.reset();
+        this._engine.reset();
+    }
+    setInput(input, offset, count) {
+        this._engine.setInput(input, offset, count);
+    }
+    deflate(output, offset, length) {
+        const origLength = length;
+        while (true) {
+            const count = this._pending.flush(output, offset, length);
+            offset += count;
+            length -= count;
+            if (length === 0 || this._state === Deflater.FinishedState) {
+                break;
+            }
+            if (!this._engine.deflate((this._state & Deflater.IsFlushing) !== 0, (this._state & Deflater.IsFinishing) !== 0)) {
+                switch (this._state) {
+                    case Deflater.BusyState:
+                        return origLength - length;
+                    case Deflater.FlushingState:
+                        let neededbits = 8 + (-this._pending.bitCount & 7);
+                        while (neededbits > 0) {
+                            this._pending.writeBits(2, 10);
+                            neededbits -= 10;
+                        }
+                        this._state = Deflater.BusyState;
+                        break;
+                    case Deflater.FinishingState:
+                        this._pending.alignToByte();
+                        this._state = Deflater.FinishedState;
+                        break;
+                }
+            }
+        }
+        return origLength - length;
+    }
+    finish() {
+        this._state |= Deflater.IsFlushing | Deflater.IsFinishing;
+    }
+}
+Deflater.IsFlushing = 0x04;
+Deflater.IsFinishing = 0x08;
+Deflater.BusyState = 0x10;
+Deflater.FlushingState = 0x14;
+Deflater.FinishingState = 0x1c;
+Deflater.FinishedState = 0x1e;
+class DeflaterConstants {
+}
+DeflaterConstants.MAX_WBITS = 15;
+DeflaterConstants.WSIZE = 1 << DeflaterConstants.MAX_WBITS;
+DeflaterConstants.WMASK = DeflaterConstants.WSIZE - 1;
+DeflaterConstants.MIN_MATCH = 3;
+DeflaterConstants.MAX_MATCH = 258;
+DeflaterConstants.DEFAULT_MEM_LEVEL = 8;
+DeflaterConstants.PENDING_BUF_SIZE = 1 << (DeflaterConstants.DEFAULT_MEM_LEVEL + 8);
+DeflaterConstants.HASH_BITS = DeflaterConstants.DEFAULT_MEM_LEVEL + 7;
+DeflaterConstants.HASH_SIZE = 1 << DeflaterConstants.HASH_BITS;
+DeflaterConstants.HASH_SHIFT = (DeflaterConstants.HASH_BITS + DeflaterConstants.MIN_MATCH - 1) / DeflaterConstants.MIN_MATCH;
+DeflaterConstants.HASH_MASK = DeflaterConstants.HASH_SIZE - 1;
+DeflaterConstants.MIN_LOOKAHEAD = DeflaterConstants.MAX_MATCH + DeflaterConstants.MIN_MATCH + 1;
+DeflaterConstants.MAX_DIST = DeflaterConstants.WSIZE - DeflaterConstants.MIN_LOOKAHEAD;
+class DeflaterEngine {
+    constructor(pending) {
+        this.maxChain = 128;
+        this.niceLength = 128;
+        this.goodLength = 8;
+        this.insertHashIndex = 0;
+        this.lookahead = 0;
+        this.inputBuf = null;
+        this.inputOff = 0;
+        this.inputEnd = 0;
+        this.prevAvailable = false;
+        this.matchStart = 0;
+        this.matchLen = 0;
+        this.pending = pending;
+        this.huffman = new DeflaterHuffman(pending);
+        this.inputCrc = new Crc32();
+        this.window = new Uint8Array(2 * DeflaterConstants.WSIZE);
+        this.head = new Int16Array(DeflaterConstants.HASH_SIZE);
+        this.prev = new Int16Array(DeflaterConstants.WSIZE);
+        this.blockStart = 1;
+        this.strstart = 1;
+    }
+    reset() {
+        this.huffman.reset();
+        this.inputCrc.reset();
+        this.blockStart = 1;
+        this.strstart = 1;
+        this.lookahead = 0;
+        this.prevAvailable = false;
+        this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+        for (let i = 0; i < DeflaterConstants.HASH_SIZE; i++) {
+            this.head[i] = 0;
+        }
+        for (let i = 0; i < DeflaterConstants.WSIZE; i++) {
+            this.prev[i] = 0;
+        }
+    }
+    updateHash() {
+        this.insertHashIndex =
+            (this.window[this.strstart] << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + 1];
+    }
+    needsInput() {
+        return this.inputEnd === this.inputOff;
+    }
+    setInput(buffer, offset, count) {
+        const end = offset + count;
+        this.inputBuf = buffer;
+        this.inputOff = offset;
+        this.inputEnd = end;
+    }
+    deflate(flush, finish) {
+        let progress;
+        do {
+            this.fillWindow();
+            const canFlush = flush && this.inputOff === this.inputEnd;
+            progress = this.deflateSlow(canFlush, finish);
+        } while (this.pending.isFlushed && progress);
+        return progress;
+    }
+    deflateSlow(flush, finish) {
+        if (this.lookahead < DeflaterConstants.MIN_LOOKAHEAD && !flush) {
+            return false;
+        }
+        while (this.lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush) {
+            if (this.lookahead === 0) {
+                if (this.prevAvailable) {
+                    this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
+                }
+                this.prevAvailable = false;
+                this.huffman.flushBlock(this.window, this.blockStart, this.strstart - this.blockStart, finish);
+                this.blockStart = this.strstart;
+                return false;
+            }
+            if (this.strstart >= 2 * DeflaterConstants.WSIZE - DeflaterConstants.MIN_LOOKAHEAD) {
+                this.slideWindow();
+            }
+            const prevMatch = this.matchStart;
+            let prevLen = this.matchLen;
+            if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
+                const hashHead = this.insertString();
+                if (hashHead !== 0 &&
+                    this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
+                    this.findLongestMatch(hashHead)) {
+                    if (this.matchLen === DeflaterConstants.MIN_MATCH &&
+                        this.strstart - this.matchStart > DeflaterEngine.TooFar) {
+                        this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+                    }
+                }
+            }
+            if (prevLen >= DeflaterConstants.MIN_MATCH && this.matchLen <= prevLen) {
+                this.huffman.tallyDist(this.strstart - 1 - prevMatch, prevLen);
+                prevLen -= 2;
+                do {
+                    this.strstart++;
+                    this.lookahead--;
+                    if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
+                        this.insertString();
+                    }
+                } while (--prevLen > 0);
+                this.strstart++;
+                this.lookahead--;
+                this.prevAvailable = false;
+                this.matchLen = DeflaterConstants.MIN_MATCH - 1;
+            }
+            else {
+                if (this.prevAvailable) {
+                    this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
+                }
+                this.prevAvailable = true;
+                this.strstart++;
+                this.lookahead--;
+            }
+            if (this.huffman.isFull()) {
+                let len = this.strstart - this.blockStart;
+                if (this.prevAvailable) {
+                    len--;
+                }
+                const lastBlock = finish && this.lookahead === 0 && !this.prevAvailable;
+                this.huffman.flushBlock(this.window, this.blockStart, len, lastBlock);
+                this.blockStart += len;
+                return !lastBlock;
+            }
+        }
+        return true;
+    }
+    findLongestMatch(curMatch) {
+        let match;
+        let scan = this.strstart;
+        const scanMax = scan + Math.min(DeflaterConstants.MAX_MATCH, this.lookahead) - 1;
+        const limit = Math.max(scan - DeflaterConstants.MAX_DIST, 0);
+        const window = this.window;
+        const prev = this.prev;
+        let chainLength = this.maxChain;
+        const niceLength = Math.min(this.niceLength, this.lookahead);
+        this.matchLen = Math.max(this.matchLen, DeflaterConstants.MIN_MATCH - 1);
+        if (scan + this.matchLen > scanMax) {
+            return false;
+        }
+        let scan_end1 = window[scan + this.matchLen - 1];
+        let scan_end = window[scan + this.matchLen];
+        if (this.matchLen >= this.goodLength) {
+            chainLength >>= 2;
+        }
+        do {
+            match = curMatch;
+            scan = this.strstart;
+            if (window[match + this.matchLen] !== scan_end ||
+                window[match + this.matchLen - 1] !== scan_end1 ||
+                window[match] !== window[scan] ||
+                window[++match] !== window[++scan]) {
+                continue;
+            }
+            switch ((scanMax - scan) % 8) {
+                case 1:
+                    if (window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 2:
+                    if (window[++scan] === window[++match] && window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 3:
+                    if (window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 4:
+                    if (window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 5:
+                    if (window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 6:
+                    if (window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+                case 7:
+                    if (window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match] &&
+                        window[++scan] === window[++match]) {
+                        break;
+                    }
+                    break;
+            }
+            if (window[scan] === window[match]) {
+                do {
+                    if (scan === scanMax) {
+                        ++scan;
+                        ++match;
+                        break;
+                    }
+                } while (window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match] &&
+                    window[++scan] === window[++match]);
+            }
+            if (scan - this.strstart > this.matchLen) {
+                this.matchStart = curMatch;
+                this.matchLen = scan - this.strstart;
+                if (this.matchLen >= niceLength) {
+                    break;
+                }
+                scan_end1 = window[scan - 1];
+                scan_end = window[scan];
+            }
+            curMatch = prev[curMatch & DeflaterConstants.WMASK] & 0xffff;
+        } while (curMatch > limit && 0 !== --chainLength);
+        return this.matchLen >= DeflaterConstants.MIN_MATCH;
+    }
+    insertString() {
+        const hash = ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^
+            this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) &
+            DeflaterConstants.HASH_MASK;
+        const match = this.head[hash];
+        this.prev[this.strstart & DeflaterConstants.WMASK] = match;
+        this.head[hash] = this.strstart;
+        this.insertHashIndex = hash;
+        return match & 0xffff;
+    }
+    fillWindow() {
+        if (this.strstart >= DeflaterConstants.WSIZE + DeflaterConstants.MAX_DIST) {
+            this.slideWindow();
+        }
+        if (this.lookahead < DeflaterConstants.MIN_LOOKAHEAD && this.inputOff < this.inputEnd) {
+            let more = 2 * DeflaterConstants.WSIZE - this.lookahead - this.strstart;
+            if (more > this.inputEnd - this.inputOff) {
+                more = this.inputEnd - this.inputOff;
+            }
+            this.window.set(this.inputBuf.subarray(this.inputOff, this.inputOff + more), this.strstart + this.lookahead);
+            this.inputCrc.update(this.inputBuf, this.inputOff, more);
+            this.inputOff += more;
+            this.lookahead += more;
+        }
+        if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
+            this.updateHash();
+        }
+    }
+    slideWindow() {
+        this.window.set(this.window.subarray(DeflaterConstants.WSIZE, DeflaterConstants.WSIZE + DeflaterConstants.WSIZE), 0);
+        this.matchStart -= DeflaterConstants.WSIZE;
+        this.strstart -= DeflaterConstants.WSIZE;
+        this.blockStart -= DeflaterConstants.WSIZE;
+        for (let i = 0; i < DeflaterConstants.HASH_SIZE; ++i) {
+            const m = this.head[i] & 0xffff;
+            this.head[i] = m >= DeflaterConstants.WSIZE ? m - DeflaterConstants.WSIZE : 0;
+        }
+        for (let i = 0; i < DeflaterConstants.WSIZE; i++) {
+            const m = this.prev[i] & 0xffff;
+            this.prev[i] = m >= DeflaterConstants.WSIZE ? m - DeflaterConstants.WSIZE : 0;
+        }
+    }
+}
+DeflaterEngine.TooFar = 4096;
+class Tree {
+    constructor(dh, elems, minCodes, maxLength) {
+        this.length = null;
+        this.numCodes = 0;
+        this.codes = null;
+        this.huffman = dh;
+        this.minNumCodes = minCodes;
+        this.maxLength = maxLength;
+        this.freqs = new Int16Array(elems);
+        this.bitLengthCounts = new Int32Array(maxLength);
+    }
+    reset() {
+        for (let i = 0; i < this.freqs.length; i++) {
+            this.freqs[i] = 0;
+        }
+        this.codes = null;
+        this.length = null;
+    }
+    buildTree() {
+        const numSymbols = this.freqs.length;
+        const heap = new Int32Array(numSymbols);
+        let heapLen = 0;
+        let maxCode = 0;
+        for (let n = 0; n < numSymbols; n++) {
+            const freq = this.freqs[n];
+            if (freq !== 0) {
+                let pos = heapLen++;
+                while (true) {
+                    if (pos > 0) {
+                        const ppos = Math.floor((pos - 1) / 2);
+                        if (this.freqs[heap[ppos]] > freq) {
+                            heap[pos] = heap[ppos];
+                            pos = ppos;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                    else {
+                        break;
+                    }
+                }
+                heap[pos] = n;
+                maxCode = n;
+            }
+        }
+        while (heapLen < 2) {
+            const node = maxCode < 2 ? ++maxCode : 0;
+            heap[heapLen++] = node;
+        }
+        this.numCodes = Math.max(maxCode + 1, this.minNumCodes);
+        const numLeafs = heapLen;
+        const childs = new Int32Array(4 * heapLen - 2);
+        const values = new Int32Array(2 * heapLen - 1);
+        let numNodes = numLeafs;
+        for (let i = 0; i < heapLen; i++) {
+            const node = heap[i];
+            childs[2 * i] = node;
+            childs[2 * i + 1] = -1;
+            values[i] = this.freqs[node] << 8;
+            heap[i] = i;
+        }
+        do {
+            const first = heap[0];
+            let last = heap[--heapLen];
+            let ppos = 0;
+            let path = 1;
+            while (path < heapLen) {
+                if (path + 1 < heapLen && values[heap[path]] > values[heap[path + 1]]) {
+                    path++;
+                }
+                heap[ppos] = heap[path];
+                ppos = path;
+                path = path * 2 + 1;
+            }
+            let lastVal = values[last];
+            while (true) {
+                path = ppos;
+                if (ppos > 0) {
+                    ppos = Math.floor((path - 1) / 2);
+                    if (values[heap[ppos]] > lastVal) {
+                        heap[path] = heap[ppos];
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+            heap[path] = last;
+            const second = heap[0];
+            last = numNodes++;
+            childs[2 * last] = first;
+            childs[2 * last + 1] = second;
+            const mindepth = Math.min(values[first] & 0xff, values[second] & 0xff);
+            lastVal = values[first] + values[second] - mindepth + 1;
+            values[last] = lastVal;
+            ppos = 0;
+            path = 1;
+            while (path < heapLen) {
+                if (path + 1 < heapLen && values[heap[path]] > values[heap[path + 1]]) {
+                    path++;
+                }
+                heap[ppos] = heap[path];
+                ppos = path;
+                path = ppos * 2 + 1;
+            }
+            while (true) {
+                path = ppos;
+                if (path > 0) {
+                    ppos = Math.floor((path - 1) / 2);
+                    if (values[heap[ppos]] > lastVal) {
+                        heap[path] = heap[ppos];
+                    }
+                    else {
+                        break;
+                    }
+                }
+                else {
+                    break;
+                }
+            }
+            heap[path] = last;
+        } while (heapLen > 1);
+        this.buildLength(childs);
+    }
+    buildLength(childs) {
+        this.length = new Uint8Array(this.freqs.length);
+        const numNodes = Math.floor(childs.length / 2);
+        const numLeafs = Math.floor((numNodes + 1) / 2);
+        let overflow = 0;
+        for (let i = 0; i < this.maxLength; i++) {
+            this.bitLengthCounts[i] = 0;
+        }
+        const lengths = new Int32Array(numNodes);
+        lengths[numNodes - 1] = 0;
+        for (let i = numNodes - 1; i >= 0; i--) {
+            if (childs[2 * i + 1] !== -1) {
+                let bitLength = lengths[i] + 1;
+                if (bitLength > this.maxLength) {
+                    bitLength = this.maxLength;
+                    overflow++;
+                }
+                lengths[childs[2 * i]] = bitLength;
+                lengths[childs[2 * i + 1]] = bitLength;
+            }
+            else {
+                const bitLength = lengths[i];
+                this.bitLengthCounts[bitLength - 1]++;
+                this.length[childs[2 * i]] = lengths[i];
+            }
+        }
+        if (overflow === 0) {
+            return;
+        }
+        let incrBitLen = this.maxLength - 1;
+        do {
+            while (this.bitLengthCounts[--incrBitLen] === 0) { }
+            do {
+                this.bitLengthCounts[incrBitLen]--;
+                this.bitLengthCounts[++incrBitLen]++;
+                overflow -= 1 << (this.maxLength - 1 - incrBitLen);
+            } while (overflow > 0 && incrBitLen < this.maxLength - 1);
+        } while (overflow > 0);
+        this.bitLengthCounts[this.maxLength - 1] += overflow;
+        this.bitLengthCounts[this.maxLength - 2] -= overflow;
+        let nodePtr = 2 * numLeafs;
+        for (let bits = this.maxLength; bits !== 0; bits--) {
+            let n = this.bitLengthCounts[bits - 1];
+            while (n > 0) {
+                const childPtr = 2 * childs[nodePtr++];
+                if (childs[childPtr + 1] === -1) {
+                    this.length[childs[childPtr]] = bits;
+                    n--;
+                }
+            }
+        }
+    }
+    getEncodedLength() {
+        let len = 0;
+        for (let i = 0; i < this.freqs.length; i++) {
+            len += this.freqs[i] * this.length[i];
+        }
+        return len;
+    }
+    calcBLFreq(blTree) {
+        let max_count;
+        let min_count;
+        let count;
+        let curlen = -1;
+        let i = 0;
+        while (i < this.numCodes) {
+            count = 1;
+            const nextlen = this.length[i];
+            if (nextlen === 0) {
+                max_count = 138;
+                min_count = 3;
+            }
+            else {
+                max_count = 6;
+                min_count = 3;
+                if (curlen !== nextlen) {
+                    blTree.freqs[nextlen]++;
+                    count = 0;
+                }
+            }
+            curlen = nextlen;
+            i++;
+            while (i < this.numCodes && curlen === this.length[i]) {
+                i++;
+                if (++count >= max_count) {
+                    break;
+                }
+            }
+            if (count < min_count) {
+                blTree.freqs[curlen] += count;
+            }
+            else if (curlen !== 0) {
+                blTree.freqs[Tree.Repeat3To6]++;
+            }
+            else if (count <= 10) {
+                blTree.freqs[Tree.Repeat3To10]++;
+            }
+            else {
+                blTree.freqs[Tree.Repeat11To138]++;
+            }
+        }
+    }
+    setStaticCodes(staticCodes, staticLengths) {
+        this.codes = staticCodes;
+        this.length = staticLengths;
+    }
+    buildCodes() {
+        const nextCode = new Int32Array(this.maxLength);
+        let code = 0;
+        this.codes = new Int16Array(this.freqs.length);
+        for (let bits = 0; bits < this.maxLength; bits++) {
+            nextCode[bits] = code;
+            code += this.bitLengthCounts[bits] << (15 - bits);
+        }
+        for (let i = 0; i < this.numCodes; i++) {
+            const bits = this.length[i];
+            if (bits > 0) {
+                this.codes[i] = DeflaterHuffman.bitReverse(nextCode[bits - 1]);
+                nextCode[bits - 1] += 1 << (16 - bits);
+            }
+        }
+    }
+    writeTree(blTree) {
+        let maxCount;
+        let minCount;
+        let count;
+        let curlen = -1;
+        let i = 0;
+        while (i < this.numCodes) {
+            count = 1;
+            const nextlen = this.length[i];
+            if (nextlen === 0) {
+                maxCount = 138;
+                minCount = 3;
+            }
+            else {
+                maxCount = 6;
+                minCount = 3;
+                if (curlen !== nextlen) {
+                    blTree.writeSymbol(nextlen);
+                    count = 0;
+                }
+            }
+            curlen = nextlen;
+            i++;
+            while (i < this.numCodes && curlen === this.length[i]) {
+                i++;
+                if (++count >= maxCount) {
+                    break;
+                }
+            }
+            if (count < minCount) {
+                while (count-- > 0) {
+                    blTree.writeSymbol(curlen);
+                }
+            }
+            else if (curlen !== 0) {
+                blTree.writeSymbol(Tree.Repeat3To6);
+                this.huffman.pending.writeBits(count - 3, 2);
+            }
+            else if (count <= 10) {
+                blTree.writeSymbol(Tree.Repeat3To10);
+                this.huffman.pending.writeBits(count - 3, 3);
+            }
+            else {
+                blTree.writeSymbol(Tree.Repeat11To138);
+                this.huffman.pending.writeBits(count - 11, 7);
+            }
+        }
+    }
+    writeSymbol(code) {
+        this.huffman.pending.writeBits(this.codes[code] & 0xffff, this.length[code]);
+    }
+}
+Tree.Repeat3To6 = 16;
+Tree.Repeat3To10 = 17;
+Tree.Repeat11To138 = 18;
+class DeflaterHuffman {
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
+    }
+    static staticInit() {
+        let i = 0;
+        while (i < 144) {
+            DeflaterHuffman.staticLCodes[i] = DeflaterHuffman.bitReverse((0x030 + i) << 8);
+            DeflaterHuffman.staticLLength[i++] = 8;
+        }
+        while (i < 256) {
+            DeflaterHuffman.staticLCodes[i] = DeflaterHuffman.bitReverse((0x190 - 144 + i) << 7);
+            DeflaterHuffman.staticLLength[i++] = 9;
+        }
+        while (i < 280) {
+            DeflaterHuffman.staticLCodes[i] = DeflaterHuffman.bitReverse((0x000 - 256 + i) << 9);
+            DeflaterHuffman.staticLLength[i++] = 7;
+        }
+        while (i < DeflaterHuffman.LITERAL_NUM) {
+            DeflaterHuffman.staticLCodes[i] = DeflaterHuffman.bitReverse((0x0c0 - 280 + i) << 8);
+            DeflaterHuffman.staticLLength[i++] = 8;
+        }
+        for (i = 0; i < DeflaterHuffman.DIST_NUM; i++) {
+            DeflaterHuffman.staticDCodes[i] = DeflaterHuffman.bitReverse(i << 11);
+            DeflaterHuffman.staticDLength[i] = 5;
+        }
+    }
+    static bitReverse(toReverse) {
+        return ((DeflaterHuffman.bit4Reverse[toReverse & 0xf] << 12) |
+            (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
+            (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
+            DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+    }
+    isFull() {
+        return this.last_lit >= DeflaterHuffman.BUFSIZE;
+    }
+    reset() {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.literalTree.reset();
+        this.distTree.reset();
+        this.blTree.reset();
+    }
+    flushStoredBlock(stored, storedOffset, storedLength, lastBlock) {
+        this.pending.writeBits((DeflaterHuffman.STORED_BLOCK << 1) + (lastBlock ? 1 : 0), 3);
+        this.pending.alignToByte();
+        this.pending.writeShort(storedLength);
+        this.pending.writeShort(~storedLength);
+        this.pending.writeBlock(stored, storedOffset, storedLength);
+        this.reset();
+    }
+    flushBlock(stored, storedOffset, storedLength, lastBlock) {
+        this.literalTree.freqs[DeflaterHuffman.EOF_SYMBOL]++;
+        this.literalTree.buildTree();
+        this.distTree.buildTree();
+        this.literalTree.calcBLFreq(this.blTree);
+        this.distTree.calcBLFreq(this.blTree);
+        this.blTree.buildTree();
+        let blTreeCodes = 4;
+        for (let i = 18; i > blTreeCodes; i--) {
+            if (this.blTree.length[DeflaterHuffman.BL_ORDER[i]] > 0) {
+                blTreeCodes = i + 1;
+            }
+        }
+        let opt_len = 14 +
+            blTreeCodes * 3 +
+            this.blTree.getEncodedLength() +
+            this.literalTree.getEncodedLength() +
+            this.distTree.getEncodedLength() +
+            this.extra_bits;
+        let static_len = this.extra_bits;
+        for (let i = 0; i < DeflaterHuffman.LITERAL_NUM; i++) {
+            static_len += this.literalTree.freqs[i] * DeflaterHuffman.staticLLength[i];
+        }
+        for (let i = 0; i < DeflaterHuffman.DIST_NUM; i++) {
+            static_len += this.distTree.freqs[i] * DeflaterHuffman.staticDLength[i];
+        }
+        if (opt_len >= static_len) {
+            opt_len = static_len;
+        }
+        if (storedOffset >= 0 && storedLength + 4 < opt_len >> 3) {
+            this.flushStoredBlock(stored, storedOffset, storedLength, lastBlock);
+        }
+        else if (opt_len === static_len) {
+            this.pending.writeBits((DeflaterHuffman.STATIC_TREES << 1) + (lastBlock ? 1 : 0), 3);
+            this.literalTree.setStaticCodes(DeflaterHuffman.staticLCodes, DeflaterHuffman.staticLLength);
+            this.distTree.setStaticCodes(DeflaterHuffman.staticDCodes, DeflaterHuffman.staticDLength);
+            this.compressBlock();
+            this.reset();
+        }
+        else {
+            this.pending.writeBits((DeflaterHuffman.DYN_TREES << 1) + (lastBlock ? 1 : 0), 3);
+            this.sendAllTrees(blTreeCodes);
+            this.compressBlock();
+            this.reset();
+        }
+    }
+    sendAllTrees(blTreeCodes) {
+        this.blTree.buildCodes();
+        this.literalTree.buildCodes();
+        this.distTree.buildCodes();
+        this.pending.writeBits(this.literalTree.numCodes - 257, 5);
+        this.pending.writeBits(this.distTree.numCodes - 1, 5);
+        this.pending.writeBits(blTreeCodes - 4, 4);
+        for (let rank = 0; rank < blTreeCodes; rank++) {
+            this.pending.writeBits(this.blTree.length[DeflaterHuffman.BL_ORDER[rank]], 3);
+        }
+        this.literalTree.writeTree(this.blTree);
+        this.distTree.writeTree(this.blTree);
+    }
+    compressBlock() {
+        for (let i = 0; i < this.last_lit; i++) {
+            const litlen = this.l_buf[i] & 0xff;
+            let dist = this.d_buf[i];
+            if (dist-- !== 0) {
+                const lc = DeflaterHuffman.Lcode(litlen);
+                this.literalTree.writeSymbol(lc);
+                let bits = Math.floor((lc - 261) / 4);
+                if (bits > 0 && bits <= 5) {
+                    this.pending.writeBits(litlen & ((1 << bits) - 1), bits);
+                }
+                const dc = DeflaterHuffman.Dcode(dist);
+                this.distTree.writeSymbol(dc);
+                bits = Math.floor(dc / 2) - 1;
+                if (bits > 0) {
+                    this.pending.writeBits(dist & ((1 << bits) - 1), bits);
+                }
+            }
+            else {
+                this.literalTree.writeSymbol(litlen);
+            }
+        }
+        this.literalTree.writeSymbol(DeflaterHuffman.EOF_SYMBOL);
+    }
+    tallyDist(distance, length) {
+        this.d_buf[this.last_lit] = distance;
+        this.l_buf[this.last_lit++] = length - 3;
+        const lc = DeflaterHuffman.Lcode(length - 3);
+        this.literalTree.freqs[lc]++;
+        if (lc >= 265 && lc < 285) {
+            this.extra_bits += Math.floor((lc - 261) / 4);
+        }
+        const dc = DeflaterHuffman.Dcode(distance - 1);
+        this.distTree.freqs[dc]++;
+        if (dc >= 4) {
+            this.extra_bits += Math.floor(dc / 2) - 1;
+        }
+        return this.isFull();
+    }
+    tallyLit(literal) {
+        this.d_buf[this.last_lit] = 0;
+        this.l_buf[this.last_lit++] = literal;
+        this.literalTree.freqs[literal]++;
+        return this.isFull();
+    }
+    static Lcode(length) {
+        if (length === 255) {
+            return 285;
+        }
+        let code = 257;
+        while (length >= 8) {
+            code += 4;
+            length = length >> 1;
+        }
+        return code + length;
+    }
+    static Dcode(distance) {
+        let code = 0;
+        while (distance >= 4) {
+            code += 2;
+            distance = distance >> 1;
+        }
+        return code + distance;
+    }
+}
+DeflaterHuffman.BUFSIZE = 1 << (DeflaterConstants.DEFAULT_MEM_LEVEL + 6);
+DeflaterHuffman.LITERAL_NUM = 286;
+DeflaterHuffman.STORED_BLOCK = 0;
+DeflaterHuffman.STATIC_TREES = 1;
+DeflaterHuffman.DYN_TREES = 2;
+DeflaterHuffman.DIST_NUM = 30;
+DeflaterHuffman.staticLCodes = new Int16Array(DeflaterHuffman.LITERAL_NUM);
+DeflaterHuffman.staticLLength = new Uint8Array(DeflaterHuffman.LITERAL_NUM);
+DeflaterHuffman.staticDCodes = new Int16Array(DeflaterHuffman.DIST_NUM);
+DeflaterHuffman.staticDLength = new Uint8Array(DeflaterHuffman.DIST_NUM);
+DeflaterHuffman.BL_ORDER = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+DeflaterHuffman.bit4Reverse = new Uint8Array([
+    0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15
+]);
+DeflaterHuffman.BITLEN_NUM = 19;
+DeflaterHuffman.EOF_SYMBOL = 256;
+DeflaterHuffman.staticInit();
+class Huffman {
+}
+class Found extends Huffman {
+    constructor(n) {
+        super();
+        this.n = n;
+    }
+}
+class NeedBit extends Huffman {
+    constructor(left, right) {
+        super();
+        this.left = left;
+        this.right = right;
+    }
+}
+class NeedBits extends Huffman {
+    constructor(n, table) {
+        super();
+        this.n = n;
+        this.table = table;
+    }
+}
+class HuffTools {
+    static make(lengths, pos, nlengths, maxbits) {
+        const counts = [];
+        const tmp = [];
+        if (maxbits > 32) {
+            throw new FormatError('Invalid huffman');
+        }
+        for (let i = 0; i < maxbits; i++) {
+            counts.push(0);
+            tmp.push(0);
+        }
+        for (let i = 0; i < nlengths; i++) {
+            const p = lengths[i + pos];
+            if (p >= maxbits) {
+                throw new FormatError('Invalid huffman');
+            }
+            counts[p]++;
+        }
+        let code = 0;
+        for (let i = 1; i < maxbits - 1; i++) {
+            code = (code + counts[i]) << 1;
+            tmp[i] = code;
+        }
+        const bits = new Map();
+        for (let i = 0; i < nlengths; i++) {
+            const l = lengths[i + pos];
+            if (l !== 0) {
+                const n = tmp[l - 1];
+                tmp[l - 1] = n + 1;
+                bits.set((n << 5) | l, i);
+            }
+        }
+        return HuffTools.treeCompress(new NeedBit(HuffTools.treeMake(bits, maxbits, 0, 1), HuffTools.treeMake(bits, maxbits, 1, 1)));
+    }
+    static treeMake(bits, maxbits, v, len) {
+        if (len > maxbits) {
+            throw new FormatError('Invalid huffman');
+        }
+        const idx = (v << 5) | len;
+        if (bits.has(idx)) {
+            return new Found(bits.get(idx));
+        }
+        v = v << 1;
+        len += 1;
+        return new NeedBit(HuffTools.treeMake(bits, maxbits, v, len), HuffTools.treeMake(bits, maxbits, v | 1, len));
+    }
+    static treeCompress(t) {
+        const d = HuffTools.treeDepth(t);
+        if (d === 0) {
+            return t;
+        }
+        if (d === 1) {
+            if (t instanceof NeedBit) {
+                return new NeedBit(HuffTools.treeCompress(t.left), HuffTools.treeCompress(t.right));
+            }
+            throw new FormatError('assert');
+        }
+        const size = 1 << d;
+        const table = [];
+        for (let i = 0; i < size; i++) {
+            table.push(new Found(-1));
+        }
+        HuffTools.treeWalk(table, 0, 0, d, t);
+        return new NeedBits(d, table);
+    }
+    static treeWalk(table, p, cd, d, t) {
+        if (t instanceof NeedBit) {
+            if (d > 0) {
+                HuffTools.treeWalk(table, p, cd + 1, d - 1, t.left);
+                HuffTools.treeWalk(table, p | (1 << cd), cd + 1, d - 1, t.right);
+            }
+            else {
+                table[p] = HuffTools.treeCompress(t);
+            }
+        }
+        else {
+            table[p] = HuffTools.treeCompress(t);
+        }
+    }
+    static treeDepth(t) {
+        if (t instanceof Found) {
+            return 0;
+        }
+        if (t instanceof NeedBits) {
+            throw new FormatError('assert');
+        }
+        if (t instanceof NeedBit) {
+            const da = HuffTools.treeDepth(t.left);
+            const db = HuffTools.treeDepth(t.right);
+            return 1 + (da < db ? da : db);
+        }
+        return 0;
+    }
+}
+var InflateState;
+(function (InflateState) {
+    InflateState[InflateState["Head"] = 0] = "Head";
+    InflateState[InflateState["Block"] = 1] = "Block";
+    InflateState[InflateState["CData"] = 2] = "CData";
+    InflateState[InflateState["Flat"] = 3] = "Flat";
+    InflateState[InflateState["Crc"] = 4] = "Crc";
+    InflateState[InflateState["Dist"] = 5] = "Dist";
+    InflateState[InflateState["DistOne"] = 6] = "DistOne";
+    InflateState[InflateState["Done"] = 7] = "Done";
+})(InflateState || (InflateState = {}));
+class InflateWindow {
+    constructor() {
+        this.buffer = new Uint8Array(InflateWindow.BufferSize);
+        this.pos = 0;
+    }
+    slide() {
+        const b = new Uint8Array(InflateWindow.BufferSize);
+        this.pos -= InflateWindow.Size;
+        b.set(this.buffer.subarray(InflateWindow.Size, InflateWindow.Size + this.pos), 0);
+        this.buffer = b;
+    }
+    addBytes(b, p, len) {
+        if (this.pos + len > InflateWindow.BufferSize) {
+            this.slide();
+        }
+        this.buffer.set(b.subarray(p, p + len), this.pos);
+        this.pos += len;
+    }
+    addByte(c) {
+        if (this.pos === InflateWindow.BufferSize) {
+            this.slide();
+        }
+        this.buffer[this.pos] = c;
+        this.pos++;
+    }
+    getLastChar() {
+        return this.buffer[this.pos - 1];
+    }
+    available() {
+        return this.pos;
+    }
+}
+InflateWindow.Size = 1 << 15;
+InflateWindow.BufferSize = 1 << 16;
+class Inflate {
+    constructor(readable) {
+        this._nbits = 0;
+        this._bits = 0;
+        this._state = InflateState.Block;
+        this._isFinal = false;
+        this._huffman = Inflate._fixedHuffman;
+        this._huffdist = null;
+        this._len = 0;
+        this._dist = 0;
+        this._needed = 0;
+        this._output = null;
+        this._outpos = 0;
+        this._lengths = [];
+        this._window = new InflateWindow();
+        this._input = readable;
+        for (let i = 0; i < 19; i++) {
+            this._lengths.push(-1);
+        }
+    }
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
+    }
+    readBytes(b, pos, len) {
+        this._needed = len;
+        this._outpos = pos;
+        this._output = b;
+        if (len > 0) {
+            while (this.inflateLoop()) {
+            }
+        }
+        return len - this._needed;
+    }
+    inflateLoop() {
+        switch (this._state) {
+            case InflateState.Head:
+                const cmf = this._input.readByte();
+                const cm = cmf & 15;
+                if (cm !== 8) {
+                    throw new FormatError('Invalid data');
+                }
+                const flg = this._input.readByte();
+                const fdict = (flg & 32) !== 0;
+                if (((cmf << 8) + flg) % 31 !== 0) {
+                    throw new FormatError('Invalid data');
+                }
+                if (fdict) {
+                    throw new FormatError('Unsupported dictionary');
+                }
+                this._state = InflateState.Block;
+                return true;
+            case InflateState.Crc:
+                this._state = InflateState.Done;
+                return true;
+            case InflateState.Done:
+                return false;
+            case InflateState.Block:
+                this._isFinal = this.getBit();
+                switch (this.getBits(2)) {
+                    case 0:
+                        this._len = IOHelper.readUInt16LE(this._input);
+                        const nlen = IOHelper.readUInt16LE(this._input);
+                        if (nlen !== 0xffff - this._len) {
+                            throw new FormatError('Invalid data');
+                        }
+                        this._state = InflateState.Flat;
+                        const r = this.inflateLoop();
+                        this.resetBits();
+                        return r;
+                    case 1:
+                        this._huffman = Inflate._fixedHuffman;
+                        this._huffdist = null;
+                        this._state = InflateState.CData;
+                        return true;
+                    case 2:
+                        const hlit = this.getBits(5) + 257;
+                        const hdist = this.getBits(5) + 1;
+                        const hclen = this.getBits(4) + 4;
+                        for (let i = 0; i < hclen; i++) {
+                            this._lengths[Inflate.CodeLengthsPos[i]] = this.getBits(3);
+                        }
+                        for (let i = hclen; i < 19; i++) {
+                            this._lengths[Inflate.CodeLengthsPos[i]] = 0;
+                        }
+                        this._huffman = HuffTools.make(this._lengths, 0, 19, 8);
+                        const xlengths = [];
+                        for (let i = 0; i < hlit + hdist; i++) {
+                            xlengths.push(0);
+                        }
+                        this.inflateLengths(xlengths, hlit + hdist);
+                        this._huffdist = HuffTools.make(xlengths, hlit, hdist, 16);
+                        this._huffman = HuffTools.make(xlengths, 0, hlit, 16);
+                        this._state = InflateState.CData;
+                        return true;
+                    default:
+                        throw new FormatError('Invalid data');
+                }
+            case InflateState.Flat: {
+                const rlen = this._len < this._needed ? this._len : this._needed;
+                const bytes = IOHelper.readByteArray(this._input, rlen);
+                this._len -= rlen;
+                this.addBytes(bytes, 0, rlen);
+                if (this._len === 0) {
+                    this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
+                }
+                return this._needed > 0;
+            }
+            case InflateState.DistOne: {
+                const rlen = this._len < this._needed ? this._len : this._needed;
+                this.addDistOne(rlen);
+                this._len -= rlen;
+                if (this._len === 0) {
+                    this._state = InflateState.CData;
+                }
+                return this._needed > 0;
+            }
+            case InflateState.Dist:
+                while (this._len > 0 && this._needed > 0) {
+                    const rdist = this._len < this._dist ? this._len : this._dist;
+                    const rlen = this._needed < rdist ? this._needed : rdist;
+                    this.addDist(this._dist, rlen);
+                    this._len -= rlen;
+                }
+                if (this._len === 0) {
+                    this._state = InflateState.CData;
+                }
+                return this._needed > 0;
+            case InflateState.CData:
+                let n = this.applyHuffman(this._huffman);
+                if (n < 256) {
+                    this.addByte(n);
+                    return this._needed > 0;
+                }
+                if (n === 256) {
+                    this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
+                    return true;
+                }
+                n = (n - 257) & 0xff;
+                let extraBits = Inflate.LenExtraBitsTbl[n];
+                if (extraBits === -1) {
+                    throw new FormatError('Invalid data');
+                }
+                this._len = Inflate.LenBaseValTbl[n] + this.getBits(extraBits);
+                const huffdist = this._huffdist;
+                const distCode = !huffdist ? this.getRevBits(5) : this.applyHuffman(huffdist);
+                extraBits = Inflate.DistExtraBitsTbl[distCode];
+                if (extraBits === -1) {
+                    throw new FormatError('Invalid data');
+                }
+                this._dist = Inflate.DistBaseValTbl[distCode] + this.getBits(extraBits);
+                if (this._dist > this._window.available()) {
+                    throw new FormatError('Invalid data');
+                }
+                this._state = this._dist === 1 ? InflateState.DistOne : InflateState.Dist;
+                return true;
+        }
+        return false;
+    }
+    addDistOne(n) {
+        const c = this._window.getLastChar();
+        for (let i = 0; i < n; i++) {
+            this.addByte(c);
+        }
+    }
+    addByte(b) {
+        this._window.addByte(b);
+        this._output[this._outpos] = b;
+        this._needed--;
+        this._outpos++;
+    }
+    addDist(d, len) {
+        this.addBytes(this._window.buffer, this._window.pos - d, len);
+    }
+    getBit() {
+        if (this._nbits === 0) {
+            this._nbits = 8;
+            this._bits = this._input.readByte();
+        }
+        const b = (this._bits & 1) === 1;
+        this._nbits--;
+        this._bits = this._bits >> 1;
+        return b;
+    }
+    getBits(n) {
+        while (this._nbits < n) {
+            this._bits = this._bits | (this._input.readByte() << this._nbits);
+            this._nbits += 8;
+        }
+        const b = this._bits & ((1 << n) - 1);
+        this._nbits -= n;
+        this._bits = this._bits >> n;
+        return b;
+    }
+    getRevBits(n) {
+        return n === 0 ? 0 : this.getBit() ? (1 << (n - 1)) | this.getRevBits(n - 1) : this.getRevBits(n - 1);
+    }
+    resetBits() {
+        this._bits = 0;
+        this._nbits = 0;
+    }
+    addBytes(b, p, len) {
+        this._window.addBytes(b, p, len);
+        this._output.set(b.subarray(p, p + len), this._outpos);
+        this._needed -= len;
+        this._outpos += len;
+    }
+    inflateLengths(a, max) {
+        let i = 0;
+        let prev = 0;
+        while (i < max) {
+            const n = this.applyHuffman(this._huffman);
+            switch (n) {
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                    prev = n;
+                    a[i] = n;
+                    i++;
+                    break;
+                case 16:
+                    const end = i + 3 + this.getBits(2);
+                    if (end > max) {
+                        throw new FormatError('Invalid data');
+                    }
+                    while (i < end) {
+                        a[i] = prev;
+                        i++;
+                    }
+                    break;
+                case 17:
+                    i += 3 + this.getBits(3);
+                    if (i > max) {
+                        throw new FormatError('Invalid data');
+                    }
+                    break;
+                case 18:
+                    i += 11 + this.getBits(7);
+                    if (i > max) {
+                        throw new FormatError('Invalid data');
+                    }
+                    break;
+                default: {
+                    throw new FormatError('Invalid data');
+                }
+            }
+        }
+    }
+    applyHuffman(h) {
+        if (h instanceof Found) {
+            return h.n;
+        }
+        if (h instanceof NeedBit) {
+            return this.applyHuffman(this.getBit() ? h.right : h.left);
+        }
+        if (h instanceof NeedBits) {
+            return this.applyHuffman(h.table[this.getBits(h.n)]);
+        }
+        throw new FormatError('Invalid data');
+    }
+}
+Inflate.LenExtraBitsTbl = [
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, -1, -1
+];
+Inflate.LenBaseValTbl = [
+    3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227,
+    258
+];
+Inflate.DistExtraBitsTbl = [
+    0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, -1, -1
+];
+Inflate.DistBaseValTbl = [
+    1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097,
+    6145, 8193, 12289, 16385, 24577
+];
+Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+Inflate._fixedHuffman = Inflate.buildFixedHuffman();
+class PendingBuffer {
+    constructor(bufferSize) {
+        this._start = 0;
+        this._end = 0;
+        this._bits = 0;
+        this.bitCount = 0;
+        this._buffer = new Uint8Array(bufferSize);
+    }
+    get isFlushed() {
+        return this._end === 0;
+    }
+    reset() {
+        this._start = 0;
+        this._end = 0;
+        this.bitCount = 0;
+    }
+    writeShortMSB(s) {
+        this._buffer[this._end++] = (s >> 8) & 0xff;
+        this._buffer[this._end++] = s & 0xff;
+    }
+    writeShort(value) {
+        this._buffer[this._end++] = value;
+        this._buffer[this._end++] = value >> 8;
+    }
+    writeBlock(block, offset, length) {
+        this._buffer.set(block.subarray(offset, offset + length), this._end);
+        this._end += length;
+    }
+    flush(output, offset, length) {
+        if (this.bitCount >= 8) {
+            this._buffer[this._end++] = this._bits & 0xff;
+            this._bits >>= 8;
+            this.bitCount -= 8;
+        }
+        if (length > this._end - this._start) {
+            length = this._end - this._start;
+            output.set(this._buffer.subarray(this._start, this._start + length), offset);
+            this._start = 0;
+            this._end = 0;
+        }
+        else {
+            output.set(this._buffer.subarray(this._start, this._start + length), offset);
+            this._start += length;
+        }
+        return length;
+    }
+    writeBits(b, count) {
+        this._bits |= b << this.bitCount;
+        this.bitCount += count;
+        if (this.bitCount >= 16) {
+            this._buffer[this._end++] = this._bits & 0xff;
+            this._buffer[this._end++] = (this._bits >> 8) & 0xff;
+            this._bits >>= 16;
+            this.bitCount -= 16;
+        }
+    }
+    alignToByte() {
+        if (this.bitCount > 0) {
+            this._buffer[this._end++] = this._bits & 0xff;
+            if (this.bitCount > 8) {
+                this._buffer[this._end++] = (this._bits >> 8) & 0xff;
+            }
+        }
+        this._bits = 0;
+        this.bitCount = 0;
+    }
+}
+class ZipEntry {
+    constructor(fullName, data) {
+        this.fullName = fullName;
+        const i = fullName.lastIndexOf('/');
+        this.fileName = i === -1 || i === fullName.length - 1 ? this.fullName : fullName.substr(i + 1);
+        this.data = data;
+    }
+}
+ZipEntry.OptionalDataDescriptorSignature = 0x08074b50;
+ZipEntry.CompressionMethodDeflate = 8;
+ZipEntry.LocalFileHeaderSignature = 0x04034b50;
+ZipEntry.CentralFileHeaderSignature = 0x02014b50;
+ZipEntry.EndOfCentralDirSignature = 0x06054b50;
+class ZipReader {
+    constructor(readable) {
+        this._readable = readable;
+    }
+    read() {
+        const entries = [];
+        while (true) {
+            const e = this.readEntry();
+            if (!e) {
+                break;
+            }
+            entries.push(e);
+        }
+        return entries;
+    }
+    readEntry() {
+        const readable = this._readable;
+        const h = IOHelper.readInt32LE(readable);
+        if (h !== ZipEntry.LocalFileHeaderSignature) {
+            return null;
+        }
+        IOHelper.readUInt16LE(readable);
+        const flags = IOHelper.readUInt16LE(readable);
+        const compressionMethod = IOHelper.readUInt16LE(readable);
+        const compressed = compressionMethod !== 0;
+        if (compressed && compressionMethod !== ZipEntry.CompressionMethodDeflate) {
+            return null;
+        }
+        IOHelper.readInt16LE(this._readable);
+        IOHelper.readInt16LE(this._readable);
+        IOHelper.readInt32LE(readable);
+        IOHelper.readInt32LE(readable);
+        const uncompressedSize = IOHelper.readInt32LE(readable);
+        const fileNameLength = IOHelper.readInt16LE(readable);
+        const extraFieldLength = IOHelper.readInt16LE(readable);
+        const fname = IOHelper.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
+        readable.skip(extraFieldLength);
+        let data;
+        if (compressed) {
+            const target = ByteBuffer.empty();
+            const z = new Inflate(this._readable);
+            const buffer = new Uint8Array(65536);
+            while (true) {
+                const bytes = z.readBytes(buffer, 0, buffer.length);
+                target.write(buffer, 0, bytes);
+                if (bytes < buffer.length) {
+                    break;
+                }
+            }
+            data = target.toArray();
+        }
+        else {
+            data = IOHelper.readByteArray(this._readable, uncompressedSize);
+        }
+        if ((flags & 8) !== 0) {
+            const crc32 = IOHelper.readInt32LE(this._readable);
+            if (crc32 === ZipEntry.OptionalDataDescriptorSignature) {
+                IOHelper.readInt32LE(this._readable);
+            }
+            IOHelper.readInt32LE(this._readable);
+            IOHelper.readInt32LE(this._readable);
+        }
+        return new ZipEntry(fname, data);
+    }
+}
+class ZipCentralDirectoryHeader {
+    constructor(entry, crc32, localHeaderOffset, compressionMode, compressedSize) {
+        this.entry = entry;
+        this.crc32 = crc32;
+        this.localHeaderOffset = localHeaderOffset;
+        this.compressionMode = compressionMode;
+        this.compressedSize = compressedSize;
+    }
+}
+class ZipWriter {
+    constructor(data) {
+        this._centralDirectoryHeaders = [];
+        this._deflater = new Deflater();
+        this._data = data;
+    }
+    writeEntry(entry) {
+        const compressionMode = ZipEntry.CompressionMethodDeflate;
+        const compressedData = ByteBuffer.empty();
+        const crc32 = this.compress(compressedData, entry.data, compressionMode);
+        const compressedDataArray = compressedData.toArray();
+        const directoryHeader = new ZipCentralDirectoryHeader(entry, crc32, this._data.bytesWritten, compressionMode, compressedData.length);
+        this._centralDirectoryHeaders.push(directoryHeader);
+        IOHelper.writeInt32LE(this._data, ZipEntry.LocalFileHeaderSignature);
+        IOHelper.writeUInt16LE(this._data, 10);
+        IOHelper.writeUInt16LE(this._data, 0x0800);
+        IOHelper.writeUInt16LE(this._data, compressionMode);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt32LE(this._data, crc32);
+        IOHelper.writeInt32LE(this._data, compressedDataArray.length);
+        IOHelper.writeInt32LE(this._data, entry.data.length);
+        IOHelper.writeInt16LE(this._data, entry.fullName.length);
+        IOHelper.writeInt16LE(this._data, 0);
+        const fileNameBuffer = IOHelper.stringToBytes(entry.fullName);
+        this._data.write(fileNameBuffer, 0, fileNameBuffer.length);
+        this._data.write(compressedDataArray, 0, compressedDataArray.length);
+    }
+    compress(output, data, compressionMode) {
+        if (compressionMode !== ZipEntry.CompressionMethodDeflate) {
+            const crc = new Crc32();
+            crc.update(data, 0, data.length);
+            output.write(data, 0, data.length);
+            return crc.value;
+        }
+        const buffer = new Uint8Array(512);
+        this._deflater.reset();
+        this._deflater.setInput(data, 0, data.length);
+        while (!this._deflater.isNeedingInput) {
+            const len = this._deflater.deflate(buffer, 0, buffer.length);
+            if (len <= 0) {
+                break;
+            }
+            output.write(buffer, 0, len);
+        }
+        this._deflater.finish();
+        while (!this._deflater.isFinished) {
+            const len = this._deflater.deflate(buffer, 0, buffer.length);
+            if (len <= 0) {
+                break;
+            }
+            output.write(buffer, 0, len);
+        }
+        return this._deflater.inputCrc;
+    }
+    end() {
+        const startOfCentralDirectory = this._data.bytesWritten;
+        for (const header of this._centralDirectoryHeaders) {
+            this.writeCentralDirectoryHeader(header);
+        }
+        const endOfCentralDirectory = this._data.bytesWritten;
+        this.writeEndOfCentralDirectoryRecord(startOfCentralDirectory, endOfCentralDirectory);
+    }
+    writeEndOfCentralDirectoryRecord(startOfCentralDirectory, endOfCentralDirectory) {
+        IOHelper.writeInt32LE(this._data, ZipEntry.EndOfCentralDirSignature);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, this._centralDirectoryHeaders.length);
+        IOHelper.writeInt16LE(this._data, this._centralDirectoryHeaders.length);
+        IOHelper.writeInt32LE(this._data, endOfCentralDirectory - startOfCentralDirectory);
+        IOHelper.writeInt32LE(this._data, startOfCentralDirectory);
+        IOHelper.writeInt16LE(this._data, 0);
+    }
+    writeCentralDirectoryHeader(header) {
+        IOHelper.writeInt32LE(this._data, ZipEntry.CentralFileHeaderSignature);
+        IOHelper.writeUInt16LE(this._data, 10);
+        IOHelper.writeUInt16LE(this._data, 10);
+        IOHelper.writeUInt16LE(this._data, 0x0800);
+        IOHelper.writeUInt16LE(this._data, header.compressionMode);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt32LE(this._data, header.crc32);
+        IOHelper.writeInt32LE(this._data, header.compressedSize);
+        IOHelper.writeInt32LE(this._data, header.entry.data.length);
+        IOHelper.writeInt16LE(this._data, header.entry.fullName.length);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt16LE(this._data, 0);
+        IOHelper.writeInt32LE(this._data, 0);
+        IOHelper.writeInt32LE(this._data, header.localHeaderOffset);
+        const fileNameBuffer = IOHelper.stringToBytes(header.entry.fullName);
+        this._data.write(fileNameBuffer, 0, fileNameBuffer.length);
     }
 }
 class Gp3To5Importer extends ScoreImporter {
@@ -5994,6 +11113,113 @@ class MixTableChange {
         this.duration = -1;
     }
 }
+class GpxImporter extends ScoreImporter {
+    get name() {
+        return 'Guitar Pro 6';
+    }
+    readScore() {
+        Logger.debug(this.name, 'Loading GPX filesystem');
+        const fileSystem = new GpxFileSystem();
+        fileSystem.fileFilter = s => {
+            return (s.endsWith('score.gpif') ||
+                s.endsWith('BinaryStylesheet') ||
+                s.endsWith('PartConfiguration') ||
+                s.endsWith('LayoutConfiguration'));
+        };
+        fileSystem.load(this.data);
+        Logger.debug(this.name, 'GPX filesystem loaded');
+        let xml = null;
+        let binaryStylesheetData = null;
+        let partConfigurationData = null;
+        let layoutConfigurationData = null;
+        for (const entry of fileSystem.files) {
+            switch (entry.fileName) {
+                case 'score.gpif':
+                    xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
+                    break;
+                case 'BinaryStylesheet':
+                    binaryStylesheetData = entry.data;
+                    break;
+                case 'PartConfiguration':
+                    partConfigurationData = entry.data;
+                    break;
+                case 'LayoutConfiguration':
+                    layoutConfigurationData = entry.data;
+                    break;
+            }
+        }
+        if (!xml) {
+            throw new UnsupportedFormatError('No score.gpif found in GPX');
+        }
+        Logger.debug(this.name, 'Start Parsing score.gpif');
+        const gpifParser = new GpifParser();
+        gpifParser.parseXml(xml, this.settings);
+        Logger.debug(this.name, 'score.gpif parsed');
+        const score = gpifParser.score;
+        return score;
+    }
+}
+class Gp7To8Importer extends ScoreImporter {
+    get name() {
+        return 'Guitar Pro 7-8';
+    }
+    readScore() {
+        Logger.debug(this.name, 'Loading ZIP entries');
+        const fileSystem = new ZipReader(this.data);
+        let entries;
+        try {
+            entries = fileSystem.read();
+        }
+        catch (e) {
+            throw new UnsupportedFormatError('No Zip archive', e);
+        }
+        Logger.debug(this.name, 'Zip entries loaded');
+        let xml = null;
+        let binaryStylesheetData = null;
+        let partConfigurationData = null;
+        let layoutConfigurationData = null;
+        const entryLookup = new Map();
+        for (const entry of entries) {
+            entryLookup.set(entry.fullName, entry);
+            switch (entry.fileName) {
+                case 'score.gpif':
+                    xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
+                    break;
+                case 'BinaryStylesheet':
+                    binaryStylesheetData = entry.data;
+                    break;
+                case 'PartConfiguration':
+                    partConfigurationData = entry.data;
+                    break;
+                case 'LayoutConfiguration':
+                    layoutConfigurationData = entry.data;
+                    break;
+            }
+        }
+        if (!xml) {
+            throw new UnsupportedFormatError('No score.gpif found in zip archive');
+        }
+        Logger.debug(this.name, 'Start Parsing score.gpif');
+        const gpifParser = new GpifParser();
+        gpifParser.loadAsset = (fileName) => {
+            if (entryLookup.has(fileName)) {
+                return entryLookup.get(fileName).data;
+            }
+            ;
+            return undefined;
+        };
+        gpifParser.parseXml(xml, this.settings);
+        Logger.debug(this.name, 'score.gpif parsed');
+        const score = gpifParser.score;
+        if (binaryStylesheetData) {
+            Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
+            const stylesheet = new BinaryStylesheet(binaryStylesheetData);
+            stylesheet.apply(score);
+            Logger.debug(this.name, 'BinaryStylesheet parsed');
+        }
+        return score;
+    }
+}
 console.log('Alpha Tab Import *.mid v1.0.1');
 class AlphaTabImportMusicPlugin {
     constructor() {
@@ -6071,14 +11297,32 @@ class FileLoaderAlpha {
                 let path = inputFile.value;
                 path = path.toLowerCase().trim();
                 if (path.endsWith('.gp3') || path.endsWith('.gp4') || path.endsWith('.gp5')) {
-                    let scoreImporter = new Gp3To5Importer();
+                    let gp35 = new Gp3To5Importer();
                     settings.importer.encoding = 'windows-1251';
-                    scoreImporter.init(data, settings);
-                    let score = scoreImporter.readScore();
+                    gp35.init(data, settings);
+                    let score = gp35.readScore();
                     console.log(score);
                 }
                 else {
-                    console.log('wrong path', path);
+                    if (path.endsWith('.gpx')) {
+                        let gpx = new GpxImporter();
+                        settings.importer.encoding = 'windows-1251';
+                        gpx.init(data, settings);
+                        let score = gpx.readScore();
+                        console.log(score);
+                    }
+                    else {
+                        if (path.endsWith('.gp')) {
+                            let gp78 = new Gp7To8Importer();
+                            settings.importer.encoding = 'windows-1251';
+                            gp78.init(data, settings);
+                            let score = gp78.readScore();
+                            console.log(score);
+                        }
+                        else {
+                            console.log('wrong path', path);
+                        }
+                    }
                 }
             }
         };

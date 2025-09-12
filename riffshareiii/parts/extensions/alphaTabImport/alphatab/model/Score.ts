@@ -314,7 +314,7 @@ class Score {
     /**
      * Information about the backing track that can be used instead of the synthesized audio.
      */
-    //public backingTrack: BackingTrack | undefined;
+    public backingTrack: BackingTrack | undefined;
 
     /**
      * The style customizations for this item.
