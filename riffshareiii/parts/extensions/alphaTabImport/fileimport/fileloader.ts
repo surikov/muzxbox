@@ -55,7 +55,15 @@ class FileLoaderAlpha {
 							let score = gp78.readScore();
 							console.log(score);
 						} else {
-							console.log('wrong path', path);
+							if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
+								let mxl: MusicXmlImporter = new MusicXmlImporter();
+								settings.importer.encoding = 'windows-1251';
+								mxl.init(data, settings);
+								let score = mxl.readScore();
+								console.log(score);
+							} else {
+								console.log('wrong path', path);
+							}
 						}
 					}
 				}

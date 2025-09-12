@@ -11220,6 +11220,2732 @@ class Gp7To8Importer extends ScoreImporter {
         return score;
     }
 }
+class StaffContext {
+    constructor() {
+        this.currentDynamics = DynamicValue.F;
+        this.slideOrigins = new Map();
+        this.transpose = 0;
+        this.isExplicitlyBeamed = false;
+        this.tieStarts = new Set();
+        this.tieStartIds = new Map();
+        this.slideOrigins = new Map();
+        this.slurStarts = new Map();
+    }
+}
+class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
+    constructor() {
+        super(...arguments);
+        this.outputMidiChannel = -1;
+        this.outputMidiProgram = -1;
+        this.outputMidiBank = -1;
+        this.outputVolume = -1;
+        this.outputBalance = -1;
+    }
+}
+class TrackInfo {
+    constructor(track) {
+        this.instruments = new Map();
+        this._instrumentIdToArticulationIndex = new Map();
+        this._lyricsLine = 0;
+        this._lyricsLines = new Map();
+        this.track = track;
+    }
+    getLyricLine(number) {
+        if (this._lyricsLines.has(number)) {
+            return this._lyricsLines.get(number);
+        }
+        const line = this._lyricsLine;
+        this._lyricsLines.set(number, line);
+        this._lyricsLine++;
+        return line;
+    }
+    getOrCreateArticulation(instrumentId, note) {
+        const noteValue = note.octave * 12 + note.tone;
+        const lookup = `${instrumentId}_${noteValue}`;
+        if (this._instrumentIdToArticulationIndex.has(lookup)) {
+            return this._instrumentIdToArticulationIndex.get(lookup);
+        }
+        let articulation;
+        if (this.instruments.has(instrumentId)) {
+            articulation = this.instruments.get(instrumentId);
+        }
+        else {
+            articulation = TrackInfo.defaultNoteArticulation;
+        }
+        const index = this.track.percussionArticulations.length;
+        const bar = note.beat.voice.bar;
+        const actualSteps = note.beat.voice.bar.staff.standardNotationLineCount * 2 - 1;
+        const fiveLineSteps = 5 * 2 - 1;
+        const stepDifference = fiveLineSteps - actualSteps;
+        this._instrumentIdToArticulationIndex.set(lookup, index);
+        return index;
+    }
+}
+TrackInfo.defaultNoteArticulation = new InstrumentArticulation();
+class MusicXmlImporter extends ScoreImporter {
+    constructor() {
+        super(...arguments);
+        this._idToTrackInfo = new Map();
+        this._indexToTrackInfo = new Map();
+        this._staffToContext = new Map();
+        this._divisionsPerQuarterNote = 1;
+        this._currentDynamics = DynamicValue.F;
+        this._musicalPosition = 0;
+        this._lastBeat = null;
+        this._nextMasterBarRepeatEnding = 0;
+        this._nextBeatAutomations = null;
+        this._nextBeatChord = null;
+        this._nextBeatCrescendo = null;
+        this._nextBeatLetRing = false;
+        this._nextBeatPalmMute = false;
+        this._nextBeatOttavia = null;
+        this._nextBeatText = null;
+        this._simileMarkAllStaves = null;
+        this._simileMarkPerStaff = null;
+        this._isBeatSlash = false;
+        this._keyAllStaves = null;
+        this._currentTrillStep = -1;
+    }
+    get name() {
+        return 'MusicXML';
+    }
+    readScore() {
+        const xml = this.extractMusicXml();
+        const dom = new XmlDocument();
+        try {
+            dom.parse(xml);
+        }
+        catch (e) {
+            throw new UnsupportedFormatError('Unsupported format', e);
+        }
+        this._score = new Score();
+        this._score.tempo = 120;
+        this.parseDom(dom);
+        ModelUtils.consolidate(this._score);
+        this._score.finish(this.settings);
+        this._score.rebuildRepeatGroups();
+        return this._score;
+    }
+    extractMusicXml() {
+        const zip = new ZipReader(this.data);
+        let entries;
+        try {
+            entries = zip.read();
+        }
+        catch {
+            entries = [];
+        }
+        if (entries.length === 0) {
+            this.data.reset();
+            return IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+        }
+        const container = entries.find(e => e.fullName === 'META-INF/container.xml');
+        if (!container) {
+            throw new UnsupportedFormatError('No compressed MusicXML');
+        }
+        const containerDom = new XmlDocument();
+        try {
+            containerDom.parse(IOHelper.toString(container.data, this.settings.importer.encoding));
+        }
+        catch (e) {
+            throw new UnsupportedFormatError('Malformed container.xml, could not parse as XML', e);
+        }
+        const root = containerDom.firstElement;
+        if (!root || root.localName !== 'container') {
+            throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
+        }
+        const rootFiles = root.findChildElement('rootfiles');
+        if (!rootFiles) {
+            throw new UnsupportedFormatError("Malformed container.xml, 'container/rootfiles' not found");
+        }
+        let uncompressedFileFullPath = '';
+        for (const c of rootFiles.childElements()) {
+            if (c.localName === 'rootfile') {
+                uncompressedFileFullPath = c.getAttribute('full-path');
+                break;
+            }
+        }
+        if (!uncompressedFileFullPath) {
+            throw new UnsupportedFormatError('Unsupported compressed MusicXML, missing rootfile');
+        }
+        const file = entries.find(e => e.fullName === uncompressedFileFullPath);
+        if (!file) {
+            throw new UnsupportedFormatError(`Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`);
+        }
+        return IOHelper.toString(file.data, this.settings.importer.encoding);
+    }
+    parseDom(dom) {
+        const root = dom.firstElement;
+        if (!root) {
+            throw new UnsupportedFormatError('Unsupported format');
+        }
+        switch (root.localName) {
+            case 'score-partwise':
+                this.parsePartwise(root);
+                break;
+            case 'score-timewise':
+                this.parseTimewise(root);
+                break;
+            default:
+                throw new UnsupportedFormatError('Unsupported format');
+        }
+    }
+    parsePartwise(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'credit':
+                    this.parseCredit(c);
+                    break;
+                case 'identification':
+                    this.parseIdentification(c);
+                    break;
+                case 'movement-title':
+                    this.parseMovementTitle(c);
+                    break;
+                case 'part':
+                    this.parsePartwisePart(c);
+                    break;
+                case 'part-list':
+                    this.parsePartList(c);
+                    break;
+                case 'work':
+                    this.parseWork(c);
+                    break;
+            }
+        }
+    }
+    parseTimewise(element) {
+        let index = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'credit':
+                    this.parseCredit(c);
+                    break;
+                case 'identification':
+                    this.parseIdentification(c);
+                    break;
+                case 'movement-title':
+                    this.parseMovementTitle(c);
+                    break;
+                case 'part-list':
+                    this.parsePartList(c);
+                    break;
+                case 'work':
+                    this.parseWork(c);
+                    break;
+                case 'measure':
+                    this.parseTimewiseMeasure(c, index);
+                    index++;
+                    break;
+            }
+        }
+    }
+    parseCredit(element) {
+        if (element.getAttribute('page', '1') !== '1') {
+            return;
+        }
+        const creditTypes = [];
+        let firstWords = null;
+        let fullText = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'credit-type':
+                    creditTypes.push(c.innerText);
+                    break;
+                case 'credit-words':
+                    if (firstWords === null) {
+                        firstWords = c;
+                    }
+                    fullText += c.innerText;
+                    break;
+            }
+        }
+        if (creditTypes.length > 0) {
+            for (const type of creditTypes) {
+                switch (type) {
+                    case 'title':
+                        this._score.title = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'subtitle':
+                        this._score.subTitle = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'composer':
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'arranger':
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'lyricist':
+                        this._score.words = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'rights':
+                        this._score.copyright = MusicXmlImporter.sanitizeDisplay(fullText);
+                        break;
+                    case 'part name':
+                        break;
+                }
+            }
+        }
+        else if (firstWords) {
+            const justify = firstWords.getAttribute('font-size', '0');
+            const valign = firstWords.getAttribute('font-size', 'top');
+            const halign = firstWords.getAttribute('halign', 'left');
+            if (valign === 'top') {
+                if (fullText.includes('copyright') ||
+                    fullText.includes('Copyright') ||
+                    fullText.includes('©') ||
+                    fullText.includes('(c)') ||
+                    fullText.includes('(C)')) {
+                    this._score.copyright = MusicXmlImporter.sanitizeDisplay(fullText);
+                    return;
+                }
+                if (halign === 'center' || justify === 'center') {
+                    if (this._score.title.length === 0) {
+                        this._score.title = MusicXmlImporter.sanitizeDisplay(fullText);
+                        return;
+                    }
+                    if (this._score.subTitle.length === 0) {
+                        this._score.subTitle = MusicXmlImporter.sanitizeDisplay(fullText);
+                        return;
+                    }
+                    if (this._score.album.length === 0) {
+                        this._score.album = MusicXmlImporter.sanitizeDisplay(fullText);
+                        return;
+                    }
+                }
+                else if (halign === 'right' || justify === 'right') {
+                    if (this._score.music.length === 0) {
+                        this._score.music = MusicXmlImporter.sanitizeDisplay(fullText);
+                        return;
+                    }
+                }
+                if (this._score.artist.length === 0) {
+                    this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
+                    return;
+                }
+                if (this._score.words.length === 0) {
+                    this._score.words = MusicXmlImporter.sanitizeDisplay(fullText);
+                    return;
+                }
+            }
+        }
+    }
+    static sanitizeDisplay(text) {
+        return text.replaceAll('\r', '').replaceAll('\n', ' ').replaceAll('\t', '\xA0\xA0').replaceAll(' ', '\xA0');
+    }
+    parseIdentification(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'creator':
+                    if (c.attributes.has('type')) {
+                        switch (c.attributes.get('type')) {
+                            case 'composer':
+                                this._score.artist = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                                break;
+                            case 'lyricist':
+                                this._score.words = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                                break;
+                            case 'arranger':
+                                this._score.music = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                                break;
+                        }
+                    }
+                    else {
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                    }
+                    break;
+                case 'rights':
+                    if (this._score.copyright.length > 0) {
+                        this._score.copyright += ', ';
+                    }
+                    this._score.copyright += c.innerText;
+                    if (c.attributes.has('type')) {
+                        this._score.copyright += ` (${c.attributes.get('type')})`;
+                    }
+                    break;
+                case 'encoding':
+                    this.parseEncoding(c);
+                    break;
+            }
+        }
+    }
+    parseEncoding(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'encoder':
+                    if (this._score.tab.length > 0) {
+                        this._score.tab += ', ';
+                    }
+                    this._score.tab += c.innerText;
+                    if (c.attributes.has('type')) {
+                        this._score.tab += ` (${c.attributes.get('type')})`;
+                    }
+                    break;
+                case 'encoding-description':
+                    this._score.notices += MusicXmlImporter.sanitizeDisplay(c.innerText);
+                    break;
+            }
+        }
+    }
+    parseMovementTitle(element) {
+        if (this._score.title.length === 0) {
+            this._score.title = MusicXmlImporter.sanitizeDisplay(element.innerText);
+        }
+        else {
+            this._score.subTitle = MusicXmlImporter.sanitizeDisplay(element.innerText);
+        }
+    }
+    parsePartList(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'score-part':
+                    this.parseScorePart(c);
+                    break;
+            }
+        }
+    }
+    parseScorePart(element) {
+        const track = new Track();
+        track.ensureStaveCount(1);
+        this._score.addTrack(track);
+        const id = element.attributes.get('id');
+        const trackInfo = new TrackInfo(track);
+        this._idToTrackInfo.set(id, trackInfo);
+        this._indexToTrackInfo.set(track.index, trackInfo);
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'part-name':
+                    track.name = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                    break;
+                case 'part-name-display':
+                    track.name = this.parsePartDisplayAsText(c);
+                    break;
+                case 'part-abbreviation':
+                    track.shortName = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                    break;
+                case 'part-abbreviation-display':
+                    track.shortName = this.parsePartDisplayAsText(c);
+                    break;
+                case 'score-instrument':
+                    this.parseScoreInstrument(c, trackInfo);
+                    break;
+                case 'midi-device':
+                    if (c.attributes.has('port')) {
+                        track.playbackInfo.port = Number.parseInt(c.attributes.get('port'), 10);
+                    }
+                    break;
+                case 'midi-instrument':
+                    this.parseScorePartMidiInstrument(c, trackInfo);
+                    break;
+            }
+        }
+        if (trackInfo.firstArticulation) {
+            if (trackInfo.firstArticulation.outputMidiProgram >= 0) {
+                track.playbackInfo.program = trackInfo.firstArticulation.outputMidiProgram;
+            }
+            if (trackInfo.firstArticulation.outputMidiBank >= 0) {
+                track.playbackInfo.bank = trackInfo.firstArticulation.outputMidiBank;
+            }
+            if (trackInfo.firstArticulation.outputBalance >= 0) {
+                track.playbackInfo.balance = trackInfo.firstArticulation.outputBalance;
+            }
+            if (trackInfo.firstArticulation.outputVolume >= 0) {
+                track.playbackInfo.volume = trackInfo.firstArticulation.outputVolume;
+            }
+            if (trackInfo.firstArticulation.outputMidiChannel >= 0) {
+                track.playbackInfo.primaryChannel = trackInfo.firstArticulation.outputMidiChannel;
+                track.playbackInfo.secondaryChannel = trackInfo.firstArticulation.outputMidiChannel;
+            }
+        }
+    }
+    parseScoreInstrument(element, trackInfo) {
+        const articulation = new InstrumentArticulationWithPlaybackInfo();
+        if (!trackInfo.firstArticulation) {
+            trackInfo.firstArticulation = articulation;
+        }
+        trackInfo.instruments.set(element.getAttribute('id', ''), articulation);
+    }
+    parseScorePartMidiInstrument(element, trackInfo) {
+        const id = element.getAttribute('id', '');
+        if (!trackInfo.instruments.has(id)) {
+            return;
+        }
+        const articulation = trackInfo.instruments.get(id);
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'midi-channel':
+                    articulation.outputMidiChannel = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'midi-bank':
+                    articulation.outputMidiBank = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'midi-program':
+                    articulation.outputMidiProgram = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'midi-unpitched':
+                    articulation.outputMidiNumber = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'volume':
+                    articulation.outputVolume = MusicXmlImporter.interpolatePercent(Number.parseFloat(c.innerText));
+                    break;
+                case 'pan':
+                    articulation.outputBalance = MusicXmlImporter.interpolatePan(Number.parseFloat(c.innerText));
+                    break;
+            }
+        }
+    }
+    static interpolatePercent(value) {
+        return MusicXmlImporter.interpolate(0, 100, 0, 16, value) | 0;
+    }
+    static interpolatePan(value) {
+        return MusicXmlImporter.interpolate(-90, 90, 0, 16, value) | 0;
+    }
+    static interpolate(inputStart, inputEnd, outputStart, outputEnd, value) {
+        const t = (value - inputStart) / (inputEnd - inputStart);
+        return outputStart + (outputEnd - outputStart) * t;
+    }
+    parsePartDisplayAsText(element) {
+        let text = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'display-text':
+                    text += c.innerText;
+                    break;
+                case 'accidental-text':
+                    switch (c.innerText) {
+                        case 'sharp':
+                            text += '♯';
+                            break;
+                        case 'natural':
+                            text += '♮';
+                            break;
+                        case 'flat':
+                            text += '♭';
+                            break;
+                        case 'double-sharp':
+                            text += '𝄪';
+                            break;
+                        case 'sharp-sharp':
+                            text += '♯♯';
+                            break;
+                        case 'flat-flat':
+                            text += '𝄫';
+                            break;
+                        case 'natural-sharp':
+                            text += '♮♯';
+                            break;
+                        case 'natural-flat':
+                            text += '♮♭';
+                            break;
+                        case 'sharp-down':
+                            text += '𝄱';
+                            break;
+                        case 'sharp-up':
+                            text += '𝄰';
+                            break;
+                        case 'natural-down':
+                            text += '𝄯';
+                            break;
+                        case 'natural-up':
+                            text += '𝄮';
+                            break;
+                        case 'flat-down':
+                            text += '𝄭';
+                            break;
+                        case 'flat-up':
+                            text += '𝄬';
+                            break;
+                        case 'arrow-down':
+                            text += '↓';
+                            break;
+                        case 'arrow-up':
+                            text += '↑';
+                            break;
+                        case 'triple-sharp':
+                            text += '♯𝄪';
+                            break;
+                        case 'triple-flat':
+                            text += '𝄬𝄬𝄬';
+                            break;
+                        case 'sharp-1':
+                            text += '♯¹';
+                            break;
+                        case 'sharp-2':
+                            text += '♯²';
+                            break;
+                        case 'sharp-3':
+                            text += '♯³';
+                            break;
+                        case 'sharp-4':
+                            text += '♯⁴';
+                            break;
+                        case 'sharp-5':
+                            text += '♯⁵';
+                            break;
+                        case 'flat-1':
+                            text += '♭¹';
+                            break;
+                        case 'flat-2':
+                            text += '♭²';
+                            break;
+                        case 'flat-3':
+                            text += '♭³';
+                            break;
+                        case 'flat-4':
+                            text += '♭⁴';
+                            break;
+                        case 'flat-5':
+                            text += '♭⁵';
+                            break;
+                    }
+                    break;
+            }
+        }
+        return MusicXmlImporter.sanitizeDisplay(text);
+    }
+    parseWork(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'work-title':
+                    this._score.title = MusicXmlImporter.sanitizeDisplay(c.innerText);
+                    break;
+            }
+        }
+    }
+    parsePartwisePart(element) {
+        const id = element.attributes.get('id');
+        if (!id || !this._idToTrackInfo.has(id)) {
+            return;
+        }
+        const track = this._idToTrackInfo.get(id).track;
+        let index = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'measure':
+                    this.parsePartwiseMeasure(c, track, index);
+                    index++;
+                    break;
+            }
+        }
+    }
+    parsePartwiseMeasure(element, track, index) {
+        const masterBar = this.getOrCreateMasterBar(element, index);
+        this.parsePartMeasure(element, masterBar, track);
+    }
+    parseTimewiseMeasure(element, index) {
+        const masterBar = this.getOrCreateMasterBar(element, index);
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'part':
+                    this.parseTimewisePart(c, masterBar);
+                    break;
+            }
+        }
+    }
+    getOrCreateMasterBar(element, index) {
+        const implicit = element.attributes.get('implicit') === 'yes';
+        while (this._score.masterBars.length <= index) {
+            const newMasterBar = new MasterBar();
+            if (implicit) {
+                newMasterBar.isAnacrusis = true;
+            }
+            this._score.addMasterBar(newMasterBar);
+            if (newMasterBar.index > 0) {
+                newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar.timeSignatureDenominator;
+                newMasterBar.timeSignatureNumerator = newMasterBar.previousMasterBar.timeSignatureNumerator;
+                newMasterBar.tripletFeel = newMasterBar.previousMasterBar.tripletFeel;
+            }
+        }
+        const masterBar = this._score.masterBars[index];
+        return masterBar;
+    }
+    parseTimewisePart(element, masterBar) {
+        const id = element.attributes.get('id');
+        if (!id || !this._idToTrackInfo.has(id)) {
+            return;
+        }
+        const track = this._idToTrackInfo.get(id).track;
+        this.parsePartMeasure(element, masterBar, track);
+    }
+    parsePartMeasure(element, masterBar, track) {
+        this._musicalPosition = 0;
+        this._lastBeat = null;
+        masterBar.alternateEndings = this._nextMasterBarRepeatEnding;
+        const barLines = [];
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'note':
+                    this.parseNote(c, masterBar, track);
+                    break;
+                case 'backup':
+                    this.parseBackup(c);
+                    break;
+                case 'forward':
+                    this.parseForward(c);
+                    break;
+                case 'direction':
+                    this.parseDirection(c, masterBar, track);
+                    break;
+                case 'attributes':
+                    this.parseAttributes(c, masterBar, track);
+                    break;
+                case 'harmony':
+                    this.parseHarmony(c, track);
+                    break;
+                case 'print':
+                    this.parsePrint(c, masterBar, track);
+                    break;
+                case 'sound':
+                    this.parseSound(c, masterBar, track);
+                    break;
+                case 'barline':
+                    barLines.push(c);
+                    break;
+            }
+        }
+        for (const barLine of barLines) {
+            this.parseBarLine(barLine, masterBar, track);
+        }
+        this.applySimileMarks(masterBar, track);
+        const staff = this.getOrCreateStaff(track, 0);
+        this.getOrCreateBar(staff, masterBar);
+        this._keyAllStaves = null;
+    }
+    parsePrint(element, masterBar, track) {
+        if (element.getAttribute('new-system', 'no') === 'yes') {
+            track.addLineBreaks(masterBar.index);
+        }
+        else if (element.getAttribute('new-page', 'no') === 'yes') {
+            track.addLineBreaks(masterBar.index);
+        }
+    }
+    applySimileMarks(masterBar, track) {
+        if (this._simileMarkAllStaves !== null) {
+            for (const s of track.staves) {
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = this._simileMarkAllStaves;
+                if (bar.simileMark !== SimileMark.None) {
+                    this.clearBar(bar);
+                }
+            }
+            if (this._simileMarkAllStaves === SimileMark.FirstOfDouble) {
+                this._simileMarkAllStaves = SimileMark.SecondOfDouble;
+            }
+            else {
+                this._simileMarkAllStaves = null;
+            }
+        }
+        if (this._simileMarkPerStaff !== null) {
+            const keys = Array.from(this._simileMarkPerStaff.keys());
+            for (const i of keys) {
+                const s = this.getOrCreateStaff(track, i);
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = this._simileMarkPerStaff.get(i);
+                if (bar.simileMark !== SimileMark.None) {
+                    this.clearBar(bar);
+                }
+                if (bar.simileMark === SimileMark.FirstOfDouble) {
+                    this._simileMarkPerStaff.set(i, SimileMark.SecondOfDouble);
+                }
+                else {
+                    this._simileMarkPerStaff.delete(i);
+                }
+            }
+            if (this._simileMarkPerStaff.size === 0) {
+                this._simileMarkPerStaff = null;
+            }
+        }
+    }
+    clearBar(bar) {
+        for (const v of bar.voices) {
+            const emptyBeat = new Beat();
+            emptyBeat.isEmpty = true;
+            v.addBeat(emptyBeat);
+        }
+    }
+    parseBarLine(element, masterBar, track) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'bar-style':
+                    this.parseBarStyle(c, masterBar, track, element.getAttribute('location', 'right'));
+                    break;
+                case 'ending':
+                    this.parseEnding(c, masterBar);
+                    break;
+                case 'repeat':
+                    this.parseRepeat(c, masterBar);
+                    break;
+            }
+        }
+    }
+    parseRepeat(element, masterBar) {
+        const direction = element.getAttribute('direction');
+        let times = Number.parseInt(element.getAttribute('times'), 10);
+        if (times < 0 || Number.isNaN(times)) {
+            times = 2;
+        }
+        if (direction === 'backward') {
+            masterBar.repeatCount = times;
+        }
+        else if (direction === 'forward') {
+            masterBar.isRepeatStart = true;
+        }
+    }
+    parseEnding(element, masterBar) {
+        const numbers = element
+            .getAttribute('number')
+            .split(',')
+            .map(v => Number.parseInt(v, 10));
+        let flags = 0;
+        for (const num of numbers) {
+            flags = flags | ((0x01 << (num - 1)) & 0xff);
+        }
+        masterBar.alternateEndings = flags;
+        switch (element.getAttribute('type', '')) {
+            case 'start':
+                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding | flags;
+                break;
+            case 'stop':
+            case 'discontinue':
+                this._nextMasterBarRepeatEnding = this._nextMasterBarRepeatEnding & ~flags;
+                break;
+            case 'continue':
+                break;
+        }
+    }
+    parseBarStyle(element, masterBar, track, location) {
+        let style = BarLineStyle.Automatic;
+        switch (element.innerText) {
+            case 'dashed':
+                style = BarLineStyle.Dashed;
+                break;
+            case 'dotted':
+                style = BarLineStyle.Dotted;
+                break;
+            case 'heavy':
+                style = BarLineStyle.Heavy;
+                break;
+            case 'heavy-heavy':
+                style = BarLineStyle.HeavyHeavy;
+                break;
+            case 'heavy-light':
+                style = BarLineStyle.HeavyLight;
+                break;
+            case 'light-heavy':
+                style = BarLineStyle.LightHeavy;
+                break;
+            case 'light-light':
+                style = BarLineStyle.LightLight;
+                break;
+            case 'none':
+                style = BarLineStyle.None;
+                break;
+            case 'regular':
+                style = BarLineStyle.Regular;
+                break;
+            case 'short':
+                style = BarLineStyle.Short;
+                break;
+            case 'tick':
+                style = BarLineStyle.Tick;
+                break;
+        }
+        for (const s of track.staves) {
+            const bar = this.getOrCreateBar(s, masterBar);
+            switch (location) {
+                case 'left':
+                    bar.barLineLeft = style;
+                    break;
+                case 'right':
+                    bar.barLineRight = style;
+                    break;
+            }
+        }
+    }
+    parseSound(element, masterBar, _track) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'midi-instrument':
+                    this.parseSoundMidiInstrument(c, masterBar);
+                    break;
+                case 'swing':
+                    this.parseSwing(c, masterBar);
+                    break;
+                case 'offset':
+                    break;
+            }
+        }
+        if (element.attributes.has('coda')) {
+            masterBar.addDirection(Direction.TargetCoda);
+        }
+        if (element.attributes.has('tocoda')) {
+            masterBar.addDirection(Direction.JumpDaCoda);
+        }
+        if (element.attributes.has('dacapo')) {
+            masterBar.addDirection(Direction.JumpDaCapo);
+        }
+        if (element.attributes.has('dalsegno')) {
+            masterBar.addDirection(Direction.JumpDalSegno);
+        }
+        if (element.attributes.has('fine')) {
+            masterBar.addDirection(Direction.TargetFine);
+        }
+        if (element.attributes.has('segno')) {
+            masterBar.addDirection(Direction.TargetSegno);
+        }
+        if (element.attributes.has('pan')) {
+            if (!this._nextBeatAutomations) {
+                this._nextBeatAutomations = [];
+            }
+            const automation = new Automation();
+            automation.type = AutomationType.Balance;
+            automation.value = MusicXmlImporter.interpolatePan(Number.parseFloat(element.attributes.get('pan')));
+            this._nextBeatAutomations.push(automation);
+        }
+        if (element.attributes.has('tempo')) {
+            if (!this._nextBeatAutomations) {
+                this._nextBeatAutomations = [];
+            }
+            const automation = new Automation();
+            automation.type = AutomationType.Tempo;
+            automation.value = MusicXmlImporter.interpolatePercent(Number.parseFloat(element.attributes.get('tempo')));
+            this._nextBeatAutomations.push(automation);
+        }
+    }
+    parseSwing(element, masterBar) {
+        let first = 0;
+        let second = 0;
+        let swingType = null;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'straight':
+                    masterBar.tripletFeel = TripletFeel.NoTripletFeel;
+                    return;
+                case 'first':
+                    first = Number.parseInt(c.innerText, 10);
+                    break;
+                case 'second':
+                    second = Number.parseInt(c.innerText, 10);
+                    break;
+                case 'swing-type':
+                    swingType = this.parseBeatDuration(c);
+                    break;
+            }
+        }
+        if (!swingType) {
+            swingType = Duration.Eighth;
+        }
+        if (swingType === Duration.Eighth) {
+            if (first === 2 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Triplet8th;
+            }
+            else if (first === 3 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Dotted8th;
+            }
+            else if (first === 1 && second === 3) {
+                masterBar.tripletFeel = TripletFeel.Scottish8th;
+            }
+        }
+        else if (swingType === Duration.Sixteenth) {
+            if (first === 2 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Triplet16th;
+            }
+            else if (first === 3 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Dotted16th;
+            }
+            else if (first === 1 && second === 3) {
+                masterBar.tripletFeel = TripletFeel.Scottish16th;
+            }
+        }
+    }
+    parseSoundMidiInstrument(element, _masterBar) {
+        let automation;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'midi-bank':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+                    automation = new Automation();
+                    automation.type = AutomationType.Bank;
+                    automation.value = Number.parseInt(c.innerText, 10) - 1;
+                    this._nextBeatAutomations.push(automation);
+                    break;
+                case 'midi-program':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+                    automation = new Automation();
+                    automation.type = AutomationType.Instrument;
+                    automation.value = Number.parseInt(c.innerText, 10) - 1;
+                    this._nextBeatAutomations.push(automation);
+                    break;
+                case 'volume':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+                    automation = new Automation();
+                    automation.type = AutomationType.Volume;
+                    automation.value = MusicXmlImporter.interpolatePercent(Number.parseFloat(c.innerText));
+                    this._nextBeatAutomations.push(automation);
+                    break;
+                case 'pan':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+                    automation = new Automation();
+                    automation.type = AutomationType.Balance;
+                    automation.value = MusicXmlImporter.interpolatePan(Number.parseFloat(c.innerText));
+                    this._nextBeatAutomations.push(automation);
+                    break;
+            }
+        }
+    }
+    parseHarmony(element, _track) {
+        const chord = new Chord();
+        let degreeParenthesis = false;
+        let degree = '';
+        for (const childNode of element.childElements()) {
+            switch (childNode.localName) {
+                case 'root':
+                    chord.name = this.parseHarmonyRoot(childNode);
+                    break;
+                case 'kind':
+                    chord.name = chord.name + this.parseHarmonyKind(childNode);
+                    if (childNode.getAttribute('parentheses-degrees', 'no') === 'yes') {
+                        degreeParenthesis = true;
+                    }
+                    break;
+                case 'frame':
+                    this.parseHarmonyFrame(childNode, chord);
+                    break;
+                case 'degree':
+                    degree += this.parseDegree(childNode);
+                    break;
+            }
+        }
+        if (degree) {
+            chord.name += degreeParenthesis ? `(${degree})` : degree;
+        }
+        if (this._nextBeatChord === null) {
+            this._nextBeatChord = chord;
+        }
+    }
+    parseDegree(element) {
+        let value = '';
+        let alter = '';
+        let type = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'degree-value':
+                    value = c.innerText;
+                    break;
+                case 'degree-alter':
+                    switch (c.innerText) {
+                        case '-1':
+                            alter = '♭';
+                            break;
+                        case '1':
+                            alter = '♯';
+                            break;
+                    }
+                    break;
+                case 'degree-type':
+                    type += c.getAttribute('text', '');
+                    break;
+            }
+        }
+        return `${type}${alter}${value}`;
+    }
+    parseHarmonyRoot(element) {
+        let rootStep = '';
+        let rootAlter = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'root-step':
+                    rootStep = c.innerText;
+                    break;
+                case 'root-alter':
+                    switch (Number.parseFloat(c.innerText)) {
+                        case -2:
+                            rootAlter = 'bb';
+                            break;
+                        case -1:
+                            rootAlter = 'b';
+                            break;
+                        case 0:
+                            rootAlter = '';
+                            break;
+                        case 1:
+                            rootAlter = '#';
+                            break;
+                        case 2:
+                            rootAlter = '##';
+                            break;
+                    }
+                    break;
+            }
+        }
+        return rootStep + rootAlter;
+    }
+    parseHarmonyKind(xmlNode) {
+        const kindText = xmlNode.getAttribute('text');
+        let resultKind = '';
+        if (kindText) {
+            resultKind = kindText;
+        }
+        else {
+            const kindContent = xmlNode.innerText;
+            switch (kindContent) {
+                case 'major':
+                    resultKind = '';
+                    break;
+                case 'minor':
+                    resultKind = 'm';
+                    break;
+                case 'augmented':
+                    resultKind = '+';
+                    break;
+                case 'diminished':
+                    resultKind = '\u25CB';
+                    break;
+                case 'dominant':
+                    resultKind = '7';
+                    break;
+                case 'major-seventh':
+                    resultKind = '7M';
+                    break;
+                case 'minor-seventh':
+                    resultKind = 'm7';
+                    break;
+                case 'diminished-seventh':
+                    resultKind = '\u25CB7';
+                    break;
+                case 'augmented-seventh':
+                    resultKind = '+7';
+                    break;
+                case 'half-diminished':
+                    resultKind = '\u2349';
+                    break;
+                case 'major-minor':
+                    resultKind = 'mMaj';
+                    break;
+                case 'major-sixth':
+                    resultKind = 'maj6';
+                    break;
+                case 'minor-sixth':
+                    resultKind = 'm6';
+                    break;
+                case 'dominant-ninth':
+                    resultKind = '9';
+                    break;
+                case 'major-ninth':
+                    resultKind = 'maj9';
+                    break;
+                case 'minor-ninth':
+                    resultKind = 'm9';
+                    break;
+                case 'dominant-11th':
+                    resultKind = '11';
+                    break;
+                case 'major-11th':
+                    resultKind = 'maj11';
+                    break;
+                case 'minor-11th':
+                    resultKind = 'm11';
+                    break;
+                case 'dominant-13th':
+                    resultKind = '13';
+                    break;
+                case 'major-13th':
+                    resultKind = 'maj13';
+                    break;
+                case 'minor-13th':
+                    resultKind = 'm13';
+                    break;
+                case 'suspended-second':
+                    resultKind = 'sus2';
+                    break;
+                case 'suspended-fourth':
+                    resultKind = 'sus4';
+                    break;
+                case 'Neapolitan':
+                    resultKind = '♭II';
+                    break;
+                case 'Italian':
+                    resultKind = 'It⁺⁶';
+                    break;
+                case 'French':
+                    resultKind = 'Fr⁺⁶';
+                    break;
+                case 'German':
+                    resultKind = 'Fr⁺⁶';
+                    break;
+                default:
+                    resultKind = kindContent;
+                    break;
+            }
+        }
+        return resultKind;
+    }
+    parseHarmonyFrame(xmlNode, chord) {
+        for (const frameChild of xmlNode.childElements()) {
+            switch (frameChild.localName) {
+                case 'frame-strings':
+                    const stringsCount = Number.parseInt(frameChild.innerText, 10);
+                    chord.strings = new Array(stringsCount);
+                    for (let i = 0; i < stringsCount; i++) {
+                        chord.strings[i] = -1;
+                    }
+                    break;
+                case 'first-fret':
+                    chord.firstFret = Number.parseInt(frameChild.innerText, 10);
+                    break;
+                case 'frame-note':
+                    let stringNo = null;
+                    let fretNo = null;
+                    for (const noteChild of frameChild.childElements()) {
+                        switch (noteChild.localName) {
+                            case 'string':
+                                stringNo = Number.parseInt(noteChild.innerText, 10);
+                                break;
+                            case 'fret':
+                                fretNo = Number.parseInt(noteChild.innerText, 10);
+                                if (stringNo && fretNo >= 0) {
+                                    chord.strings[stringNo - 1] = fretNo;
+                                }
+                                break;
+                            case 'barre':
+                                if (stringNo && fretNo && noteChild.getAttribute('type') === 'start') {
+                                    chord.barreFrets.push(fretNo);
+                                }
+                                break;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    parseAttributes(element, masterBar, track) {
+        let staffIndex;
+        let staff;
+        let bar;
+        if (this._lastBeat == null) {
+            for (const c of element.childElements()) {
+                switch (c.localName) {
+                    case 'divisions':
+                        this._divisionsPerQuarterNote = Number.parseFloat(c.innerText);
+                        break;
+                    case 'key':
+                        this.parseKey(c, masterBar, track);
+                        break;
+                    case 'time':
+                        this.parseTime(c, masterBar);
+                        break;
+                    case 'staves':
+                        track.ensureStaveCount(Number.parseInt(c.innerText, 10));
+                        break;
+                    case 'clef':
+                        staffIndex = Number.parseInt(c.getAttribute('number', '1'), 10) - 1;
+                        staff = this.getOrCreateStaff(track, staffIndex);
+                        bar = this.getOrCreateBar(staff, masterBar);
+                        this.parseClef(c, bar);
+                        break;
+                    case 'staff-details':
+                        staffIndex = Number.parseInt(c.getAttribute('number', '1'), 10) - 1;
+                        staff = this.getOrCreateStaff(track, staffIndex);
+                        this.parseStaffDetails(c, staff);
+                        break;
+                    case 'transpose':
+                        this.parseTranspose(c, track);
+                        break;
+                    case 'measure-style':
+                        this.parseMeasureStyle(c, track, false);
+                        break;
+                }
+            }
+        }
+        else {
+            for (const c of element.childElements()) {
+                switch (c.localName) {
+                    case 'divisions':
+                        this._divisionsPerQuarterNote = Number.parseFloat(c.innerText);
+                        break;
+                    case 'measure-style':
+                        this.parseMeasureStyle(c, track, true);
+                        break;
+                }
+            }
+        }
+    }
+    parseMeasureStyle(element, _track, midBar) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'measure-repeat':
+                    if (!midBar) {
+                        let simileMark = null;
+                        switch (c.getAttribute('type')) {
+                            case 'start':
+                                switch (Number.parseInt(c.getAttribute('slashes', '1'), 10)) {
+                                    case 1:
+                                        simileMark = SimileMark.Simple;
+                                        break;
+                                    case 2:
+                                        simileMark = SimileMark.FirstOfDouble;
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                break;
+                            case 'stop':
+                                simileMark = null;
+                                break;
+                        }
+                        if (element.attributes.has('number')) {
+                            this._simileMarkPerStaff = this._simileMarkPerStaff ?? new Map();
+                            const staff = Number.parseInt(element.attributes.get('number'), 10) - 1;
+                            if (simileMark == null) {
+                                this._simileMarkPerStaff.delete(staff);
+                            }
+                            else {
+                                this._simileMarkPerStaff.set(staff, simileMark);
+                            }
+                        }
+                        else {
+                            this._simileMarkAllStaves = simileMark;
+                        }
+                    }
+                    break;
+                case 'slash':
+                    switch (c.getAttribute('type')) {
+                        case 'start':
+                            this._isBeatSlash = true;
+                            break;
+                        case 'stop':
+                            this._isBeatSlash = false;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseTranspose(element, track) {
+        let semitones = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'chromatic':
+                    semitones += Number.parseFloat(c.innerText);
+                    break;
+                case 'octave-change':
+                    semitones += Number.parseFloat(c.innerText) * 12;
+                    break;
+            }
+        }
+        if (element.attributes.has('number')) {
+            const staff = this.getOrCreateStaff(track, Number.parseInt(element.attributes.get('number'), 10) - 1);
+            this.getStaffContext(staff).transpose = semitones;
+            staff.displayTranspositionPitch = semitones;
+        }
+        else {
+            for (const staff of track.staves) {
+                this.getStaffContext(staff).transpose = semitones;
+                staff.displayTranspositionPitch = semitones;
+            }
+        }
+    }
+    parseStaffDetails(element, staff) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'staff-lines':
+                    staff.standardNotationLineCount = Number.parseInt(c.innerText, 10);
+                    break;
+                case 'staff-tuning':
+                    this.parseStaffTuning(c, staff);
+                    break;
+                case 'capo':
+                    staff.capo = Number.parseInt(c.innerText, 10);
+                    break;
+            }
+        }
+    }
+    parseStaffTuning(element, staff) {
+        if (staff.stringTuning.tunings.length === 0) {
+            staff.showTablature = true;
+            staff.showStandardNotation = false;
+            staff.stringTuning.tunings = new Array(staff.standardNotationLineCount).fill(0);
+        }
+        const line = Number.parseInt(element.getAttribute('line'), 10);
+        let tuningStep = 'C';
+        let tuningOctave = '';
+        let tuningAlter = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'tuning-step':
+                    tuningStep = c.innerText;
+                    break;
+                case 'tuning-alter':
+                    tuningAlter = Number.parseFloat(c.innerText);
+                    break;
+                case 'tuning-octave':
+                    tuningOctave = c.innerText;
+                    break;
+            }
+        }
+        const tuning = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
+        staff.tuning[staff.tuning.length - line] = tuning;
+    }
+    parseClef(element, bar) {
+        let sign = 's';
+        let line = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'sign':
+                    sign = c.innerText.toLowerCase();
+                    break;
+                case 'line':
+                    line = Number.parseInt(c.innerText, 10);
+                    break;
+                case 'clef-octave-change':
+                    switch (Number.parseInt(c.innerText, 10)) {
+                        case -2:
+                            bar.clefOttava = Ottavia._15mb;
+                            break;
+                        case -1:
+                            bar.clefOttava = Ottavia._8vb;
+                            break;
+                        case 1:
+                            bar.clefOttava = Ottavia._8va;
+                            break;
+                        case 2:
+                            bar.clefOttava = Ottavia._15mb;
+                            break;
+                    }
+                    break;
+            }
+        }
+        switch (sign) {
+            case 'g':
+                bar.clef = Clef.G2;
+                break;
+            case 'f':
+                bar.clef = Clef.F4;
+                break;
+            case 'c':
+                if (line === 3) {
+                    bar.clef = Clef.C3;
+                }
+                else {
+                    bar.clef = Clef.C4;
+                }
+                break;
+            case 'percussion':
+                bar.clef = Clef.Neutral;
+                bar.staff.isPercussion = true;
+                break;
+            case 'tab':
+                bar.clef = Clef.G2;
+                bar.staff.showTablature = true;
+                break;
+            default:
+                bar.clef = Clef.G2;
+                break;
+        }
+    }
+    parseTime(element, masterBar) {
+        let beatsParsed = false;
+        let beatTypeParsed = false;
+        for (const c of element.childElements()) {
+            const v = c.innerText;
+            switch (c.localName) {
+                case 'beats':
+                    if (!beatsParsed) {
+                        if (v.indexOf('+') === -1) {
+                            masterBar.timeSignatureNumerator = Number.parseInt(v, 10);
+                        }
+                        else {
+                            masterBar.timeSignatureNumerator = v
+                                .split('+')
+                                .map(v => Number.parseInt(v, 10))
+                                .reduce((sum, v) => v + sum, 0);
+                        }
+                        beatsParsed = true;
+                    }
+                    break;
+                case 'beat-type':
+                    if (!beatTypeParsed) {
+                        if (v.indexOf('+') === -1) {
+                            masterBar.timeSignatureDenominator = Number.parseInt(v, 10);
+                        }
+                        else {
+                            masterBar.timeSignatureDenominator = v
+                                .split('+')
+                                .map(v => Number.parseInt(v, 10))
+                                .reduce((sum, v) => v + sum, 0);
+                        }
+                        beatTypeParsed = true;
+                    }
+                    break;
+            }
+        }
+        switch (element.getAttribute('symbol', '')) {
+            case 'common':
+            case 'cut':
+                masterBar.timeSignatureCommon = true;
+                break;
+        }
+    }
+    parseKey(element, masterBar, track) {
+        let fifths = -KeySignature.C;
+        let mode = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'fifths':
+                    fifths = Number.parseInt(c.innerText, 10);
+                    break;
+                case 'mode':
+                    mode = c.innerText;
+                    break;
+            }
+        }
+        let keySignature;
+        if (-7 <= fifths && fifths <= 7) {
+            keySignature = fifths;
+        }
+        else {
+            keySignature = KeySignature.C;
+        }
+        let keySignatureType;
+        if (mode === 'minor') {
+            keySignatureType = KeySignatureType.Minor;
+        }
+        else {
+            keySignatureType = KeySignatureType.Major;
+        }
+        if (element.attributes.has('number')) {
+            const staff = this.getOrCreateStaff(track, Number.parseInt(element.attributes.get('number'), 10) - 1);
+            const bar = this.getOrCreateBar(staff, masterBar);
+            bar.keySignature = keySignature;
+            bar.keySignatureType = keySignatureType;
+        }
+        else {
+            this._keyAllStaves = [keySignature, keySignatureType];
+            for (const s of track.staves) {
+                if (s.bars.length > masterBar.index) {
+                    s.bars[masterBar.index].keySignature = keySignature;
+                    s.bars[masterBar.index].keySignatureType = keySignatureType;
+                }
+            }
+        }
+    }
+    parseDirection(element, masterBar, track) {
+        const directionTypes = [];
+        let offset = null;
+        let staffIndex = -1;
+        let tempo = -1;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'direction-type':
+                    const type = c.firstElement;
+                    if (type) {
+                        directionTypes.push(type);
+                    }
+                    break;
+                case 'offset':
+                    offset = Number.parseFloat(c.innerText);
+                    break;
+                case 'voice':
+                    break;
+                case 'staff':
+                    staffIndex = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'sound':
+                    if (c.attributes.has('tempo')) {
+                        tempo = Number.parseFloat(c.attributes.get('tempo'));
+                    }
+                    break;
+            }
+        }
+        let staff = null;
+        if (staffIndex >= 0) {
+            staff = this.getOrCreateStaff(track, staffIndex);
+        }
+        else if (this._lastBeat !== null) {
+            staff = this._lastBeat.voice.bar.staff;
+        }
+        else {
+            staff = this.getOrCreateStaff(track, 0);
+        }
+        const bar = staff ? this.getOrCreateBar(staff, masterBar) : null;
+        const getRatioPosition = () => {
+            let timelyPosition = this._musicalPosition;
+            if (offset !== null) {
+                timelyPosition += offset;
+            }
+            const totalDuration = masterBar.calculateDuration(false);
+            return timelyPosition / totalDuration;
+        };
+        if (tempo > 0) {
+            const tempoAutomation = new Automation();
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = tempo;
+            tempoAutomation.ratioPosition = getRatioPosition();
+            if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+                masterBar.tempoAutomations.push(tempoAutomation);
+                if (masterBar.index === 0) {
+                    masterBar.score.tempo = tempoAutomation.value;
+                }
+            }
+        }
+        let previousWords = '';
+        for (const direction of directionTypes) {
+            switch (direction.localName) {
+                case 'rehearsal':
+                    masterBar.section = new Section();
+                    masterBar.section.marker = direction.innerText;
+                    break;
+                case 'segno':
+                    masterBar.addDirection(Direction.TargetSegno);
+                    break;
+                case 'coda':
+                    masterBar.addDirection(Direction.TargetCoda);
+                    break;
+                case 'words':
+                    previousWords = direction.innerText;
+                    break;
+                case 'wedge':
+                    switch (direction.getAttribute('type')) {
+                        case 'crescendo':
+                            this._nextBeatCrescendo = CrescendoType.Crescendo;
+                            break;
+                        case 'diminuendo':
+                            this._nextBeatCrescendo = CrescendoType.Decrescendo;
+                            break;
+                        case 'stop':
+                            this._nextBeatCrescendo = null;
+                            break;
+                    }
+                    break;
+                case 'dynamics':
+                    const newDynamics = this.parseDynamics(direction);
+                    if (newDynamics !== null) {
+                        this._currentDynamics = newDynamics;
+                    }
+                    break;
+                case 'dashes':
+                    const type = direction.getAttribute('type', 'start');
+                    switch (previousWords) {
+                        case 'LetRing':
+                            this._nextBeatLetRing = type === 'start' || type === 'continue';
+                            break;
+                        case 'P.M.':
+                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
+                            break;
+                    }
+                    previousWords = '';
+                    break;
+                case 'pedal':
+                    const pedal = this.parsePedal(direction);
+                    if (pedal && bar) {
+                        pedal.ratioPosition = getRatioPosition();
+                        const canHaveUp = bar.sustainPedals.length > 0 &&
+                            bar.sustainPedals[bar.sustainPedals.length - 1].pedalType !== SustainPedalMarkerType.Up;
+                        if (pedal.pedalType !== SustainPedalMarkerType.Up || canHaveUp) {
+                            bar.sustainPedals.push(pedal);
+                        }
+                    }
+                    break;
+                case 'metronome':
+                    this.parseMetronome(direction, masterBar, getRatioPosition());
+                    break;
+                case 'octave-shift':
+                    this._nextBeatOttavia = this.parseOctaveShift(direction);
+                    break;
+            }
+        }
+        if (previousWords) {
+            this._nextBeatText = previousWords;
+        }
+    }
+    parseOctaveShift(element) {
+        const type = element.getAttribute('type');
+        const size = Number.parseInt(element.getAttribute('size', '8'), 10);
+        switch (size) {
+            case 15:
+                switch (type) {
+                    case 'up':
+                        return Ottavia._15mb;
+                    case 'down':
+                        return Ottavia._15ma;
+                    case 'stop':
+                        return Ottavia.Regular;
+                    case 'continue':
+                        return this._nextBeatOttavia;
+                }
+                break;
+            case 8:
+                switch (type) {
+                    case 'up':
+                        return Ottavia._8vb;
+                    case 'down':
+                        return Ottavia._8va;
+                    case 'stop':
+                        return Ottavia.Regular;
+                    case 'continue':
+                        return this._nextBeatOttavia;
+                }
+                break;
+        }
+        return null;
+    }
+    parseMetronome(element, masterBar, ratioPosition) {
+        let unit = null;
+        let perMinute = -1;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'beat-unit':
+                    unit = this.parseBeatDuration(c);
+                    break;
+                case 'per-minute':
+                    perMinute = Number.parseFloat(c.innerText);
+                    break;
+            }
+        }
+        if (unit !== null && perMinute > 0) {
+            const tempoAutomation = new Automation();
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+            tempoAutomation.ratioPosition = ratioPosition;
+            if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+                masterBar.tempoAutomations.push(tempoAutomation);
+                if (masterBar.index === 0) {
+                    masterBar.score.tempo = tempoAutomation.value;
+                }
+            }
+        }
+    }
+    hasSameTempo(masterBar, tempoAutomation) {
+        for (const existing of masterBar.tempoAutomations) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value === existing.value) {
+                return true;
+            }
+        }
+        return false;
+    }
+    parsePedal(element) {
+        const marker = new SustainPedalMarker();
+        switch (element.getAttribute('type')) {
+            case 'start':
+                marker.pedalType = SustainPedalMarkerType.Down;
+                break;
+            case 'stop':
+                marker.pedalType = SustainPedalMarkerType.Up;
+                break;
+            case 'continue':
+                marker.pedalType = SustainPedalMarkerType.Hold;
+                break;
+            default:
+                return null;
+        }
+        return marker;
+    }
+    parseDynamics(element) {
+        for (const c of element.childElements()) {
+            const dynamicString = c.localName.toUpperCase();
+            switch (dynamicString) {
+                case 'PPP':
+                case 'PP':
+                case 'P':
+                case 'MP':
+                case 'MF':
+                case 'F':
+                case 'FF':
+                case 'FFF':
+                case 'PPPP':
+                case 'PPPPP':
+                case 'PPPPPP':
+                case 'FFFF':
+                case 'FFFFF':
+                case 'FFFFFF':
+                case 'SF':
+                case 'SFP':
+                case 'SFPP':
+                case 'FP':
+                case 'RF':
+                case 'RFZ':
+                case 'SFZ':
+                case 'SFFZ':
+                case 'FZ':
+                case 'N':
+                case 'PF':
+                case 'SFZP':
+                    return DynamicValue[dynamicString];
+            }
+        }
+        return null;
+    }
+    parseForward(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'duration':
+                    this._musicalPosition += this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(c.innerText));
+                    break;
+            }
+        }
+    }
+    parseBackup(element) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'duration':
+                    const beat = this._lastBeat;
+                    if (beat) {
+                        let musicalPosition = this._musicalPosition;
+                        musicalPosition -= this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(c.innerText));
+                        if (musicalPosition < 0) {
+                            musicalPosition = 0;
+                        }
+                        this._musicalPosition = musicalPosition;
+                    }
+                    break;
+            }
+        }
+    }
+    getOrCreateStaff(track, staffIndex) {
+        while (track.staves.length <= staffIndex) {
+            const staff = new Staff();
+            track.addStaff(staff);
+            if (this._score.masterBars.length > 0) {
+                this.getOrCreateBar(staff, this._score.masterBars[this._score.masterBars.length - 1]);
+            }
+        }
+        return track.staves[staffIndex];
+    }
+    getOrCreateBar(staff, masterBar) {
+        const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+        while (staff.bars.length <= masterBar.index) {
+            const newBar = new Bar();
+            staff.addBar(newBar);
+            if (newBar.previousBar) {
+                newBar.clef = newBar.previousBar.clef;
+                newBar.clefOttava = newBar.previousBar.clefOttava;
+                newBar.keySignature = newBar.previousBar.keySignature;
+                newBar.keySignatureType = newBar.previousBar.keySignatureType;
+            }
+            if (this._keyAllStaves != null) {
+                newBar.keySignature = this._keyAllStaves[0];
+                newBar.keySignatureType = this._keyAllStaves[1];
+            }
+            for (let i = 0; i < voiceCount; i++) {
+                const voice = new Voice();
+                newBar.addVoice(voice);
+            }
+        }
+        return staff.bars[masterBar.index];
+    }
+    getOrCreateVoice(bar, voiceIndex) {
+        let voicesCreated = false;
+        while (bar.voices.length <= voiceIndex) {
+            bar.addVoice(new Voice());
+            voicesCreated = true;
+        }
+        if (voicesCreated) {
+            for (const b of bar.staff.bars) {
+                while (b.voices.length <= voiceIndex) {
+                    b.addVoice(new Voice());
+                }
+            }
+        }
+        return bar.voices[voiceIndex];
+    }
+    parseNote(element, masterBar, track) {
+        let beat = null;
+        let graceType = GraceType.None;
+        let graceDurationInDivisions = 0;
+        let beamMode = null;
+        let isChord = false;
+        let staffIndex = 0;
+        let voiceIndex = 0;
+        let durationInTicks = -1;
+        let beatDuration = null;
+        let dots = 0;
+        let tupletNumerator = -1;
+        let tupletDenominator = -1;
+        let note = null;
+        let isPitched = false;
+        let instrumentId = null;
+        const noteIsVisible = element.getAttribute('print-object', 'yes') !== 'no';
+        const ensureBeat = () => {
+            if (beat !== null) {
+                return;
+            }
+            if (isChord && !this._lastBeat) {
+                Logger.warning('MusicXML', 'Malformed MusicXML, <chord /> cannot be set on the first note of a measure');
+                isChord = false;
+            }
+            if (isChord && !note) {
+                Logger.warning('MusicXML', 'Cannot mix <chord /> and <rest />');
+                isChord = false;
+            }
+            const staff = this.getOrCreateStaff(track, staffIndex);
+            if (isChord) {
+                beat = this._lastBeat;
+                beat.addNote(note);
+                return;
+            }
+            const bar = this.getOrCreateBar(staff, masterBar);
+            const voice = this.getOrCreateVoice(bar, voiceIndex);
+            const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
+            let gap = this._musicalPosition - actualMusicalPosition;
+            if (gap > 0) {
+                if (this._lastBeat &&
+                    this._lastBeat.beamingMode === BeatBeamingMode.ForceMergeWithNext &&
+                    this._lastBeat.voice.bar.staff.index !== staffIndex &&
+                    voice.beats.length > 0 &&
+                    voice.beats[voice.beats.length - 1].beamingMode === BeatBeamingMode.ForceMergeWithNext) {
+                    const preferredDuration = voice.beats[voice.beats.length - 1].duration;
+                    while (gap > 0) {
+                        const restGap = this.createRestForGap(gap, preferredDuration);
+                        if (restGap !== null) {
+                            this.insertBeatToVoice(restGap, voice);
+                            gap -= restGap.playbackDuration;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+                }
+                if (gap > 0) {
+                    const placeholder = new Beat();
+                    placeholder.dynamics = this._currentDynamics;
+                    placeholder.isEmpty = true;
+                    placeholder.duration = Duration.TwoHundredFiftySixth;
+                    placeholder.overrideDisplayDuration = gap;
+                    placeholder.updateDurations();
+                    this.insertBeatToVoice(placeholder, voice);
+                }
+            }
+            else if (gap < 0) {
+                Logger.error('MusicXML', 'Unsupported forward/backup detected. Cannot fill new beats into already filled area of voice');
+            }
+            if (durationInTicks < 0 && beatDuration !== null) {
+                durationInTicks = MidiUtils.toTicks(beatDuration);
+                if (dots > 0) {
+                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots === 2);
+                }
+            }
+            const newBeat = new Beat();
+            beat = newBeat;
+            if (beamMode === null) {
+                newBeat.beamingMode = this.getStaffContext(staff).isExplicitlyBeamed
+                    ? BeatBeamingMode.ForceSplitToNext
+                    : BeatBeamingMode.Auto;
+            }
+            else {
+                newBeat.beamingMode = beamMode;
+                this.getStaffContext(staff).isExplicitlyBeamed = true;
+            }
+            newBeat.isEmpty = false;
+            newBeat.dynamics = this._currentDynamics;
+            if (this._isBeatSlash) {
+                newBeat.slashed = true;
+            }
+            const automations = this._nextBeatAutomations;
+            this._nextBeatAutomations = null;
+            if (automations !== null) {
+                for (const automation of automations) {
+                    newBeat.automations.push(automation);
+                }
+            }
+            const chord = this._nextBeatChord;
+            this._nextBeatChord = null;
+            if (chord !== null) {
+                newBeat.chordId = chord.uniqueId;
+                if (!voice.bar.staff.hasChord(chord.uniqueId)) {
+                    voice.bar.staff.addChord(newBeat.chordId, chord);
+                }
+            }
+            const crescendo = this._nextBeatCrescendo;
+            if (crescendo !== null) {
+                newBeat.crescendo = crescendo;
+            }
+            const ottavia = this._nextBeatOttavia;
+            if (ottavia !== null) {
+                newBeat.ottava = ottavia;
+            }
+            newBeat.isLetRing = this._nextBeatLetRing;
+            newBeat.isPalmMute = this._nextBeatPalmMute;
+            if (this._nextBeatText) {
+                newBeat.text = this._nextBeatText;
+                this._nextBeatText = null;
+            }
+            if (note !== null) {
+                newBeat.addNote(note);
+            }
+            this.insertBeatToVoice(newBeat, voice);
+            if (note !== null) {
+                note.isVisible = noteIsVisible;
+                const trackInfo = this._indexToTrackInfo.get(track.index);
+                if (instrumentId !== null) {
+                    note.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId, note);
+                }
+                else if (!isPitched) {
+                    note.percussionArticulation = trackInfo.getOrCreateArticulation('', note);
+                }
+            }
+            if (graceType !== GraceType.None) {
+                newBeat.graceType = graceType;
+                this.applyBeatDurationFromTicks(newBeat, graceDurationInDivisions, null, false);
+            }
+            else {
+                newBeat.tupletNumerator = tupletNumerator;
+                newBeat.tupletDenominator = tupletDenominator;
+                newBeat.dots = dots;
+                this.applyBeatDurationFromTicks(newBeat, durationInTicks, beatDuration, true);
+            }
+            this._musicalPosition = newBeat.displayEnd;
+            this._lastBeat = newBeat;
+        };
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'grace':
+                    const makeTime = Number.parseFloat(c.getAttribute('make-time', '-1'));
+                    if (makeTime >= 0) {
+                        graceDurationInDivisions = this.musicXmlDivisionsToAlphaTabTicks(makeTime);
+                        graceType = GraceType.BeforeBeat;
+                    }
+                    else {
+                        graceType = GraceType.OnBeat;
+                    }
+                    if (c.getAttribute('slash') === 'yes') {
+                        graceType = GraceType.BeforeBeat;
+                    }
+                    break;
+                case 'chord':
+                    isChord = true;
+                    break;
+                case 'cue':
+                    return;
+                case 'pitch':
+                    note = this.parsePitch(c);
+                    isPitched = true;
+                    break;
+                case 'unpitched':
+                    note = this.parseUnpitched(c, track);
+                    break;
+                case 'rest':
+                    note = null;
+                    if (beatDuration === null) {
+                        beatDuration = Duration.Whole;
+                    }
+                    break;
+                case 'duration':
+                    durationInTicks = this.parseDuration(c);
+                    break;
+                case 'instrument':
+                    instrumentId = c.getAttribute('id', '');
+                    break;
+                case 'voice':
+                    voiceIndex = Number.parseInt(c.innerText, 10);
+                    if (Number.isNaN(voiceIndex)) {
+                        Logger.warning('MusicXML', 'Voices need to be specified as numbers');
+                        voiceIndex = 0;
+                    }
+                    else {
+                        voiceIndex = voiceIndex - 1;
+                    }
+                    break;
+                case 'type':
+                    beatDuration = this.parseBeatDuration(c);
+                    break;
+                case 'dot':
+                    dots++;
+                    break;
+                case 'accidental':
+                    if (note === null) {
+                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
+                    }
+                    else {
+                        this.parseAccidental(c, note);
+                    }
+                    break;
+                case 'time-modification':
+                    for (const tmc of c.childElements()) {
+                        switch (tmc.localName) {
+                            case 'actual-notes':
+                                tupletNumerator = Number.parseInt(tmc.innerText, 10);
+                                break;
+                            case 'normal-notes':
+                                tupletDenominator = Number.parseInt(tmc.innerText, 10);
+                                break;
+                        }
+                    }
+                    break;
+                case 'stem':
+                    break;
+                case 'notehead':
+                    if (note === null) {
+                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
+                    }
+                    else {
+                    }
+                    break;
+                case 'staff':
+                    staffIndex = Number.parseInt(c.innerText, 10) - 1;
+                    break;
+                case 'beam':
+                    if (c.getAttribute('number', '1') === '1') {
+                        switch (c.innerText) {
+                            case 'begin':
+                                beamMode = BeatBeamingMode.ForceMergeWithNext;
+                                break;
+                            case 'continue':
+                                beamMode = BeatBeamingMode.ForceMergeWithNext;
+                                break;
+                            case 'end':
+                                beamMode = BeatBeamingMode.ForceSplitToNext;
+                                break;
+                        }
+                    }
+                    break;
+                case 'notations':
+                    ensureBeat();
+                    this.parseNotations(c, note, beat);
+                    break;
+                case 'lyric':
+                    ensureBeat();
+                    this.parseLyric(c, beat, track);
+                    break;
+                case 'play':
+                    this.parsePlay(c, note);
+                    break;
+            }
+        }
+        if (isPitched) {
+            const staff = this.getOrCreateStaff(track, staffIndex);
+            const transpose = this.getStaffContext(staff).transpose;
+            if (transpose !== 0) {
+                const value = note.octave * 12 + note.tone + transpose;
+                note.octave = (value / 12) | 0;
+                note.tone = value - note.octave * 12;
+            }
+        }
+        ensureBeat();
+    }
+    parsePlay(element, note) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'mute':
+                    if (note && c.innerText === 'palm') {
+                        note.isPalmMute = true;
+                    }
+                    break;
+                case 'semi-pitched':
+                    break;
+            }
+        }
+    }
+    createRestForGap(gap, preferredDuration) {
+        let preferredDurationTicks = MidiUtils.toTicks(preferredDuration);
+        while (preferredDurationTicks > gap) {
+            if (preferredDuration === Duration.TwoHundredFiftySixth) {
+                return null;
+            }
+            preferredDuration = (preferredDuration * 2);
+            preferredDurationTicks = MidiUtils.toTicks(preferredDuration);
+        }
+        const placeholder = new Beat();
+        placeholder.dynamics = this._currentDynamics;
+        placeholder.isEmpty = false;
+        placeholder.duration = preferredDuration;
+        placeholder.overrideDisplayDuration = preferredDurationTicks;
+        placeholder.updateDurations();
+        return placeholder;
+    }
+    insertBeatToVoice(newBeat, voice) {
+        if (voice.beats.length > 0) {
+            const lastBeat = voice.beats[voice.beats.length - 1];
+            lastBeat.nextBeat = newBeat;
+            newBeat.previousBeat = lastBeat;
+            let previousNonGraceBeat = lastBeat;
+            while (previousNonGraceBeat !== null) {
+                if (previousNonGraceBeat.graceType === GraceType.None) {
+                    break;
+                }
+                if (previousNonGraceBeat.index > 0) {
+                    previousNonGraceBeat = previousNonGraceBeat.previousBeat;
+                }
+                else {
+                    previousNonGraceBeat = null;
+                }
+            }
+            if (previousNonGraceBeat !== null) {
+                newBeat.displayStart = previousNonGraceBeat.displayEnd;
+            }
+        }
+        voice.addBeat(newBeat);
+    }
+    musicXmlDivisionsToAlphaTabTicks(divisions) {
+        return (divisions * MidiUtils.QuarterTime) / this._divisionsPerQuarterNote;
+    }
+    parseBeatDuration(element) {
+        switch (element.innerText) {
+            case '1024th':
+                return Duration.TwoHundredFiftySixth;
+            case '512th':
+                return Duration.TwoHundredFiftySixth;
+            case '256th':
+                return Duration.TwoHundredFiftySixth;
+            case '128th':
+                return Duration.OneHundredTwentyEighth;
+            case '64th':
+                return Duration.SixtyFourth;
+            case '32nd':
+                return Duration.ThirtySecond;
+            case '16th':
+                return Duration.Sixteenth;
+            case 'eighth':
+                return Duration.Eighth;
+            case 'quarter':
+                return Duration.Quarter;
+            case 'half':
+                return Duration.Half;
+            case 'whole':
+                return Duration.Whole;
+            case 'breve':
+                return Duration.DoubleWhole;
+            case 'long':
+                return Duration.QuadrupleWhole;
+        }
+        return null;
+    }
+    applyBeatDurationFromTicks(newBeat, ticks, beatDuration, applyDisplayDuration) {
+        if (!beatDuration) {
+            for (let i = 0; i < MusicXmlImporter.allDurations.length; i++) {
+                const dt = MusicXmlImporter.allDurationTicks[i];
+                if (ticks >= dt) {
+                    beatDuration = MusicXmlImporter.allDurations[i];
+                }
+                else {
+                    break;
+                }
+            }
+        }
+        newBeat.duration = beatDuration ?? Duration.Sixteenth;
+        if (applyDisplayDuration) {
+            newBeat.overrideDisplayDuration = ticks;
+        }
+        newBeat.updateDurations();
+    }
+    parseLyric(element, beat, track) {
+        const info = this._indexToTrackInfo.get(track.index);
+        const index = info.getLyricLine(element.getAttribute('number', ''));
+        if (beat.lyrics === null) {
+            beat.lyrics = [];
+        }
+        while (beat.lyrics.length <= index) {
+            beat.lyrics.push('');
+        }
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'text':
+                    if (beat.lyrics[index]) {
+                        beat.lyrics[index] += ` ${c.innerText}`;
+                    }
+                    else {
+                        beat.lyrics[index] = c.innerText;
+                    }
+                    break;
+                case 'elision':
+                    beat.lyrics[index] += c.innerText;
+                    break;
+            }
+        }
+    }
+    parseNotations(element, note, beat) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'tied':
+                    if (note) {
+                        this.parseTied(c, note, beat.voice.bar.staff);
+                    }
+                    break;
+                case 'slur':
+                    if (note) {
+                        this.parseSlur(c, note);
+                    }
+                    break;
+                case 'glissando':
+                    if (note) {
+                        this.parseGlissando(c, note);
+                    }
+                    break;
+                case 'slide':
+                    if (note) {
+                        this.parseSlide(c, note);
+                    }
+                    break;
+                case 'ornaments':
+                    if (note) {
+                        this.parseOrnaments(c, note);
+                    }
+                    break;
+                case 'technical':
+                    this.parseTechnical(c, note, beat);
+                    break;
+                case 'articulations':
+                    if (note) {
+                        this.parseArticulations(c, note);
+                    }
+                    break;
+                case 'dynamics':
+                    const dynamics = this.parseDynamics(c);
+                    if (dynamics !== null) {
+                        beat.dynamics = dynamics;
+                        this._currentDynamics = dynamics;
+                    }
+                    break;
+                case 'fermata':
+                    this.parseFermata(c, beat);
+                    break;
+                case 'arpeggiate':
+                    this.parseArpeggiate(c, beat);
+                    break;
+            }
+        }
+    }
+    getStaffContext(staff) {
+        if (!this._staffToContext.has(staff)) {
+            const context = new StaffContext();
+            this._staffToContext.set(staff, context);
+            return context;
+        }
+        return this._staffToContext.get(staff);
+    }
+    parseGlissando(element, note) {
+        const type = element.getAttribute('type');
+        const number = element.getAttribute('number', '1');
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+        switch (type) {
+            case 'start':
+                context.slideOrigins.set(number, note);
+                break;
+            case 'stop':
+                if (context.slideOrigins.has(number)) {
+                    const origin = context.slideOrigins.get(number);
+                    origin.slideTarget = note;
+                    note.slideOrigin = origin;
+                    origin.slideOutType = SlideOutType.Shift;
+                }
+                break;
+        }
+    }
+    parseSlur(element, note) {
+        const slurNumber = element.getAttribute('number', '1');
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+        switch (element.getAttribute('type')) {
+            case 'start':
+                context.slurStarts.set(slurNumber, note);
+                break;
+            case 'stop':
+                if (context.slurStarts.has(slurNumber)) {
+                    note.isSlurDestination = true;
+                    const slurStart = context.slurStarts.get(slurNumber);
+                    slurStart.slurDestination = note;
+                    note.slurOrigin = slurStart;
+                    context.slurStarts.delete(slurNumber);
+                }
+                break;
+        }
+    }
+    parseArpeggiate(element, beat) {
+        const direction = element.getAttribute('direction', 'down');
+        switch (direction) {
+            case 'down':
+                beat.brushType = BrushType.ArpeggioDown;
+                break;
+            case 'up':
+                beat.brushType = BrushType.ArpeggioUp;
+                break;
+        }
+    }
+    parseFermata(element, beat) {
+        let fermata;
+        switch (element.innerText) {
+            case 'normal':
+                fermata = FermataType.Medium;
+                break;
+            case 'angled':
+                fermata = FermataType.Short;
+                break;
+            case 'square':
+                fermata = FermataType.Long;
+                break;
+            default:
+                fermata = FermataType.Medium;
+                break;
+        }
+        beat.fermata = new Fermata();
+        beat.fermata.type = fermata;
+    }
+    parseArticulations(element, note) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'accent':
+                    note.accentuated = AccentuationType.Normal;
+                    break;
+                case 'strong-accent':
+                    note.accentuated = AccentuationType.Heavy;
+                    break;
+                case 'staccato':
+                    note.isStaccato = true;
+                    break;
+                case 'tenuto':
+                    note.accentuated = AccentuationType.Tenuto;
+                    break;
+            }
+        }
+    }
+    parseTechnical(element, note, beat) {
+        const bends = [];
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'up-bow':
+                    beat.pickStroke = PickStroke.Up;
+                    break;
+                case 'down-bow':
+                    beat.pickStroke = PickStroke.Down;
+                    break;
+                case 'harmonic':
+                    break;
+                case 'fingering':
+                    if (note) {
+                        note.leftHandFinger = this.parseFingering(c);
+                    }
+                    break;
+                case 'pluck':
+                    if (note) {
+                        note.rightHandFinger = this.parseFingering(c);
+                    }
+                    break;
+                case 'fret':
+                    if (note) {
+                        note.fret = Number.parseInt(c.innerText, 10);
+                    }
+                    break;
+                case 'string':
+                    if (note) {
+                        note.string = beat.voice.bar.staff.tuning.length - Number.parseInt(c.innerText, 10) + 1;
+                    }
+                    break;
+                case 'hammer-on':
+                case 'pull-off':
+                    if (note) {
+                        note.isHammerPullOrigin = true;
+                    }
+                    break;
+                case 'bend':
+                    bends.push(c);
+                    break;
+                case 'tap':
+                    beat.tap = true;
+                    break;
+                case 'smear':
+                    if (note) {
+                        note.vibrato = VibratoType.Slight;
+                    }
+                    break;
+                case 'golpe':
+                    switch (c.getAttribute('placement', 'above')) {
+                        case 'above':
+                            beat.golpe = GolpeType.Finger;
+                            break;
+                        case 'below':
+                            beat.golpe = GolpeType.Thumb;
+                            break;
+                    }
+                    break;
+            }
+        }
+        if (note && bends.length > 0) {
+            this.parseBends(bends, note);
+        }
+    }
+    parseBends(elements, note) {
+        const baseOffset = BendPoint.MaxPosition / elements.length;
+        let currentValue = 0;
+        let currentOffset = 0;
+        let isFirstBend = true;
+        for (const bend of elements) {
+            const bendAlterElement = bend.findChildElement('bend-alter');
+            if (bendAlterElement) {
+                const absValue = Math.round(Math.abs(Number.parseFloat(bendAlterElement.innerText)) * 2);
+                if (bend.findChildElement('pre-bend')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFirstBend = false;
+                    }
+                    else {
+                        currentOffset += baseOffset;
+                    }
+                }
+                else if (bend.findChildElement('release')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentOffset += baseOffset;
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+                else {
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentValue += absValue;
+                    currentOffset += baseOffset;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+            }
+        }
+    }
+    parseFingering(c) {
+        switch (c.innerText) {
+            case '0':
+                return Fingers.NoOrDead;
+            case '1':
+            case 'p':
+            case 't':
+                return Fingers.Thumb;
+            case '2':
+            case 'i':
+                return Fingers.IndexFinger;
+            case '3':
+            case 'm':
+                return Fingers.MiddleFinger;
+            case '4':
+            case 'a':
+                return Fingers.AnnularFinger;
+            case '5':
+            case 'c':
+                return Fingers.LittleFinger;
+        }
+        return Fingers.Unknown;
+    }
+    parseOrnaments(element, note) {
+        let currentTrillStep = -1;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'trill-mark':
+                    currentTrillStep = Number.parseInt(c.getAttribute('trill-step', '2'), 10);
+                    if (note.isStringed) {
+                        note.trillValue = note.stringTuning + currentTrillStep;
+                    }
+                    else if (!note.isPercussion) {
+                        note.trillValue = note.calculateRealValue(false, false) + currentTrillStep;
+                    }
+                    break;
+                case 'turn':
+                    note.ornament = NoteOrnament.Turn;
+                    break;
+                case 'inverted-turn':
+                    note.ornament = NoteOrnament.InvertedTurn;
+                    break;
+                case 'wavy-line':
+                    if (currentTrillStep > 0) {
+                        if (c.getAttribute('type') === 'start') {
+                            this._currentTrillStep = currentTrillStep;
+                        }
+                    }
+                    else if (this._currentTrillStep > 0) {
+                        if (c.getAttribute('type') === 'stop') {
+                            this._currentTrillStep = -1;
+                        }
+                        else if (note.isStringed) {
+                            note.trillValue = note.stringTuning + this._currentTrillStep;
+                        }
+                        else if (!note.isPercussion) {
+                            note.trillValue = note.calculateRealValue(false, false) + this._currentTrillStep;
+                        }
+                    }
+                    else {
+                        note.vibrato = VibratoType.Slight;
+                    }
+                    break;
+                case 'mordent':
+                    note.ornament = NoteOrnament.LowerMordent;
+                    break;
+                case 'inverted-mordent':
+                    note.ornament = NoteOrnament.UpperMordent;
+                    break;
+                case 'tremolo':
+                    switch (c.innerText) {
+                        case '1':
+                            note.beat.tremoloSpeed = Duration.Eighth;
+                            break;
+                        case '2':
+                            note.beat.tremoloSpeed = Duration.Sixteenth;
+                            break;
+                        case '3':
+                            note.beat.tremoloSpeed = Duration.ThirtySecond;
+                            break;
+                    }
+                    break;
+            }
+        }
+    }
+    parseSlide(element, note) {
+        const type = element.getAttribute('type');
+        const number = element.getAttribute('number', '1');
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+        switch (type) {
+            case 'start':
+                context.slideOrigins.set(number, note);
+                break;
+            case 'stop':
+                if (context.slideOrigins.has(number)) {
+                    const origin = context.slideOrigins.get(number);
+                    origin.slideTarget = note;
+                    note.slideOrigin = origin;
+                    origin.slideOutType = SlideOutType.Shift;
+                }
+                break;
+        }
+    }
+    parseTied(element, note, staff) {
+        const type = element.getAttribute('type');
+        const number = element.getAttribute('number', '');
+        const context = this.getStaffContext(staff);
+        if (type === 'start') {
+            if (number) {
+                if (context.tieStartIds.has(number)) {
+                    const unclosed = context.tieStartIds.get(number);
+                    context.tieStarts.delete(unclosed);
+                }
+                context.tieStartIds.set(number, note);
+            }
+            context.tieStarts.add(note);
+        }
+        else if (type === 'stop' && !note.isTieDestination) {
+            let tieOrigin = null;
+            if (number) {
+                if (!context.tieStartIds.has(number)) {
+                    return;
+                }
+                tieOrigin = context.tieStartIds.get(number);
+                context.tieStartIds.delete(number);
+                context.tieStarts.delete(note);
+            }
+            else {
+                const realValue = this.calculatePitchedNoteValue(note);
+                for (const t of context.tieStarts) {
+                    if (this.calculatePitchedNoteValue(t) === realValue) {
+                        tieOrigin = t;
+                        context.tieStarts.delete(tieOrigin);
+                        break;
+                    }
+                }
+            }
+            if (!tieOrigin) {
+                return;
+            }
+            note.isTieDestination = true;
+            note.tieOrigin = tieOrigin;
+        }
+    }
+    parseAccidental(element, note) {
+        switch (element.innerText) {
+            case 'sharp':
+                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                break;
+            case 'natural':
+                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                break;
+            case 'flat':
+                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                break;
+            case 'double-sharp':
+                note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                break;
+            case 'flat-flat':
+                note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                break;
+        }
+    }
+    calculatePitchedNoteValue(note) {
+        return note.octave * 12 + note.tone;
+    }
+    parseDuration(element) {
+        return this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(element.innerText));
+    }
+    parseUnpitched(element, _track) {
+        let step = '';
+        let octave = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'display-step':
+                    step = c.innerText;
+                    break;
+                case 'display-octave':
+                    octave = Number.parseInt(c.innerText, 10) + 1;
+                    break;
+            }
+        }
+        const note = new Note();
+        if (step === '') {
+            note.octave = 0;
+            note.tone = 0;
+        }
+        else {
+            const value = octave * 12 + ModelUtils.getToneForText(step).noteValue;
+            note.octave = (value / 12) | 0;
+            note.tone = value - note.octave * 12;
+        }
+        return note;
+    }
+    parsePitch(element) {
+        let step = '';
+        let semitones = 0;
+        let octave = 0;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'step':
+                    step = c.innerText;
+                    break;
+                case 'alter':
+                    semitones = Number.parseFloat(c.innerText);
+                    if (Number.isNaN(semitones)) {
+                        semitones = 0;
+                    }
+                    break;
+                case 'octave':
+                    octave = Number.parseInt(c.innerText, 10) + 1;
+                    break;
+            }
+        }
+        semitones = semitones | 0;
+        const value = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
+        const note = new Note();
+        note.octave = (value / 12) | 0;
+        note.tone = value - note.octave * 12;
+        return note;
+    }
+}
+MusicXmlImporter.allDurations = [
+    Duration.TwoHundredFiftySixth,
+    Duration.OneHundredTwentyEighth,
+    Duration.SixtyFourth,
+    Duration.ThirtySecond,
+    Duration.Sixteenth,
+    Duration.Eighth,
+    Duration.Quarter,
+    Duration.Half,
+    Duration.Whole,
+    Duration.DoubleWhole,
+    Duration.QuadrupleWhole
+];
+MusicXmlImporter.allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiUtils.toTicks(d));
 console.log('Alpha Tab Import *.mid v1.0.1');
 class AlphaTabImportMusicPlugin {
     constructor() {
@@ -11320,7 +14046,16 @@ class FileLoaderAlpha {
                             console.log(score);
                         }
                         else {
-                            console.log('wrong path', path);
+                            if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
+                                let mxl = new MusicXmlImporter();
+                                settings.importer.encoding = 'windows-1251';
+                                mxl.init(data, settings);
+                                let score = mxl.readScore();
+                                console.log(score);
+                            }
+                            else {
+                                console.log('wrong path', path);
+                            }
                         }
                     }
                 }

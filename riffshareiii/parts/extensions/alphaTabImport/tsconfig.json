@@ -146,6 +146,7 @@
 		,"./alphatab/importer/Gp3To5Importer.ts"
 		,"./alphatab/importer/GpxImporter.ts"
 		,"./alphatab/importer/Gp7To8Importer.ts"
+		,"./alphatab/importer/MusicXmlImporter.ts"
 
 
         ,"./fileimport/aimportplugin.ts"
