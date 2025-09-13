@@ -104,11 +104,14 @@ class Gp3To5Importer extends ScoreImporter {
             // master equalizer preset (1)
             this.data.skip(19);
         }
+        //console.log('p',this.data.position);
         // page setup since GP5
         if (this._versionNumber >= 500) {
             this.readPageSetup();
+            //console.log('t',this.data.position);
             this._score.tempoLabel = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
+        //console.log('ap',this.data.position);
         // tempo stuff
         this._score.tempo = IOHelper.readInt32LE(this.data);
         if (this._versionNumber >= 510) {
@@ -119,7 +122,9 @@ class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 400) {
             this.data.readByte();
         }
+        //console.log('a1',this.data.position);
         this.readPlaybackInfos();
+        //console.log('b1',this.data.position);
         // repetition stuff
         if (this._versionNumber >= 500) {
             this.readDirection(Direction.TargetCoda);
@@ -149,15 +154,18 @@ class Gp3To5Importer extends ScoreImporter {
             // unknown (4)
             this.data.skip(4);
         }
+        //console.log('c1',this.data.position);
         // contents
         this._barCount = IOHelper.readInt32LE(this.data);
-		//console.log('_barCount',this._barCount);
+		//console.log('_barCount',this._barCount,this.data.position);
         this._trackCount = IOHelper.readInt32LE(this.data);
-		//console.log('_trackCount',this._trackCount);
+		//console.log('_trackCount',this._trackCount,this.data.position);
         this.readMasterBars();
+        //console.log('m1',this.data.position);
         this.readTracks();
+        //console.log('t1',this.data.position);
         this.readBars();
-
+        //console.log('r1',this.data.position);
         // To be more in line with the GP7 structure we create an
         // initial tempo automation on the first masterbar
         if (this._score.masterBars.length > 0) {
@@ -239,8 +247,13 @@ class Gp3To5Importer extends ScoreImporter {
             this._lyrics.push(lyrics);
         }
     }
-
-    public readPageSetup(): void {
+    public readPageSetup() {
+        this.data.skip(30);
+        for (let i = 0; i < 10; i++) {
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        }
+    }
+    public readPageSetupOriginal(): void {
         // Page Width (4)
         // Page Heigth (4)
         // Padding Left (4)
@@ -318,6 +331,7 @@ class Gp3To5Importer extends ScoreImporter {
 
     public readMasterBars(): void {
         for (let i: number = 0; i < this._barCount; i++) {
+            //console.log('bar',i,this.data.position);
             this.readMasterBar();
         }
     }
@@ -379,7 +393,7 @@ class Gp3To5Importer extends ScoreImporter {
             const section: Section = new Section();
             section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             section.marker = '';
-            //GpBinaryHelpers.gpReadColor(this.data, false);
+            GpBinaryHelpers.gpReadColor(this.data, false);
             newMasterBar.section = section;
         }
         // keysignature
@@ -637,6 +651,7 @@ class Gp3To5Importer extends ScoreImporter {
         bar.addVoice(newVoice);
 		//console.log(':',beatCount,newVoice);
         for (let i: number = 0; i < beatCount; i++) {
+            //console.log(i,this.data.position);
             this.readBeat(track, bar, newVoice);
         }
     }
@@ -837,6 +852,7 @@ class Gp3To5Importer extends ScoreImporter {
     }
 
     public readChord(beat: Beat): void {
+        //console.log('chord',this.data.position);
         const chord: Chord = new Chord();
         const chordId: string = ModelUtils.newGuid();
         if (this._versionNumber >= 500) {
@@ -924,6 +940,7 @@ class Gp3To5Importer extends ScoreImporter {
                 }
             }
         }
+        //console.log(chord.name,this.data.position);
         if (chord.name) {
             beat.chordId = chordId;
             beat.voice.bar.staff.addChord(beat.chordId, chord);

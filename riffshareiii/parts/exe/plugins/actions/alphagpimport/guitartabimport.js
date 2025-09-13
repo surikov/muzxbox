@@ -799,10 +799,13 @@ class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 510) {
             this.data.skip(19);
         }
+console.log('p',this.data.position);
         if (this._versionNumber >= 500) {
             this.readPageSetup();
+console.log('t',this.data.position);
             this._score.tempoLabel = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
+console.log('ap',this.data.position);
         this._score.tempo = IOHelper.readInt32LE(this.data);
         if (this._versionNumber >= 510) {
             GpBinaryHelpers.gpReadBool(this.data);
@@ -811,17 +814,22 @@ class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 400) {
             this.data.readByte();
         }
+console.log('a1',this.data.position);
         this.readPlaybackInfos();
+console.log('b1',this.data.position);
         if (this._versionNumber >= 500) {
             this.data.skip(38);
             this.data.skip(4);
         }
+console.log('c1',this.data.position);
         this._barCount = IOHelper.readInt32LE(this.data);
-		console.log('_barCount',this._barCount);
+		console.log('_barCount',this._barCount,this.data.position);
         this._trackCount = IOHelper.readInt32LE(this.data);
-		console.log('_trackCount',this._trackCount);
+		console.log('_trackCount',this._trackCount,this.data.position);
         this.readMasterBars();
+console.log('m1',this.data.position);
         this.readTracks();
+console.log('t1',this.data.position);
         this.readBars();
         if (this._score.masterBars.length > 0) {
             this._score.masterBars[0].tempoAutomation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
@@ -898,6 +906,7 @@ class Gp3To5Importer extends ScoreImporter {
     }
     readMasterBars() {
         for (let i = 0; i < this._barCount; i++) {
+console.log('bar',i,this.data.position);
             this.readMasterBar();
         }
     }
@@ -1075,6 +1084,7 @@ class Gp3To5Importer extends ScoreImporter {
         let newVoice = new Voice();
         bar.addVoice(newVoice);
         for (let i = 0; i < beatCount; i++) {
+console.log(i,this.data.position);
             this.readBeat(track, bar, newVoice);
         }
     }
