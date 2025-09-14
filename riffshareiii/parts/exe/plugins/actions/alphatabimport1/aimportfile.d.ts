@@ -154,13 +154,13 @@ type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    menuPerformers?: boolean;
-    menuSamplers?: boolean;
-    menuFilters?: boolean;
-    menuActions?: boolean;
-    menuPlugins?: boolean;
-    menuClipboard?: boolean;
-    menuSettings?: boolean;
+    menuPerformers: boolean;
+    menuSamplers: boolean;
+    menuFilters: boolean;
+    menuActions: boolean;
+    menuPlugins: boolean;
+    menuClipboard: boolean;
+    menuSettings: boolean;
 };
 type MZXBX_CachedWave = {
     path: string;
@@ -2393,4 +2393,5 @@ declare class AlphaTabImportMusicPlugin {
 }
 declare class FileLoaderAlpha {
     constructor(inputFile: any);
+    convertProject(score: Score): void;
 }

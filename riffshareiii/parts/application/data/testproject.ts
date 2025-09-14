@@ -17,12 +17,13 @@ function createNewEmptyProjectData(): Zvoog_Project {
 			{
 				title: "Piano track"
 				, measures: [{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }]
-				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50*Math.random(), y: 100*Math.random() }, state: 0 }
+				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0 }
 			}
 		]
 		, percussions: []
 		, comments: []
 		, filters: []
+		, menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 	};
 	return newEmptyProject
 
@@ -244,6 +245,7 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 		, widthDurationRatio: 17
 		, octaveCount: 10
 	}*/
+	, menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 };
 
 

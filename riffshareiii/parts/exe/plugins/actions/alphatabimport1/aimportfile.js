@@ -14034,7 +14034,7 @@ class FileLoaderAlpha {
                     settings.importer.encoding = 'windows-1251';
                     gp35.init(data, settings);
                     let score = gp35.readScore();
-                    console.log(score);
+                    me.convertProject(score);
                 }
                 else {
                     if (path.endsWith('.gpx')) {
@@ -14042,7 +14042,7 @@ class FileLoaderAlpha {
                         settings.importer.encoding = 'windows-1251';
                         gpx.init(data, settings);
                         let score = gpx.readScore();
-                        console.log(score);
+                        me.convertProject(score);
                     }
                     else {
                         if (path.endsWith('.gp')) {
@@ -14050,7 +14050,7 @@ class FileLoaderAlpha {
                             settings.importer.encoding = 'windows-1251';
                             gp78.init(data, settings);
                             let score = gp78.readScore();
-                            console.log(score);
+                            me.convertProject(score);
                         }
                         else {
                             if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
@@ -14058,7 +14058,7 @@ class FileLoaderAlpha {
                                 settings.importer.encoding = 'windows-1251';
                                 mxl.init(data, settings);
                                 let score = mxl.readScore();
-                                console.log(score);
+                                me.convertProject(score);
                             }
                             else {
                                 console.log('wrong path', path);
@@ -14069,6 +14069,23 @@ class FileLoaderAlpha {
             }
         };
         fileReader.readAsArrayBuffer(file);
+    }
+    convertProject(score) {
+        console.log(score);
+        let data = {
+            versionCode: '1',
+            title: 'test',
+            timeline: [],
+            tracks: [],
+            percussions: [],
+            comments: [],
+            filters: [],
+            selectedPart: { startMeasure: -1, endMeasure: -1 },
+            position: { x: 0, y: 0, z: 0 },
+            list: false,
+            menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
+        };
+        console.log(data);
     }
 }
 console.log('test');

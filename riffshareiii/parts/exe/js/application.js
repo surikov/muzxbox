@@ -6249,7 +6249,8 @@ function createNewEmptyProjectData() {
         ],
         percussions: [],
         comments: [],
-        filters: []
+        filters: [],
+        menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
     };
     return newEmptyProject;
 }
@@ -6416,7 +6417,8 @@ let _______mzxbxProjectForTesting2 = {
         { id: 'track1Volme', title: 'tf1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 132, y: 23 }, automation: [], state: 0 },
         { id: 'track2Volme', title: 'tg1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 },
         { id: 'track3Echo', title: 't1h', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
-    ]
+    ],
+    menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 };
 class MixerDataMathUtility {
     constructor(data) {
