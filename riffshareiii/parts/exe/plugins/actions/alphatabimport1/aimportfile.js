@@ -440,14 +440,6 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
-    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -462,6 +454,14 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
+    }
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
     }
 }
 var LogLevel;
@@ -3532,6 +3532,11 @@ class Chord {
     }
 }
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3632,11 +3637,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8328,6 +8328,10 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8343,10 +8347,6 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8360,14 +8360,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
-    get inputCrc() {
-        return this._engine.inputCrc.value;
-    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
+    }
+    get inputCrc() {
+        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9026,6 +9026,16 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
+    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9054,16 +9064,6 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
-    }
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9386,13 +9386,6 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
-    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9411,6 +9404,13 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
+    }
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -9679,15 +9679,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
-    get isFlushed() {
-        return this._end === 0;
-    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
+    }
+    get isFlushed() {
+        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -13954,26 +13954,26 @@ MusicXmlImporter.allDurations = [
 ];
 MusicXmlImporter.allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiUtils.toTicks(d));
 console.log('Alpha Tab Import *.mid v1.0.1');
+let parsedProject = null;
 class AlphaTabImportMusicPlugin {
     constructor() {
         this.callbackID = '';
-        this.parsedProject = null;
         this.init();
     }
     init() {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         window.parent.postMessage({
             dialogID: this.callbackID,
-            pluginData: this.parsedProject,
+            pluginData: parsedProject,
             done: false
         }, '*');
     }
     sendImportedMusicData() {
-        console.log('sendImportedMusicData', this.parsedProject);
-        if (this.parsedProject) {
+        console.log('sendImportedMusicData', parsedProject);
+        if (parsedProject) {
             var oo = {
                 dialogID: this.callbackID,
-                pluginData: this.parsedProject,
+                pluginData: parsedProject,
                 done: true
             };
             window.parent.postMessage(oo, '*');
@@ -13992,10 +13992,12 @@ class AlphaTabImportMusicPlugin {
     }
     loadMusicfile(inputFile) {
         let loader = new FileLoaderAlpha(inputFile);
+        console.log('loadMusicfile', inputFile);
     }
 }
 class FileLoaderAlpha {
     constructor(inputFile) {
+        this.inames = new ChordPitchPerformerUtil();
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
@@ -14072,21 +14074,410 @@ class FileLoaderAlpha {
     }
     convertProject(score) {
         console.log(score);
-        let data = {
+        let project = {
             versionCode: '1',
-            title: 'test',
+            title: score.title,
             timeline: [],
             tracks: [],
             percussions: [],
             comments: [],
             filters: [],
             selectedPart: { startMeasure: -1, endMeasure: -1 },
-            position: { x: 0, y: 0, z: 0 },
+            position: { x: 0, y: 0, z: 30 },
             list: false,
             menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
         };
-        console.log(data);
+        let tempo = 120;
+        for (let bb = 0; bb < score.masterBars.length; bb++) {
+            let maBar = score.masterBars[bb];
+            if (maBar.tempoAutomation) {
+                if (maBar.tempoAutomation.value > 0) {
+                    tempo = maBar.tempoAutomation.value;
+                }
+            }
+            let measure = {
+                tempo: tempo,
+                metre: {
+                    count: maBar.timeSignatureNumerator,
+                    part: maBar.timeSignatureDenominator
+                }
+            };
+            project.timeline.push(measure);
+        }
+        let echoOutID = 'reverberation' + Math.random();
+        let compresID = 'compression' + Math.random();
+        for (let tt = 0; tt < score.tracks.length; tt++) {
+            let scoreTrack = score.tracks[tt];
+            let pp = false;
+            for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+                if (scoreTrack.staves[ss].isPercussion) {
+                    pp = true;
+                }
+            }
+            if (pp) {
+                this.addScoreDrumsTracks(project, scoreTrack, compresID);
+            }
+            else {
+                this.addScoreInsTrack(project, scoreTrack, compresID);
+            }
+        }
+        let filterEcho = {
+            id: echoOutID, title: 'Echo',
+            kind: 'miniumecho1', data: '22', outputs: [''],
+            iconPosition: {
+                x: 77 + project.tracks.length * 30,
+                y: project.tracks.length * 8 + 2
+            },
+            automation: [], state: 0
+        };
+        let filterCompression = {
+            id: compresID,
+            title: 'Compressor',
+            kind: 'miniumdcompressor1',
+            data: '33',
+            outputs: [echoOutID],
+            iconPosition: {
+                x: 88 + project.tracks.length * 30,
+                y: project.tracks.length * 8 + 2
+            },
+            automation: [], state: 0
+        };
+        project.filters.push(filterEcho);
+        project.filters.push(filterCompression);
+        this.arrangeTracks(project);
+        this.arrangeDrums(project);
+        this.arrangeFilters(project);
+        parsedProject = project;
+        console.log(parsedProject);
+    }
+    arrangeTracks(project) {
+        for (let ii = 0; ii < project.tracks.length; ii++) {
+            project.tracks[ii].performer.iconPosition.x = ii * 9;
+            project.tracks[ii].performer.iconPosition.y = ii * 5;
+        }
+    }
+    arrangeDrums(project) {
+        for (let ii = 0; ii < project.percussions.length; ii++) {
+            project.percussions[ii].sampler.iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9;
+            project.percussions[ii].sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - ii * 5;
+        }
+    }
+    arrangeFilters(project) {
+        for (let ii = 0; ii < project.filters.length - 2; ii++) {
+            project.filters[ii].iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
+            project.filters[ii].iconPosition.y = ii * 7;
+        }
+        let cmp = project.filters[project.filters.length - 1];
+        let eq = project.filters[project.filters.length - 2];
+        cmp.iconPosition.x = project.filters.length * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
+        cmp.iconPosition.y = 6 * 12;
+        eq.iconPosition.x = cmp.iconPosition.x + 10;
+        eq.iconPosition.y = 5 * 12;
+    }
+    findVolumeInstrument(program) {
+        let re = { idx: 0, ratio: 0.7 };
+        let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+        for (var i = 0; i < instrs.length; i++) {
+            if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
+                re.idx = i;
+                break;
+            }
+        }
+        if (program == 16)
+            re.ratio = 0.4;
+        if (program == 19)
+            re.ratio = 0.4;
+        if (program == 27)
+            re.ratio = 0.95;
+        if (program == 32)
+            re.ratio = 0.95;
+        if (program == 33)
+            re.ratio = 0.95;
+        if (program == 34)
+            re.ratio = 0.95;
+        if (program == 35)
+            re.ratio = 0.95;
+        if (program == 36)
+            re.ratio = 0.95;
+        if (program == 37)
+            re.ratio = 0.95;
+        if (program == 38)
+            re.ratio = 0.95;
+        if (program == 39)
+            re.ratio = 0.95;
+        if (program == 48)
+            re.ratio = 0.4;
+        if (program == 49)
+            re.ratio = 0.4;
+        if (program == 50)
+            re.ratio = 0.5;
+        if (program == 51)
+            re.ratio = 0.4;
+        if (program == 65)
+            re.ratio = 0.99;
+        if (program == 80)
+            re.ratio = 0.3;
+        if (program == 89)
+            re.ratio = 0.4;
+        return re;
+    }
+    ;
+    findModeInstrument(program) {
+        if (program == 24)
+            return 4;
+        if (program == 25)
+            return 4;
+        if (program == 26)
+            return 4;
+        if (program == 27)
+            return 4;
+        if (program == 29)
+            return 1;
+        if (program == 30)
+            return 1;
+        return 0;
+    }
+    ;
+    addScoreInsTrack(project, scoreTrack, targetId) {
+        let strummode = 0;
+        if (scoreTrack.playbackInfo.program == 24
+            || scoreTrack.playbackInfo.program == 25
+            || scoreTrack.playbackInfo.program == 26
+            || scoreTrack.playbackInfo.program == 27
+            || scoreTrack.playbackInfo.program == 28
+            || scoreTrack.playbackInfo.program == 29
+            || scoreTrack.playbackInfo.program == 30) {
+            strummode = 4;
+        }
+        let idxRatio = this.findVolumeInstrument(scoreTrack.playbackInfo.program);
+        let iidx = idxRatio.idx;
+        let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
+        let volume = 1;
+        let ivolume = Math.round(volume * 100) * idxRatio.ratio;
+        let util = new ChordPitchPerformerUtil();
+        let mzxbxTrack = {
+            title: scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program],
+            measures: [],
+            performer: {
+                id: 'track' + scoreTrack.playbackInfo.program + Math.random(),
+                data: '' + ivolume + '/' + iidx + '/' + strummode,
+                kind: 'miniumpitchchord1',
+                outputs: [targetId],
+                iconPosition: { x: 0, y: 0 },
+                state: 0
+            }
+        };
+        let palmMuteTrack = {
+            title: 'P.M.' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program],
+            measures: [],
+            performer: {
+                id: 'track' + (scoreTrack.playbackInfo.program + Math.random()),
+                data: '' + ivolume + '/' + iidx + '/0',
+                kind: 'miniumpitchchord1',
+                outputs: [targetId],
+                iconPosition: { x: 0, y: 0 },
+                state: 0
+            }
+        };
+        let upTrack = {
+            title: '^' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program],
+            measures: [],
+            performer: {
+                id: 'track' + (scoreTrack.playbackInfo.program + Math.random()),
+                data: '' + ivolume + '/' + iidx + '/2',
+                kind: 'miniumpitchchord1',
+                outputs: [targetId],
+                iconPosition: { x: 0, y: 0 },
+                state: 0
+            }
+        };
+        let downTrack = {
+            title: 'v' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program],
+            measures: [],
+            performer: {
+                id: 'track' + (scoreTrack.playbackInfo.program + Math.random()),
+                data: '' + ivolume + '/' + iidx + '/1',
+                kind: 'miniumpitchchord1',
+                outputs: [targetId],
+                iconPosition: { x: 0, y: 0 },
+                state: 0
+            }
+        };
+        if (scoreTrack.playbackInfo.program == 29
+            || scoreTrack.playbackInfo.program == 30) {
+            mzxbxTrack.performer.data = '30/341';
+            palmMuteTrack.performer.data = '29/323';
+        }
+        let pmFlag = false;
+        let upFlag = false;
+        let downFlag = false;
+        project.tracks.push(mzxbxTrack);
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            let mzxbxMeasure = { chords: [] };
+            let pmMeasure = { chords: [] };
+            let upMeasure = { chords: [] };
+            let downMeasure = { chords: [] };
+            mzxbxTrack.measures.push(mzxbxMeasure);
+            palmMuteTrack.measures.push(pmMeasure);
+            upTrack.measures.push(upMeasure);
+            downTrack.measures.push(downMeasure);
+            for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+                let staff = scoreTrack.staves[ss];
+                let tuning = staff.stringTuning.tunings;
+                let bar = staff.bars[mm];
+                for (let vv = 0; vv < bar.voices.length; vv++) {
+                    let voice = bar.voices[vv];
+                    let start = MMUtil();
+                    for (let bb = 0; bb < voice.beats.length; bb++) {
+                        let beat = voice.beats[bb];
+                        let currentDuration = this.beatDuration(beat);
+                        for (let nn = 0; nn < beat.notes.length; nn++) {
+                            let note = beat.notes[nn];
+                            let pitch = this.stringFret2pitch(note.string, note.fret, tuning);
+                            if (note.isPalmMute) {
+                                let pmChord = this.takeChord(start, pmMeasure);
+                                pmChord.slides = [{ duration: currentDuration, delta: 0 }];
+                                pmChord.pitches.push(pitch);
+                                pmFlag = true;
+                            }
+                            else {
+                                if (beat.brushType == 1) {
+                                    let upchord = this.takeChord(start, upMeasure);
+                                    upchord.slides = [{ duration: currentDuration, delta: 0 }];
+                                    upchord.pitches.push(pitch);
+                                    upFlag = true;
+                                }
+                                else {
+                                    if (beat.brushType == 2) {
+                                        let downchord = this.takeChord(start, downMeasure);
+                                        downchord.slides = [{ duration: currentDuration, delta: 0 }];
+                                        downchord.pitches.push(pitch);
+                                        downFlag = true;
+                                    }
+                                    else {
+                                        let chord = this.takeChord(start, mzxbxMeasure);
+                                        chord.slides = [{ duration: currentDuration, delta: 0 }];
+                                        chord.pitches.push(pitch);
+                                    }
+                                }
+                            }
+                        }
+                        start = start.plus(currentDuration);
+                    }
+                }
+            }
+        }
+        if (pmFlag) {
+            project.tracks.push(palmMuteTrack);
+        }
+        if (upFlag) {
+            project.tracks.push(upTrack);
+        }
+        if (downFlag) {
+            project.tracks.push(downTrack);
+        }
+    }
+    beatDuration(beat) {
+        let duration = MMUtil().set({ count: 1, part: beat.duration });
+        if (beat.dots > 0) {
+            duration = duration.plus({ count: duration.count, part: 2 * beat.duration });
+        }
+        if (beat.dots > 1) {
+            duration = duration.plus({ count: duration.count, part: 4 * beat.duration });
+        }
+        if (beat.dots > 2) {
+            duration = duration.plus({ count: duration.count, part: 8 * beat.duration });
+        }
+        if (beat.dots > 3) {
+            duration = duration.plus({ count: duration.count, part: 16 * beat.duration });
+        }
+        return duration;
+    }
+    stringFret2pitch(stringNum, fretNum, tuning) {
+        if (stringNum > 0 && stringNum <= tuning.length) {
+            return tuning[tuning.length - stringNum] + fretNum;
+        }
+        return -1;
+    }
+    takeChord(start, measure) {
+        let startBeat = MMUtil().set(start);
+        for (let cc = 0; cc < measure.chords.length; cc++) {
+            if (startBeat.equals(measure.chords[cc].skip)) {
+                return measure.chords[cc];
+            }
+        }
+        let newChord = { pitches: [], slides: [], skip: { count: start.count, part: start.part } };
+        measure.chords.push(newChord);
+        return newChord;
+    }
+    addScoreDrumsTracks(project, scoreTrack, targetId) {
+        let trackDrums = [];
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
+                let staff = scoreTrack.staves[ss];
+                let bar = staff.bars[mm];
+                for (let vv = 0; vv < bar.voices.length; vv++) {
+                    let voice = bar.voices[vv];
+                    let start = MMUtil();
+                    for (let bb = 0; bb < voice.beats.length; bb++) {
+                        let beat = voice.beats[bb];
+                        let currentDuration = this.beatDuration(beat);
+                        for (let nn = 0; nn < beat.notes.length; nn++) {
+                            let note = beat.notes[nn];
+                            let drum = note.percussionArticulation;
+                            let track = this.takeDrumTrack(scoreTrack.name + ': ' + drum, trackDrums, drum, targetId);
+                            let measure = this.takeDrumMeasure(track, mm);
+                            measure.skips.push(start);
+                        }
+                        start = start.plus(currentDuration);
+                    }
+                }
+            }
+        }
+        for (let mm = 0; mm < project.timeline.length; mm++) {
+            for (let tt = 0; tt < trackDrums.length; tt++) {
+                if (trackDrums[tt]) {
+                    this.takeDrumMeasure(trackDrums[tt], mm);
+                }
+            }
+        }
+        for (let tt = 0; tt < trackDrums.length; tt++) {
+            if (trackDrums[tt]) {
+                project.percussions.push(trackDrums[tt]);
+            }
+        }
+    }
+    takeDrumMeasure(trackDrum, barNum) {
+        if (trackDrum.measures[barNum]) {
+        }
+        else {
+            let measure = {
+                skips: []
+            };
+            trackDrum.measures[barNum] = measure;
+        }
+        return trackDrum.measures[barNum];
+    }
+    takeDrumTrack(title, trackDrums, drumNum, targetId) {
+        if (trackDrums[drumNum]) {
+        }
+        else {
+            let track = {
+                title: title,
+                measures: [],
+                sampler: {
+                    id: 'drum' + (drumNum + Math.random()),
+                    data: '' + drumNum,
+                    kind: 'zdrum1',
+                    outputs: [targetId],
+                    iconPosition: { x: 0, y: 0 },
+                    state: 0
+                }
+            };
+            trackDrums[drumNum] = track;
+        }
+        trackDrums[drumNum].title = title + ' ' + allPercussionDrumTitles()[drumNum];
+        return trackDrums[drumNum];
     }
 }
-console.log('test');
 //# sourceMappingURL=aimportfile.js.map

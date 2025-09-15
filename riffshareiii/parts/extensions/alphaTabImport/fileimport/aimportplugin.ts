@@ -1,7 +1,8 @@
 console.log('Alpha Tab Import *.mid v1.0.1');
+let parsedProject: Zvoog_Project | null = null;
 class AlphaTabImportMusicPlugin {
 	callbackID = '';
-	parsedProject: Zvoog_Project | null = null;
+	
 	constructor() {
 		this.init();
 	}
@@ -9,16 +10,16 @@ class AlphaTabImportMusicPlugin {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		window.parent.postMessage({
 			dialogID: this.callbackID
-			, pluginData: this.parsedProject
+			, pluginData: parsedProject
 			, done: false
 		}, '*');
 	}
 	sendImportedMusicData() {
-		console.log('sendImportedMusicData', this.parsedProject);
-		if (this.parsedProject) {
+		console.log('sendImportedMusicData', parsedProject);
+		if (parsedProject) {
 			var oo: MZXBX_MessageToHost = {
 				dialogID: this.callbackID
-				, pluginData: this.parsedProject
+				, pluginData: parsedProject
 				, done: true
 			};
 			window.parent.postMessage(oo, '*');
@@ -40,6 +41,8 @@ class AlphaTabImportMusicPlugin {
 		//console.log('loadMusicfile');
 		//console.dir(inputFile);
 		let loader = new FileLoaderAlpha(inputFile);
+		console.log('loadMusicfile',inputFile);
+		
 	}
 
 }

@@ -27,6 +27,7 @@ class ChordPitchPerformerUtil {
 		//console.log('ChordPitchPerformerUtil.dumpParameters',loudness , idx , mode);
 		return loudness + '/' + idx + '/' + mode;
 	}
+	 
 	tonechordinslist(): string[] {
 		var insNames: string[] = [];
 		insNames[0] = "Acoustic Grand Piano: Piano";

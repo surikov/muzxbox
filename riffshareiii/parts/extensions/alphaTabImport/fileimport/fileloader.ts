@@ -1,5 +1,6 @@
 class FileLoaderAlpha {
 	inames: ChordPitchPerformerUtil = new ChordPitchPerformerUtil();
+
 	constructor(inputFile) {
 		var file = inputFile.files[0];
 		var fileReader = new FileReader();
@@ -89,7 +90,7 @@ class FileLoaderAlpha {
 			, comments: []
 			, filters: []
 			, selectedPart: { startMeasure: -1, endMeasure: -1 }
-			, position: { x: 0, y: 0, z: 0 }
+			, position: { x: 0, y: 0, z: 30 }
 			, list: false
 			, menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 		};
@@ -111,8 +112,8 @@ class FileLoaderAlpha {
 			project.timeline.push(measure);
 
 		}
-		let echoOutID = 'reverberation';
-		let compresID = 'compression';
+		let echoOutID = 'reverberation' + Math.random();
+		let compresID = 'compression' + Math.random();
 		for (let tt = 0; tt < score.tracks.length; tt++) {
 			let scoreTrack = score.tracks[tt];
 			let pp = false;
@@ -127,12 +128,116 @@ class FileLoaderAlpha {
 				this.addScoreInsTrack(project, scoreTrack, compresID);
 			}
 		}
-		console.log(project);
+		let filterEcho: Zvoog_FilterTarget = {
+			id: echoOutID, title: 'Echo'
+			, kind: 'miniumecho1', data: '22', outputs: ['']
+			, iconPosition: {
+				x: 77 + project.tracks.length * 30
+				, y: project.tracks.length * 8 + 2
+			}
+			, automation: [], state: 0
+		};
+		let filterCompression: Zvoog_FilterTarget = {
+			id: compresID
+			, title: 'Compressor'
+			, kind: 'miniumdcompressor1'
+			, data: '33'
+			, outputs: [echoOutID]
+			, iconPosition: {
+				x: 88 + project.tracks.length * 30
+				, y: project.tracks.length * 8 + 2
+			}
+			, automation: [], state: 0
+		};
+		project.filters.push(filterEcho);
+		project.filters.push(filterCompression);
+
+		this.arrangeTracks(project);
+		this.arrangeDrums(project);
+		this.arrangeFilters(project);
+
+		parsedProject = project;
+		console.log(parsedProject);
 	}
+	arrangeTracks(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.tracks.length; ii++) {
+			project.tracks[ii].performer.iconPosition.x = ii * 9;
+			project.tracks[ii].performer.iconPosition.y = ii * 5;
+		}
+	}
+	arrangeDrums(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.percussions.length; ii++) {
+			project.percussions[ii].sampler.iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9;
+			project.percussions[ii].sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - ii * 5;
+		}
+	}
+	arrangeFilters(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.filters.length - 2; ii++) {
+			project.filters[ii].iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
+			project.filters[ii].iconPosition.y = ii * 7;
+		}
+		let cmp = project.filters[project.filters.length - 1];
+		let eq = project.filters[project.filters.length - 2];
+
+		cmp.iconPosition.x = project.filters.length * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
+		cmp.iconPosition.y = 6 * 12;
+		
+		eq.iconPosition.x = cmp.iconPosition.x+10;
+		eq.iconPosition.y = 5 * 12;
+	}
+	findVolumeInstrument(program: number): { idx: number, ratio: number } {
+		let re = { idx: 0, ratio: 0.7 };
+		let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		for (var i = 0; i < instrs.length; i++) {
+			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
+				re.idx = i;
+				break;
+			}
+		}
+
+		if (program == 16) re.ratio = 0.4;
+		if (program == 19) re.ratio = 0.4;
+
+		if (program == 27) re.ratio = 0.95;
+
+		if (program == 32) re.ratio = 0.95;
+		if (program == 33) re.ratio = 0.95;
+		if (program == 34) re.ratio = 0.95;
+		if (program == 35) re.ratio = 0.95;
+		if (program == 36) re.ratio = 0.95;
+		if (program == 37) re.ratio = 0.95;
+		if (program == 38) re.ratio = 0.95;
+		if (program == 39) re.ratio = 0.95;
+
+		if (program == 48) re.ratio = 0.4;
+		if (program == 49) re.ratio = 0.4;
+		if (program == 50) re.ratio = 0.5;
+		if (program == 51) re.ratio = 0.4;
+
+		if (program == 65) re.ratio = 0.99;
+
+		if (program == 80) re.ratio = 0.3;
+		if (program == 89) re.ratio = 0.4;
+
+
+
+		//console.log('program', program, 'not found set 0');
+		return re;
+	};
+	findModeInstrument(program: number): number {
+		if (program == 24) return 4;
+		if (program == 25) return 4;
+		if (program == 26) return 4;
+		if (program == 27) return 4;
+		if (program == 29) return 1;
+		if (program == 30) return 1;
+		return 0;
+	};
 
 	addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
 		//let perfkind = 'zinstr1';
-		let strummode = 'plain';
+		//strumMode: 0 | 1 | 2 | 3 | 4 = this.strumModeFlat;	//Flat / Down / Up / Snap / Pong
+		let strummode: 0 | 1 | 2 | 3 | 4 = 0;//Flat / Down / Up / Snap / Pong
 		if (scoreTrack.playbackInfo.program == 24
 			|| scoreTrack.playbackInfo.program == 25
 			|| scoreTrack.playbackInfo.program == 26
@@ -142,17 +247,23 @@ class FileLoaderAlpha {
 			|| scoreTrack.playbackInfo.program == 30
 		) {
 			//perfkind = 'zvstrumming1';
-			strummode = 'pong';
+			strummode = 4;
 		}
+		let idxRatio = this.findVolumeInstrument(scoreTrack.playbackInfo.program);
+		let iidx = idxRatio.idx;
+		let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
+		let volume = 1;
+		let ivolume = Math.round(volume * 100) * idxRatio.ratio;
+		let util = new ChordPitchPerformerUtil();
+		//let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
 		let mzxbxTrack: Zvoog_MusicTrack = {
 			title: scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program]
 			, measures: []
 			, performer: {
-				id: 'track' + (this.inames.tonechordinslist[scoreTrack.playbackInfo.program] + Math.random())
-				//, data: '' + scoreTrack.playbackInfo.program + '//pong'
-				, data: '' + scoreTrack.playbackInfo.program + '//' + strummode
+				id: 'track' + scoreTrack.playbackInfo.program + Math.random()
+				, data: '' + ivolume + '/' + iidx + '/' + strummode
 				//, kind: perfkind
-				, kind: 'zvstrumming1'
+				, kind: 'miniumpitchchord1'
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
@@ -162,10 +273,11 @@ class FileLoaderAlpha {
 			title: 'P.M.' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program]
 			, measures: []
 			, performer: {
-				id: 'track' + (this.inames.tonechordinslist[scoreTrack.playbackInfo.program] + Math.random())
-				, data: '' + scoreTrack.playbackInfo.program
+				id: 'track' + (scoreTrack.playbackInfo.program + Math.random())
+				//, data: '' + scoreTrack.playbackInfo.program
+				, data: '' + ivolume + '/' + iidx + '/0'
 				//, kind: perfkind
-				, kind: 'zvstrumming1'
+				, kind: 'miniumpitchchord1'
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
@@ -175,10 +287,10 @@ class FileLoaderAlpha {
 			title: '^' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program]
 			, measures: []
 			, performer: {
-				id: 'track' + (this.inames.tonechordinslist[scoreTrack.playbackInfo.program] + Math.random())
-				, data: '' + scoreTrack.playbackInfo.program + '//up'
+				id: 'track' + (scoreTrack.playbackInfo.program + Math.random())
+				, data: '' + ivolume + '/' + iidx + '/2'
 				//, kind: perfkind
-				, kind: 'zvstrumming1'
+				, kind: 'miniumpitchchord1'
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
@@ -188,10 +300,10 @@ class FileLoaderAlpha {
 			title: 'v' + scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program]
 			, measures: []
 			, performer: {
-				id: 'track' + (this.inames.tonechordinslist[scoreTrack.playbackInfo.program] + Math.random())
-				, data: '' + scoreTrack.playbackInfo.program + '//down'
+				id: 'track' + (scoreTrack.playbackInfo.program + Math.random())
+				, data: '' + ivolume + '/' + iidx + '/1'
 				//, kind: perfkind
-				, kind: 'zvstrumming1'
+				, kind: 'miniumpitchchord1'
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
@@ -386,7 +498,7 @@ class FileLoaderAlpha {
 		}
 		return trackDrum.measures[barNum];
 	}
-	 takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number, targetId: string): Zvoog_PercussionTrack {
+	takeDrumTrack(title: string, trackDrums: Zvoog_PercussionTrack[], drumNum: number, targetId: string): Zvoog_PercussionTrack {
 		if (trackDrums[drumNum]) {
 			//
 		} else {
@@ -406,7 +518,7 @@ class FileLoaderAlpha {
 			};
 			trackDrums[drumNum] = track;
 		}
-		trackDrums[drumNum].title = title + ' ' + drumNames[drumNum];
+		trackDrums[drumNum].title = title + ' ' + allPercussionDrumTitles()[drumNum];
 		return trackDrums[drumNum];
 	}
 }
