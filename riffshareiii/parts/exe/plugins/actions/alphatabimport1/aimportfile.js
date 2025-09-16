@@ -14147,19 +14147,74 @@ class FileLoaderAlpha {
         this.arrangeTracks(project);
         this.arrangeDrums(project);
         this.arrangeFilters(project);
+        this.addLyrics(project, score);
         parsedProject = project;
         console.log(parsedProject);
     }
+    addLyrics(project, score) {
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            project.comments.push({ points: [] });
+        }
+        let firstBar = project.comments[0];
+        this.addHeaderText(score.album, 'Album', firstBar);
+        this.addHeaderText(score.artist, 'Artist', firstBar);
+        this.addHeaderText(score.copyright, 'Copyright', firstBar);
+        this.addHeaderText(score.instructions, 'Instructions', firstBar);
+        this.addHeaderText(score.music, 'Music', firstBar);
+        this.addHeaderText(score.notices, 'Notices', firstBar);
+        this.addHeaderText(score.subTitle, 'Subtitle', firstBar);
+        this.addHeaderText(score.tab, 'Tab', firstBar);
+        this.addHeaderText(score.tempoLabel, 'Tempo', firstBar);
+        this.addHeaderText(score.words, 'words', firstBar);
+        for (let mm = 0; mm < score.masterBars.length; mm++) {
+            let mbar = score.masterBars[mm];
+            if (mbar.section) {
+                this.addBarText(mbar.section.text, project, mm);
+            }
+        }
+        for (let tt = 0; tt < score.tracks.length; tt++) {
+            let cutrack = score.tracks[tt];
+            for (let ss = 0; ss < cutrack.staves.length; ss++) {
+                let custaff = cutrack.staves[ss];
+                for (let bb = 0; bb < custaff.bars.length; bb++) {
+                    let bar = custaff.bars[bb];
+                    for (let vv = 0; vv < bar.voices.length; vv++) {
+                        let vox = bar.voices[vv];
+                        for (let rr = 0; rr < vox.beats.length; rr++) {
+                            let beat = vox.beats[rr];
+                            if (beat.text) {
+                                this.addBarText(beat.text, project, bb);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    addBarText(text, project, barIdx) {
+        let bar = project.comments[barIdx];
+        if (text) {
+            let row = bar.points.length;
+            bar.points.push({ skip: { count: 0, part: 1 }, text: text, row: row });
+        }
+    }
+    addHeaderText(text, label, firstBar) {
+        if (text) {
+            let row = firstBar.points.length;
+            firstBar.points.push({ skip: { count: 0, part: 1 }, text: label + ': ' + text, row: row });
+        }
+    }
     arrangeTracks(project) {
         for (let ii = 0; ii < project.tracks.length; ii++) {
-            project.tracks[ii].performer.iconPosition.x = ii * 9;
-            project.tracks[ii].performer.iconPosition.y = ii * 5;
+            project.tracks[ii].performer.iconPosition.x = (project.tracks.length - ii - 1) * 9;
+            project.tracks[ii].performer.iconPosition.y = ii * 6;
         }
     }
     arrangeDrums(project) {
-        for (let ii = 0; ii < project.percussions.length; ii++) {
-            project.percussions[ii].sampler.iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9;
-            project.percussions[ii].sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - ii * 5;
+        for (let kk = 0; kk < project.percussions.length; kk++) {
+            let ss = project.percussions[project.percussions.length - 1 - kk];
+            ss.sampler.iconPosition.x = (project.percussions.length - 1 - kk) * 7 + (1 + project.tracks.length) * 9;
+            ss.sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - (1 + kk) * 7;
         }
     }
     arrangeFilters(project) {
@@ -14255,8 +14310,9 @@ class FileLoaderAlpha {
         let volume = 1;
         let ivolume = Math.round(volume * 100) * idxRatio.ratio;
         let util = new ChordPitchPerformerUtil();
+        let midiTitle = this.inames.tonechordinslist()[scoreTrack.playbackInfo.program];
         let mzxbxTrack = {
-            title: scoreTrack.name + ' ' + this.inames.tonechordinslist[scoreTrack.playbackInfo.program],
+            title: scoreTrack.name + ': ' + midiTitle,
             measures: [],
             performer: {
                 id: 'track' + scoreTrack.playbackInfo.program + Math.random(),
@@ -14330,6 +14386,8 @@ class FileLoaderAlpha {
                     let start = MMUtil();
                     for (let bb = 0; bb < voice.beats.length; bb++) {
                         let beat = voice.beats[bb];
+                        if (beat.automations.length > 0) {
+                        }
                         let currentDuration = this.beatDuration(beat);
                         for (let nn = 0; nn < beat.notes.length; nn++) {
                             let note = beat.notes[nn];
@@ -14425,7 +14483,7 @@ class FileLoaderAlpha {
                         for (let nn = 0; nn < beat.notes.length; nn++) {
                             let note = beat.notes[nn];
                             let drum = note.percussionArticulation;
-                            let track = this.takeDrumTrack(scoreTrack.name + ': ' + drum, trackDrums, drum, targetId);
+                            let track = this.takeDrumTrack(scoreTrack.name, trackDrums, drum, targetId);
                             let measure = this.takeDrumMeasure(track, mm);
                             measure.skips.push(start);
                         }
@@ -14462,21 +14520,28 @@ class FileLoaderAlpha {
         if (trackDrums[drumNum]) {
         }
         else {
+            console.log(title, drumNum);
+            let idx = firstDrumKeysArrayPercussionPaths(drumNum);
             let track = {
                 title: title,
                 measures: [],
                 sampler: {
                     id: 'drum' + (drumNum + Math.random()),
-                    data: '' + drumNum,
-                    kind: 'zdrum1',
+                    data: '100/' + idx,
+                    kind: 'miniumdrums1',
                     outputs: [targetId],
                     iconPosition: { x: 0, y: 0 },
                     state: 0
                 }
             };
+            if (idx) {
+            }
+            else {
+                track.sampler.outputs = [];
+            }
             trackDrums[drumNum] = track;
         }
-        trackDrums[drumNum].title = title + ' ' + allPercussionDrumTitles()[drumNum];
+        trackDrums[drumNum].title = title + ': ' + allPercussionDrumTitles()[drumNum];
         return trackDrums[drumNum];
     }
 }
