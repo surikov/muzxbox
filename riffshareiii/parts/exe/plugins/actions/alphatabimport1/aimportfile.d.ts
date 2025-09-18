@@ -2395,6 +2395,9 @@ declare class FileLoaderAlpha {
     inames: ChordPitchPerformerUtil;
     constructor(inputFile: any);
     convertProject(score: Score): void;
+    addRepeats(project: Zvoog_Project, score: Score): void;
+    cloneAndRepeat(project: Zvoog_Project, start: number, altEnd: number, end: number, count: number): number;
+    cloneOneMeasure(project: Zvoog_Project, from: number, to: number): void;
     addLyrics(project: Zvoog_Project, score: Score): void;
     addBarText(text: string, project: Zvoog_Project, barIdx: number): void;
     addHeaderText(text: string, label: string, firstBar: Zvoog_CommentMeasure): void;

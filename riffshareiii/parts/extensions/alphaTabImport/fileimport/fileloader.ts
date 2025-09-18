@@ -152,13 +152,89 @@ class FileLoaderAlpha {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
+		this.addLyrics(project, score);
+		//console.log(project);
+		this.addRepeats(project, score);
+
 		this.arrangeTracks(project);
 		this.arrangeDrums(project);
 		this.arrangeFilters(project);
-		this.addLyrics(project, score);
+
 
 		parsedProject = project;
 		console.log(parsedProject);
+	}
+	addRepeats(project: Zvoog_Project, score: Score) {
+		let startLoop = -1;
+		let altStart = -1;
+		let projIdx = 0;
+		for (let ii = 0; ii < score.masterBars.length; ii++) {
+			//console.log(ii, projIdx);
+			let scorebar = score.masterBars[ii];
+			if (scorebar.isRepeatStart) {
+				startLoop = ii;
+				altStart = -1;
+				//console.log('start', startLoop);
+			}
+			if (scorebar.alternateEndings) {
+				//console.log('...', ii, 'endings', scorebar.alternateEndings);
+				altStart = ii;
+			}
+			if (scorebar.isRepeatEnd) {
+				//console.log('.end', ii);
+				if (startLoop > -1) {
+					let diff = projIdx - ii;
+					projIdx = projIdx + this.cloneAndRepeat(project, startLoop + diff, altStart < 0 ? -1 : altStart + diff, ii + diff, scorebar.repeatCount);
+					//console.log('..', ii, 'repeat', scorebar.repeatCount);
+					//console.log(startLoop, altStart, ii, 'x', scorebar.repeatCount);
+					startLoop = -1;
+					altStart = -1;
+				}
+			}
+			projIdx++;
+		}
+	}
+	cloneAndRepeat(project: Zvoog_Project, start: number, altEnd: number, end: number, count: number): number {
+		console.log('repeat', start, altEnd, end, count);
+		let insertPoint = end + 1;
+		for (let cc = 0; cc < count - 1; cc++) {
+			//console.log(cc);
+			for (let mm = start; mm <= end; mm++) {
+				if ((cc == count - 2) && (altEnd > -1) && (mm >= altEnd)) {
+					//
+				} else {
+					this.cloneOneMeasure(project, mm, insertPoint);
+					insertPoint++;
+				}
+			}
+		}
+		return insertPoint - 1 - end;
+	}
+	cloneOneMeasure(project: Zvoog_Project, from: number, to: number) {
+		//console.log('clone', from, to);
+		let clone = project.timeline[from];
+		let oo = JSON.parse(JSON.stringify(clone));
+		project.timeline.splice(to, 0, oo);
+		for (let ii = 0; ii < project.tracks.length; ii++) {
+			let clone = project.tracks[ii].measures[from];
+			let oo = JSON.parse(JSON.stringify(clone));
+			project.tracks[ii].measures.splice(to, 0, oo);
+		}
+		for (let ii = 0; ii < project.percussions.length; ii++) {
+			let clone = project.percussions[ii].measures[from];
+			let oo = JSON.parse(JSON.stringify(clone));
+			project.percussions[ii].measures.splice(to, 0, oo);
+		}
+		for (let ii = 0; ii < project.filters.length; ii++) {
+			let clone = project.filters[ii].automation[from];
+			if (clone) {
+				let oo = JSON.parse(JSON.stringify(clone));
+				project.filters[ii].automation.splice(to, 0, oo);
+			}
+		}
+		let clone2 = project.comments[from];
+		let oo2 = JSON.parse(JSON.stringify(clone2));
+		project.comments.splice(to, 0, oo2);
 	}
 	addLyrics(project: Zvoog_Project, score: Score) {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
@@ -564,7 +640,7 @@ class FileLoaderAlpha {
 		if (trackDrums[drumNum]) {
 			//
 		} else {
-			console.log(title, drumNum);
+			//console.log(title, drumNum);
 			let idx = firstDrumKeysArrayPercussionPaths(drumNum);
 			let track: Zvoog_PercussionTrack = {
 				title: title
