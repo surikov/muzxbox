@@ -34,7 +34,7 @@ class FileLoaderAlpha {
 				//console.log('uint8Array', uint8Array);
 				let data: ByteBuffer = ByteBuffer.fromBuffer(uint8Array);
 				let settings: Settings = new Settings();
-
+				//settings.importer.beatTextAsLyrics = true;
 				let path: string = inputFile.value;
 				path = path.toLowerCase().trim();
 				if (path.endsWith('.gp3') || path.endsWith('.gp4') || path.endsWith('.gp5')) {
@@ -81,6 +81,7 @@ class FileLoaderAlpha {
 	}
 	convertProject(score: Score) {
 		console.log(score);
+
 		let project: Zvoog_Project = {
 			versionCode: '1'
 			, title: score.title
@@ -263,12 +264,23 @@ class FileLoaderAlpha {
 				let custaff = cutrack.staves[ss];
 				for (let bb = 0; bb < custaff.bars.length; bb++) {
 					let bar = custaff.bars[bb];
+					//console.log(bb,bar);
 					for (let vv = 0; vv < bar.voices.length; vv++) {
 						let vox = bar.voices[vv];
+						//console.log(vv,vox);
 						for (let rr = 0; rr < vox.beats.length; rr++) {
 							let beat = vox.beats[rr];
+							//console.log(rr,beat);
 							if (beat.text) {
 								this.addBarText(beat.text, project, bb);
+							}
+							if (beat.lyrics) {
+								if (beat.lyrics.length) {
+									//console.log(bb,beat.lyrics);
+									for (let ll = 0; ll < beat.lyrics.length; ll++) {
+										this.addBarText(beat.lyrics[ll], project, bb);
+									}
+								}
 							}
 						}
 					}
@@ -478,7 +490,7 @@ class FileLoaderAlpha {
 						let currentDuration = this.beatDuration(beat);
 						for (let nn = 0; nn < beat.notes.length; nn++) {
 							let note = beat.notes[nn];
-							let pitch = this.stringFret2pitch(note.string, note.fret, tuning);
+							let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
 							if (note.isPalmMute) {
 								let pmChord: Zvoog_Chord = this.takeChord(start, pmMeasure);
 								pmChord.slides = [{ duration: currentDuration, delta: 0 }];
@@ -541,7 +553,8 @@ class FileLoaderAlpha {
 		return duration;
 	}
 
-	stringFret2pitch(stringNum: number, fretNum: number, tuning: number[]): number {
+	stringFret2pitch(stringNum: number, fretNum: number, tuning: number[], octave: number, tone: number): number {
+		//console.log(stringNum, fretNum, tuning);
 		if (stringNum > 0 && stringNum <= tuning.length) {
 			return tuning[tuning.length - stringNum] + fretNum;
 		}
@@ -556,7 +569,8 @@ class FileLoaderAlpha {
 		if (stringNum == 5) return _2nd + fretNum;
 		if (stringNum == 6) return _1st + fretNum;
 		*/
-		return -1;
+		//return -1;
+		return 12 * octave + tone;
 	}
 	takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord {
 		let startBeat = MMUtil().set(start);
@@ -572,6 +586,7 @@ class FileLoaderAlpha {
 	}
 
 	addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
+		console.log(scoreTrack);
 		let trackDrums: Zvoog_PercussionTrack[] = [];
 		for (let mm = 0; mm < project.timeline.length; mm++) {
 			//let mzxbxMeasure: Zvoog_TrackMeasure = { chords: [] };
@@ -589,6 +604,25 @@ class FileLoaderAlpha {
 						for (let nn = 0; nn < beat.notes.length; nn++) {
 							let note = beat.notes[nn];
 							let drum = note.percussionArticulation;
+
+							if (drum > 34) {
+								//
+							} else {
+								
+								if (scoreTrack.percussionArticulations) {
+									//console.log(drum, scoreTrack.percussionArticulations);
+									if (scoreTrack.percussionArticulations.length) {
+										if (scoreTrack.percussionArticulations.length> drum && drum > -1) {
+											let info = scoreTrack.percussionArticulations[drum];
+											//console.log(drum, scoreTrack.name, info);
+											drum = info.outputMidiNumber;
+
+										}
+									}
+								}
+							}
+							//console.log(mm, bb, drum,note);
+
 							let track = this.takeDrumTrack(scoreTrack.name, trackDrums, drum, targetId);
 							let measure = this.takeDrumMeasure(track, mm);
 							measure.skips.push(start);

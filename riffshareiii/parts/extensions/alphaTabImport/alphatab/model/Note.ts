@@ -243,17 +243,17 @@ class Note {
      * Gets or sets the percusson element.
      * @deprecated
      */
-    //public get element(): number {
-    //    return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
-    //}
+    public get element(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
+    }
 
     /**
      * Gets or sets the variation of this note.
      * @deprecated
      */
-    //public get variation(): number {
-    //    return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
-    //}
+    public get variation(): number {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
+    }
 
     /**
      * Gets or sets the index of percussion articulation in the related `track.percussionArticulations`.

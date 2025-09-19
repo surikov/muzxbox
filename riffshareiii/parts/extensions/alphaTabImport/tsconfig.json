@@ -111,6 +111,7 @@
 		,"./alphatab/model/PlaybackInformation.ts"
 		,"./alphatab/model/InstrumentArticulation.ts"
 		,"./alphatab/model/BackingTrack.ts"
+		,"./alphatab/model/PercussionMapper.ts"
 		,"./alphatab/midi/MidiUtils.ts"		
 		,"./alphatab/midi/GeneralMidi.ts"
 		,"./alphatab/importer/ScoreImporter.ts"

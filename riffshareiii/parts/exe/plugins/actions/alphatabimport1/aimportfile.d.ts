@@ -1023,6 +1023,8 @@ declare class Note {
     octave: number;
     tone: number;
     get isPercussion(): boolean;
+    get element(): number;
+    get variation(): number;
     percussionArticulation: number;
     isVisible: boolean;
     isLeftHandTapped: boolean;
@@ -1562,9 +1564,20 @@ declare class InstrumentArticulation {
     staffLine: number;
     techniqueSymbolPlacement: TechniqueSymbolPlacement;
     outputMidiNumber: number;
+    constructor(elementType?: string, staffLine?: number, outputMidiNumber?: number);
 }
 declare class BackingTrack {
     rawAudioFile: Uint8Array | undefined;
+}
+declare class PercussionMapper {
+    private static gp6ElementAndVariationToArticulation;
+    static articulationFromElementVariation(element: number, variation: number): number;
+    static instrumentArticulations: Map<number, InstrumentArticulation>;
+    static instrumentArticulationNames: Map<string, number>;
+    static getArticulationName(n: Note): string;
+    static getArticulation(n: Note): InstrumentArticulation | null;
+    static getElementAndVariation(n: Note): number[];
+    static getArticulationByInputMidiNumber(inputMidiNumber: number): InstrumentArticulation | null;
 }
 declare class MidiUtils {
     static readonly QuarterTime: number;
@@ -2262,7 +2275,7 @@ declare class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulat
 declare class TrackInfo {
     track: Track;
     firstArticulation?: InstrumentArticulationWithPlaybackInfo;
-    instruments: Map<string, InstrumentArticulationWithPlaybackInfo>;
+    instrumentArticulations: Map<string, InstrumentArticulationWithPlaybackInfo>;
     private _instrumentIdToArticulationIndex;
     private _lyricsLine;
     private _lyricsLines;
@@ -2411,7 +2424,7 @@ declare class FileLoaderAlpha {
     findModeInstrument(program: number): number;
     addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string): void;
     beatDuration(beat: Beat): Zvoog_MetreMathType;
-    stringFret2pitch(stringNum: number, fretNum: number, tuning: number[]): number;
+    stringFret2pitch(stringNum: number, fretNum: number, tuning: number[], octave: number, tone: number): number;
     takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord;
     addScoreDrumsTracks(project: Zvoog_Project, scoreTrack: Track, targetId: string): void;
     takeDrumMeasure(trackDrum: Zvoog_PercussionTrack, barNum: number): Zvoog_PercussionMeasure;

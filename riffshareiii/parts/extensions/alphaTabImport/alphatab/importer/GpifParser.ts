@@ -2501,7 +2501,7 @@ class GpifParser {
 
         // map GP6 element and variation combos to midi numbers
         if (element !== -1 && variation !== -1) {
-            //note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
+            note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
         }
     }
 

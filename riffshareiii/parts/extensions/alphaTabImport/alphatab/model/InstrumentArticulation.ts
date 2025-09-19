@@ -70,27 +70,27 @@ class InstrumentArticulation {
      * Gets or sets which midi key to use when playing the note.
      */
     public outputMidiNumber: number;
-/*
+
     public constructor(
         elementType: string = '',
         staffLine: number = 0,
-        outputMidiNumber: number = 0,
-        noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
-        noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
-        noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
+        outputMidiNumber: number = 0
+        //noteHeadDefault: any,//MusicFontSymbol = MusicFontSymbol.None,
+        //noteHeadHalf: any,//MusicFontSymbol = MusicFontSymbol.None,
+        //noteHeadWhole: any,//MusicFontSymbol = MusicFontSymbol.None,
+        //techniqueSymbol: any,//MusicFontSymbol = MusicFontSymbol.None,
+        //techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
     ) {
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
-        this.noteHeadDefault = noteHeadDefault;
-        this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
-        this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
-        this.techniqueSymbol = techniqueSymbol;
-        this.techniqueSymbolPlacement = techniqueSymbolPlacement;
+        //this.noteHeadDefault = noteHeadDefault;
+        //this.noteHeadHalf = noteHeadHalf !== MusicFontSymbol.None ? noteHeadHalf : noteHeadDefault;
+        //this.noteHeadWhole = noteHeadWhole !== MusicFontSymbol.None ? noteHeadWhole : noteHeadDefault;
+        //this.techniqueSymbol = techniqueSymbol;
+        //this.techniqueSymbolPlacement = techniqueSymbolPlacement;
     }
-
+/*
     public getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.Whole:

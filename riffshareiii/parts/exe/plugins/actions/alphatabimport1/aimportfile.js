@@ -2416,6 +2416,12 @@ class Note {
     get isPercussion() {
         return !this.isStringed && this.percussionArticulation >= 0;
     }
+    get element() {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[0] : -1;
+    }
+    get variation() {
+        return this.isPercussion ? PercussionMapper.getElementAndVariation(this)[1] : -1;
+    }
     get isHammerPullDestination() {
         return !!this.hammerPullOrigin;
     }
@@ -4577,9 +4583,567 @@ var TechniqueSymbolPlacement;
     TechniqueSymbolPlacement[TechniqueSymbolPlacement["Outside"] = 3] = "Outside";
 })(TechniqueSymbolPlacement || (TechniqueSymbolPlacement = {}));
 class InstrumentArticulation {
+    constructor(elementType = '', staffLine = 0, outputMidiNumber = 0) {
+        this.elementType = elementType;
+        this.outputMidiNumber = outputMidiNumber;
+        this.staffLine = staffLine;
+    }
 }
 class BackingTrack {
 }
+class PercussionMapper {
+    static articulationFromElementVariation(element, variation) {
+        if (element < PercussionMapper.gp6ElementAndVariationToArticulation.length) {
+            if (variation >= PercussionMapper.gp6ElementAndVariationToArticulation.length) {
+                variation = 0;
+            }
+            return PercussionMapper.gp6ElementAndVariationToArticulation[element][variation];
+        }
+        return 38;
+    }
+    static getArticulationName(n) {
+        const articulation = PercussionMapper.getArticulation(n);
+        let input = n.percussionArticulation;
+        if (articulation) {
+            input = articulation.outputMidiNumber;
+        }
+        for (const [name, value] of PercussionMapper.instrumentArticulationNames) {
+            if (value === input) {
+                return name;
+            }
+        }
+        return 'unknown';
+    }
+    static getArticulation(n) {
+        const articulationIndex = n.percussionArticulation;
+        if (articulationIndex < 0) {
+            return null;
+        }
+        const trackArticulations = n.beat.voice.bar.staff.track.percussionArticulations;
+        if (articulationIndex < trackArticulations.length) {
+            return trackArticulations[articulationIndex];
+        }
+        return PercussionMapper.getArticulationByInputMidiNumber(articulationIndex);
+    }
+    static getElementAndVariation(n) {
+        const articulation = PercussionMapper.getArticulation(n);
+        if (!articulation) {
+            return [-1, -1];
+        }
+        for (let element = 0; element < PercussionMapper.gp6ElementAndVariationToArticulation.length; element++) {
+            const variations = PercussionMapper.gp6ElementAndVariationToArticulation[element];
+            for (let variation = 0; variation < variations.length; variation++) {
+                const gp6Articulation = PercussionMapper.getArticulationByInputMidiNumber(variations[variation]);
+                if (gp6Articulation?.outputMidiNumber === articulation.outputMidiNumber) {
+                    return [element, variation];
+                }
+            }
+        }
+        return [-1, -1];
+    }
+    static getArticulationByInputMidiNumber(inputMidiNumber) {
+        if (PercussionMapper.instrumentArticulations.has(inputMidiNumber)) {
+            return PercussionMapper.instrumentArticulations.get(inputMidiNumber);
+        }
+        return null;
+    }
+}
+PercussionMapper.gp6ElementAndVariationToArticulation = [
+    [35, 35, 35],
+    [38, 91, 37],
+    [99, 100, 99],
+    [56, 100, 56],
+    [102, 103, 102],
+    [43, 43, 43],
+    [45, 45, 45],
+    [47, 47, 47],
+    [48, 48, 48],
+    [50, 50, 50],
+    [42, 92, 46],
+    [44, 44, 44],
+    [57, 98, 57],
+    [49, 97, 49],
+    [55, 95, 55],
+    [51, 93, 127],
+    [52, 96, 52]
+];
+PercussionMapper.instrumentArticulations = new Map([
+    [
+        38,
+        new InstrumentArticulation('snare', 3, 38)
+    ],
+    [
+        37,
+        new InstrumentArticulation('snare', 3, 37)
+    ],
+    [
+        91,
+        new InstrumentArticulation('snare', 3, 38)
+    ],
+    [
+        42,
+        new InstrumentArticulation('hiHat', -1, 42)
+    ],
+    [
+        92,
+        new InstrumentArticulation('hiHat', -1, 46)
+    ],
+    [
+        46,
+        new InstrumentArticulation('hiHat', -1, 46)
+    ],
+    [
+        44,
+        new InstrumentArticulation('hiHat', 9, 44)
+    ],
+    [
+        35,
+        new InstrumentArticulation('kickDrum', 8, 35)
+    ],
+    [
+        36,
+        new InstrumentArticulation('kickDrum', 7, 36)
+    ],
+    [
+        50,
+        new InstrumentArticulation('tom', 1, 50)
+    ],
+    [
+        48,
+        new InstrumentArticulation('tom', 2, 48)
+    ],
+    [
+        47,
+        new InstrumentArticulation('tom', 4, 47)
+    ],
+    [
+        45,
+        new InstrumentArticulation('tom', 5, 45)
+    ],
+    [
+        43,
+        new InstrumentArticulation('tom', 6, 43)
+    ],
+    [
+        93,
+        new InstrumentArticulation('ride', 0, 51)
+    ],
+    [
+        51,
+        new InstrumentArticulation('ride', 0, 51)
+    ],
+    [
+        53,
+        new InstrumentArticulation('ride', 0, 53)
+    ],
+    [
+        94,
+        new InstrumentArticulation('ride', 0, 51)
+    ],
+    [
+        55,
+        new InstrumentArticulation('splash', -2, 55)
+    ],
+    [
+        95,
+        new InstrumentArticulation('splash', -2, 55)
+    ],
+    [
+        52,
+        new InstrumentArticulation('china', -3, 52)
+    ],
+    [
+        96,
+        new InstrumentArticulation('china', -3, 52)
+    ],
+    [
+        49,
+        new InstrumentArticulation('crash', -2, 49)
+    ],
+    [
+        97,
+        new InstrumentArticulation('crash', -2, 49)
+    ],
+    [
+        57,
+        new InstrumentArticulation('crash', -1, 57)
+    ],
+    [
+        98,
+        new InstrumentArticulation('crash', -1, 57)
+    ],
+    [
+        99,
+        new InstrumentArticulation('cowbell', 1, 56)
+    ],
+    [
+        100,
+        new InstrumentArticulation('cowbell', 1, 56)
+    ],
+    [
+        56,
+        new InstrumentArticulation('cowbell', 0, 56)
+    ],
+    [
+        101,
+        new InstrumentArticulation('cowbell', 0, 56)
+    ],
+    [
+        102,
+        new InstrumentArticulation('cowbell', -1, 56)
+    ],
+    [
+        103,
+        new InstrumentArticulation('cowbell', -1, 56)
+    ],
+    [
+        77,
+        new InstrumentArticulation('woodblock', -9, 77)
+    ],
+    [
+        76,
+        new InstrumentArticulation('woodblock', -10, 76)
+    ],
+    [
+        60,
+        new InstrumentArticulation('bongo', -4, 60)
+    ],
+    [
+        104,
+        new InstrumentArticulation('bongo', -5, 60)
+    ],
+    [
+        105,
+        new InstrumentArticulation('bongo', -6, 60)
+    ],
+    [
+        61,
+        new InstrumentArticulation('bongo', -7, 61)
+    ],
+    [
+        106,
+        new InstrumentArticulation('bongo', -8, 61)
+    ],
+    [
+        107,
+        new InstrumentArticulation('bongo', -16, 61)
+    ],
+    [
+        66,
+        new InstrumentArticulation('timbale', 10, 66)
+    ],
+    [
+        65,
+        new InstrumentArticulation('timbale', 9, 65)
+    ],
+    [
+        68,
+        new InstrumentArticulation('agogo', 12, 68)
+    ],
+    [
+        67,
+        new InstrumentArticulation('agogo', 11, 67)
+    ],
+    [
+        64,
+        new InstrumentArticulation('conga', 17, 64)
+    ],
+    [
+        108,
+        new InstrumentArticulation('conga', 16, 64)
+    ],
+    [
+        109,
+        new InstrumentArticulation('conga', 15, 64)
+    ],
+    [
+        63,
+        new InstrumentArticulation('conga', 14, 63)
+    ],
+    [
+        110,
+        new InstrumentArticulation('conga', 13, 63)
+    ],
+    [
+        62,
+        new InstrumentArticulation('conga', 19, 62)
+    ],
+    [
+        72,
+        new InstrumentArticulation('whistle', -11, 72)
+    ],
+    [
+        71,
+        new InstrumentArticulation('whistle', -17, 71)
+    ],
+    [
+        73,
+        new InstrumentArticulation('guiro', 38, 73)
+    ],
+    [
+        74,
+        new InstrumentArticulation('guiro', 37, 74)
+    ],
+    [
+        86,
+        new InstrumentArticulation('surdo', 36, 86)
+    ],
+    [
+        87,
+        new InstrumentArticulation('surdo', 35, 87)
+    ],
+    [
+        54,
+        new InstrumentArticulation('tambourine', 3, 54)
+    ],
+    [
+        111,
+        new InstrumentArticulation('tambourine', 2, 54)
+    ],
+    [
+        112,
+        new InstrumentArticulation('tambourine', 1, 54)
+    ],
+    [
+        113,
+        new InstrumentArticulation('tambourine', -7, 54)
+    ],
+    [
+        79,
+        new InstrumentArticulation('cuica', 30, 79)
+    ],
+    [
+        78,
+        new InstrumentArticulation('cuica', 29, 78)
+    ],
+    [
+        58,
+        new InstrumentArticulation('vibraslap', 28, 58)
+    ],
+    [
+        81,
+        new InstrumentArticulation('triangle', 27, 81)
+    ],
+    [
+        80,
+        new InstrumentArticulation('triangle', 26, 80)
+    ],
+    [
+        114,
+        new InstrumentArticulation('grancassa', 25, 43)
+    ],
+    [
+        115,
+        new InstrumentArticulation('piatti', 18, 49)
+    ],
+    [
+        116,
+        new InstrumentArticulation('piatti', 24, 49)
+    ],
+    [
+        69,
+        new InstrumentArticulation('cabasa', 23, 69)
+    ],
+    [
+        117,
+        new InstrumentArticulation('cabasa', 22, 69)
+    ],
+    [
+        85,
+        new InstrumentArticulation('castanets', 21, 85)
+    ],
+    [
+        75,
+        new InstrumentArticulation('claves', 20, 75)
+    ],
+    [
+        70,
+        new InstrumentArticulation('maraca', -12, 70)
+    ],
+    [
+        118,
+        new InstrumentArticulation('maraca', -13, 70)
+    ],
+    [
+        119,
+        new InstrumentArticulation('maraca', -14, 70)
+    ],
+    [
+        120,
+        new InstrumentArticulation('maraca', -15, 70)
+    ],
+    [
+        82,
+        new InstrumentArticulation('shaker', -23, 54)
+    ],
+    [
+        122,
+        new InstrumentArticulation('shaker', -24, 54)
+    ],
+    [
+        84,
+        new InstrumentArticulation('bellTree', -18, 53)
+    ],
+    [
+        123,
+        new InstrumentArticulation('bellTree', -19, 53)
+    ],
+    [
+        83,
+        new InstrumentArticulation('jingleBell', -20, 53)
+    ],
+    [
+        124,
+        new InstrumentArticulation('unpitched', -21, 62)
+    ],
+    [
+        125,
+        new InstrumentArticulation('unpitched', -22, 62)
+    ],
+    [
+        39,
+        new InstrumentArticulation('handClap', 3, 39)
+    ],
+    [
+        40,
+        new InstrumentArticulation('snare', 3, 40)
+    ],
+    [
+        31,
+        new InstrumentArticulation('snare', 3, 40)
+    ],
+    [
+        41,
+        new InstrumentArticulation('tom', 5, 41)
+    ],
+    [
+        59,
+        new InstrumentArticulation('ride', 2, 59)
+    ],
+    [
+        126,
+        new InstrumentArticulation('ride', 2, 59)
+    ],
+    [
+        127,
+        new InstrumentArticulation('ride', 2, 59)
+    ],
+    [
+        29,
+        new InstrumentArticulation('ride', 2, 59)
+    ],
+    [
+        30,
+        new InstrumentArticulation('crash', -3, 49)
+    ],
+    [
+        33,
+        new InstrumentArticulation('snare', 3, 37)
+    ],
+    [
+        34,
+        new InstrumentArticulation('snare', 3, 38)
+    ]
+]);
+PercussionMapper.instrumentArticulationNames = new Map([
+    ['Ride (choke)', 29],
+    ['Cymbal (hit)', 30],
+    ['Snare (side stick)', 31],
+    ['Snare (side stick) 2', 33],
+    ['Snare (hit)', 34],
+    ['Kick (hit)', 35],
+    ['Kick (hit) 2', 36],
+    ['Snare (side stick) 3', 37],
+    ['Snare (hit) 2', 38],
+    ['Hand Clap (hit)', 39],
+    ['Snare (hit) 3', 40],
+    ['Low Floor Tom (hit)', 41],
+    ['Hi-Hat (closed)', 42],
+    ['Very Low Tom (hit)', 43],
+    ['Pedal Hi-Hat (hit)', 44],
+    ['Low Tom (hit)', 45],
+    ['Hi-Hat (open)', 46],
+    ['Mid Tom (hit)', 47],
+    ['High Tom (hit)', 48],
+    ['Crash high (hit)', 49],
+    ['High Floor Tom (hit)', 50],
+    ['Ride (middle)', 51],
+    ['China (hit)', 52],
+    ['Ride (bell)', 53],
+    ['Tambourine (hit)', 54],
+    ['Splash (hit)', 55],
+    ['Cowbell medium (hit)', 56],
+    ['Crash medium (hit)', 57],
+    ['Vibraslap (hit)', 58],
+    ['Ride (edge)', 59],
+    ['Hand (hit)', 60],
+    ['Hand (hit)', 61],
+    ['Bongo high (hit)', 60],
+    ['Bongo low (hit)', 61],
+    ['Conga high (mute)', 62],
+    ['Conga high (hit)', 63],
+    ['Conga low (hit)', 64],
+    ['Timbale high (hit)', 65],
+    ['Timbale low (hit)', 66],
+    ['Agogo high (hit)', 67],
+    ['Agogo tow (hit)', 68],
+    ['Cabasa (hit)', 69],
+    ['Left Maraca (hit)', 70],
+    ['Whistle high (hit)', 71],
+    ['Whistle low (hit)', 72],
+    ['Guiro (hit)', 73],
+    ['Guiro (scrap-return)', 74],
+    ['Claves (hit)', 75],
+    ['Woodblock high (hit)', 76],
+    ['Woodblock low (hit)', 77],
+    ['Cuica (mute)', 78],
+    ['Cuica (open)', 79],
+    ['Triangle (rnute)', 80],
+    ['Triangle (hit)', 81],
+    ['Shaker (hit)', 82],
+    ['Tinkle Bell (hat)', 83],
+    ['Jingle Bell (hit)', 83],
+    ['Bell Tree (hit)', 84],
+    ['Castanets (hit)', 85],
+    ['Surdo (hit)', 86],
+    ['Surdo (mute)', 87],
+    ['Snare (rim shot)', 91],
+    ['Hi-Hat (half)', 92],
+    ['Ride (edge) 2', 93],
+    ['Ride (choke) 2', 94],
+    ['Splash (choke)', 95],
+    ['China (choke)', 96],
+    ['Crash high (choke)', 97],
+    ['Crash medium (choke)', 98],
+    ['Cowbell low (hit)', 99],
+    ['Cowbell low (tip)', 100],
+    ['Cowbell medium (tip)', 101],
+    ['Cowbell high (hit)', 102],
+    ['Cowbell high (tip)', 103],
+    ['Hand (mute)', 104],
+    ['Hand (slap)', 105],
+    ['Hand (mute) 2', 106],
+    ['Hand (slap) 2', 107],
+    ['Conga low (slap)', 108],
+    ['Conga low (mute)', 109],
+    ['Conga high (slap)', 110],
+    ['Tambourine (return)', 111],
+    ['Tambourine (roll)', 112],
+    ['Tambourine (hand)', 113],
+    ['Grancassa (hit)', 114],
+    ['Piatti (hat)', 115],
+    ['Piatti (hand)', 116],
+    ['Cabasa (return)', 117],
+    ['Left Maraca (return)', 118],
+    ['Right Maraca (hit)', 119],
+    ['Right Maraca (return)', 120],
+    ['Shaker (return)', 122],
+    ['Bell Tee (return)', 123],
+    ['Golpe (thumb)', 124],
+    ['Golpe (finger)', 125],
+    ['Ride (middle) 2', 126],
+    ['Ride (bell) 2', 127]
+]);
 class MidiUtils {
     static ticksToMillis(ticks, tempo) {
         return (ticks * (60000.0 / (tempo * MidiUtils.QuarterTime))) | 0;
@@ -7088,6 +7652,7 @@ class GpifParser {
             note.addBendPoint(bendDestination);
         }
         if (element !== -1 && variation !== -1) {
+            note.percussionArticulation = PercussionMapper.articulationFromElementVariation(element, variation);
         }
     }
     parseConcertPitch(node, note) {
@@ -11251,7 +11816,7 @@ class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
 }
 class TrackInfo {
     constructor(track) {
-        this.instruments = new Map();
+        this.instrumentArticulations = new Map();
         this._instrumentIdToArticulationIndex = new Map();
         this._lyricsLine = 0;
         this._lyricsLines = new Map();
@@ -11273,8 +11838,8 @@ class TrackInfo {
             return this._instrumentIdToArticulationIndex.get(lookup);
         }
         let articulation;
-        if (this.instruments.has(instrumentId)) {
-            articulation = this.instruments.get(instrumentId);
+        if (this.instrumentArticulations.has(instrumentId)) {
+            articulation = this.instrumentArticulations.get(instrumentId);
         }
         else {
             articulation = TrackInfo.defaultNoteArticulation;
@@ -11284,7 +11849,9 @@ class TrackInfo {
         const actualSteps = note.beat.voice.bar.staff.standardNotationLineCount * 2 - 1;
         const fiveLineSteps = 5 * 2 - 1;
         const stepDifference = fiveLineSteps - actualSteps;
+        const newArticulation = new InstrumentArticulation(articulation.elementType, 0, articulation.outputMidiNumber);
         this._instrumentIdToArticulationIndex.set(lookup, index);
+        this.track.percussionArticulations.push(newArticulation);
         return index;
     }
 }
@@ -11670,14 +12237,14 @@ class MusicXmlImporter extends ScoreImporter {
         if (!trackInfo.firstArticulation) {
             trackInfo.firstArticulation = articulation;
         }
-        trackInfo.instruments.set(element.getAttribute('id', ''), articulation);
+        trackInfo.instrumentArticulations.set(element.getAttribute('id', ''), articulation);
     }
     parseScorePartMidiInstrument(element, trackInfo) {
         const id = element.getAttribute('id', '');
-        if (!trackInfo.instruments.has(id)) {
+        if (!trackInfo.instrumentArticulations.has(id)) {
             return;
         }
-        const articulation = trackInfo.instruments.get(id);
+        const articulation = trackInfo.instrumentArticulations.get(id);
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'midi-channel':
@@ -14250,6 +14817,13 @@ class FileLoaderAlpha {
                             if (beat.text) {
                                 this.addBarText(beat.text, project, bb);
                             }
+                            if (beat.lyrics) {
+                                if (beat.lyrics.length) {
+                                    for (let ll = 0; ll < beat.lyrics.length; ll++) {
+                                        this.addBarText(beat.lyrics[ll], project, bb);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -14456,7 +15030,7 @@ class FileLoaderAlpha {
                         let currentDuration = this.beatDuration(beat);
                         for (let nn = 0; nn < beat.notes.length; nn++) {
                             let note = beat.notes[nn];
-                            let pitch = this.stringFret2pitch(note.string, note.fret, tuning);
+                            let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
                             if (note.isPalmMute) {
                                 let pmChord = this.takeChord(start, pmMeasure);
                                 pmChord.slides = [{ duration: currentDuration, delta: 0 }];
@@ -14516,11 +15090,11 @@ class FileLoaderAlpha {
         }
         return duration;
     }
-    stringFret2pitch(stringNum, fretNum, tuning) {
+    stringFret2pitch(stringNum, fretNum, tuning, octave, tone) {
         if (stringNum > 0 && stringNum <= tuning.length) {
             return tuning[tuning.length - stringNum] + fretNum;
         }
-        return -1;
+        return 12 * octave + tone;
     }
     takeChord(start, measure) {
         let startBeat = MMUtil().set(start);
@@ -14534,6 +15108,7 @@ class FileLoaderAlpha {
         return newChord;
     }
     addScoreDrumsTracks(project, scoreTrack, targetId) {
+        console.log(scoreTrack);
         let trackDrums = [];
         for (let mm = 0; mm < project.timeline.length; mm++) {
             for (let ss = 0; ss < scoreTrack.staves.length; ss++) {
@@ -14548,6 +15123,18 @@ class FileLoaderAlpha {
                         for (let nn = 0; nn < beat.notes.length; nn++) {
                             let note = beat.notes[nn];
                             let drum = note.percussionArticulation;
+                            if (drum > 34) {
+                            }
+                            else {
+                                if (scoreTrack.percussionArticulations) {
+                                    if (scoreTrack.percussionArticulations.length) {
+                                        if (scoreTrack.percussionArticulations.length > drum && drum > -1) {
+                                            let info = scoreTrack.percussionArticulations[drum];
+                                            drum = info.outputMidiNumber;
+                                        }
+                                    }
+                                }
+                            }
                             let track = this.takeDrumTrack(scoreTrack.name, trackDrums, drum, targetId);
                             let measure = this.takeDrumMeasure(track, mm);
                             measure.skips.push(start);
@@ -14585,7 +15172,6 @@ class FileLoaderAlpha {
         if (trackDrums[drumNum]) {
         }
         else {
-            console.log(title, drumNum);
             let idx = firstDrumKeysArrayPercussionPaths(drumNum);
             let track = {
                 title: title,
