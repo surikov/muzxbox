@@ -440,6 +440,14 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
+    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -454,14 +462,6 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
-    }
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
     }
 }
 var LogLevel;
@@ -3538,11 +3538,6 @@ class Chord {
     }
 }
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3643,6 +3638,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,10 +8893,6 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8912,6 +8908,10 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
+    get inputCrc() {
+        return this._engine.inputCrc.value;
+    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
-    }
-    get inputCrc() {
-        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,16 +9591,6 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
-    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9629,6 +9619,16 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+    }
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,6 +9951,13 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
+    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9969,13 +9976,6 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
-    }
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
+    get isFlushed() {
+        return this._end === 0;
+    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
-    }
-    get isFlushed() {
-        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -15027,39 +15027,51 @@ class FileLoaderAlpha {
                         let beat = voice.beats[bb];
                         if (beat.automations.length > 0) {
                         }
-                        let currentDuration = this.beatDuration(beat);
+                        let beatDuration = this.beatDuration(beat);
+                        let noteDuration = MMUtil().set(beatDuration).metre();
                         for (let nn = 0; nn < beat.notes.length; nn++) {
                             let note = beat.notes[nn];
-                            let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
-                            if (note.isPalmMute) {
-                                let pmChord = this.takeChord(start, pmMeasure);
-                                pmChord.slides = [{ duration: currentDuration, delta: 0 }];
-                                pmChord.pitches.push(pitch);
-                                pmFlag = true;
+                            if (note.isTieDestination) {
                             }
                             else {
-                                if (beat.brushType == 1) {
-                                    let upchord = this.takeChord(start, upMeasure);
-                                    upchord.slides = [{ duration: currentDuration, delta: 0 }];
-                                    upchord.pitches.push(pitch);
-                                    upFlag = true;
+                                let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
+                                if (note.tieDestination) {
+                                    let tiedNote = note.tieDestination;
+                                    while (tiedNote) {
+                                        noteDuration = MMUtil().set(this.beatDuration(tiedNote.beat)).plus(noteDuration).metre();
+                                        tiedNote = tiedNote.tieDestination;
+                                    }
+                                }
+                                if (note.isPalmMute) {
+                                    let pmChord = this.takeChord(start, pmMeasure);
+                                    pmChord.slides = [{ duration: noteDuration, delta: 0 }];
+                                    pmChord.pitches.push(pitch);
+                                    pmFlag = true;
                                 }
                                 else {
-                                    if (beat.brushType == 2) {
-                                        let downchord = this.takeChord(start, downMeasure);
-                                        downchord.slides = [{ duration: currentDuration, delta: 0 }];
-                                        downchord.pitches.push(pitch);
-                                        downFlag = true;
+                                    if (beat.brushType == 1) {
+                                        let upchord = this.takeChord(start, upMeasure);
+                                        upchord.slides = [{ duration: noteDuration, delta: 0 }];
+                                        upchord.pitches.push(pitch);
+                                        upFlag = true;
                                     }
                                     else {
-                                        let chord = this.takeChord(start, mzxbxMeasure);
-                                        chord.slides = [{ duration: currentDuration, delta: 0 }];
-                                        chord.pitches.push(pitch);
+                                        if (beat.brushType == 2) {
+                                            let downchord = this.takeChord(start, downMeasure);
+                                            downchord.slides = [{ duration: noteDuration, delta: 0 }];
+                                            downchord.pitches.push(pitch);
+                                            downFlag = true;
+                                        }
+                                        else {
+                                            let chord = this.takeChord(start, mzxbxMeasure);
+                                            chord.slides = [{ duration: noteDuration, delta: 0 }];
+                                            chord.pitches.push(pitch);
+                                        }
                                     }
                                 }
                             }
                         }
-                        start = start.plus(currentDuration);
+                        start = start.plus(beatDuration);
                     }
                 }
             }
@@ -15088,7 +15100,11 @@ class FileLoaderAlpha {
         if (beat.dots > 3) {
             duration = duration.plus({ count: duration.count, part: 16 * beat.duration });
         }
-        return duration;
+        if (beat.tupletDenominator > 0 && beat.tupletNumerator > 0) {
+            duration.count = Math.round((beat.tupletDenominator / beat.tupletNumerator) * 1024 * (duration.count / duration.part));
+            duration.part = 1024;
+        }
+        return duration.simplyfy();
     }
     stringFret2pitch(stringNum, fretNum, tuning, octave, tone) {
         if (stringNum > 0 && stringNum <= tuning.length) {
@@ -15097,7 +15113,7 @@ class FileLoaderAlpha {
         return 12 * octave + tone;
     }
     takeChord(start, measure) {
-        let startBeat = MMUtil().set(start);
+        let startBeat = MMUtil().set(start).strip(32);
         for (let cc = 0; cc < measure.chords.length; cc++) {
             if (startBeat.equals(measure.chords[cc].skip)) {
                 return measure.chords[cc];
@@ -15137,7 +15153,7 @@ class FileLoaderAlpha {
                             }
                             let track = this.takeDrumTrack(scoreTrack.name, trackDrums, drum, targetId);
                             let measure = this.takeDrumMeasure(track, mm);
-                            measure.skips.push(start);
+                            measure.skips.push(start.strip(32));
                         }
                         start = start.plus(currentDuration);
                     }
