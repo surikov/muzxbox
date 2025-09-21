@@ -15034,38 +15034,49 @@ class FileLoaderAlpha {
                             if (note.isTieDestination) {
                             }
                             else {
-                                let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
-                                if (note.tieDestination) {
-                                    let tiedNote = note.tieDestination;
-                                    while (tiedNote) {
-                                        noteDuration = MMUtil().set(this.beatDuration(tiedNote.beat)).plus(noteDuration).metre();
-                                        tiedNote = tiedNote.tieDestination;
-                                    }
-                                }
-                                if (note.isPalmMute) {
-                                    let pmChord = this.takeChord(start, pmMeasure);
-                                    pmChord.slides = [{ duration: noteDuration, delta: 0 }];
-                                    pmChord.pitches.push(pitch);
-                                    pmFlag = true;
+                                if (note.slideOrigin) {
                                 }
                                 else {
-                                    if (beat.brushType == 1) {
-                                        let upchord = this.takeChord(start, upMeasure);
-                                        upchord.slides = [{ duration: noteDuration, delta: 0 }];
-                                        upchord.pitches.push(pitch);
-                                        upFlag = true;
+                                    let pitch = this.stringFret2pitch(note.string, note.fret, tuning, note.octave, note.tone);
+                                    if (note.tieDestination) {
+                                        let tiedNote = note.tieDestination;
+                                        while (tiedNote) {
+                                            noteDuration = MMUtil().set(this.beatDuration(tiedNote.beat)).plus(noteDuration).metre();
+                                            tiedNote = tiedNote.tieDestination;
+                                        }
+                                    }
+                                    let slides = [{ duration: noteDuration, delta: 0 }];
+                                    if (note.slideTarget) {
+                                        let targetpitch = this.stringFret2pitch(note.slideTarget.string, note.slideTarget.fret, tuning, note.slideTarget.octave, note.slideTarget.tone);
+                                        let targetDuration = this.beatDuration(note.slideTarget.beat).metre();
+                                        slides = [{ duration: noteDuration, delta: targetpitch - pitch },
+                                            { duration: targetDuration, delta: targetpitch - pitch }];
+                                    }
+                                    if (note.isPalmMute) {
+                                        let pmChord = this.takeChord(start, pmMeasure);
+                                        pmChord.slides = slides;
+                                        pmChord.pitches.push(pitch);
+                                        pmFlag = true;
                                     }
                                     else {
-                                        if (beat.brushType == 2) {
-                                            let downchord = this.takeChord(start, downMeasure);
-                                            downchord.slides = [{ duration: noteDuration, delta: 0 }];
-                                            downchord.pitches.push(pitch);
-                                            downFlag = true;
+                                        if (beat.brushType == 1) {
+                                            let upchord = this.takeChord(start, upMeasure);
+                                            upchord.slides = slides;
+                                            upchord.pitches.push(pitch);
+                                            upFlag = true;
                                         }
                                         else {
-                                            let chord = this.takeChord(start, mzxbxMeasure);
-                                            chord.slides = [{ duration: noteDuration, delta: 0 }];
-                                            chord.pitches.push(pitch);
+                                            if (beat.brushType == 2) {
+                                                let downchord = this.takeChord(start, downMeasure);
+                                                downchord.slides = slides;
+                                                downchord.pitches.push(pitch);
+                                                downFlag = true;
+                                            }
+                                            else {
+                                                let chord = this.takeChord(start, mzxbxMeasure);
+                                                chord.slides = slides;
+                                                chord.pitches.push(pitch);
+                                            }
                                         }
                                     }
                                 }
