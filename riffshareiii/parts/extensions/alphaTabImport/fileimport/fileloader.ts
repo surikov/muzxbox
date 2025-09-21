@@ -511,8 +511,30 @@ class FileLoaderAlpha {
 										let targetpitch = this.stringFret2pitch(note.slideTarget.string, note.slideTarget.fret
 											, tuning, note.slideTarget.octave, note.slideTarget.tone);
 										let targetDuration = this.beatDuration(note.slideTarget.beat).metre();
-										slides = [{ duration: noteDuration, delta: targetpitch-pitch }
-											, { duration: targetDuration, delta: targetpitch-pitch }];
+										slides = [{ duration: noteDuration, delta: targetpitch - pitch }
+											, { duration: targetDuration, delta: targetpitch - pitch }];
+									}
+									if (note.bendType) {
+										//console.log(note);
+										if (note.bendPoints) {
+											slides = [];
+											let len = 0;
+											let preOffset = 0;
+											for (let bp = 0; bp < note.bendPoints.length; bp++) {
+												let offset = note.bendPoints[bp].offset / 60;
+												let value = note.bendPoints[bp].value / 4;
+												len = offset - preOffset;
+												preOffset = offset;
+												slides.push({
+													duration: {
+														count: Math.round(1024 * noteDuration.count * len)
+														, part: 1024 * noteDuration.part
+													}
+													, delta: value
+												});
+												//console.log(slides);
+											}
+										}
 									}
 									if (note.isPalmMute) {
 										let pmChord: Zvoog_Chord = this.takeChord(start, pmMeasure);

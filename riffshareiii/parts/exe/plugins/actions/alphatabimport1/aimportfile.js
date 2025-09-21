@@ -15052,6 +15052,26 @@ class FileLoaderAlpha {
                                         slides = [{ duration: noteDuration, delta: targetpitch - pitch },
                                             { duration: targetDuration, delta: targetpitch - pitch }];
                                     }
+                                    if (note.bendType) {
+                                        if (note.bendPoints) {
+                                            slides = [];
+                                            let len = 0;
+                                            let preOffset = 0;
+                                            for (let bp = 0; bp < note.bendPoints.length; bp++) {
+                                                let offset = note.bendPoints[bp].offset / 60;
+                                                let value = note.bendPoints[bp].value / 4;
+                                                len = offset - preOffset;
+                                                preOffset = offset;
+                                                slides.push({
+                                                    duration: {
+                                                        count: Math.round(1024 * noteDuration.count * len),
+                                                        part: 1024 * noteDuration.part
+                                                    },
+                                                    delta: value
+                                                });
+                                            }
+                                        }
+                                    }
                                     if (note.isPalmMute) {
                                         let pmChord = this.takeChord(start, pmMeasure);
                                         pmChord.slides = slides;
