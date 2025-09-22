@@ -2602,9 +2602,16 @@ declare class DataViewStream {
 declare class MIDIReader {
     constructor(arrayBuffer: ArrayBuffer);
 }
+declare type TrackNumChanNum = {
+    trackNum: number;
+    channelNum: number;
+    zvoogtrack: Zvoog_MusicTrack;
+};
 declare class EventsConverter {
+    parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(): Zvoog_Project;
+    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackOrder: number, channelNum: number, tracksChannels: TrackNumChanNum[]): TrackNumChanNum;
 }
 declare let parsedProject: Zvoog_Project | null;
 declare class AlphaTabImportMusicPlugin {

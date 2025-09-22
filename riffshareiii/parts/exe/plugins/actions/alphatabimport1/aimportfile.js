@@ -15324,6 +15324,7 @@ class MIDIReader {
 }
 class EventsConverter {
     constructor(parser) {
+        this.parser = parser;
     }
     convertEvents() {
         let project = {
@@ -15348,7 +15349,42 @@ class EventsConverter {
             menuClipboard: false,
             menuSettings: false
         };
+        let tracksChannels = [];
+        for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
+            let parsedtrack = this.parser.parsedTracks[ii];
+            for (let k = 0; k < parsedtrack.programChannel.length; k++) {
+                this.findOrCreateTrack(parsedtrack, ii, parsedtrack.programChannel[k].channel, tracksChannels);
+            }
+        }
+        for (let ii = 0; ii < tracksChannels.length; ii++) {
+            project.tracks.push(tracksChannels[ii].zvoogtrack);
+        }
         return project;
+    }
+    findOrCreateTrack(parsedtrack, trackOrder, channelNum, tracksChannels) {
+        for (let ii = 0; ii < tracksChannels.length; ii++) {
+            if (tracksChannels[ii].trackNum == trackOrder && tracksChannels[ii].channelNum == channelNum) {
+                return tracksChannels[ii];
+            }
+        }
+        let it = {
+            trackNum: trackOrder,
+            channelNum: channelNum,
+            zvoogtrack: {
+                title: parsedtrack.trackTitle + ' / ' + parsedtrack.instrumentName,
+                measures: [],
+                performer: {
+                    id: '' + Math.random(),
+                    data: '',
+                    kind: '',
+                    outputs: [],
+                    iconPosition: { x: 0, y: 0 },
+                    state: 0
+                }
+            }
+        };
+        tracksChannels.push(it);
+        return it;
     }
 }
 console.log('Alpha Tab Import *.mid v1.0.1');
