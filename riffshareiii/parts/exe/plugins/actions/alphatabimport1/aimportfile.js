@@ -440,14 +440,6 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
-    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -462,6 +454,14 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
+    }
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
     }
 }
 var LogLevel;
@@ -3538,6 +3538,11 @@ class Chord {
     }
 }
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3638,11 +3643,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,6 +8893,10 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8908,10 +8912,6 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
-    get inputCrc() {
-        return this._engine.inputCrc.value;
-    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
+    }
+    get inputCrc() {
+        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,6 +9591,16 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
+    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9619,16 +9629,6 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
-    }
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,13 +9951,6 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
-    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9976,6 +9969,13 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
+    }
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
-    get isFlushed() {
-        return this._end === 0;
-    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
+    }
+    get isFlushed() {
+        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -14520,6 +14520,837 @@ MusicXmlImporter.allDurations = [
     Duration.QuadrupleWhole
 ];
 MusicXmlImporter.allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiUtils.toTicks(d));
+let pluckDiff = 23;
+class MidiParser {
+    constructor(arrayBuffer) {
+        this.instrumentNamesArray = [];
+        this.drumNamesArray = [];
+        this.EVENT_META = 0xff;
+        this.EVENT_SYSEX = 0xf0;
+        this.EVENT_DIVSYSEX = 0xf7;
+        this.EVENT_MIDI = 0x8;
+        this.EVENT_META_SEQUENCE_NUMBER = 0x00;
+        this.EVENT_META_TEXT = 0x01;
+        this.EVENT_META_COPYRIGHT_NOTICE = 0x02;
+        this.EVENT_META_TRACK_NAME = 0x03;
+        this.EVENT_META_INSTRUMENT_NAME = 0x04;
+        this.EVENT_META_LYRICS = 0x05;
+        this.EVENT_META_MARKER = 0x06;
+        this.EVENT_META_CUE_POINT = 0x07;
+        this.EVENT_META_MIDI_CHANNEL_PREFIX = 0x20;
+        this.EVENT_META_END_OF_TRACK = 0x2f;
+        this.EVENT_META_SET_TEMPO = 0x51;
+        this.EVENT_META_SMTPE_OFFSET = 0x54;
+        this.EVENT_META_TIME_SIGNATURE = 0x58;
+        this.EVENT_META_KEY_SIGNATURE = 0x59;
+        this.EVENT_META_SEQUENCER_SPECIFIC = 0x7f;
+        this.EVENT_MIDI_NOTE_OFF = 0x8;
+        this.EVENT_MIDI_NOTE_ON = 0x9;
+        this.EVENT_MIDI_NOTE_AFTERTOUCH = 0xa;
+        this.EVENT_MIDI_CONTROLLER = 0xb;
+        this.EVENT_MIDI_PROGRAM_CHANGE = 0xc;
+        this.EVENT_MIDI_CHANNEL_AFTERTOUCH = 0xd;
+        this.EVENT_MIDI_PITCH_BEND = 0xe;
+        this.midiEventType = 0;
+        this.midiEventChannel = 0;
+        this.midiEventParam1 = 0;
+        this.controller_BankSelectMSB = 0x00;
+        this.controller_ModulationWheel = 0x01;
+        this.controller_coarseDataEntrySlider = 0x06;
+        this.controller_coarseVolume = 0x07;
+        this.controller_ballance = 0x08;
+        this.controller_pan = 0x0A;
+        this.controller_expression = 0x0B;
+        this.controller_BankSelectLSBGS = 0x20;
+        this.controller_fineDataEntrySlider = 0x26;
+        this.controller_ReverbLevel = 0x5B;
+        this.controller_HoldPedal1 = 0x40;
+        this.controller_TremoloDepth = 0x5C;
+        this.controller_ChorusLevel = 0x5D;
+        this.controller_NRPNParameterLSB = 0x62;
+        this.controller_NRPNParameterMSB = 0x63;
+        this.controller_fineRPN = 0x64;
+        this.controller_coarseRPN = 0x65;
+        this.controller_ResetAllControllers = 0x79;
+        console.log(this);
+        this.midiheader = new MIDIFileHeader(arrayBuffer);
+        this.parseTracks(arrayBuffer);
+    }
+    parseTracks(arrayBuffer) {
+        var curIndex = this.midiheader.HEADER_LENGTH;
+        var trackCount = this.midiheader.trackCount;
+        this.parsedTracks = [];
+        for (var i = 0; i < trackCount; i++) {
+            var track = new MIDIFileTrack(arrayBuffer, curIndex);
+            this.parsedTracks.push(track);
+            curIndex = curIndex + track.trackLength + 8;
+        }
+        for (var i = 0; i < this.parsedTracks.length; i++) {
+            this.parseTrackEvents(this.parsedTracks[i]);
+        }
+        this.parseNotes();
+        this.simplifyAllBendPaths();
+    }
+    toText(arr) {
+        let txt = '';
+        try {
+            let win1251decoder = new TextDecoder("windows-1251");
+            let bytes = new Uint8Array(arr);
+            let txt1251 = win1251decoder.decode(bytes);
+            txt = txt1251;
+        }
+        catch (xx) {
+            console.log(xx);
+            var rr = '';
+            for (var ii = 0; ii < arr.length; ii++) {
+                rr = rr + String.fromCharCode(arr[ii]);
+            }
+            txt = rr;
+        }
+        txt = txt.replace("\\n", " ");
+        txt = txt.replace("\\r", " ");
+        txt = txt.replace("\\t", " ");
+        txt = txt.replace("\n", " ");
+        txt = txt.replace("\r", " ");
+        txt = txt.replace("\t", " ");
+        txt = txt.replace("\\", " ");
+        txt = txt.replace("/", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        txt = txt.replace("  ", " ");
+        return txt;
+    }
+    findOpenedNoteBefore(firstPitch, when, track, channel) {
+        for (var i = 0; i < track.trackNotes.length; i++) {
+            let trNote = track.trackNotes[track.trackNotes.length - i - 1];
+            if (trNote.startMs < when && trNote.channelidx == channel) {
+                if (!(trNote.closed)) {
+                    if (trNote.basePitch == firstPitch) {
+                        return trNote;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    findLastNoteBefore(when, track, channel) {
+        for (var i = 0; i < track.trackNotes.length; i++) {
+            let trNote = track.trackNotes[track.trackNotes.length - i - 1];
+            if (trNote.startMs < when && trNote.channelidx == channel) {
+                return trNote;
+            }
+        }
+        return null;
+    }
+    takeOpenedNote(first, when, track, channel) {
+        for (var i = 0; i < track.trackNotes.length; i++) {
+            let trNote = track.trackNotes[i];
+            if (trNote.startMs == when && trNote.channelidx == channel) {
+                if (!(trNote.closed)) {
+                    if (trNote.basePitch == first) {
+                        return trNote;
+                    }
+                }
+            }
+        }
+        var pi = { closed: false, bendPoints: [], basePitch: first, baseDuration: -1, startMs: when, channelidx: channel };
+        track.trackNotes.push(pi);
+        return pi;
+    }
+    distanceToPoint(line, point) {
+        var m = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x);
+        var b = line.p1.y - (m * line.p1.x);
+        var d = [];
+        d.push(Math.abs(point.y - (m * point.x) - b) / Math.sqrt(Math.pow(m, 2) + 1));
+        d.push(Math.sqrt(Math.pow((point.x - line.p1.x), 2) + Math.pow((point.y - line.p1.y), 2)));
+        d.push(Math.sqrt(Math.pow((point.x - line.p2.x), 2) + Math.pow((point.y - line.p2.y), 2)));
+        d.sort(function (a, b) {
+            return (a - b);
+        });
+        return d[0];
+    }
+    ;
+    douglasPeucker(points, tolerance) {
+        if (points.length <= 2) {
+            return [points[0]];
+        }
+        var returnPoints = [];
+        var line = { p1: points[0], p2: points[points.length - 1] };
+        var maxDistance = 0;
+        var maxDistanceIndex = 0;
+        var p;
+        for (var i = 1; i <= points.length - 2; i++) {
+            var distance = this.distanceToPoint(line, points[i]);
+            if (distance > maxDistance) {
+                maxDistance = distance;
+                maxDistanceIndex = i;
+            }
+        }
+        if (maxDistance >= tolerance) {
+            p = points[maxDistanceIndex];
+            this.distanceToPoint(line, p);
+            returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(0, maxDistanceIndex + 1), tolerance));
+            returnPoints = returnPoints.concat(this.douglasPeucker(points.slice(maxDistanceIndex, points.length), tolerance));
+        }
+        else {
+            p = points[maxDistanceIndex];
+            this.distanceToPoint(line, p);
+            returnPoints = [points[0]];
+        }
+        return returnPoints;
+    }
+    ;
+    simplifyAllBendPaths() {
+        let msMinPointDuration = 25;
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var track = this.parsedTracks[t];
+            for (var nn = 0; nn < track.trackNotes.length; nn++) {
+                var note = track.trackNotes[nn];
+                if (note.bendPoints.length > 0) {
+                    let simplifiedPath = [];
+                    let cuPointDuration = 0;
+                    let lastPitchDelta = 0;
+                    for (let pp = 0; pp < note.bendPoints.length; pp++) {
+                        let cuPoint = note.bendPoints[pp];
+                        lastPitchDelta = cuPoint.basePitchDelta;
+                        cuPointDuration = cuPointDuration + cuPoint.pointDuration;
+                        if (cuPointDuration > msMinPointDuration) {
+                            simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
+                            cuPointDuration = 0;
+                        }
+                        else {
+                            if (simplifiedPath.length > 0) {
+                                let prePoint = simplifiedPath[simplifiedPath.length - 1];
+                                prePoint.basePitchDelta = lastPitchDelta;
+                            }
+                        }
+                    }
+                    simplifiedPath.push({ pointDuration: cuPointDuration, basePitchDelta: lastPitchDelta });
+                    note.bendPoints = simplifiedPath;
+                }
+                else {
+                    if (note.baseDuration > 7654) {
+                        note.baseDuration = 4321;
+                    }
+                }
+            }
+        }
+    }
+    dumpResolutionChanges() {
+        console.log('dumpResolutionChanges');
+        this.midiheader.changesResolutionBPM = [];
+        let tickResolution = this.midiheader.get0TickResolution();
+        let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
+        this.midiheader.changesResolutionBPM.push(reChange);
+        for (var t = 0; t < this.parsedTracks.length; t++) {
+            var track = this.parsedTracks[t];
+            let playTimeTicks = 0;
+            for (var e = 0; e < track.trackevents.length; e++) {
+                var cuevnt = track.trackevents[e];
+                let curDelta = 0.0;
+                if (cuevnt.delta)
+                    curDelta = cuevnt.delta;
+                playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+                if (cuevnt.basetype === this.EVENT_META) {
+                    if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+                        if (cuevnt.tempo) {
+                            tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
+                            let reChange = {
+                                track: t,
+                                ms: playTimeTicks,
+                                newresolution: tickResolution,
+                                bpm: (cuevnt.tempoBPM) ? cuevnt.tempoBPM : 120,
+                                evnt: cuevnt
+                            };
+                            this.midiheader.changesResolutionBPM.push(reChange);
+                        }
+                    }
+                }
+            }
+        }
+        this.midiheader.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
+    }
+    findResolutionBefore(ms) {
+        for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
+            if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
+                return this.midiheader.changesResolutionBPM[i].newresolution;
+            }
+        }
+        return 0;
+    }
+    parseTicks2time(track) {
+        console.log('parseTicks2time');
+        let tickResolution = this.findResolutionBefore(0);
+        let playTimeTicks = 0;
+        for (let e = 0; e < track.trackevents.length; e++) {
+            let evnt = track.trackevents[e];
+            let curDelta = 0.0;
+            if (evnt.delta)
+                curDelta = evnt.delta;
+            let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+            tickResolution = this.findResolutionBefore(searchPlayTimeTicks);
+            evnt.preTimeMs = playTimeTicks;
+            playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
+            evnt.playTimeMs = playTimeTicks;
+            evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
+        }
+    }
+    parseNotes() {
+        this.dumpResolutionChanges();
+        var expectedState = 1;
+        var expectedPitchBendRangeChannel = null;
+        var pitchBendValuesRange = Array(16).fill(2);
+        for (let t = 0; t < this.parsedTracks.length; t++) {
+            var singleParsedTrack = this.parsedTracks[t];
+            this.parseTicks2time(singleParsedTrack);
+            for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
+                if (Math.floor(e / 1000) == e / 1000) {
+                }
+                var preState = expectedState;
+                var evnt = singleParsedTrack.trackevents[e];
+                if (evnt.basetype == this.EVENT_MIDI) {
+                    evnt.param1 = evnt.param1 ? evnt.param1 : 0;
+                    if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
+                        if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                            var pitch = evnt.param1 ? evnt.param1 : 0;
+                            var when = 0;
+                            if (evnt.playTimeMs)
+                                when = evnt.playTimeMs;
+                            let trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                            trno.volume = evnt.param2;
+                            trno.openEvent = evnt;
+                        }
+                    }
+                    else {
+                        if (evnt.subtype == this.EVENT_MIDI_NOTE_OFF) {
+                            if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                                var pitch = evnt.param1 ? evnt.param1 : 0;
+                                var when = 0;
+                                if (evnt.playTimeMs)
+                                    when = evnt.playTimeMs;
+                                var openedNoteBefore = this.findOpenedNoteBefore(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                                if (openedNoteBefore) {
+                                    openedNoteBefore.baseDuration = when - openedNoteBefore.startMs;
+                                    openedNoteBefore.closed = true;
+                                    openedNoteBefore.closeEvent = evnt;
+                                }
+                            }
+                        }
+                        else {
+                            if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
+                                if (evnt.param1 >= 0 && evnt.param1 <= 127) {
+                                    singleParsedTrack.programChannel.push({
+                                        program: evnt.param1 ? evnt.param1 : 0,
+                                        channel: evnt.midiChannel ? evnt.midiChannel : 0
+                                    });
+                                }
+                            }
+                            else {
+                                if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {
+                                    var eventWhen = evnt.playTimeMs ? evnt.playTimeMs : 0;
+                                    var note = this.findLastNoteBefore(eventWhen, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                                    if (note) {
+                                        let idx = evnt.midiChannel ? evnt.midiChannel : 0;
+                                        let pp2 = evnt.param2 ? evnt.param2 : 0;
+                                        var delta = (pp2 - 64.0) / 64.0 * pitchBendValuesRange[idx];
+                                        var allPointsDuration = 0;
+                                        for (var k = 0; k < note.bendPoints.length; k++) {
+                                            allPointsDuration = allPointsDuration + note.bendPoints[k].pointDuration;
+                                        }
+                                        var point = {
+                                            pointDuration: eventWhen - note.startMs - allPointsDuration,
+                                            basePitchDelta: delta
+                                        };
+                                        if (!(note.closed)) {
+                                            note.bendPoints.push(point);
+                                        }
+                                        else {
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (evnt.subtype == this.EVENT_MIDI_CONTROLLER) {
+                                        if (evnt.param1 == this.controller_coarseVolume) {
+                                            var v = evnt.param2 ? evnt.param2 / 127 : 0;
+                                            let point = { ms: evnt.playTimeMs, value: v, channel: evnt.midiChannel ? evnt.midiChannel : 0, track: t };
+                                            singleParsedTrack.trackVolumePoints.push(point);
+                                        }
+                                        else {
+                                            if ((expectedState == 1 && evnt.param1 == this.controller_coarseRPN && evnt.param2 == 0x00) ||
+                                                (expectedState == 2 && evnt.param1 == this.controller_fineRPN && evnt.param2 == 0x00) ||
+                                                (expectedState == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
+                                                (expectedState == 4 && evnt.param1 == this.controller_fineDataEntrySlider)) {
+                                                if (expectedState > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
+                                                    console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
+                                                }
+                                                expectedPitchBendRangeChannel = evnt.midiChannel;
+                                                let idx = evnt.midiChannel ? evnt.midiChannel : 0;
+                                                if (expectedState == 3) {
+                                                    pitchBendValuesRange[idx] = evnt.param2;
+                                                }
+                                                if (expectedState == 4) {
+                                                    let pp = evnt.param2 ? evnt.param2 : 0;
+                                                    pitchBendValuesRange[idx] = pitchBendValuesRange[idx] + pp / 100;
+                                                }
+                                                expectedState++;
+                                                if (expectedState == 5) {
+                                                    expectedState = 1;
+                                                }
+                                            }
+                                            else {
+                                                if (evnt.param1 == this.controller_BankSelectMSB
+                                                    || evnt.param1 == this.controller_ModulationWheel
+                                                    || evnt.param1 == this.controller_ReverbLevel
+                                                    || evnt.param1 == this.controller_TremoloDepth
+                                                    || evnt.param1 == this.controller_ChorusLevel
+                                                    || evnt.param1 == this.controller_NRPNParameterLSB
+                                                    || evnt.param1 == this.controller_NRPNParameterMSB
+                                                    || evnt.param1 == this.controller_fineRPN
+                                                    || evnt.param1 == this.controller_coarseRPN
+                                                    || evnt.param1 == this.controller_coarseDataEntrySlider
+                                                    || evnt.param1 == this.controller_ballance
+                                                    || evnt.param1 == this.controller_pan
+                                                    || evnt.param1 == this.controller_expression
+                                                    || evnt.param1 == this.controller_BankSelectLSBGS
+                                                    || evnt.param1 == this.controller_HoldPedal1
+                                                    || evnt.param1 == this.controller_ResetAllControllers
+                                                    || (evnt.param1 >= 32 && evnt.param1 <= 63)
+                                                    || (evnt.param1 >= 70 && evnt.param1 <= 79)) {
+                                                }
+                                                else {
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (evnt.subtype == this.EVENT_META_TEXT) {
+                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                    }
+                    if (evnt.subtype == this.EVENT_META_MARKER) {
+                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                    }
+                    if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
+                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
+                    }
+                    if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
+                        singleParsedTrack.trackTitle = evnt.text ? evnt.text : '';
+                    }
+                    if (evnt.subtype == this.EVENT_META_INSTRUMENT_NAME) {
+                        singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
+                    }
+                    if (evnt.subtype == this.EVENT_META_LYRICS) {
+                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                    }
+                    if (evnt.subtype == this.EVENT_META_CUE_POINT) {
+                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
+                    }
+                    if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
+                        var majSharpCircleOfFifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
+                        var majFlatCircleOfFifths = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb'];
+                        var minSharpCircleOfFifths = ['Am', 'Em', 'Bm', 'F#m', 'C#m', 'G#m', 'D#'];
+                        var minFlatCircleOfFifths = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm'];
+                        var key = evnt.key ? evnt.key : 0;
+                        if (key > 127)
+                            key = key - 256;
+                        this.midiheader.keyFlatSharp = key;
+                        this.midiheader.keyMajMin = evnt.scale ? evnt.scale : 0;
+                        var signature = 'C';
+                        if (this.midiheader.keyFlatSharp >= 0) {
+                            if (this.midiheader.keyMajMin < 1) {
+                                signature = majSharpCircleOfFifths[Math.abs(this.midiheader.keyFlatSharp)];
+                            }
+                            else {
+                                signature = minSharpCircleOfFifths[Math.abs(this.midiheader.keyFlatSharp)];
+                            }
+                        }
+                        else {
+                            if (this.midiheader.keyMajMin < 1) {
+                                signature = majFlatCircleOfFifths[Math.abs(this.midiheader.keyFlatSharp)];
+                            }
+                            else {
+                                signature = minFlatCircleOfFifths[Math.abs(this.midiheader.keyFlatSharp)];
+                            }
+                        }
+                        this.midiheader.signsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, sign: signature });
+                    }
+                    if (evnt.subtype == this.EVENT_META_SET_TEMPO) {
+                        this.midiheader.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
+                    }
+                    if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
+                        this.midiheader.meterCount = evnt.param1 ? evnt.param1 : 4;
+                        var dvsn = evnt.param2 ? evnt.param2 : 2;
+                        if (dvsn == 1)
+                            this.midiheader.meterDivision = 2;
+                        else if (dvsn == 2)
+                            this.midiheader.meterDivision = 4;
+                        else if (dvsn == 3)
+                            this.midiheader.meterDivision = 8;
+                        else if (dvsn == 4)
+                            this.midiheader.meterDivision = 16;
+                        else if (dvsn == 5)
+                            this.midiheader.meterDivision = 32;
+                        else if (dvsn == 0)
+                            this.midiheader.meterDivision = 1;
+                        this.midiheader.metersList.push({
+                            track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
+                            count: this.midiheader.meterCount, division: this.midiheader.meterDivision
+                        });
+                    }
+                }
+                if (preState == expectedState) {
+                    if (preState >= 2 && preState <= 3) {
+                    }
+                    if (preState == 4) {
+                        expectedState = 1;
+                    }
+                }
+            }
+        }
+    }
+    nextEvent(stream) {
+        var index = stream.offset();
+        var delta = stream.readVarInt();
+        var eventTypeByte = stream.readUint8();
+        var event = { offset: index, delta: delta, eventTypeByte: eventTypeByte, playTimeMs: 0 };
+        if (0xf0 === (eventTypeByte & 0xf0)) {
+            if (eventTypeByte === this.EVENT_META) {
+                event.basetype = this.EVENT_META;
+                event.subtype = stream.readUint8();
+                event.length = stream.readVarInt();
+                switch (event.subtype) {
+                    case this.EVENT_META_SEQUENCE_NUMBER:
+                        event.msb = stream.readUint8();
+                        event.lsb = stream.readUint8();
+                        console.log('EVENT_META_SEQUENCE_NUMBER', event);
+                        return event;
+                    case this.EVENT_META_TEXT:
+                    case this.EVENT_META_COPYRIGHT_NOTICE:
+                    case this.EVENT_META_TRACK_NAME:
+                    case this.EVENT_META_INSTRUMENT_NAME:
+                    case this.EVENT_META_LYRICS:
+                    case this.EVENT_META_MARKER:
+                    case this.EVENT_META_CUE_POINT:
+                        event.data = stream.readBytes(event.length);
+                        event.text = this.toText(event.data ? event.data : []);
+                        return event;
+                    case this.EVENT_META_MIDI_CHANNEL_PREFIX:
+                        event.prefix = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_END_OF_TRACK:
+                        return event;
+                    case this.EVENT_META_SET_TEMPO:
+                        event.tempo = (stream.readUint8() << 16) + (stream.readUint8() << 8) + stream.readUint8();
+                        event.tempoBPM = 60000000 / event.tempo;
+                        return event;
+                    case this.EVENT_META_SMTPE_OFFSET:
+                        event.hour = stream.readUint8();
+                        event.minutes = stream.readUint8();
+                        event.seconds = stream.readUint8();
+                        event.frames = stream.readUint8();
+                        event.subframes = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_KEY_SIGNATURE:
+                        event.key = stream.readUint8();
+                        event.scale = stream.readUint8();
+                        return event;
+                    case this.EVENT_META_TIME_SIGNATURE:
+                        event.data = stream.readBytes(event.length);
+                        event.param1 = event.data[0];
+                        event.param2 = event.data[1];
+                        event.param3 = event.data[2];
+                        event.param4 = event.data[3];
+                        return event;
+                    case this.EVENT_META_SEQUENCER_SPECIFIC:
+                        event.data = stream.readBytes(event.length);
+                        return event;
+                    default:
+                        event.data = stream.readBytes(event.length);
+                        return event;
+                }
+            }
+            else {
+                if (eventTypeByte === this.EVENT_SYSEX || eventTypeByte === this.EVENT_DIVSYSEX) {
+                    event.basetype = eventTypeByte;
+                    event.length = stream.readVarInt();
+                    event.data = stream.readBytes(event.length);
+                    return event;
+                }
+                else {
+                    event.basetype = eventTypeByte;
+                    event.badsubtype = stream.readVarInt();
+                    event.length = stream.readUint8();
+                    event.data = stream.readBytes(event.length);
+                    return event;
+                }
+            }
+        }
+        else {
+            if (0 === (eventTypeByte & 0x80)) {
+                if (!this.midiEventType) {
+                    throw new Error('no pre event' + stream.offset());
+                }
+                this.midiEventParam1 = eventTypeByte;
+            }
+            else {
+                this.midiEventType = eventTypeByte >> 4;
+                this.midiEventChannel = eventTypeByte & 0x0f;
+                this.midiEventParam1 = stream.readUint8();
+            }
+            event.basetype = this.EVENT_MIDI;
+            event.subtype = this.midiEventType;
+            event.midiChannel = this.midiEventChannel;
+            event.param1 = this.midiEventParam1;
+            switch (this.midiEventType) {
+                case this.EVENT_MIDI_NOTE_OFF:
+                    event.param2 = stream.readUint8();
+                    return event;
+                case this.EVENT_MIDI_NOTE_ON:
+                    event.param2 = stream.readUint8();
+                    if (!event.param2) {
+                        event.subtype = this.EVENT_MIDI_NOTE_OFF;
+                        event.param2 = -1;
+                    }
+                    return event;
+                case this.EVENT_MIDI_NOTE_AFTERTOUCH:
+                    event.param2 = stream.readUint8();
+                    return event;
+                case this.EVENT_MIDI_CONTROLLER:
+                    event.param2 = stream.readUint8();
+                    if (event.param1 == 7) {
+                    }
+                    return event;
+                case this.EVENT_MIDI_PROGRAM_CHANGE:
+                    return event;
+                case this.EVENT_MIDI_CHANNEL_AFTERTOUCH:
+                    return event;
+                case this.EVENT_MIDI_PITCH_BEND:
+                    event.param2 = stream.readUint8();
+                    return event;
+                default:
+                    console.log('unknown note', event);
+                    return event;
+            }
+        }
+    }
+    parseTrackEvents(track) {
+        var stream = new DataViewStream(track.trackContent);
+        this.midiEventType = 0;
+        this.midiEventChannel = 0;
+        this.midiEventParam1 = 0;
+        while (!stream.end()) {
+            var e = this.nextEvent(stream);
+            track.trackevents.push(e);
+        }
+    }
+    findNearestAvgTick(ms, stat) {
+        let foundDiff = 1234567890;
+        let fountMs = 0;
+        for (let ii = 0; ii < stat.length; ii++) {
+            let cuDiff = Math.abs(stat[ii].avgstartms - ms);
+            if (foundDiff > cuDiff) {
+                foundDiff = cuDiff;
+                fountMs = stat[ii].avgstartms;
+            }
+        }
+        return fountMs;
+    }
+    findPreMetre(ms) {
+        let cume = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
+        for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
+            cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
+            if (ms >= this.midiheader.metersList[ii].ms - 99) {
+                break;
+            }
+        }
+        return cume;
+    }
+    findPreBPM(ms) {
+        let bpm = this.midiheader.changesResolutionBPM[0].bpm;
+        for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
+            bpm = this.midiheader.changesResolutionBPM[ii].bpm;
+            if (ms >= this.midiheader.changesResolutionBPM[ii].ms - 99) {
+                break;
+            }
+        }
+        return bpm;
+    }
+}
+class MIDIFileTrack {
+    constructor(buffer, start) {
+        this.HDR_LENGTH = 8;
+        this.trackNotes = [];
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH);
+        this.trackLength = this.datas.getUint32(4);
+        this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
+        this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
+        this.trackevents = [];
+        this.trackVolumePoints = [];
+        this.programChannel = [];
+    }
+}
+class MIDIFileHeader {
+    constructor(buffer) {
+        this.HEADER_LENGTH = 14;
+        this.tempoBPM = 120;
+        this.changesResolutionBPM = [];
+        this.metersList = [];
+        this.lyricsList = [];
+        this.signsList = [];
+        this.meterCount = 4;
+        this.meterDivision = 4;
+        this.keyFlatSharp = 0;
+        this.keyMajMin = 0;
+        this.lastNonZeroQuarter = 0;
+        this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
+        this.format = this.datas.getUint16(8);
+        this.trackCount = this.datas.getUint16(10);
+        console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
+    }
+    getCalculatedTickResolution(tempo) {
+        this.lastNonZeroQuarter = tempo;
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    }
+    get0TickResolution() {
+        var tempo = 0;
+        if (this.lastNonZeroQuarter) {
+            tempo = this.lastNonZeroQuarter;
+        }
+        else {
+            tempo = 60000000 / this.tempoBPM;
+        }
+        if (this.datas.getUint16(12) & 0x8000) {
+            var r = 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+            return r;
+        }
+        else {
+            tempo = tempo || 500000;
+            var r = tempo / this.getTicksPerBeat();
+            return r;
+        }
+    }
+    getTicksPerBeat() {
+        var divisionWord = this.datas.getUint16(12);
+        return divisionWord;
+    }
+    getTicksPerFrame() {
+        const divisionWord = this.datas.getUint16(12);
+        return divisionWord & 0x00ff;
+    }
+    getSMPTEFrames() {
+        const divisionWord = this.datas.getUint16(12);
+        let smpteFrames;
+        smpteFrames = divisionWord & 0x7f00;
+        if (smpteFrames == 29) {
+            return 29.97;
+        }
+        else {
+            return smpteFrames;
+        }
+    }
+}
+class DataViewStream {
+    constructor(dv) {
+        this.position = 0;
+        this.buffer = dv;
+    }
+    readUint8() {
+        var n = this.buffer.getUint8(this.position);
+        this.position++;
+        return n;
+    }
+    readUint16() {
+        var v = this.buffer.getUint16(this.position);
+        this.position = this.position + 2;
+        return v;
+    }
+    readVarInt() {
+        var v = 0;
+        var i = 0;
+        var b;
+        while (i < 4) {
+            b = this.readUint8();
+            if (b & 0x80) {
+                v = v + (b & 0x7f);
+                v = v << 7;
+            }
+            else {
+                return v + b;
+            }
+            i++;
+        }
+        throw new Error('readVarInt ' + i);
+    }
+    readBytes(length) {
+        var bytes = [];
+        for (var i = 0; i < length; i++) {
+            bytes.push(this.readUint8());
+        }
+        return bytes;
+    }
+    offset() {
+        return this.buffer.byteOffset + this.position;
+    }
+    end() {
+        return this.position == this.buffer.byteLength;
+    }
+}
+class MIDIReader {
+    constructor(arrayBuffer) {
+        let parser = new MidiParser(arrayBuffer);
+        console.log(parser);
+        let converter = new EventsConverter(parser);
+        let project = converter.convertEvents();
+        console.log(project);
+    }
+}
+class EventsConverter {
+    constructor(parser) {
+    }
+    convertEvents() {
+        let project = {
+            title: 'test',
+            timeline: [],
+            tracks: [],
+            percussions: [],
+            filters: [],
+            comments: [],
+            selectedPart: {
+                startMeasure: -1,
+                endMeasure: -1
+            },
+            versionCode: '1',
+            list: false,
+            position: { x: 0, y: 0, z: 30 },
+            menuPerformers: false,
+            menuSamplers: false,
+            menuFilters: false,
+            menuActions: false,
+            menuPlugins: false,
+            menuClipboard: false,
+            menuSettings: false
+        };
+        return project;
+    }
+}
 console.log('Alpha Tab Import *.mid v1.0.1');
 let parsedProject = null;
 class AlphaTabImportMusicPlugin {
@@ -14630,7 +15461,12 @@ class FileLoaderAlpha {
                                 me.convertProject(score);
                             }
                             else {
-                                console.log('wrong path', path);
+                                if (path.endsWith('.mid')) {
+                                    let mireader = new MIDIReader(arrayBuffer);
+                                }
+                                else {
+                                    console.log('wrong path', path);
+                                }
                             }
                         }
                     }

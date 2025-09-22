@@ -65,7 +65,12 @@ class FileLoaderAlpha {
 								let score = mxl.readScore();
 								me.convertProject(score);
 							} else {
-								console.log('wrong path', path);
+								if (path.endsWith('.mid') ) {
+									let mireader: MIDIReader = new MIDIReader(arrayBuffer);
+
+								} else {
+									console.log('wrong path', path);
+								}
 							}
 						}
 					}

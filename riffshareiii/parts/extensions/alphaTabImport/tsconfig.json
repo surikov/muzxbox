@@ -149,6 +149,15 @@
 		,"./alphatab/importer/Gp7To8Importer.ts"
 		,"./alphatab/importer/MusicXmlImporter.ts"
 
+		,"./midiimport/MIDIEvent.ts"
+		,"midiimport/MIDIParser.ts"
+		,"midiimport/MIDIFileTrack.ts"
+		,"./midiimport/MIDIFileHeader.ts"
+		,"./midiimport/DataViewStream.ts"
+		,"midiimport/midiimport.ts"
+		,"midiimport/eventsconvert.ts"
+		
+
 
         ,"./fileimport/aimportplugin.ts"
 		,"./fileimport/fileloader.ts"
