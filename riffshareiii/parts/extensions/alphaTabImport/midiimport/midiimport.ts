@@ -5,5 +5,6 @@ class MIDIReader {
 		let converter = new EventsConverter(parser);
 		let project = converter.convertEvents();
 		console.log(project);
+		parsedProject = project;
 	}
 }

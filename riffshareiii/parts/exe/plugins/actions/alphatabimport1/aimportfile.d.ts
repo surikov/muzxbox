@@ -2498,7 +2498,7 @@ declare class MidiParser {
     toText(arr: number[]): string;
     findOpenedNoteBefore(firstPitch: number, when: number, track: MIDIFileTrack, channel: number): TrackNote | null;
     findLastNoteBefore(when: number, track: MIDIFileTrack, channel: number): TrackNote | null;
-    takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote;
+    takeOpenedNote(first: number, when: number, trackIdx: number, track: MIDIFileTrack, channel: number): TrackNote;
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyAllBendPaths(): void;
@@ -2526,6 +2526,8 @@ declare type TrackNote = {
     baseDuration: number;
     startMs: number;
     channelidx: number;
+    trackidx: number;
+    avgMs: number;
 };
 declare class MIDIFileTrack {
     datas: DataView;
@@ -2602,16 +2604,23 @@ declare class DataViewStream {
 declare class MIDIReader {
     constructor(arrayBuffer: ArrayBuffer);
 }
-declare type TrackNumChanNum = {
-    trackNum: number;
-    channelNum: number;
-    zvoogtrack: Zvoog_MusicTrack;
-};
 declare class EventsConverter {
     parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(): Zvoog_Project;
-    findOrCreateTrack(parsedtrack: MIDIFileTrack, trackOrder: number, channelNum: number, tracksChannels: TrackNumChanNum[]): TrackNumChanNum;
+    addTrackNote(timeline: Zvoog_SongMeasure[], note: TrackNote): void;
+    addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: {
+        midiTrack: number;
+        midiPitch: number;
+    }[], note: TrackNote): void;
+    takeProTrackNo(allTracks: {
+        midiTrack: number;
+        midiChan: number;
+    }[], midiTrack: number, midiChannel: number): number;
+    takeProSamplerNo(allPercussions: {
+        midiTrack: number;
+        midiPitch: number;
+    }[], midiTrack: number, midiPitch: number): number;
 }
 declare let parsedProject: Zvoog_Project | null;
 declare class AlphaTabImportMusicPlugin {

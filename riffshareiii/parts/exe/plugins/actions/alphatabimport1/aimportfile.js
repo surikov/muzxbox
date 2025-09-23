@@ -14648,7 +14648,7 @@ class MidiParser {
         }
         return null;
     }
-    takeOpenedNote(first, when, track, channel) {
+    takeOpenedNote(first, when, trackIdx, track, channel) {
         for (var i = 0; i < track.trackNotes.length; i++) {
             let trNote = track.trackNotes[i];
             if (trNote.startMs == when && trNote.channelidx == channel) {
@@ -14659,7 +14659,7 @@ class MidiParser {
                 }
             }
         }
-        var pi = { closed: false, bendPoints: [], basePitch: first, baseDuration: -1, startMs: when, channelidx: channel };
+        var pi = { basePitch: first, startMs: when, avgMs: -1, trackidx: trackIdx, channelidx: channel, baseDuration: -1, closed: false, bendPoints: [] };
         track.trackNotes.push(pi);
         return pi;
     }
@@ -14822,7 +14822,7 @@ class MidiParser {
                             var when = 0;
                             if (evnt.playTimeMs)
                                 when = evnt.playTimeMs;
-                            let trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+                            let trno = this.takeOpenedNote(pitch, when, t, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
                             trno.volume = evnt.param2;
                             trno.openEvent = evnt;
                         }
@@ -15320,6 +15320,7 @@ class MIDIReader {
         let converter = new EventsConverter(parser);
         let project = converter.convertEvents();
         console.log(project);
+        parsedProject = project;
     }
 }
 class EventsConverter {
@@ -15349,42 +15350,142 @@ class EventsConverter {
             menuClipboard: false,
             menuSettings: false
         };
-        let tracksChannels = [];
+        let allNotes = [];
+        let allTracks = [];
+        let allPercussions = [];
         for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
             let parsedtrack = this.parser.parsedTracks[ii];
-            for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-                this.findOrCreateTrack(parsedtrack, ii, parsedtrack.programChannel[k].channel, tracksChannels);
+            for (let nn = 0; nn < parsedtrack.trackNotes.length; nn++) {
+                allNotes.push(parsedtrack.trackNotes[nn]);
+                if (parsedtrack.trackNotes[nn].channelidx == 9) {
+                    this.takeProSamplerNo(allPercussions, ii, parsedtrack.trackNotes[nn].basePitch);
+                }
+                else {
+                    this.takeProTrackNo(allTracks, ii, parsedtrack.trackNotes[nn].channelidx);
+                }
             }
         }
-        for (let ii = 0; ii < tracksChannels.length; ii++) {
-            project.tracks.push(tracksChannels[ii].zvoogtrack);
+        allNotes.sort((a, b) => { return a.startMs - b.startMs; });
+        console.log(allNotes);
+        console.log(allTracks);
+        console.log(allPercussions);
+        let lastMs = allNotes[allNotes.length - 1].startMs;
+        let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
+        for (let ii = 0; ii < barCount; ii++) {
+            project.timeline.push({
+                tempo: 120,
+                metre: {
+                    count: 4,
+                    part: 4
+                }
+            });
         }
-        return project;
-    }
-    findOrCreateTrack(parsedtrack, trackOrder, channelNum, tracksChannels) {
-        for (let ii = 0; ii < tracksChannels.length; ii++) {
-            if (tracksChannels[ii].trackNum == trackOrder && tracksChannels[ii].channelNum == channelNum) {
-                return tracksChannels[ii];
-            }
-        }
-        let it = {
-            trackNum: trackOrder,
-            channelNum: channelNum,
-            zvoogtrack: {
-                title: parsedtrack.trackTitle + ' / ' + parsedtrack.instrumentName,
+        let echoOutID = 'reverberation';
+        let compresID = 'compression';
+        let filterEcho = {
+            id: echoOutID,
+            title: echoOutID,
+            kind: 'miniumecho1',
+            data: '22',
+            outputs: [''],
+            iconPosition: { x: 0, y: 0 },
+            automation: [], state: 0
+        };
+        let filterCompression = {
+            id: compresID,
+            title: compresID,
+            kind: 'miniumdcompressor1',
+            data: '33',
+            outputs: [echoOutID],
+            iconPosition: { x: 0, y: 0 },
+            automation: [], state: 0
+        };
+        project.filters.push(filterEcho);
+        project.filters.push(filterCompression);
+        for (let ii = 0; ii < allTracks.length; ii++) {
+            let tt = {
+                title: '' + ii,
                 measures: [],
                 performer: {
-                    id: '' + Math.random(),
+                    id: 'track' + (ii + Math.random()),
                     data: '',
-                    kind: '',
-                    outputs: [],
+                    kind: 'miniumpitchchord1',
+                    outputs: [compresID],
                     iconPosition: { x: 0, y: 0 },
                     state: 0
                 }
+            };
+            for (let mm = 0; mm < project.timeline.length; mm++) {
+                tt.measures.push({ chords: [] });
             }
-        };
-        tracksChannels.push(it);
-        return it;
+            project.tracks.push(tt);
+        }
+        for (let ii = 0; ii < allPercussions.length; ii++) {
+            let pp = {
+                title: '' + ii,
+                measures: [],
+                sampler: {
+                    id: 'drum' + (ii + Math.random()),
+                    data: '',
+                    kind: 'miniumdrums1',
+                    outputs: [compresID],
+                    iconPosition: { x: 0, y: 0 },
+                    state: 0
+                }
+            };
+            for (let mm = 0; mm < project.timeline.length; mm++) {
+                pp.measures.push({ skips: [] });
+            }
+            project.percussions.push(pp);
+        }
+        for (let ii = 0; ii < allNotes.length; ii++) {
+            let it = allNotes[ii];
+            if (it.channelidx == 9) {
+                this.addDrumkNote(project.percussions, project.timeline, allPercussions, it);
+            }
+            else {
+                this.addTrackNote(project.timeline, it);
+            }
+        }
+        return project;
+    }
+    addTrackNote(timeline, note) {
+    }
+    addDrumkNote(percussions, timeline, allPercussions, note) {
+        let barStart = 0;
+        for (let ii = 0; ii < timeline.length; ii++) {
+            let measure = timeline[ii];
+            let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
+            if (note.startMs >= barStart && note.startMs < barStart + durationMs) {
+                let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch);
+                let pertrack = percussions[peridx];
+                let noteStartMs = note.startMs - barStart;
+                let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+                pertrack.measures[ii].skips.push(when);
+                return;
+            }
+            barStart = barStart + durationMs;
+        }
+    }
+    takeProTrackNo(allTracks, midiTrack, midiChannel) {
+        for (let ii = 0; ii < allTracks.length; ii++) {
+            let it = allTracks[ii];
+            if (it.midiTrack == midiTrack && it.midiChan == midiChannel) {
+                return ii;
+            }
+        }
+        allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel });
+        return allTracks.length - 1;
+    }
+    takeProSamplerNo(allPercussions, midiTrack, midiPitch) {
+        for (let ii = 0; ii < allPercussions.length; ii++) {
+            let it = allPercussions[ii];
+            if (it.midiTrack == midiTrack && it.midiPitch == midiPitch) {
+                return ii;
+            }
+        }
+        allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch });
+        return allPercussions.length - 1;
     }
 }
 console.log('Alpha Tab Import *.mid v1.0.1');

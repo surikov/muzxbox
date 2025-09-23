@@ -1,4 +1,4 @@
-type TrackNumChanNum = { trackNum: number, channelNum: number, zvoogtrack: Zvoog_MusicTrack };
+//type TrackNumChanNum = { trackNum: number, channelNum: number, zvoogtrack: Zvoog_MusicTrack };
 class EventsConverter {
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
@@ -11,7 +11,6 @@ class EventsConverter {
 			, tracks: []
 			, percussions: []
 			, filters: []
-			//,automations: []
 			, comments: []
 			, selectedPart: {
 				startMeasure: -1
@@ -28,20 +27,158 @@ class EventsConverter {
 			, menuClipboard: false
 			, menuSettings: false
 		};
-		let tracksChannels: TrackNumChanNum[] = [];
+		let allNotes: TrackNote[] = [];
+		let allTracks: { midiTrack: number, midiChan: number }[] = [];
+		let allPercussions: { midiTrack: number, midiPitch: number }[] = [];
 		for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
 			let parsedtrack: MIDIFileTrack = this.parser.parsedTracks[ii];
-			for (let k = 0; k < parsedtrack.programChannel.length; k++) {
-				this.findOrCreateTrack(parsedtrack, ii, parsedtrack.programChannel[k].channel, tracksChannels);
+			for (let nn = 0; nn < parsedtrack.trackNotes.length; nn++) {
+				allNotes.push(parsedtrack.trackNotes[nn]);
+				if (parsedtrack.trackNotes[nn].channelidx == 9) {
+					this.takeProSamplerNo(allPercussions, ii, parsedtrack.trackNotes[nn].basePitch);
+				} else {
+					this.takeProTrackNo(allTracks, ii, parsedtrack.trackNotes[nn].channelidx);
+				}
 			}
+		}
 
+		allNotes.sort((a, b) => { return a.startMs - b.startMs; });
+		console.log(allNotes);
+		console.log(allTracks);
+		console.log(allPercussions);
+		let lastMs = allNotes[allNotes.length - 1].startMs;
+		let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
+		for (let ii = 0; ii < barCount; ii++) {
+			project.timeline.push({
+				tempo: 120
+				, metre: {
+					count: 4
+					, part: 4
+				}
+			});
 		}
-		for (let ii = 0; ii < tracksChannels.length; ii++) {
-			project.tracks.push(tracksChannels[ii].zvoogtrack);
+
+		let echoOutID = 'reverberation';
+		let compresID = 'compression';
+		let filterEcho: Zvoog_FilterTarget = {
+			id: echoOutID
+			, title: echoOutID
+			, kind: 'miniumecho1'
+			, data: '22'
+			, outputs: ['']
+			, iconPosition: { x: 0, y: 0 }
+			, automation: [], state: 0
+		};
+		let filterCompression: Zvoog_FilterTarget = {
+			id: compresID
+			, title: compresID
+			, kind: 'miniumdcompressor1'
+			, data: '33'
+			, outputs: [echoOutID]
+			, iconPosition: { x: 0, y: 0 }
+			, automation: [], state: 0
+		};
+		project.filters.push(filterEcho);
+		project.filters.push(filterCompression);
+		for (let ii = 0; ii < allTracks.length; ii++) {
+			let tt: Zvoog_MusicTrack = {
+				title: '' + ii
+				, measures: []
+				, performer: {
+					id: 'track' + (ii + Math.random())
+					, data: ''
+					, kind: 'miniumpitchchord1'
+					, outputs: [compresID]
+					, iconPosition: { x: 0, y: 0 }
+					, state: 0
+				}
+			};
+			for (let mm = 0; mm < project.timeline.length; mm++) {
+				tt.measures.push({ chords: [] });
+			}
+			project.tracks.push(tt);
 		}
+		for (let ii = 0; ii < allPercussions.length; ii++) {
+			let pp: Zvoog_PercussionTrack = {
+				title: '' + ii
+				, measures: []
+				, sampler: {
+					id: 'drum' + (ii + Math.random())
+					, data: ''
+					, kind: 'miniumdrums1'
+					, outputs: [compresID]
+					, iconPosition: { x: 0, y: 0 }
+					, state: 0
+				}
+			};
+			for (let mm = 0; mm < project.timeline.length; mm++) {
+				pp.measures.push({ skips: [] });
+			}
+			project.percussions.push(pp);
+		}
+		for (let ii = 0; ii < allNotes.length; ii++) {
+			let it = allNotes[ii];
+			if (it.channelidx == 9) {
+				this.addDrumkNote(project.percussions, project.timeline, allPercussions, it);
+			} else {
+				this.addTrackNote(project.timeline, it);
+			}
+		}
+
 		return project;
 	}
-	findOrCreateTrack(parsedtrack: MIDIFileTrack, trackOrder: number, channelNum: number, tracksChannels: TrackNumChanNum[]): TrackNumChanNum {
+	addTrackNote(timeline: Zvoog_SongMeasure[], note: TrackNote) {
+
+	}
+	addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: { midiTrack: number, midiPitch: number }[], note: TrackNote) {
+		let barStart = 0;
+		for (let ii = 0; ii < timeline.length; ii++) {
+			let measure = timeline[ii];
+			let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
+			if (note.startMs >= barStart && note.startMs < barStart + durationMs) {
+				let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch);
+				let pertrack=percussions[peridx];
+				let noteStartMs = note.startMs - barStart;
+				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+				//console.log(peridx,pertrack);
+				pertrack.measures[ii].skips.push(when);
+				return;
+			}
+			barStart = barStart + durationMs;
+		}
+	}
+	/*findBarNo(timeline: Zvoog_SongMeasure[], startMs: number): number {
+		let barStart = 0;
+		for (let ii = 0; ii < timeline.length; ii++) {
+			let measure = timeline[ii];
+			let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
+			if (startMs >= barStart && startMs < barStart + durationMs) {
+				return ii;
+			}
+		}
+		return -1;
+	}*/
+	takeProTrackNo(allTracks: { midiTrack: number, midiChan: number }[], midiTrack: number, midiChannel: number): number {
+		for (let ii = 0; ii < allTracks.length; ii++) {
+			let it = allTracks[ii];
+			if (it.midiTrack == midiTrack && it.midiChan == midiChannel) {
+				return ii;
+			}
+		}
+		allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel });
+		return allTracks.length - 1;
+	}
+	takeProSamplerNo(allPercussions: { midiTrack: number, midiPitch: number }[], midiTrack: number, midiPitch: number): number {
+		for (let ii = 0; ii < allPercussions.length; ii++) {
+			let it = allPercussions[ii];
+			if (it.midiTrack == midiTrack && it.midiPitch == midiPitch) {
+				return ii;
+			}
+		}
+		allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch });
+		return allPercussions.length - 1;
+	}
+	/*findOrCreateTrack(parsedtrack: MIDIFileTrack, trackOrder: number, channelNum: number, tracksChannels: TrackNumChanNum[]): TrackNumChanNum {
 		for (let ii = 0; ii < tracksChannels.length; ii++) {
 			if (tracksChannels[ii].trackNum == trackOrder && tracksChannels[ii].channelNum == channelNum) {
 				return tracksChannels[ii];
@@ -65,5 +202,5 @@ class EventsConverter {
 		};
 		tracksChannels.push(it);
 		return it;
-	}
+	}*/
 }

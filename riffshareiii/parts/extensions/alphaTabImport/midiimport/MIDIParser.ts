@@ -214,7 +214,7 @@ class MidiParser {
 		return pi;
 	}
 */
-	takeOpenedNote(first: number, when: number, track: MIDIFileTrack, channel: number): TrackNote {
+	takeOpenedNote(first: number, when: number, trackIdx: number, track: MIDIFileTrack, channel: number): TrackNote {
 		for (var i = 0; i < track.trackNotes.length; i++) {
 			let trNote = track.trackNotes[i];
 			if (trNote.startMs == when && trNote.channelidx == channel) {
@@ -225,7 +225,7 @@ class MidiParser {
 				}
 			}
 		}
-		var pi: TrackNote = { closed: false, bendPoints: [], basePitch: first, baseDuration: -1, startMs: when, channelidx: channel };
+		var pi: TrackNote = { basePitch: first, startMs: when, avgMs: -1, trackidx: trackIdx, channelidx: channel, baseDuration: -1, closed: false, bendPoints: [] };
 		track.trackNotes.push(pi);
 		return pi;
 	}
@@ -453,7 +453,7 @@ class MidiParser {
 							var pitch = evnt.param1 ? evnt.param1 : 0;
 							var when = 0;
 							if (evnt.playTimeMs) when = evnt.playTimeMs;
-							let trno = this.takeOpenedNote(pitch, when, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
+							let trno = this.takeOpenedNote(pitch, when, t, singleParsedTrack, evnt.midiChannel ? evnt.midiChannel : 0);
 							trno.volume = evnt.param2;
 							trno.openEvent = evnt;
 						}

@@ -19,6 +19,8 @@ type TrackNote = {
 	, baseDuration: number
 	, startMs: number
 	, channelidx: number
+	, trackidx: number
+	, avgMs: number
 }
 class MIDIFileTrack {
 	//nn:number
@@ -32,7 +34,7 @@ class MIDIFileTrack {
 	programChannel: { program: number, channel: number }[];
 	trackVolumePoints: { ms: number, value: number, channel: number }[];
 	//trackChords: TrackChord[] = [];
-	trackNotes:TrackNote[]=[];
+	trackNotes: TrackNote[] = [];
 	constructor(buffer: ArrayBuffer, start: number) {
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
 		this.trackLength = this.datas.getUint32(4);
