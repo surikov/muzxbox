@@ -2608,7 +2608,15 @@ declare class EventsConverter {
     parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(): Zvoog_Project;
+    findVolumeDrum(midi: number): {
+        idx: number;
+        ratio: number;
+    };
     addTrackNote(timeline: Zvoog_SongMeasure[], note: TrackNote): void;
+    findVolumeInstrument(program: number): {
+        idx: number;
+        ratio: number;
+    };
     addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: {
         midiTrack: number;
         midiPitch: number;

@@ -125,6 +125,7 @@ class SchedulePlayer {
         return this.performerDrumHolders;
     }
     launchCollectedPlugins() {
+        let trackName = '?';
         try {
             for (let ff = 0; ff < this.filterHolders.length; ff++) {
                 let plugin = this.filterHolders[ff].pluginAudioFilter;
@@ -133,6 +134,7 @@ class SchedulePlayer {
                 }
             }
             for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+                trackName = this.performerDrumHolders[pp].description;
                 let plugin = this.performerDrumHolders[pp].plugin;
                 if (plugin) {
                     plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
@@ -141,8 +143,9 @@ class SchedulePlayer {
             return null;
         }
         catch (xx) {
-            console.log('Can not launch due', xx);
-            return 'Can not launch due ' + xx;
+            let ermsg = 'Can not launch [' + trackName + '] due';
+            console.log(ermsg, xx);
+            return ermsg + ' ' + xx;
         }
     }
     checkCollectedPlugins() {

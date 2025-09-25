@@ -9,6 +9,22 @@ class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 	sampleDuration = 0.000001;
 	loudness = 0.9;
 	preidx = -1;
+	sureNumber(nn: number, value: any): number {
+		try {
+			if (value === 0) {
+				return 0;
+			} else {
+				if (1 * value == value) {
+					return 1 * value;
+				} else {
+					return nn;
+				}
+			}
+		} catch (xx) {
+			console.log(xx);
+		}
+		return nn;
+	}
 	launch(context: AudioContext, parameters: string): void {
 		if (this.audioContext) {
 			//
@@ -26,6 +42,9 @@ class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		} catch (xx) {
 			console.log(xx);
 		}
+		idx = this.sureNumber(0, idx);
+		this.loudness = this.sureNumber(0, this.loudness);
+		//console.log(':',this.loudness,idx);
 		this.volumeNode.gain.setValueAtTime(this.loudness, 0);
 		if ((this.preset) && this.preidx == idx) {
 			//

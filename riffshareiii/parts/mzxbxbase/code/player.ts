@@ -50,6 +50,7 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	launchCollectedPlugins(): null | string {
 		//console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
+		let trackName:string='?';
 		try {
 			//
 			for (let ff = 0; ff < this.filterHolders.length; ff++) {
@@ -62,6 +63,7 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
 				//console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
+				trackName=this.performerDrumHolders[pp].description;
 				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 				if (plugin) {
 					plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
@@ -69,8 +71,9 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 			return null;
 		} catch (xx) {
-			console.log('Can not launch due', xx);
-			return 'Can not launch due ' + xx;
+			let ermsg='Can not launch ['+trackName+ '] due';
+			console.log(ermsg, xx);
+			return ermsg+' ' + xx;
 		}
 	}
 	checkCollectedPlugins(): null | string {

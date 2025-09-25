@@ -512,6 +512,25 @@ class PercussionDrumKitImplementation {
         this.loudness = 0.9;
         this.preidx = -1;
     }
+    sureNumber(nn, value) {
+        try {
+            if (value === 0) {
+                return 0;
+            }
+            else {
+                if (1 * value == value) {
+                    return 1 * value;
+                }
+                else {
+                    return nn;
+                }
+            }
+        }
+        catch (xx) {
+            console.log(xx);
+        }
+        return nn;
+    }
     launch(context, parameters) {
         if (this.audioContext) {
         }
@@ -530,6 +549,8 @@ class PercussionDrumKitImplementation {
         catch (xx) {
             console.log(xx);
         }
+        idx = this.sureNumber(0, idx);
+        this.loudness = this.sureNumber(0, this.loudness);
         this.volumeNode.gain.setValueAtTime(this.loudness, 0);
         if ((this.preset) && this.preidx == idx) {
         }

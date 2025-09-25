@@ -81,12 +81,22 @@ class EventsConverter {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 		for (let ii = 0; ii < allTracks.length; ii++) {
+			let parsedMIDItrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
+			let midiProgram = 0;
+			for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
+				if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
+					midiProgram = parsedMIDItrack.programChannel[kk].program;
+				}
+			}
+			let idxRatio = this.findVolumeInstrument(midiProgram);
+			let iidx = idxRatio.idx;
+
 			let tt: Zvoog_MusicTrack = {
 				title: '' + ii
 				, measures: []
 				, performer: {
 					id: 'track' + (ii + Math.random())
-					, data: ''
+					, data: ('100/' + iidx + '/0')
 					, kind: 'miniumpitchchord1'
 					, outputs: [compresID]
 					, iconPosition: { x: 0, y: 0 }
@@ -99,12 +109,13 @@ class EventsConverter {
 			project.tracks.push(tt);
 		}
 		for (let ii = 0; ii < allPercussions.length; ii++) {
+			let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
 			let pp: Zvoog_PercussionTrack = {
 				title: '' + ii
 				, measures: []
 				, sampler: {
 					id: 'drum' + (ii + Math.random())
-					, data: ''
+					, data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx
 					, kind: 'miniumdrums1'
 					, outputs: [compresID]
 					, iconPosition: { x: 0, y: 0 }
@@ -127,9 +138,59 @@ class EventsConverter {
 
 		return project;
 	}
+	findVolumeDrum(midi: number): { idx: number, ratio: number } {
+		let re = { idx: 0, ratio: 1 };
+		let pre = '' + midi;
+		for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
+			if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+				re.idx = nn;
+				break;
+			}
+		}
+		return re;
+	};
 	addTrackNote(timeline: Zvoog_SongMeasure[], note: TrackNote) {
 
 	}
+	findVolumeInstrument(program: number): { idx: number, ratio: number } {
+		let re = { idx: 0, ratio: 0.7 };
+		let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		for (var i = 0; i < instrs.length; i++) {
+			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
+				re.idx = i;
+				break;
+			}
+		}
+
+		if (program == 16) re.ratio = 0.4;
+		if (program == 19) re.ratio = 0.4;
+
+		if (program == 27) re.ratio = 0.95;
+
+		if (program == 32) re.ratio = 0.95;
+		if (program == 33) re.ratio = 0.95;
+		if (program == 34) re.ratio = 0.95;
+		if (program == 35) re.ratio = 0.95;
+		if (program == 36) re.ratio = 0.95;
+		if (program == 37) re.ratio = 0.95;
+		if (program == 38) re.ratio = 0.95;
+		if (program == 39) re.ratio = 0.95;
+
+		if (program == 48) re.ratio = 0.4;
+		if (program == 49) re.ratio = 0.4;
+		if (program == 50) re.ratio = 0.5;
+		if (program == 51) re.ratio = 0.4;
+
+		if (program == 65) re.ratio = 0.99;
+
+		if (program == 80) re.ratio = 0.3;
+		if (program == 89) re.ratio = 0.4;
+
+
+
+		//console.log('program', program, 'not found set 0');
+		return re;
+	};
 	addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: { midiTrack: number, midiPitch: number }[], note: TrackNote) {
 		let barStart = 0;
 		for (let ii = 0; ii < timeline.length; ii++) {
@@ -137,7 +198,7 @@ class EventsConverter {
 			let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
 			if (note.startMs >= barStart && note.startMs < barStart + durationMs) {
 				let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch);
-				let pertrack=percussions[peridx];
+				let pertrack = percussions[peridx];
 				let noteStartMs = note.startMs - barStart;
 				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
 				//console.log(peridx,pertrack);

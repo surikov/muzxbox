@@ -9,6 +9,7 @@ interface Zvoog_MetreMathType {
     metre(): Zvoog_Metre;
     simplyfy(): Zvoog_MetreMathType;
     strip(toPart: number): Zvoog_MetreMathType;
+    floor(toPart: number): Zvoog_MetreMathType;
     equals(metre: Zvoog_Metre): boolean;
     less(metre: Zvoog_Metre): boolean;
     more(metre: Zvoog_Metre): boolean;
@@ -153,6 +154,13 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
+    menuPerformers: boolean;
+    menuSamplers: boolean;
+    menuFilters: boolean;
+    menuActions: boolean;
+    menuPlugins: boolean;
+    menuClipboard: boolean;
+    menuSettings: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -360,6 +368,7 @@ declare class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugi
     sampleDuration: number;
     loudness: number;
     preidx: number;
+    sureNumber(nn: number, value: any): number;
     launch(context: AudioContext, parameters: string): void;
     busy(): null | string;
     start(when: number, tempo: any): void;
