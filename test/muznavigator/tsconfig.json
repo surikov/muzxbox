@@ -25,5 +25,6 @@
 		"player.ts"
 		,"route.ts"
 		,"shift.ts"
+		,"fxshift.ts"
 	]
 }

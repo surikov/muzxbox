@@ -14,6 +14,7 @@ class FxPlayer {
         if (this.currentContext) {
             if (this.mp3sourceNode) {
                 this.mp3sourceNode.stop();
+                this.mp3sourceNode.disconnect();
             }
             else {
             }
@@ -28,7 +29,7 @@ class FxPlayer {
     startAudioBuffer(rebuff) {
         if (this.currentContext) {
             this.mp3sourceNode = this.currentContext.createBufferSource();
-            this.mp3sourceNode.connect(this.currentContext.destination);
+            this.mp3sourceNode.connect(this.fxShift.input());
             this.mp3sourceNode.buffer = rebuff;
             if (this.mp3sourceNode) {
                 let offset = 0;
@@ -54,6 +55,8 @@ class FxPlayer {
         else {
             this.currentContext = new AudioContext();
             console.log('baseLatency', this.currentContext.baseLatency);
+            this.fxShift = new FxShift(this.currentContext);
+            this.fxShift.output().connect(this.currentContext.destination);
         }
     }
     load(file) {
@@ -110,13 +113,189 @@ function startLoadMP3(it) {
     player.load(file);
 }
 function warnInit() {
-    alert('Загрузите .mp3 перед изменением звука');
+    alert('Загрузите .mp3/.wav перед изменением звука');
 }
 function onPitchChange(it) {
     if (player.mp3sourceNode) {
         console.log('onPitchChange', it.value);
         player.pitchRatio = 1 * it.value;
         player.resetSource();
+    }
+    else {
+        warnInit();
+    }
+}
+function onCodmpressorLevel(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onCompressorThreshold(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onCompressorKnee(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onCompressorRatio(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onCompressorAttack(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onCompressorRelease(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onReverberatorChange(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onFlangerLevel(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onFlangerDelay(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onFlangerDepth(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onFlangerFeedback(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onFlangerSpeed(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq32(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq64(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq128(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq256(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq512(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq1k(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq2k(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq4k(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq8k(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
+    }
+    else {
+        warnInit();
+    }
+}
+function onEq16k(it) {
+    if (player.mp3sourceNode) {
+        console.log('on', it.value);
     }
     else {
         warnInit();
@@ -295,6 +474,17 @@ function ___do___PitchShift(audioBuffer, ratio) {
                 audioBuffer.copyToChannel(newData, ii);
             }
         }
+    }
+}
+class FxShift {
+    constructor(currentContext) {
+        this.volume = currentContext.createGain();
+    }
+    input() {
+        return this.volume;
+    }
+    output() {
+        return this.volume;
     }
 }
 //# sourceMappingURL=fxplayer.js.map

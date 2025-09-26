@@ -7,11 +7,14 @@ class FxPlayer {
 	lastDuration = 0;
 	pitchRatio: number = 1;
 
+	fxShift:FxShift;
+
 	resetSource() {
 		console.log('resetSource');
 		if (this.currentContext) {
 			if (this.mp3sourceNode) {
 				this.mp3sourceNode.stop();
+				this.mp3sourceNode.disconnect();
 			} else {
 				//
 			}
@@ -28,7 +31,8 @@ class FxPlayer {
 
 		if (this.currentContext) {
 			this.mp3sourceNode = this.currentContext.createBufferSource();
-			this.mp3sourceNode.connect(this.currentContext.destination);
+			//this.mp3sourceNode.connect(this.currentContext.destination);
+			this.mp3sourceNode.connect(this.fxShift.input());
 			this.mp3sourceNode.buffer = rebuff;
 			if (this.mp3sourceNode) {
 				let offset = 0;
@@ -54,6 +58,8 @@ class FxPlayer {
 		} else {
 			this.currentContext = new AudioContext();
 			console.log('baseLatency', this.currentContext.baseLatency);
+			this.fxShift=new FxShift(this.currentContext);
+			this.fxShift.output().connect(this.currentContext.destination);
 		}
 	}
 	load(file: File) {
