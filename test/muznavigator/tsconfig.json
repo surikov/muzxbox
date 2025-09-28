@@ -22,9 +22,15 @@
 		"types": []
 	},
 	"files": [
-		"player.ts"
+		"fxplayer.ts"
 		,"route.ts"
 		,"shift.ts"
 		,"fxshift.ts"
+		,"reverberator.ts"
+		,"ticker.ts"
+		,"player.ts"
+		,"otypes.ts"
+		,"loader.ts"
+		,"channel.ts"
 	]
 }

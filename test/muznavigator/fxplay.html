@@ -4,74 +4,60 @@
 	<title>МузНавигатор Демо</title>
 	<meta charset="UTF-8" />
 	<script src="fxplayer.js"></script>
+	<script src="bundle.js"></script>
 </head>
 
 <body>
 	<h1>Демо для МузНавигатор</h1>
+	<p><i>Sergey Surikov</i></p>
 	<p>Открыть локальный файл MP3</button></p>
-	<p><input type="file" onchange="startLoadMP3(this);" accept=".mp3, .wav"></p>
-	<h2>Compressor</h2>
+	<p><input id="filestart" type="file" onchange="startLoadMP3(this);" accept=".mp3, .wav"></p>
+	<h2>Equalizer</h2>
 	<p>
-		level<br /><input type="range" onchange="onCompressorLevel(this);">
+		32<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq32(this);">
 		<br />
-		threshold<br /><input type="range" onchange="onCompressorThreshold(this);">
+		64<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq64(this);">
 		<br />
-		knee<br /><input type="range" onchange="onCompressorKnee(this);">
+		128<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq128(this);">
 		<br />
-		ratio<br /><input type="range" onchange="onCompressorRatio(this);">
+		256<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq256(this);">
 		<br />
-		attack<br /><input type="range" onchange="onCompressorAttack(this);">
+		512<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq512(this);">
 		<br />
-		release<br /><input type="range" onchange="onCompressorRelease(this);">
-	</p>
-	<h2>Reverberator</h2>
-	<p>
-		level<br /><input type="range" onchange="onReverberatorChange(this);">
-	</p>
-	<h2>Flanger</h2>
-	<p>
-		level<br /><input type="range" onchange="onFlangerLevel(this);">
+		1k<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq1k(this);">
 		<br />
-		delay<br /><input type="range" onchange="onFlangerDelay(this);">
+		2k<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq2k(this);">
 		<br />
-		depth<br /><input type="range" onchange="onFlangerDepth(this);">
+		4k<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq4k(this);">
 		<br />
-		feedback<br /><input type="range" onchange="onFlangerFeedback(this);">
+		8k<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq8k(this);">
 		<br />
-		speed<br /><input type="range" onchange="onFlangerSpeed(this);">
+		16k<br /><input type="range" value="0.0" min="-10.0" max="10.0" step="2" onchange="onEq16k(this);">
 	</p>
 	<h2>Pitch shifter</h2>
 	<p>
-		ratio<br /><input type="range" value="1.0" min="0.5" max="1.5" step="0.25" onchange="onPitchChange(this);">
+		ratio<br /><input type="range" value="0" min="-3" max="3" step="1" onchange="onPitchChange(this);">
 	</p>
-	<!--
-	<h2>Tempo changer</h2>
+	<h2>Compressor</h2>
 	<p>
-		ratio<br /><input type="range" onchange="onReverberatorChange(this);">
+		level<br /><input type="range" value="0.0" min="0.0" max="1.0" step="0.2" onchange="onCompressorLevel(this);">
+		<br />
+		threshold<br /><input type="range" value="-50" min="-100" max="0" step="10" onchange="onCompressorThreshold(this);">
+		<br />
+		knee<br /><input type="range" value="40" min="0" max="40" step="5" onchange="onCompressorKnee(this);">
+		<br />
+		ratio<br /><input type="range" value="12" min="1" max="20" step="1" onchange="onCompressorRatio(this);">
+		<br />
+		attack<br /><input type="range" value="0" min="0" max="1" step="0.01" onchange="onCompressorAttack(this);">
+		<br />
+		release<br /><input type="range" value="0.25" min="0" max="1" step="0.01" onchange="onCompressorRelease(this);">
 	</p>
--->
-	<h2>Equalizer</h2>
+	<h2>Reverberator</h2>
 	<p>
-		32<br /><input type="range" onchange="onEq32(this);">
-		<br />
-		64<br /><input type="range" onchange="onEq64(this);">
-		<br />
-		128<br /><input type="range" onchange="onEq128(this);">
-		<br />
-		256<br /><input type="range" onchange="onEq256(this);">
-		<br />
-		512<br /><input type="range" onchange="onEq512(this);">
-		<br />
-		1k<br /><input type="range" onchange="onEq1k(this);">
-		<br />
-		2k<br /><input type="range" onchange="onEq2k(this);">
-		<br />
-		4k<br /><input type="range" onchange="onEq4k(this);">
-		<br />
-		8k<br /><input type="range" onchange="onEq8k(this);">
-		<br />
-		16k<br /><input type="range" onchange="onEq16k(this);">
+		level<br /><input type="range" value="0.0" min="0.0" max="1.5" step="0.3"  onchange="onReverberatorChange(this);">
 	</p>
+	
+	
 </body>
 
 
