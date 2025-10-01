@@ -2604,31 +2604,56 @@ declare class DataViewStream {
 declare class MIDIReader {
     constructor(arrayBuffer: ArrayBuffer);
 }
+declare type MIDITrackInfo = {
+    midiTrack: number;
+    midiChan: number;
+    trackVolumePoints: {
+        ms: number;
+        value: number;
+        channel: number;
+    }[];
+};
+declare type MIDIDrumInfo = {
+    midiTrack: number;
+    midiPitch: number;
+    trackVolumePoints: {
+        ms: number;
+        value: number;
+        channel: number;
+    }[];
+};
 declare class EventsConverter {
     parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(): Zvoog_Project;
+    collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]): void;
+    addComments(project: Zvoog_Project): void;
+    addLyricsPoints(bar: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string): void;
+    findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
+        idx: number;
+        skip: Zvoog_Metre;
+    };
     findVolumeDrum(midi: number): {
         idx: number;
         ratio: number;
     };
-    addTrackNote(timeline: Zvoog_SongMeasure[], note: TrackNote): void;
     findVolumeInstrument(program: number): {
         idx: number;
         ratio: number;
     };
-    addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: {
-        midiTrack: number;
-        midiPitch: number;
-    }[], note: TrackNote): void;
-    takeProTrackNo(allTracks: {
-        midiTrack: number;
-        midiChan: number;
-    }[], midiTrack: number, midiChannel: number): number;
-    takeProSamplerNo(allPercussions: {
-        midiTrack: number;
-        midiPitch: number;
-    }[], midiTrack: number, midiPitch: number): number;
+    takeChord(bar: Zvoog_TrackMeasure, when: Zvoog_Metre): Zvoog_Chord;
+    addTrackNote(tracks: Zvoog_MusicTrack[], timeline: Zvoog_SongMeasure[], allTracks: MIDITrackInfo[], note: TrackNote): void;
+    addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: MIDIDrumInfo[], note: TrackNote): void;
+    takeProTrackNo(allTracks: MIDITrackInfo[], midiTrack: number, midiChannel: number, trackVolumePoints: null | {
+        ms: number;
+        value: number;
+        channel: number;
+    }[]): number;
+    takeProSamplerNo(allPercussions: MIDIDrumInfo[], midiTrack: number, midiPitch: number, trackVolumePoints: null | {
+        ms: number;
+        value: number;
+        channel: number;
+    }[]): number;
 }
 declare let parsedProject: Zvoog_Project | null;
 declare class AlphaTabImportMusicPlugin {
