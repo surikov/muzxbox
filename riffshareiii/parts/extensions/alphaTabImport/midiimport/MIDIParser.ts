@@ -69,7 +69,7 @@ class MidiParser {
 
 
 	constructor(arrayBuffer: ArrayBuffer) {
-		console.log(this);
+		//console.log(this);
 		this.midiheader = new MIDIFileHeader(arrayBuffer);
 		this.parseTracks(arrayBuffer);
 
@@ -368,6 +368,7 @@ class MidiParser {
 				playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
 				if (cuevnt.basetype === this.EVENT_META) {
 					if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+
 						if (cuevnt.tempo) {
 							tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
 							let reChange = {
@@ -380,6 +381,7 @@ class MidiParser {
 							};
 							//console.log(cuevnt.playTimeMs);
 							this.midiheader.changesResolutionBPM.push(reChange);
+							console.log( playTimeTicks,'resolution', tickResolution,'bpm',reChange.bpm);
 						}
 					}
 				}
@@ -628,6 +630,7 @@ class MidiParser {
 					}
 					if (evnt.subtype == this.EVENT_META_SET_TEMPO) {
 						this.midiheader.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
+						//console.log('tempo', this.midiheader.tempoBPM, evnt);
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
 						this.midiheader.meterCount = evnt.param1 ? evnt.param1 : 4;

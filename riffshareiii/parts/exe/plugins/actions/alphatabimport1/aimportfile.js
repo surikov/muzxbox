@@ -14572,7 +14572,6 @@ class MidiParser {
         this.controller_fineRPN = 0x64;
         this.controller_coarseRPN = 0x65;
         this.controller_ResetAllControllers = 0x79;
-        console.log(this);
         this.midiheader = new MIDIFileHeader(arrayBuffer);
         this.parseTracks(arrayBuffer);
     }
@@ -14769,6 +14768,7 @@ class MidiParser {
                                 evnt: cuevnt
                             };
                             this.midiheader.changesResolutionBPM.push(reChange);
+                            console.log(playTimeTicks, 'resolution', tickResolution, 'bpm', reChange.bpm);
                         }
                     }
                 }
