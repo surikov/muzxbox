@@ -23,6 +23,8 @@ type TrackNote = {
 	, avgMs: number
 }
 class MIDIFileTrack {
+	currentEventIdx: number = -1;
+	currentEvent: MIDIEvent | null = null;
 	//nn:number
 	datas: DataView;
 	HDR_LENGTH: number = 8;
@@ -43,5 +45,14 @@ class MIDIFileTrack {
 		this.trackevents = [];
 		this.trackVolumePoints = [];
 		this.programChannel = [];
+	}
+	moveNextCuEvent(): void {
+		if (this.currentEventIdx < this.trackevents.length - 2) {
+			this.currentEventIdx++;
+			this.currentEvent = this.trackevents[this.currentEventIdx];
+			//console.log(this.currentEventIdx,this.trackevents.length,this);
+		} else {
+			this.currentEvent = null;
+		}
 	}
 }

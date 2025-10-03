@@ -2504,7 +2504,9 @@ declare class MidiParser {
     simplifyAllBendPaths(): void;
     dumpResolutionChanges(): void;
     findResolutionBefore(ms: number): number;
+    nextByAllTracksEvent(): MIDIEvent | null;
     parseTicks2time(track: MIDIFileTrack): void;
+    fillEventsTimeMs(): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
@@ -2530,6 +2532,8 @@ declare type TrackNote = {
     avgMs: number;
 };
 declare class MIDIFileTrack {
+    currentEventIdx: number;
+    currentEvent: MIDIEvent | null;
     datas: DataView;
     HDR_LENGTH: number;
     trackLength: number;
@@ -2548,6 +2552,7 @@ declare class MIDIFileTrack {
     }[];
     trackNotes: TrackNote[];
     constructor(buffer: ArrayBuffer, start: number);
+    moveNextCuEvent(): void;
 }
 declare class MIDIFileHeader {
     datas: DataView;
@@ -2589,6 +2594,7 @@ declare class MIDIFileHeader {
     getTicksPerBeat(): number;
     getTicksPerFrame(): number;
     getSMPTEFrames(): number;
+    getFormat: () => number;
 }
 declare class DataViewStream {
     position: number;

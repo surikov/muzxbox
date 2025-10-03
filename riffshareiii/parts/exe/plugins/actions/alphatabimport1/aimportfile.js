@@ -14784,6 +14784,33 @@ class MidiParser {
         }
         return 0;
     }
+    nextByAllTracksEvent() {
+        let reEvent = null;
+        let trackWithSmallestDelta = null;
+        for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+            var atrack = this.parsedTracks[tt];
+            if (atrack.currentEvent) {
+                if (trackWithSmallestDelta) {
+                    if (trackWithSmallestDelta.currentEvent) {
+                        if (trackWithSmallestDelta.currentEvent.delta > atrack.currentEvent.delta) {
+                            trackWithSmallestDelta = atrack;
+                            reEvent = trackWithSmallestDelta.currentEvent;
+                        }
+                    }
+                }
+                else {
+                    trackWithSmallestDelta = atrack;
+                    reEvent = trackWithSmallestDelta.currentEvent;
+                }
+            }
+        }
+        if (trackWithSmallestDelta) {
+            if (trackWithSmallestDelta.currentEvent) {
+                trackWithSmallestDelta.moveNextCuEvent();
+            }
+        }
+        return reEvent;
+    }
     parseTicks2time(track) {
         console.log('parseTicks2time');
         let tickResolution = this.findResolutionBefore(0);
@@ -14801,14 +14828,53 @@ class MidiParser {
             evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
         }
     }
-    parseNotes() {
+    fillEventsTimeMs() {
+        console.log('fillEventsTimeMs');
         this.dumpResolutionChanges();
+        var format = this.midiheader.getFormat();
+        console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
+        if (format == 1 || this.midiheader.trackCount > 1) {
+            console.log('multi track');
+            for (let t = 0; t < this.parsedTracks.length; t++) {
+                var singleParsedTrack = this.parsedTracks[t];
+                this.parseTicks2time(singleParsedTrack);
+            }
+        }
+        else {
+            console.log('single track');
+            for (let t = 0; t < this.parsedTracks.length; t++) {
+                var singleParsedTrack = this.parsedTracks[t];
+                this.parseTicks2time(singleParsedTrack);
+            }
+        }
+        let playTime = 0;
+        let tickResolution = this.midiheader.getCalculatedTickResolution(0);
+        for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+            this.parsedTracks[tt].moveNextCuEvent();
+        }
+        let cuevnt = this.nextByAllTracksEvent();
+        while (cuevnt) {
+            if (cuevnt.delta) {
+                playTime = playTime + (cuevnt.delta * tickResolution) / 1000;
+            }
+            console.log(playTime, cuevnt);
+            if (cuevnt.basetype === this.EVENT_META) {
+                if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+                    tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
+                    console.log(cuevnt.tempoBPM, tickResolution);
+                }
+            }
+            cuevnt = this.nextByAllTracksEvent();
+        }
+    }
+    parseNotes() {
+        console.log('parseNotes');
+        this.fillEventsTimeMs();
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
         var pitchBendValuesRange = Array(16).fill(2);
         for (let t = 0; t < this.parsedTracks.length; t++) {
             var singleParsedTrack = this.parsedTracks[t];
-            this.parseTicks2time(singleParsedTrack);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
                 if (Math.floor(e / 1000) == e / 1000) {
                 }
@@ -15188,6 +15254,8 @@ class MidiParser {
 }
 class MIDIFileTrack {
     constructor(buffer, start) {
+        this.currentEventIdx = -1;
+        this.currentEvent = null;
         this.HDR_LENGTH = 8;
         this.trackNotes = [];
         this.datas = new DataView(buffer, start, this.HDR_LENGTH);
@@ -15197,6 +15265,15 @@ class MIDIFileTrack {
         this.trackevents = [];
         this.trackVolumePoints = [];
         this.programChannel = [];
+    }
+    moveNextCuEvent() {
+        if (this.currentEventIdx < this.trackevents.length - 2) {
+            this.currentEventIdx++;
+            this.currentEvent = this.trackevents[this.currentEventIdx];
+        }
+        else {
+            this.currentEvent = null;
+        }
     }
 }
 class MIDIFileHeader {
@@ -15212,6 +15289,15 @@ class MIDIFileHeader {
         this.keyFlatSharp = 0;
         this.keyMajMin = 0;
         this.lastNonZeroQuarter = 0;
+        this.getFormat = function () {
+            const format = this.datas.getUint16(8);
+            if (0 == format || 1 == format || 2 == format) {
+            }
+            else {
+                console.log('wrong format', format);
+            }
+            return format;
+        };
         this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
         this.format = this.datas.getUint16(8);
         this.trackCount = this.datas.getUint16(10);

@@ -85,6 +85,18 @@ class MidiParser {
 			// Updating index to the track end
 			curIndex = curIndex + track.trackLength + 8;
 		}
+		/*var format = this.midiheader.getFormat();
+		if (1 == format || 1 == this.midiheader.trackCount) {
+			console.log('format', format,'tracks',this.midiheader.trackCount);
+			for (var i = 0; i < this.parsedTracks.length; i++) {
+				this.parseTrackEvents(this.parsedTracks[i]);
+			}
+
+		} else {
+			for (var i = 0; i < this.parsedTracks.length; i++) {
+				this.parseTrackEvents(this.parsedTracks[i]);
+			}
+		}*/
 		for (var i = 0; i < this.parsedTracks.length; i++) {
 			this.parseTrackEvents(this.parsedTracks[i]);
 		}
@@ -381,7 +393,7 @@ class MidiParser {
 							};
 							//console.log(cuevnt.playTimeMs);
 							this.midiheader.changesResolutionBPM.push(reChange);
-							console.log( playTimeTicks,'resolution', tickResolution,'bpm',reChange.bpm);
+							console.log(playTimeTicks, 'resolution', tickResolution, 'bpm', reChange.bpm);
 						}
 					}
 				}
@@ -405,6 +417,32 @@ class MidiParser {
 			}
 		}
 	}*/
+	nextByAllTracksEvent(): MIDIEvent | null {
+		let reEvent: MIDIEvent | null = null;
+		let trackWithSmallestDelta: MIDIFileTrack | null = null;
+		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+			var atrack: MIDIFileTrack = this.parsedTracks[tt];
+			if (atrack.currentEvent) {
+				if (trackWithSmallestDelta) {
+					if (trackWithSmallestDelta.currentEvent) {
+						if (trackWithSmallestDelta.currentEvent.delta > atrack.currentEvent.delta) {
+							trackWithSmallestDelta = atrack;
+							reEvent = trackWithSmallestDelta.currentEvent;
+						}
+					}
+				} else {
+					trackWithSmallestDelta = atrack;
+					reEvent = trackWithSmallestDelta.currentEvent;
+				}
+			}
+		}
+		if (trackWithSmallestDelta) {
+			if (trackWithSmallestDelta.currentEvent) {
+				trackWithSmallestDelta.moveNextCuEvent();
+			}
+		}
+		return reEvent;
+	}
 	parseTicks2time(track: MIDIFileTrack) {
 		console.log('parseTicks2time');
 		let tickResolution: number = this.findResolutionBefore(0);
@@ -426,10 +464,52 @@ class MidiParser {
 		}
 		//this.adjustChangesResolutionBPM();
 	}
+	fillEventsTimeMs() {
+		console.log('fillEventsTimeMs');
+		this.dumpResolutionChanges();
+		var format = this.midiheader.getFormat();
+		console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
+		if (format == 1 || this.midiheader.trackCount > 1) {
+			console.log('multi track');
+			for (let t = 0; t < this.parsedTracks.length; t++) {
+				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
+				this.parseTicks2time(singleParsedTrack);
+			}
+		} else {
+			console.log('single track');
+			for (let t = 0; t < this.parsedTracks.length; t++) {
+				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
+				this.parseTicks2time(singleParsedTrack);
+			}
+		}
+
+		let playTime = 0;
+		let tickResolution = this.midiheader.getCalculatedTickResolution(0);
+		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+			this.parsedTracks[tt].moveNextCuEvent();
+		}
+		let cuevnt = this.nextByAllTracksEvent();
+		while (cuevnt) {
+			if (cuevnt.delta) {
+				playTime = playTime + (cuevnt.delta * tickResolution)/1000;
+			}
+			console.log(playTime,cuevnt);
+			if (cuevnt.basetype === this.EVENT_META) {
+				// tempo change events
+				if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+					tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
+					//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
+					console.log(cuevnt.tempoBPM, tickResolution);
+				}
+			}
+			cuevnt = this.nextByAllTracksEvent();
+		}
+	}
 
 	parseNotes() {
-		//console.log('parseNotes');
-		this.dumpResolutionChanges();
+		console.log('parseNotes');
+		this.fillEventsTimeMs();
+		//this.dumpResolutionChanges();
 		// counts which pitch-bend range message can be expected next
 		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)
 		//, number 2 (required after number 1)
@@ -440,7 +520,7 @@ class MidiParser {
 		var pitchBendValuesRange = Array(16).fill(2); // Default pitch-bend range is 2 semitones.
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
-			this.parseTicks2time(singleParsedTrack);
+			//this.parseTicks2time(singleParsedTrack);
 			//console.log('notes for track',t,singleParsedTrack);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
 				if (Math.floor(e / 1000) == e / 1000) {

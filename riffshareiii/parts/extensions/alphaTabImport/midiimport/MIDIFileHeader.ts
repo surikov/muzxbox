@@ -19,6 +19,18 @@ class MIDIFileHeader {
 		this.trackCount = this.datas.getUint16(10);
 		console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
 	}
+	/*
+	// Tick compute
+	getTickResolution(tempo: number) {
+		// Frames per seconds
+		if (this.datas.getUint16(12) & 0x8000) {
+			return 1000000 / (this.getSMPTEFrames() * this.getTicksPerFrame());
+			// Ticks per beat
+		}
+		// Default MIDI tempo is 120bpm, 500ms per beat
+		tempo = tempo || 500000;
+		return tempo / this.getTicksPerBeat();
+	}*/
 	getCalculatedTickResolution(tempo: number): number {
 		this.lastNonZeroQuarter = tempo;
 		if (this.datas.getUint16(12) & 0x8000) {
@@ -64,4 +76,14 @@ class MIDIFileHeader {
 			return smpteFrames;
 		}
 	}
+	// MIDI file format
+	getFormat = function (): number {
+		const format = this.datas.getUint16(8);
+		if (0 == format || 1 == format || 2 == format) {
+
+		} else {
+			console.log('wrong format', format);
+		}
+		return format;
+	};
 }
