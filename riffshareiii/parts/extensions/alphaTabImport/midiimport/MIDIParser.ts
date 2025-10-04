@@ -393,7 +393,7 @@ class MidiParser {
 							};
 							//console.log(cuevnt.playTimeMs);
 							this.midiheader.changesResolutionBPM.push(reChange);
-							console.log(playTimeTicks, 'resolution', tickResolution, 'bpm', reChange.bpm);
+							//console.log(playTimeTicks, 'resolution', tickResolution, 'bpm', reChange.bpm);
 						}
 					}
 				}
@@ -456,7 +456,7 @@ class MidiParser {
 		}
 		return minDeltaEvent;
 	}
-	parseTicks2time(track: MIDIFileTrack) {
+	/*parseTicks2time(track: MIDIFileTrack) {
 		console.log('parseTicks2time');
 		let tickResolution: number = this.findResolutionBefore(0);
 		let playTimeTicks: number = 0;
@@ -476,13 +476,13 @@ class MidiParser {
 			evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
 		}
 		//this.adjustChangesResolutionBPM();
-	}
+	}*/
 	fillEventsTimeMs() {
 		console.log('fillEventsTimeMs');
 		this.dumpResolutionChanges();
 		var format = this.midiheader.getFormat();
 		console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
-		if (format == 1 || this.midiheader.trackCount > 1) {
+		if (format == 1) {//|| this.midiheader.trackCount > 1) {
 			console.log('multi track');
 			/*for (let t = 0; t < this.parsedTracks.length; t++) {
 				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
@@ -499,22 +499,43 @@ class MidiParser {
 					playTime = playTime + (cuevnt.delta * tickResolution) / 1000;
 				}
 				//console.log(playTime, cuevnt);
-				cuevnt.playTimeMs=playTime;
+				cuevnt.playTimeMs = playTime;
 				if (cuevnt.basetype === this.EVENT_META) {
 					// tempo change events
 					if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
 						tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
 						//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
-						console.log(cuevnt.tempoBPM, tickResolution);
+						//console.log(cuevnt.tempoBPM, tickResolution);
 					}
 				}
 				cuevnt = this.nextByAllTracksEvent();
 			}
 		} else {
 			console.log('single track');
+			let playTime = 0;
+			let tickResolution = this.midiheader.getCalculatedTickResolution(0);
 			for (let t = 0; t < this.parsedTracks.length; t++) {
-				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
-				this.parseTicks2time(singleParsedTrack);
+				var track: MIDIFileTrack = this.parsedTracks[t];
+				if (format == 2) {
+					//
+				} else {
+					playTime = 0;
+				}
+				//playTime = (2 === format && playTime ? playTime : 0);
+				for (let e = 0; e < track.trackevents.length; e++) {
+					let trevnt = track.trackevents[e];
+					//playTime += event.delta ? (event.delta * tickResolution) / 1000 : 0;
+					playTime = playTime + trevnt.delta * tickResolution / 1000;
+					trevnt.playTimeMs=playTime;
+					if (trevnt.basetype === this.EVENT_META) {
+						// tempo change events
+						if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
+							tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
+						}
+					}
+
+				}
+				//this.parseTicks2time(singleParsedTrack);
 			}
 		}
 

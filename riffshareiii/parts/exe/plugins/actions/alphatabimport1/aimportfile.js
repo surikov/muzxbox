@@ -14768,7 +14768,6 @@ class MidiParser {
                                 evnt: cuevnt
                             };
                             this.midiheader.changesResolutionBPM.push(reChange);
-                            console.log(playTimeTicks, 'resolution', tickResolution, 'bpm', reChange.bpm);
                         }
                     }
                 }
@@ -14824,29 +14823,12 @@ class MidiParser {
         }
         return minDeltaEvent;
     }
-    parseTicks2time(track) {
-        console.log('parseTicks2time');
-        let tickResolution = this.findResolutionBefore(0);
-        let playTimeTicks = 0;
-        for (let e = 0; e < track.trackevents.length; e++) {
-            let evnt = track.trackevents[e];
-            let curDelta = 0.0;
-            if (evnt.delta)
-                curDelta = evnt.delta;
-            let searchPlayTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-            tickResolution = this.findResolutionBefore(searchPlayTimeTicks);
-            evnt.preTimeMs = playTimeTicks;
-            playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-            evnt.playTimeMs = playTimeTicks;
-            evnt.deltaTimeMs = curDelta * tickResolution / 1000.0;
-        }
-    }
     fillEventsTimeMs() {
         console.log('fillEventsTimeMs');
         this.dumpResolutionChanges();
         var format = this.midiheader.getFormat();
         console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
-        if (format == 1 || this.midiheader.trackCount > 1) {
+        if (format == 1) {
             console.log('multi track');
             let playTime = 0;
             let tickResolution = this.midiheader.getCalculatedTickResolution(0);
@@ -14862,7 +14844,6 @@ class MidiParser {
                 if (cuevnt.basetype === this.EVENT_META) {
                     if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
                         tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
-                        console.log(cuevnt.tempoBPM, tickResolution);
                     }
                 }
                 cuevnt = this.nextByAllTracksEvent();
@@ -14870,9 +14851,25 @@ class MidiParser {
         }
         else {
             console.log('single track');
+            let playTime = 0;
+            let tickResolution = this.midiheader.getCalculatedTickResolution(0);
             for (let t = 0; t < this.parsedTracks.length; t++) {
-                var singleParsedTrack = this.parsedTracks[t];
-                this.parseTicks2time(singleParsedTrack);
+                var track = this.parsedTracks[t];
+                if (format == 2) {
+                }
+                else {
+                    playTime = 0;
+                }
+                for (let e = 0; e < track.trackevents.length; e++) {
+                    let trevnt = track.trackevents[e];
+                    playTime = playTime + trevnt.delta * tickResolution / 1000;
+                    trevnt.playTimeMs = playTime;
+                    if (trevnt.basetype === this.EVENT_META) {
+                        if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
+                            tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
+                        }
+                    }
+                }
             }
         }
     }
