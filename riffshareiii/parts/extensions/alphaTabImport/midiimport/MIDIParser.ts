@@ -418,8 +418,9 @@ class MidiParser {
 		}
 	}*/
 	nextByAllTracksEvent(): MIDIEvent | null {
-		let reEvent: MIDIEvent | null = null;
+		let minDeltaEvent: MIDIEvent | null = null;
 		let trackWithSmallestDelta: MIDIFileTrack | null = null;
+		let minDeltaTrackIdx = -1;
 		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
 			var atrack: MIDIFileTrack = this.parsedTracks[tt];
 			if (atrack.currentEvent) {
@@ -427,21 +428,33 @@ class MidiParser {
 					if (trackWithSmallestDelta.currentEvent) {
 						if (trackWithSmallestDelta.currentEvent.delta > atrack.currentEvent.delta) {
 							trackWithSmallestDelta = atrack;
-							reEvent = trackWithSmallestDelta.currentEvent;
+							minDeltaEvent = trackWithSmallestDelta.currentEvent;
+							minDeltaTrackIdx = tt;
 						}
 					}
 				} else {
 					trackWithSmallestDelta = atrack;
-					reEvent = trackWithSmallestDelta.currentEvent;
+					minDeltaEvent = trackWithSmallestDelta.currentEvent;
+					minDeltaTrackIdx = tt;
 				}
 			}
 		}
 		if (trackWithSmallestDelta) {
-			if (trackWithSmallestDelta.currentEvent) {
-				trackWithSmallestDelta.moveNextCuEvent();
+			if (minDeltaEvent) {//trackWithSmallestDelta.currentEvent) {
+				//trackWithSmallestDelta.moveNextCuEvent();
+				for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+					var atrack: MIDIFileTrack = this.parsedTracks[tt];
+					if (tt == minDeltaTrackIdx) {
+						atrack.moveNextCuEvent();
+					} else {
+						if (atrack.currentEvent) {
+							atrack.currentEvent.delta = atrack.currentEvent.delta - minDeltaEvent?.delta;
+						}
+					}
+				}
 			}
 		}
-		return reEvent;
+		return minDeltaEvent;
 	}
 	parseTicks2time(track: MIDIFileTrack) {
 		console.log('parseTicks2time');
@@ -471,9 +484,31 @@ class MidiParser {
 		console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
 		if (format == 1 || this.midiheader.trackCount > 1) {
 			console.log('multi track');
-			for (let t = 0; t < this.parsedTracks.length; t++) {
+			/*for (let t = 0; t < this.parsedTracks.length; t++) {
 				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 				this.parseTicks2time(singleParsedTrack);
+			}*/
+			let playTime = 0;
+			let tickResolution = this.midiheader.getCalculatedTickResolution(0);
+			for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+				this.parsedTracks[tt].moveNextCuEvent();
+			}
+			let cuevnt = this.nextByAllTracksEvent();
+			while (cuevnt) {
+				if (cuevnt.delta) {
+					playTime = playTime + (cuevnt.delta * tickResolution) / 1000;
+				}
+				//console.log(playTime, cuevnt);
+				cuevnt.playTimeMs=playTime;
+				if (cuevnt.basetype === this.EVENT_META) {
+					// tempo change events
+					if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
+						tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
+						//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
+						console.log(cuevnt.tempoBPM, tickResolution);
+					}
+				}
+				cuevnt = this.nextByAllTracksEvent();
 			}
 		} else {
 			console.log('single track');
@@ -483,27 +518,7 @@ class MidiParser {
 			}
 		}
 
-		let playTime = 0;
-		let tickResolution = this.midiheader.getCalculatedTickResolution(0);
-		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
-			this.parsedTracks[tt].moveNextCuEvent();
-		}
-		let cuevnt = this.nextByAllTracksEvent();
-		while (cuevnt) {
-			if (cuevnt.delta) {
-				playTime = playTime + (cuevnt.delta * tickResolution)/1000;
-			}
-			console.log(playTime,cuevnt);
-			if (cuevnt.basetype === this.EVENT_META) {
-				// tempo change events
-				if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
-					tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
-					//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
-					console.log(cuevnt.tempoBPM, tickResolution);
-				}
-			}
-			cuevnt = this.nextByAllTracksEvent();
-		}
+
 	}
 
 	parseNotes() {
