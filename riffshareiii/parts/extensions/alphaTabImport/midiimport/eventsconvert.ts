@@ -1,14 +1,24 @@
 //type TrackNumChanNum = { trackNum: number, channelNum: number, zvoogtrack: Zvoog_MusicTrack };
-type MIDITrackInfo = { midiTrack: number, midiChan: number, trackVolumePoints: { ms: number, value: number, channel: number }[] };
-type MIDIDrumInfo = { midiTrack: number, midiPitch: number, trackVolumePoints: { ms: number, value: number, channel: number }[] };
+type MIDITrackInfo = {
+	midiTrack: number
+	, midiChan: number
+	, trackVolumePoints: { ms: number, value: number, channel: number }[]
+	,title:string
+};
+type MIDIDrumInfo = {
+	midiTrack: number
+	, midiPitch: number
+	, trackVolumePoints: { ms: number, value: number, channel: number }[]
+	,title:string
+};
 class EventsConverter {
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
 		this.parser = parser;
 	}
-	convertEvents(): Zvoog_Project {
+	convertEvents(name:string): Zvoog_Project {
 		let project: Zvoog_Project = {
-			title: 'test'
+			title: name
 			, timeline: []
 			, tracks: []
 			, percussions: []
@@ -84,55 +94,12 @@ class EventsConverter {
 		};
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
-		for (let ii = 0; ii < allTracks.length; ii++) {
-			let parsedMIDItrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
-			let midiProgram = 0;
-			for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
-				if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
-					midiProgram = parsedMIDItrack.programChannel[kk].program;
-				}
-			}
-			let idxRatio = this.findVolumeInstrument(midiProgram);
-			let iidx = idxRatio.idx;
 
-			let tt: Zvoog_MusicTrack = {
-				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
-				, measures: []
-				, performer: {
-					id: 'track' + (ii + Math.random())
-					, data: ('100/' + iidx + '/0')
-					, kind: 'miniumpitchchord1'
-					, outputs: [compresID]
-					, iconPosition: { x: 0, y: 0 }
-					, state: 0
-				}
-			};
-			for (let mm = 0; mm < project.timeline.length; mm++) {
-				tt.measures.push({ chords: [] });
-			}
-			project.tracks.push(tt);
-		}
-		//console.log(project);
-		for (let ii = 0; ii < allPercussions.length; ii++) {
-			let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
-			let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
-			let pp: Zvoog_PercussionTrack = {
-				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
-				, measures: []
-				, sampler: {
-					id: 'drum' + (ii + Math.random())
-					, data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx
-					, kind: 'miniumdrums1'
-					, outputs: [compresID]
-					, iconPosition: { x: 0, y: 0 }
-					, state: 0
-				}
-			};
-			for (let mm = 0; mm < project.timeline.length; mm++) {
-				pp.measures.push({ skips: [] });
-			}
-			project.percussions.push(pp);
-		}
+
+		this.addInsTrack(project, allTracks, compresID);
+		this.addPercussionTrack(project, allPercussions, compresID);
+
+
 		for (let ii = 0; ii < allNotes.length; ii++) {
 			let it = allNotes[ii];
 			if (it.channelidx == 9) {
@@ -142,7 +109,193 @@ class EventsConverter {
 			}
 		}
 		this.addComments(project);
+		this.arrangeIcons(project);
 		return project;
+	}
+	addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string) {
+		let filterPitch: { track: number, pitch: number, id: string }[] = [];
+		//console.log(project);
+		let wwCell =9;
+		let hhCell = 3;
+
+		for (let ii = 0; ii < allPercussions.length; ii++) {
+			let left = 9 * (ii + 11 + project.tracks.length);
+			let top = (8 * 12 + 2 * project.percussions.length)  + ii * hhCell-allPercussions.length*hhCell;
+			let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
+			let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
+			let drumData = '99';
+			let insOut: string[] = [compresID];
+			if (parsedMIDItrack.trackVolumePoints.length > 1) {
+				let filterID = '';
+				for (let ff = 0; ff < filterPitch.length; ff++) {
+					if (filterPitch[ff].track == allPercussions[ii].midiTrack) {
+						filterID = filterPitch[ff].id;
+						break;
+					}
+				}
+				if (filterID) {
+					insOut = [filterID];
+				} else {
+					filterID = 'drumfader' + Math.random();
+
+					let filterVolume: Zvoog_FilterTarget = {
+						id: filterID
+						, title: 'Fader ' + allPercussions[ii].midiTrack + '/' + allPercussions[ii].midiPitch
+						, kind: 'miniumfader1'
+						, data: drumData//'99'
+						, outputs: [compresID]
+						, iconPosition: { x: left + 7 * wwCell, y: top }
+						, automation: []
+						, state: 0
+					};
+					insOut = [filterID];
+					project.filters.push(filterVolume);
+					for (let mm = 0; mm < project.timeline.length; mm++) {
+						filterVolume.automation.push({ changes: [] });
+					}
+					for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
+						let gain = parsedMIDItrack.trackVolumePoints[vv];
+						let vol = '' + Math.round(gain.value * 100) + '%';
+						let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+						if (pnt) {
+							pnt.skip = MMUtil().set(pnt.skip).strip(16);
+							for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+								let volumeskip = filterVolume.automation[pnt.idx].changes[aa].skip;
+								if (MMUtil().set(volumeskip).equals(pnt.skip)) {
+									filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+									break;
+								}
+							}
+							filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+						}
+					}
+					filterPitch.push({
+						track: allPercussions[ii].midiTrack
+						, pitch: allPercussions[ii].midiPitch
+						, id: filterID
+					});
+				}
+			}
+			//console.log(filterPitch);
+			let pp: Zvoog_PercussionTrack = {
+				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
+				, measures: []
+				, sampler: {
+					id: 'drum' + (ii + Math.random())
+					, data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx
+					, kind: 'miniumdrums1'
+					, outputs: insOut//[compresID]
+					, iconPosition: { x: left, y: top }
+					, state: 0
+				}
+			};
+			for (let mm = 0; mm < project.timeline.length; mm++) {
+				pp.measures.push({ skips: [] });
+			}
+			project.percussions.push(pp);
+		}
+	}
+	addInsTrack(project: Zvoog_Project, allTracks: MIDITrackInfo[], compresID: string) {
+		let wwCell = 9;
+		let hhCell = 7;
+		for (let ii = 0; ii < project.tracks.length; ii++) {
+			let track = project.tracks[ii];
+			track.performer.iconPosition.x = ii * wwCell;
+			track.performer.iconPosition.y = ii * hhCell;
+		}
+		for (let ii = 0; ii < allTracks.length; ii++) {
+			let parsedMIDItrack: MIDIFileTrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
+			let midiProgram = 0;
+			for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
+				if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
+					midiProgram = parsedMIDItrack.programChannel[kk].program;
+				}
+			}
+			let idxRatio = this.findVolumeInstrument(midiProgram);
+			let iidx = idxRatio.idx;
+
+			let insData = '100/' + iidx + '/0';
+			let insOut: string[] = [compresID];
+			if (parsedMIDItrack.trackVolumePoints.length > 1) {
+				let filterID = 'fader' + Math.random();
+				let filterVolume: Zvoog_FilterTarget = {
+					id: filterID
+					, title: 'Fader for track ' + ii
+					, kind: 'miniumfader1'
+					, data: '99'
+					, outputs: [compresID]
+					, iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell *0.8}
+					, automation: []
+					, state: 0
+				};
+				insOut = [filterID];
+				project.filters.push(filterVolume);
+				for (let mm = 0; mm < project.timeline.length; mm++) {
+					filterVolume.automation.push({ changes: [] });
+				}
+				for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
+					let gain = parsedMIDItrack.trackVolumePoints[vv];
+					let vol = '' + Math.round(gain.value * 100) + '%';
+					let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+					if (pnt) {
+						pnt.skip = MMUtil().set(pnt.skip).strip(16);
+						for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+							let volumeskip = filterVolume.automation[pnt.idx].changes[aa].skip;
+							if (MMUtil().set(volumeskip).equals(pnt.skip)) {
+								filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+								break;
+							}
+						}
+						filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+					}
+				}
+			}
+			let tt: Zvoog_MusicTrack = {
+				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
+				, measures: []
+				, performer: {
+					id: 'track' + (ii + Math.random())
+					, data: insData//('100/' + iidx + '/0')
+					, kind: 'miniumpitchchord1'
+					, outputs: insOut//[compresID]
+					, iconPosition: { x: ii * wwCell, y: ii * hhCell }
+					, state: 0
+				}
+			};
+
+
+
+			for (let mm = 0; mm < project.timeline.length; mm++) {
+				tt.measures.push({ chords: [] });
+			}
+			project.tracks.push(tt);
+		}
+	}
+	arrangeIcons(project: Zvoog_Project) {
+		//let wwCell = 7;
+		//let hhCell = 9;
+		/*for (let ii = 0; ii < project.tracks.length; ii++) {
+			let track = project.tracks[ii];
+			track.performer.iconPosition.x = ii * wwCell;
+			track.performer.iconPosition.y = ii * hhCell;
+		}*/
+		let tracksWidth = 9 * (8 + project.tracks.length);
+		/*for (let ii = 0; ii < project.percussions.length; ii++) {
+			let percus = project.percussions[project.percussions.length - 1 - ii];
+			percus.sampler.iconPosition.x = ii * wwCell + tracksWidth;
+			percus.sampler.iconPosition.y = (8 * 12 + project.percussions.length) - ii * hhCell;
+		}*/
+		let perWidth = 9 * (8+project.percussions.length);
+		/*for (let ii = 2; ii < project.filters.length; ii++) {
+			let filter = project.filters[ii];
+			filter.iconPosition.x = ii * wwCell + tracksWidth + perWidth;
+			filter.iconPosition.y = (ii - 2) * hhCell;
+		}*/
+		//let filtersWidth = wwCell * (project.filters.length - 0);
+		project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth ;
+		project.filters[0].iconPosition.y = 1 * 9 + 66;
+		project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth ;
+		project.filters[1].iconPosition.y = 2 * 9 + 11;
 	}
 	collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]) {
 		for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
@@ -351,10 +504,12 @@ class EventsConverter {
 				return ii;
 			}
 		}
+		let title:string='';
 		if (trackVolumePoints) {
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, trackVolumePoints: trackVolumePoints });
+			
+			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title:title,trackVolumePoints: trackVolumePoints });
 		} else {
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, trackVolumePoints: [] });
+			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel,  title:title,trackVolumePoints: [] });
 		}
 		//console.log(allTracks.length);
 		return allTracks.length - 1;
@@ -367,10 +522,11 @@ class EventsConverter {
 				return ii;
 			}
 		}
+		let title:string='';
 		if (trackVolumePoints) {
-			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, trackVolumePoints: trackVolumePoints });
+			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch,  title:title,trackVolumePoints: trackVolumePoints });
 		} else {
-			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, trackVolumePoints: [] });
+			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch,  title:title,trackVolumePoints: [] });
 		}
 		return allPercussions.length - 1;
 	}

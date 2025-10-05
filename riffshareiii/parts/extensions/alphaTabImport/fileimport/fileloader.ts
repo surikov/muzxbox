@@ -66,7 +66,8 @@ class FileLoaderAlpha {
 								me.convertProject(score);
 							} else {
 								if (path.endsWith('.mid') ) {
-									let mireader: MIDIReader = new MIDIReader(arrayBuffer);
+									
+									let mireader: MIDIReader = new MIDIReader(title,arrayBuffer);
 
 								} else {
 									console.log('wrong path', path);

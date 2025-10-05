@@ -364,7 +364,7 @@ class MidiParser {
 			}
 		}
 	}
-	dumpResolutionChanges(): void {
+	/*dumpResolutionChanges(): void {
 		console.log('dumpResolutionChanges');
 		this.midiheader.changesResolutionBPM = [];
 		let tickResolution: number = this.midiheader.get0TickResolution();
@@ -400,15 +400,15 @@ class MidiParser {
 			}
 		}
 		this.midiheader.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
-	}
-	findResolutionBefore(ms: number): number {
+	}*/
+	/*findResolutionBefore(ms: number): number {
 		for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
 			if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
 				return this.midiheader.changesResolutionBPM[i].newresolution
 			}
 		}
 		return 0;
-	}
+	}*/
 	/*adjustChangesResolutionBPM() {
 		for (var i = 0; i < this.midiheader.changesResolutionBPM.length; i++) {
 			let ee = this.midiheader.changesResolutionBPM[i].evnt;
@@ -477,9 +477,26 @@ class MidiParser {
 		}
 		//this.adjustChangesResolutionBPM();
 	}*/
+	addResolutionPoint(trackIdx: number, playTimeTicks: number, tickResolution: number, tempo: number, vnt: MIDIEvent | null) {
+		let reChange: { track: number, ms: number, newresolution: number, bpm: number, evnt: MIDIEvent | null } = {
+			track: trackIdx
+			, ms: playTimeTicks
+			//, ms: cuevnt.playTimeMs
+			, newresolution: tickResolution
+			, bpm: tempo
+			, evnt: vnt
+		};
+		//console.log(cuevnt.playTimeMs);
+		this.midiheader.changesResolutionTempo.push(reChange);
+		this.midiheader.changesResolutionTempo.sort((a, b) => { return a.ms - b.ms; });
+	}
 	fillEventsTimeMs() {
 		console.log('fillEventsTimeMs');
-		this.dumpResolutionChanges();
+		//this.dumpResolutionChanges();
+		let tickResolutionAt0: number = this.midiheader.get0TickResolution();
+		//let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
+		//this.midiheader.changesResolutionBPM.push(reChange);
+		this.addResolutionPoint(-1, -1, tickResolutionAt0, 120, null);
 		var format = this.midiheader.getFormat();
 		console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
 		if (format == 1) {//|| this.midiheader.trackCount > 1) {
@@ -506,6 +523,7 @@ class MidiParser {
 						tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
 						//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
 						//console.log(cuevnt.tempoBPM, tickResolution);
+						this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempo ? cuevnt.tempo : 12, cuevnt);
 					}
 				}
 				cuevnt = this.nextByAllTracksEvent();
@@ -526,11 +544,12 @@ class MidiParser {
 					let trevnt = track.trackevents[e];
 					//playTime += event.delta ? (event.delta * tickResolution) / 1000 : 0;
 					playTime = playTime + trevnt.delta * tickResolution / 1000;
-					trevnt.playTimeMs=playTime;
+					trevnt.playTimeMs = playTime;
 					if (trevnt.basetype === this.EVENT_META) {
 						// tempo change events
 						if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
 							tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
+							this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempo ? trevnt.tempo : 12, trevnt);
 						}
 					}
 
@@ -914,7 +933,7 @@ class MidiParser {
 		}
 	}
 
-
+/*
 	findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number {
 		let foundDiff = 1234567890;
 		let fountMs = 0;
@@ -926,8 +945,8 @@ class MidiParser {
 			}
 		}
 		return fountMs;
-	}
-
+	}*/
+/*
 	findPreMetre(ms: number): Zvoog_Metre {
 		let cume: Zvoog_Metre = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
 		for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
@@ -937,8 +956,8 @@ class MidiParser {
 			}
 		}
 		return cume;
-	}
-	findPreBPM(ms: number): number {
+	}*/
+	/*findPreBPM(ms: number): number {
 		let bpm = this.midiheader.changesResolutionBPM[0].bpm;
 		for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
 			bpm = this.midiheader.changesResolutionBPM[ii].bpm;
@@ -947,7 +966,7 @@ class MidiParser {
 			}
 		}
 		return bpm;
-	}
+	}*/
 
 
 

@@ -2502,16 +2502,12 @@ declare class MidiParser {
     distanceToPoint(line: PP, point: XYp): number;
     douglasPeucker(points: XYp[], tolerance: number): XYp[];
     simplifyAllBendPaths(): void;
-    dumpResolutionChanges(): void;
-    findResolutionBefore(ms: number): number;
     nextByAllTracksEvent(): MIDIEvent | null;
+    addResolutionPoint(trackIdx: number, playTimeTicks: number, tickResolution: number, tempo: number, vnt: MIDIEvent | null): void;
     fillEventsTimeMs(): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;
-    findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number;
-    findPreMetre(ms: number): Zvoog_Metre;
-    findPreBPM(ms: number): number;
 }
 type NotePitch = {
     pointDuration: number;
@@ -2559,7 +2555,7 @@ declare class MIDIFileHeader {
     format: number;
     trackCount: number;
     tempoBPM: number;
-    changesResolutionBPM: {
+    changesResolutionTempo: {
         track: number;
         ms: number;
         newresolution: number;
@@ -2607,7 +2603,7 @@ declare class DataViewStream {
     end(): boolean;
 }
 declare class MIDIReader {
-    constructor(arrayBuffer: ArrayBuffer);
+    constructor(filename: string, arrayBuffer: ArrayBuffer);
 }
 type MIDITrackInfo = {
     midiTrack: number;
@@ -2617,6 +2613,7 @@ type MIDITrackInfo = {
         value: number;
         channel: number;
     }[];
+    title: string;
 };
 type MIDIDrumInfo = {
     midiTrack: number;
@@ -2626,11 +2623,15 @@ type MIDIDrumInfo = {
         value: number;
         channel: number;
     }[];
+    title: string;
 };
 declare class EventsConverter {
     parser: MidiParser;
     constructor(parser: MidiParser);
-    convertEvents(): Zvoog_Project;
+    convertEvents(name: string): Zvoog_Project;
+    addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string): void;
+    addInsTrack(project: Zvoog_Project, allTracks: MIDITrackInfo[], compresID: string): void;
+    arrangeIcons(project: Zvoog_Project): void;
     collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]): void;
     addComments(project: Zvoog_Project): void;
     addLyricsPoints(bar: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string): void;

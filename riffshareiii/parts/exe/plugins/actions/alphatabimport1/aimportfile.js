@@ -14741,48 +14741,6 @@ class MidiParser {
             }
         }
     }
-    dumpResolutionChanges() {
-        console.log('dumpResolutionChanges');
-        this.midiheader.changesResolutionBPM = [];
-        let tickResolution = this.midiheader.get0TickResolution();
-        let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
-        this.midiheader.changesResolutionBPM.push(reChange);
-        for (var t = 0; t < this.parsedTracks.length; t++) {
-            var track = this.parsedTracks[t];
-            let playTimeTicks = 0;
-            for (var e = 0; e < track.trackevents.length; e++) {
-                var cuevnt = track.trackevents[e];
-                let curDelta = 0.0;
-                if (cuevnt.delta)
-                    curDelta = cuevnt.delta;
-                playTimeTicks = playTimeTicks + curDelta * tickResolution / 1000.0;
-                if (cuevnt.basetype === this.EVENT_META) {
-                    if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
-                        if (cuevnt.tempo) {
-                            tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo);
-                            let reChange = {
-                                track: t,
-                                ms: playTimeTicks,
-                                newresolution: tickResolution,
-                                bpm: (cuevnt.tempoBPM) ? cuevnt.tempoBPM : 120,
-                                evnt: cuevnt
-                            };
-                            this.midiheader.changesResolutionBPM.push(reChange);
-                        }
-                    }
-                }
-            }
-        }
-        this.midiheader.changesResolutionBPM.sort((a, b) => { return a.ms - b.ms; });
-    }
-    findResolutionBefore(ms) {
-        for (var i = this.midiheader.changesResolutionBPM.length - 1; i >= 0; i--) {
-            if (this.midiheader.changesResolutionBPM[i].ms <= ms) {
-                return this.midiheader.changesResolutionBPM[i].newresolution;
-            }
-        }
-        return 0;
-    }
     nextByAllTracksEvent() {
         let minDeltaEvent = null;
         let trackWithSmallestDelta = null;
@@ -14823,9 +14781,21 @@ class MidiParser {
         }
         return minDeltaEvent;
     }
+    addResolutionPoint(trackIdx, playTimeTicks, tickResolution, tempo, vnt) {
+        let reChange = {
+            track: trackIdx,
+            ms: playTimeTicks,
+            newresolution: tickResolution,
+            bpm: tempo,
+            evnt: vnt
+        };
+        this.midiheader.changesResolutionTempo.push(reChange);
+        this.midiheader.changesResolutionTempo.sort((a, b) => { return a.ms - b.ms; });
+    }
     fillEventsTimeMs() {
         console.log('fillEventsTimeMs');
-        this.dumpResolutionChanges();
+        let tickResolutionAt0 = this.midiheader.get0TickResolution();
+        this.addResolutionPoint(-1, -1, tickResolutionAt0, 120, null);
         var format = this.midiheader.getFormat();
         console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
         if (format == 1) {
@@ -14844,6 +14814,7 @@ class MidiParser {
                 if (cuevnt.basetype === this.EVENT_META) {
                     if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
                         tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
+                        this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempo ? cuevnt.tempo : 12, cuevnt);
                     }
                 }
                 cuevnt = this.nextByAllTracksEvent();
@@ -14867,6 +14838,7 @@ class MidiParser {
                     if (trevnt.basetype === this.EVENT_META) {
                         if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
                             tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
+                            this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempo ? trevnt.tempo : 12, trevnt);
                         }
                     }
                 }
@@ -15225,38 +15197,6 @@ class MidiParser {
             track.trackevents.push(e);
         }
     }
-    findNearestAvgTick(ms, stat) {
-        let foundDiff = 1234567890;
-        let fountMs = 0;
-        for (let ii = 0; ii < stat.length; ii++) {
-            let cuDiff = Math.abs(stat[ii].avgstartms - ms);
-            if (foundDiff > cuDiff) {
-                foundDiff = cuDiff;
-                fountMs = stat[ii].avgstartms;
-            }
-        }
-        return fountMs;
-    }
-    findPreMetre(ms) {
-        let cume = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
-        for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
-            cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
-            if (ms >= this.midiheader.metersList[ii].ms - 99) {
-                break;
-            }
-        }
-        return cume;
-    }
-    findPreBPM(ms) {
-        let bpm = this.midiheader.changesResolutionBPM[0].bpm;
-        for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
-            bpm = this.midiheader.changesResolutionBPM[ii].bpm;
-            if (ms >= this.midiheader.changesResolutionBPM[ii].ms - 99) {
-                break;
-            }
-        }
-        return bpm;
-    }
 }
 class MIDIFileTrack {
     constructor(buffer, start) {
@@ -15286,7 +15226,7 @@ class MIDIFileHeader {
     constructor(buffer) {
         this.HEADER_LENGTH = 14;
         this.tempoBPM = 120;
-        this.changesResolutionBPM = [];
+        this.changesResolutionTempo = [];
         this.metersList = [];
         this.lyricsList = [];
         this.signsList = [];
@@ -15406,11 +15346,11 @@ class DataViewStream {
     }
 }
 class MIDIReader {
-    constructor(arrayBuffer) {
+    constructor(filename, arrayBuffer) {
         let parser = new MidiParser(arrayBuffer);
         console.log(parser);
         let converter = new EventsConverter(parser);
-        let project = converter.convertEvents();
+        let project = converter.convertEvents(filename);
         console.log(project);
         parsedProject = project;
     }
@@ -15419,9 +15359,9 @@ class EventsConverter {
     constructor(parser) {
         this.parser = parser;
     }
-    convertEvents() {
+    convertEvents(name) {
         let project = {
-            title: 'test',
+            title: name,
             timeline: [],
             tracks: [],
             percussions: [],
@@ -15479,53 +15419,8 @@ class EventsConverter {
         };
         project.filters.push(filterEcho);
         project.filters.push(filterCompression);
-        for (let ii = 0; ii < allTracks.length; ii++) {
-            let parsedMIDItrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
-            let midiProgram = 0;
-            for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
-                if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
-                    midiProgram = parsedMIDItrack.programChannel[kk].program;
-                }
-            }
-            let idxRatio = this.findVolumeInstrument(midiProgram);
-            let iidx = idxRatio.idx;
-            let tt = {
-                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
-                measures: [],
-                performer: {
-                    id: 'track' + (ii + Math.random()),
-                    data: ('100/' + iidx + '/0'),
-                    kind: 'miniumpitchchord1',
-                    outputs: [compresID],
-                    iconPosition: { x: 0, y: 0 },
-                    state: 0
-                }
-            };
-            for (let mm = 0; mm < project.timeline.length; mm++) {
-                tt.measures.push({ chords: [] });
-            }
-            project.tracks.push(tt);
-        }
-        for (let ii = 0; ii < allPercussions.length; ii++) {
-            let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
-            let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
-            let pp = {
-                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
-                measures: [],
-                sampler: {
-                    id: 'drum' + (ii + Math.random()),
-                    data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx,
-                    kind: 'miniumdrums1',
-                    outputs: [compresID],
-                    iconPosition: { x: 0, y: 0 },
-                    state: 0
-                }
-            };
-            for (let mm = 0; mm < project.timeline.length; mm++) {
-                pp.measures.push({ skips: [] });
-            }
-            project.percussions.push(pp);
-        }
+        this.addInsTrack(project, allTracks, compresID);
+        this.addPercussionTrack(project, allPercussions, compresID);
         for (let ii = 0; ii < allNotes.length; ii++) {
             let it = allNotes[ii];
             if (it.channelidx == 9) {
@@ -15536,7 +15431,168 @@ class EventsConverter {
             }
         }
         this.addComments(project);
+        this.arrangeIcons(project);
         return project;
+    }
+    addPercussionTrack(project, allPercussions, compresID) {
+        let filterPitch = [];
+        let wwCell = 9;
+        let hhCell = 3;
+        for (let ii = 0; ii < allPercussions.length; ii++) {
+            let left = 9 * (ii + 11 + project.tracks.length);
+            let top = (8 * 12 + 2 * project.percussions.length) + ii * hhCell - allPercussions.length * hhCell;
+            let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
+            let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
+            let drumData = '99';
+            let insOut = [compresID];
+            if (parsedMIDItrack.trackVolumePoints.length > 1) {
+                let filterID = '';
+                for (let ff = 0; ff < filterPitch.length; ff++) {
+                    if (filterPitch[ff].track == allPercussions[ii].midiTrack) {
+                        filterID = filterPitch[ff].id;
+                        break;
+                    }
+                }
+                if (filterID) {
+                    insOut = [filterID];
+                }
+                else {
+                    filterID = 'drumfader' + Math.random();
+                    let filterVolume = {
+                        id: filterID,
+                        title: 'Fader ' + allPercussions[ii].midiTrack + '/' + allPercussions[ii].midiPitch,
+                        kind: 'miniumfader1',
+                        data: drumData,
+                        outputs: [compresID],
+                        iconPosition: { x: left + 7 * wwCell, y: top },
+                        automation: [],
+                        state: 0
+                    };
+                    insOut = [filterID];
+                    project.filters.push(filterVolume);
+                    for (let mm = 0; mm < project.timeline.length; mm++) {
+                        filterVolume.automation.push({ changes: [] });
+                    }
+                    for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
+                        let gain = parsedMIDItrack.trackVolumePoints[vv];
+                        let vol = '' + Math.round(gain.value * 100) + '%';
+                        let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+                        if (pnt) {
+                            pnt.skip = MMUtil().set(pnt.skip).strip(16);
+                            for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+                                let volumeskip = filterVolume.automation[pnt.idx].changes[aa].skip;
+                                if (MMUtil().set(volumeskip).equals(pnt.skip)) {
+                                    filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+                                    break;
+                                }
+                            }
+                            filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+                        }
+                    }
+                    filterPitch.push({
+                        track: allPercussions[ii].midiTrack,
+                        pitch: allPercussions[ii].midiPitch,
+                        id: filterID
+                    });
+                }
+            }
+            let pp = {
+                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
+                measures: [],
+                sampler: {
+                    id: 'drum' + (ii + Math.random()),
+                    data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx,
+                    kind: 'miniumdrums1',
+                    outputs: insOut,
+                    iconPosition: { x: left, y: top },
+                    state: 0
+                }
+            };
+            for (let mm = 0; mm < project.timeline.length; mm++) {
+                pp.measures.push({ skips: [] });
+            }
+            project.percussions.push(pp);
+        }
+    }
+    addInsTrack(project, allTracks, compresID) {
+        let wwCell = 9;
+        let hhCell = 7;
+        for (let ii = 0; ii < project.tracks.length; ii++) {
+            let track = project.tracks[ii];
+            track.performer.iconPosition.x = ii * wwCell;
+            track.performer.iconPosition.y = ii * hhCell;
+        }
+        for (let ii = 0; ii < allTracks.length; ii++) {
+            let parsedMIDItrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
+            let midiProgram = 0;
+            for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
+                if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
+                    midiProgram = parsedMIDItrack.programChannel[kk].program;
+                }
+            }
+            let idxRatio = this.findVolumeInstrument(midiProgram);
+            let iidx = idxRatio.idx;
+            let insData = '100/' + iidx + '/0';
+            let insOut = [compresID];
+            if (parsedMIDItrack.trackVolumePoints.length > 1) {
+                let filterID = 'fader' + Math.random();
+                let filterVolume = {
+                    id: filterID,
+                    title: 'Fader for track ' + ii,
+                    kind: 'miniumfader1',
+                    data: '99',
+                    outputs: [compresID],
+                    iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 },
+                    automation: [],
+                    state: 0
+                };
+                insOut = [filterID];
+                project.filters.push(filterVolume);
+                for (let mm = 0; mm < project.timeline.length; mm++) {
+                    filterVolume.automation.push({ changes: [] });
+                }
+                for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
+                    let gain = parsedMIDItrack.trackVolumePoints[vv];
+                    let vol = '' + Math.round(gain.value * 100) + '%';
+                    let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
+                    if (pnt) {
+                        pnt.skip = MMUtil().set(pnt.skip).strip(16);
+                        for (let aa = 0; aa < filterVolume.automation[pnt.idx].changes.length; aa++) {
+                            let volumeskip = filterVolume.automation[pnt.idx].changes[aa].skip;
+                            if (MMUtil().set(volumeskip).equals(pnt.skip)) {
+                                filterVolume.automation[pnt.idx].changes.splice(aa, 1);
+                                break;
+                            }
+                        }
+                        filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
+                    }
+                }
+            }
+            let tt = {
+                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
+                measures: [],
+                performer: {
+                    id: 'track' + (ii + Math.random()),
+                    data: insData,
+                    kind: 'miniumpitchchord1',
+                    outputs: insOut,
+                    iconPosition: { x: ii * wwCell, y: ii * hhCell },
+                    state: 0
+                }
+            };
+            for (let mm = 0; mm < project.timeline.length; mm++) {
+                tt.measures.push({ chords: [] });
+            }
+            project.tracks.push(tt);
+        }
+    }
+    arrangeIcons(project) {
+        let tracksWidth = 9 * (8 + project.tracks.length);
+        let perWidth = 9 * (8 + project.percussions.length);
+        project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth;
+        project.filters[0].iconPosition.y = 1 * 9 + 66;
+        project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth;
+        project.filters[1].iconPosition.y = 2 * 9 + 11;
     }
     collectNotes(allNotes, allTracks, allPercussions) {
         for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
@@ -15730,11 +15786,12 @@ class EventsConverter {
                 return ii;
             }
         }
+        let title = '';
         if (trackVolumePoints) {
-            allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, trackVolumePoints: trackVolumePoints });
+            allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: trackVolumePoints });
         }
         else {
-            allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, trackVolumePoints: [] });
+            allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: [] });
         }
         return allTracks.length - 1;
     }
@@ -15745,11 +15802,12 @@ class EventsConverter {
                 return ii;
             }
         }
+        let title = '';
         if (trackVolumePoints) {
-            allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, trackVolumePoints: trackVolumePoints });
+            allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, title: title, trackVolumePoints: trackVolumePoints });
         }
         else {
-            allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, trackVolumePoints: [] });
+            allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, title: title, trackVolumePoints: [] });
         }
         return allPercussions.length - 1;
     }
@@ -15865,7 +15923,7 @@ class FileLoaderAlpha {
                             }
                             else {
                                 if (path.endsWith('.mid')) {
-                                    let mireader = new MIDIReader(arrayBuffer);
+                                    let mireader = new MIDIReader(title, arrayBuffer);
                                 }
                                 else {
                                     console.log('wrong path', path);

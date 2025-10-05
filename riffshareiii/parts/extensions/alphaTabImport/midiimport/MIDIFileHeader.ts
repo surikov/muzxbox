@@ -4,7 +4,7 @@ class MIDIFileHeader {
 	format: number;
 	trackCount: number;
 	tempoBPM: number = 120;
-	changesResolutionBPM: { track: number, ms: number, newresolution: number, bpm: number, evnt: MIDIEvent | null }[] = [];
+	changesResolutionTempo: { track: number, ms: number, newresolution: number, bpm: number, evnt: MIDIEvent | null }[] = [];
 	metersList: { track: number, ms: number, count: number, division: number }[] = [];
 	lyricsList: { track: number, ms: number, txt: string }[] = [];
 	signsList: { track: number, ms: number, sign: string }[] = [];
