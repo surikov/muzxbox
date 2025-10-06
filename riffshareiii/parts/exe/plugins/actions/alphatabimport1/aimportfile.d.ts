@@ -2505,6 +2505,7 @@ declare class MidiParser {
     nextByAllTracksEvent(): MIDIEvent | null;
     addResolutionPoint(trackIdx: number, playTimeTicks: number, tickResolution: number, tempo: number, vnt: MIDIEvent | null): void;
     fillEventsTimeMs(): void;
+    alignEventsTime(): void;
     parseNotes(): void;
     nextEvent(stream: DataViewStream): MIDIEvent;
     parseTrackEvents(track: MIDIFileTrack): void;

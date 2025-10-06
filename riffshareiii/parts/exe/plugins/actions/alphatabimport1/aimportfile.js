@@ -14845,9 +14845,54 @@ class MidiParser {
             }
         }
     }
+    alignEventsTime() {
+        let maxDelta = 23;
+        let starts = [];
+        let aligned = [];
+        for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+            var singleParsedTrack = this.parsedTracks[tt];
+            for (var ee = 0; ee < singleParsedTrack.trackevents.length; ee++) {
+                var evnt = singleParsedTrack.trackevents[ee];
+                if (evnt.basetype == this.EVENT_MIDI) {
+                    if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
+                        starts.push(evnt);
+                    }
+                }
+            }
+        }
+        starts.sort((a, b) => { return a.playTimeMs - b.playTimeMs; });
+        if (starts.length) {
+            let evnt = starts[0];
+            aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+            for (let ee = 1; ee < starts.length; ee++) {
+                let evnt = starts[ee];
+                let last = aligned[aligned.length - 1];
+                let pretime = last.events[last.events.length - 1].playTimeMs;
+                if (evnt.playTimeMs < pretime + maxDelta) {
+                    last.events.push(evnt);
+                }
+                else {
+                    aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+                }
+            }
+            for (let ii = 0; ii < aligned.length; ii++) {
+                let smm = 0;
+                for (ee = 0; ee < aligned[ii].events.length; ee++) {
+                    smm = smm + aligned[ii].events[ee].playTimeMs;
+                }
+                aligned[ii].avg = Math.round(smm / aligned[ii].events.length);
+            }
+            for (let ii = 0; ii < aligned.length; ii++) {
+                for (ee = 0; ee < aligned[ii].events.length; ee++) {
+                    aligned[ii].events[ee].playTimeMs = aligned[ii].avg;
+                }
+            }
+        }
+    }
     parseNotes() {
         console.log('parseNotes');
         this.fillEventsTimeMs();
+        this.alignEventsTime();
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
         var pitchBendValuesRange = Array(16).fill(2);

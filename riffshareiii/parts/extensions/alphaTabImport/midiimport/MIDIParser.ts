@@ -560,10 +560,55 @@ class MidiParser {
 
 
 	}
-
+	alignEventsTime() {
+		let maxDelta = 23;
+		let starts: MIDIEvent[] = [];
+		let aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
+		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
+			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[tt];
+			for (var ee = 0; ee < singleParsedTrack.trackevents.length; ee++) {
+				var evnt = singleParsedTrack.trackevents[ee];
+				if (evnt.basetype == this.EVENT_MIDI) {
+					if (evnt.subtype == this.EVENT_MIDI_NOTE_ON) {
+						starts.push(evnt);
+					}
+				}
+			}
+		}
+		starts.sort((a, b) => { return a.playTimeMs - b.playTimeMs; });
+		//console.log(starts);
+		if (starts.length) {
+			let evnt = starts[0];
+			aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+			for (let ee = 1; ee < starts.length; ee++) {
+				let evnt = starts[ee];
+				let last = aligned[aligned.length - 1];
+				let pretime = last.events[last.events.length - 1].playTimeMs;
+				if (evnt.playTimeMs < pretime + maxDelta) {
+					last.events.push(evnt);
+				} else {
+					aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+				}
+			}
+			for (let ii = 0; ii < aligned.length; ii++) {
+				let smm = 0;
+				for (ee = 0; ee < aligned[ii].events.length; ee++) {
+					smm = smm + aligned[ii].events[ee].playTimeMs;
+				}
+				aligned[ii].avg = Math.round(smm / aligned[ii].events.length);
+			}
+			//console.log(aligned);
+			for (let ii = 0; ii < aligned.length; ii++) {
+				for (ee = 0; ee < aligned[ii].events.length; ee++) {
+					aligned[ii].events[ee].playTimeMs=aligned[ii].avg;
+				}
+			}
+		}
+	}
 	parseNotes() {
 		console.log('parseNotes');
 		this.fillEventsTimeMs();
+		this.alignEventsTime();
 		//this.dumpResolutionChanges();
 		// counts which pitch-bend range message can be expected next
 		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)
@@ -933,30 +978,30 @@ class MidiParser {
 		}
 	}
 
-/*
-	findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number {
-		let foundDiff = 1234567890;
-		let fountMs = 0;
-		for (let ii = 0; ii < stat.length; ii++) {
-			let cuDiff = Math.abs(stat[ii].avgstartms - ms);
-			if (foundDiff > cuDiff) {
-				foundDiff = cuDiff;
-				fountMs = stat[ii].avgstartms;
+	/*
+		findNearestAvgTick(ms: number, stat: TicksAverageTime[]): number {
+			let foundDiff = 1234567890;
+			let fountMs = 0;
+			for (let ii = 0; ii < stat.length; ii++) {
+				let cuDiff = Math.abs(stat[ii].avgstartms - ms);
+				if (foundDiff > cuDiff) {
+					foundDiff = cuDiff;
+					fountMs = stat[ii].avgstartms;
+				}
 			}
-		}
-		return fountMs;
-	}*/
-/*
-	findPreMetre(ms: number): Zvoog_Metre {
-		let cume: Zvoog_Metre = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
-		for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
-			cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
-			if (ms >= this.midiheader.metersList[ii].ms - 99) {
-				break;
+			return fountMs;
+		}*/
+	/*
+		findPreMetre(ms: number): Zvoog_Metre {
+			let cume: Zvoog_Metre = { count: this.midiheader.metersList[0].count, part: this.midiheader.metersList[0].division };
+			for (let ii = this.midiheader.metersList.length - 1; ii >= 0; ii--) {
+				cume = { count: this.midiheader.metersList[ii].count, part: this.midiheader.metersList[ii].division };
+				if (ms >= this.midiheader.metersList[ii].ms - 99) {
+					break;
+				}
 			}
-		}
-		return cume;
-	}*/
+			return cume;
+		}*/
 	/*findPreBPM(ms: number): number {
 		let bpm = this.midiheader.changesResolutionBPM[0].bpm;
 		for (let ii = this.midiheader.changesResolutionBPM.length - 1; ii >= 0; ii--) {
