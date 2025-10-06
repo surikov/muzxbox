@@ -14814,7 +14814,7 @@ class MidiParser {
                 if (cuevnt.basetype === this.EVENT_META) {
                     if (cuevnt.subtype === this.EVENT_META_SET_TEMPO) {
                         tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
-                        this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempo ? cuevnt.tempo : 12, cuevnt);
+                        this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempoBPM ? cuevnt.tempoBPM : 12, cuevnt);
                     }
                 }
                 cuevnt = this.nextByAllTracksEvent();
@@ -14893,6 +14893,7 @@ class MidiParser {
         console.log('parseNotes');
         this.fillEventsTimeMs();
         this.alignEventsTime();
+        console.log(this.midiheader.changesResolutionTempo);
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
         var pitchBendValuesRange = Array(16).fill(2);

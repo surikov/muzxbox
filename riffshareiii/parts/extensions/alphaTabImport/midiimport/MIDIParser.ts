@@ -523,7 +523,7 @@ class MidiParser {
 						tickResolution = this.midiheader.getCalculatedTickResolution(cuevnt.tempo ? cuevnt.tempo : 0);
 						//console.log(playTime,'11 tickResolution',tickResolution,'bpm',event.tempoBPM);
 						//console.log(cuevnt.tempoBPM, tickResolution);
-						this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempo ? cuevnt.tempo : 12, cuevnt);
+						this.addResolutionPoint(-1, playTime, tickResolution, cuevnt.tempoBPM ? cuevnt.tempoBPM : 12, cuevnt);
 					}
 				}
 				cuevnt = this.nextByAllTracksEvent();
@@ -609,6 +609,7 @@ class MidiParser {
 		console.log('parseNotes');
 		this.fillEventsTimeMs();
 		this.alignEventsTime();
+		console.log(this.midiheader.changesResolutionTempo);
 		//this.dumpResolutionChanges();
 		// counts which pitch-bend range message can be expected next
 		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)
