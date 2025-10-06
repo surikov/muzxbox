@@ -29,12 +29,13 @@ function initFaderUI() {
     let volume = document.getElementById('volume');
     let numval = document.getElementById('numval');
     let bridge = new FaderBridge(() => {
+        console.log('data', bridge.data);
         numval.innerHTML = bridge.data;
-        volume.value = bridge.data;
+        volume.value = 1 * parseInt(bridge.data);
     });
     volume.addEventListener('change', (event) => {
         numval.innerHTML = volume.value;
-        bridge.sendMessageToHost(volume.value);
+        bridge.sendMessageToHost('' + volume.value);
     });
 }
 //# sourceMappingURL=faderui.js.map

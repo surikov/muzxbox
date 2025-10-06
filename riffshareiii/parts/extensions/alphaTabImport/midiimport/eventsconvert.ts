@@ -3,20 +3,20 @@ type MIDITrackInfo = {
 	midiTrack: number
 	, midiChan: number
 	, trackVolumePoints: { ms: number, value: number, channel: number }[]
-	,title:string
+	, title: string
 };
 type MIDIDrumInfo = {
 	midiTrack: number
 	, midiPitch: number
 	, trackVolumePoints: { ms: number, value: number, channel: number }[]
-	,title:string
+	, title: string
 };
 class EventsConverter {
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
 		this.parser = parser;
 	}
-	convertEvents(name:string): Zvoog_Project {
+	convertEvents(name: string): Zvoog_Project {
 		let project: Zvoog_Project = {
 			title: name
 			, timeline: []
@@ -115,17 +115,20 @@ class EventsConverter {
 	addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string) {
 		let filterPitch: { track: number, pitch: number, id: string }[] = [];
 		//console.log(project);
-		let wwCell =9;
-		let hhCell = 3;
+		let wwCell = 9;
+		let hhCell = 2;
 
 		for (let ii = 0; ii < allPercussions.length; ii++) {
 			let left = 9 * (ii + 11 + project.tracks.length);
-			let top = (8 * 12 + 2 * project.percussions.length)  + ii * hhCell-allPercussions.length*hhCell;
+			let top = (8 * 12 + 2 * project.percussions.length) + ii * hhCell - allPercussions.length * hhCell;
 			let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
 			let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
-			let drumData = '99';
+			let drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
+
 			let insOut: string[] = [compresID];
-			if (parsedMIDItrack.trackVolumePoints.length > 1) {
+			let perTrackTitle = '' + parsedMIDItrack.trackTitle + ': ' + allPercussionDrumTitles()[allPercussions[ii].midiPitch];
+			//if (parsedMIDItrack.trackVolumePoints.length > 1) {
+			if (this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints)) {
 				let filterID = '';
 				for (let ff = 0; ff < filterPitch.length; ff++) {
 					if (filterPitch[ff].track == allPercussions[ii].midiTrack) {
@@ -140,9 +143,9 @@ class EventsConverter {
 
 					let filterVolume: Zvoog_FilterTarget = {
 						id: filterID
-						, title: 'Fader ' + allPercussions[ii].midiTrack + '/' + allPercussions[ii].midiPitch
+						, title: 'Fader for ' + perTrackTitle//allPercussions[ii].midiTrack + '/' + allPercussions[ii].midiPitch
 						, kind: 'miniumfader1'
-						, data: drumData//'99'
+						, data: '' + (100 * volDrum.ratio)//drumData//'99'
 						, outputs: [compresID]
 						, iconPosition: { x: left + 7 * wwCell, y: top }
 						, automation: []
@@ -155,7 +158,8 @@ class EventsConverter {
 					}
 					for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
 						let gain = parsedMIDItrack.trackVolumePoints[vv];
-						let vol = '' + Math.round(gain.value * 100) + '%';
+						let vol = '' + Math.round(gain.value * 100 * volDrum.ratio) + '%';
+
 						let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
 						if (pnt) {
 							pnt.skip = MMUtil().set(pnt.skip).strip(16);
@@ -175,14 +179,24 @@ class EventsConverter {
 						, id: filterID
 					});
 				}
+			} else {
+				if (parsedMIDItrack.trackVolumePoints.length) {
+					let lastVolume = parsedMIDItrack.trackVolumePoints[parsedMIDItrack.trackVolumePoints.length - 1].value;
+					drumData = '' + Math.round(100 * volDrum.ratio * lastVolume) + '/' + volDrum.idx;
+				} else {
+					drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
+				}
+			}
+			if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
+				insOut = [];
 			}
 			//console.log(filterPitch);
 			let pp: Zvoog_PercussionTrack = {
-				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
+				title: '' + perTrackTitle//(1 + ii) + '. ' + parsedMIDItrack.trackTitle
 				, measures: []
 				, sampler: {
 					id: 'drum' + (ii + Math.random())
-					, data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx
+					, data: drumData//'' + (volDrum.ratio * 100) + '/' + volDrum.idx
 					, kind: 'miniumdrums1'
 					, outputs: insOut//[compresID]
 					, iconPosition: { x: left, y: top }
@@ -193,6 +207,17 @@ class EventsConverter {
 				pp.measures.push({ skips: [] });
 			}
 			project.percussions.push(pp);
+		}
+	}
+	hasVolumeAutomation(trackVolumePoints: { ms: number, value: number, channel: number }[]): boolean {
+		if (trackVolumePoints.length) {
+			if (trackVolumePoints[trackVolumePoints.length - 1].ms > 987) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
 		}
 	}
 	addInsTrack(project: Zvoog_Project, allTracks: MIDITrackInfo[], compresID: string) {
@@ -212,19 +237,23 @@ class EventsConverter {
 				}
 			}
 			let idxRatio = this.findVolumeInstrument(midiProgram);
+			//let volumeRatio = idxRatio.ratio;
 			let iidx = idxRatio.idx;
-
-			let insData = '100/' + iidx + '/0';
+			let intitle = '' + parsedMIDItrack.trackTitle + ': ' + new ChordPitchPerformerUtil().tonechordinslist()[midiProgram];
+			let imode = this.findModeInstrument(midiProgram);//Flat / Down / Up / Snap / Pong
+			let insData = '100/' + iidx + '/' + imode;
 			let insOut: string[] = [compresID];
-			if (parsedMIDItrack.trackVolumePoints.length > 1) {
+			//console.log(midiProgram, intitle, parsedMIDItrack.trackVolumePoints.length, this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints));
+			if (this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints)) {
+				//if (parsedMIDItrack.trackVolumePoints.length > 1) {
 				let filterID = 'fader' + Math.random();
 				let filterVolume: Zvoog_FilterTarget = {
 					id: filterID
-					, title: 'Fader for track ' + ii
+					, title: 'Fader for  ' + intitle
 					, kind: 'miniumfader1'
-					, data: '99'
+					, data: '' + (100 * idxRatio.ratio)
 					, outputs: [compresID]
-					, iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell *0.8}
+					, iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 }
 					, automation: []
 					, state: 0
 				};
@@ -235,7 +264,7 @@ class EventsConverter {
 				}
 				for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
 					let gain = parsedMIDItrack.trackVolumePoints[vv];
-					let vol = '' + Math.round(gain.value * 100) + '%';
+					let vol = '' + Math.round(gain.value * 100 * idxRatio.ratio) + '%';
 					let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
 					if (pnt) {
 						pnt.skip = MMUtil().set(pnt.skip).strip(16);
@@ -249,9 +278,20 @@ class EventsConverter {
 						filterVolume.automation[pnt.idx].changes.push({ skip: pnt.skip, stateBlob: vol });
 					}
 				}
+			} else {
+				if (parsedMIDItrack.trackVolumePoints.length) {
+					let lastVolume = parsedMIDItrack.trackVolumePoints[parsedMIDItrack.trackVolumePoints.length - 1].value;
+					insData = '' + Math.round(100 * idxRatio.ratio * lastVolume) + '/' + iidx + '/' + imode;
+				} else {
+					insData = '' + Math.round(idxRatio.ratio * 100) + '/' + iidx + '/' + imode;
+				}
+
+			}
+			if (midiProgram < 0 || midiProgram > 127) {
+				insOut = [];
 			}
 			let tt: Zvoog_MusicTrack = {
-				title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle
+				title: '' + intitle//(1 + ii) + '. ' + parsedMIDItrack.trackTitle
 				, measures: []
 				, performer: {
 					id: 'track' + (ii + Math.random())
@@ -271,6 +311,15 @@ class EventsConverter {
 			project.tracks.push(tt);
 		}
 	}
+	findModeInstrument(program: number): number {
+		if (program == 24) return 4;
+		if (program == 25) return 4;
+		if (program == 26) return 4;
+		if (program == 27) return 4;
+		if (program == 29) return 1;
+		if (program == 30) return 1;
+		return 0;
+	};
 	arrangeIcons(project: Zvoog_Project) {
 		//let wwCell = 7;
 		//let hhCell = 9;
@@ -285,16 +334,16 @@ class EventsConverter {
 			percus.sampler.iconPosition.x = ii * wwCell + tracksWidth;
 			percus.sampler.iconPosition.y = (8 * 12 + project.percussions.length) - ii * hhCell;
 		}*/
-		let perWidth = 9 * (8+project.percussions.length);
+		let perWidth = 9 * (8 + project.percussions.length);
 		/*for (let ii = 2; ii < project.filters.length; ii++) {
 			let filter = project.filters[ii];
 			filter.iconPosition.x = ii * wwCell + tracksWidth + perWidth;
 			filter.iconPosition.y = (ii - 2) * hhCell;
 		}*/
 		//let filtersWidth = wwCell * (project.filters.length - 0);
-		project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth ;
+		project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth;
 		project.filters[0].iconPosition.y = 1 * 9 + 66;
-		project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth ;
+		project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth;
 		project.filters[1].iconPosition.y = 2 * 9 + 11;
 	}
 	collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]) {
@@ -458,8 +507,14 @@ class EventsConverter {
 							});
 						}
 					} else {
-						let duration = MMUtil().set(measure.metre).calculate(note.baseDuration / 1000, measure.tempo).metre();
-						chord.slides = [{ duration: duration, delta: 0 }];
+						let duration = MMUtil().set(measure.metre).calculate(note.baseDuration / 1000, measure.tempo);
+						if (duration.less({ count: 1, part: 16 })) {
+							duration.set({ count: 1, part: 16 });
+						}
+						if (duration.more({ count: 4, part: 1 })) {
+							duration.set({ count: 4, part: 1 });
+						}
+						chord.slides = [{ duration: duration.metre(), delta: 0 }];
 					}
 				}
 				return;
@@ -504,12 +559,12 @@ class EventsConverter {
 				return ii;
 			}
 		}
-		let title:string='';
+		let title: string = '';
 		if (trackVolumePoints) {
-			
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title:title,trackVolumePoints: trackVolumePoints });
+
+			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: trackVolumePoints });
 		} else {
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel,  title:title,trackVolumePoints: [] });
+			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: [] });
 		}
 		//console.log(allTracks.length);
 		return allTracks.length - 1;
@@ -522,11 +577,11 @@ class EventsConverter {
 				return ii;
 			}
 		}
-		let title:string='';
+		let title: string = '';
 		if (trackVolumePoints) {
-			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch,  title:title,trackVolumePoints: trackVolumePoints });
+			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, title: title, trackVolumePoints: trackVolumePoints });
 		} else {
-			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch,  title:title,trackVolumePoints: [] });
+			allPercussions.push({ midiTrack: midiTrack, midiPitch: midiPitch, title: title, trackVolumePoints: [] });
 		}
 		return allPercussions.length - 1;
 	}

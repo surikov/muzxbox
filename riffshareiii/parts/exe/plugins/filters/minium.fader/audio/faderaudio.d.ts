@@ -9,6 +9,7 @@ interface Zvoog_MetreMathType {
     metre(): Zvoog_Metre;
     simplyfy(): Zvoog_MetreMathType;
     strip(toPart: number): Zvoog_MetreMathType;
+    floor(toPart: number): Zvoog_MetreMathType;
     equals(metre: Zvoog_Metre): boolean;
     less(metre: Zvoog_Metre): boolean;
     more(metre: Zvoog_Metre): boolean;
@@ -153,6 +154,13 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
+    menuPerformers: boolean;
+    menuSamplers: boolean;
+    menuFilters: boolean;
+    menuActions: boolean;
+    menuPlugins: boolean;
+    menuClipboard: boolean;
+    menuSettings: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -161,16 +169,18 @@ declare type MZXBX_CachedWave = {
     line100?: number[];
 };
 declare type MZXBX_FilterHolder = {
-    plugin: MZXBX_AudioFilterPlugin | null;
+    pluginAudioFilter: MZXBX_AudioFilterPlugin | null;
     filterId: string;
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_PerformerSamplerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channelId: string;
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_Channel = {
     id: string;
@@ -203,6 +213,7 @@ declare type MZXBX_Filter = {
     kind: string;
     properties: string;
     outputs: string[];
+    description: string;
 };
 declare type MZXBX_AudioFilterPlugin = {
     launch: (context: AudioContext, parameters: string) => void;
@@ -222,6 +233,7 @@ declare type MZXBX_AudioSamplerPlugin = {
 declare type MZXBX_ChannelSource = {
     kind: string;
     properties: string;
+    description: string;
 };
 declare type MZXBX_AudioPerformerPlugin = {
     launch: (context: AudioContext, parameters: string) => void;

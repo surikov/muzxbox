@@ -440,14 +440,6 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
-    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -462,6 +454,14 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
+    }
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
     }
 }
 var LogLevel;
@@ -3538,6 +3538,11 @@ class Chord {
     }
 }
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3638,11 +3643,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,6 +8893,10 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8908,10 +8912,6 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
-    get inputCrc() {
-        return this._engine.inputCrc.value;
-    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
+    }
+    get inputCrc() {
+        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,6 +9591,16 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
+    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9619,16 +9629,6 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
-    }
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,13 +9951,6 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
-    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9976,6 +9969,13 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
+    }
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
-    get isFlushed() {
-        return this._end === 0;
-    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
+    }
+    get isFlushed() {
+        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -15437,15 +15437,16 @@ class EventsConverter {
     addPercussionTrack(project, allPercussions, compresID) {
         let filterPitch = [];
         let wwCell = 9;
-        let hhCell = 3;
+        let hhCell = 2;
         for (let ii = 0; ii < allPercussions.length; ii++) {
             let left = 9 * (ii + 11 + project.tracks.length);
             let top = (8 * 12 + 2 * project.percussions.length) + ii * hhCell - allPercussions.length * hhCell;
             let volDrum = this.findVolumeDrum(allPercussions[ii].midiPitch);
             let parsedMIDItrack = this.parser.parsedTracks[allPercussions[ii].midiTrack];
-            let drumData = '99';
+            let drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
             let insOut = [compresID];
-            if (parsedMIDItrack.trackVolumePoints.length > 1) {
+            let perTrackTitle = '' + parsedMIDItrack.trackTitle + ': ' + allPercussionDrumTitles()[allPercussions[ii].midiPitch];
+            if (this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints)) {
                 let filterID = '';
                 for (let ff = 0; ff < filterPitch.length; ff++) {
                     if (filterPitch[ff].track == allPercussions[ii].midiTrack) {
@@ -15460,9 +15461,9 @@ class EventsConverter {
                     filterID = 'drumfader' + Math.random();
                     let filterVolume = {
                         id: filterID,
-                        title: 'Fader ' + allPercussions[ii].midiTrack + '/' + allPercussions[ii].midiPitch,
+                        title: 'Fader for ' + perTrackTitle,
                         kind: 'miniumfader1',
-                        data: drumData,
+                        data: '' + (100 * volDrum.ratio),
                         outputs: [compresID],
                         iconPosition: { x: left + 7 * wwCell, y: top },
                         automation: [],
@@ -15475,7 +15476,7 @@ class EventsConverter {
                     }
                     for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
                         let gain = parsedMIDItrack.trackVolumePoints[vv];
-                        let vol = '' + Math.round(gain.value * 100) + '%';
+                        let vol = '' + Math.round(gain.value * 100 * volDrum.ratio) + '%';
                         let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
                         if (pnt) {
                             pnt.skip = MMUtil().set(pnt.skip).strip(16);
@@ -15496,12 +15497,24 @@ class EventsConverter {
                     });
                 }
             }
+            else {
+                if (parsedMIDItrack.trackVolumePoints.length) {
+                    let lastVolume = parsedMIDItrack.trackVolumePoints[parsedMIDItrack.trackVolumePoints.length - 1].value;
+                    drumData = '' + Math.round(100 * volDrum.ratio * lastVolume) + '/' + volDrum.idx;
+                }
+                else {
+                    drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
+                }
+            }
+            if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
+                insOut = [];
+            }
             let pp = {
-                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
+                title: '' + perTrackTitle,
                 measures: [],
                 sampler: {
                     id: 'drum' + (ii + Math.random()),
-                    data: '' + (volDrum.ratio * 100) + '/' + volDrum.idx,
+                    data: drumData,
                     kind: 'miniumdrums1',
                     outputs: insOut,
                     iconPosition: { x: left, y: top },
@@ -15512,6 +15525,19 @@ class EventsConverter {
                 pp.measures.push({ skips: [] });
             }
             project.percussions.push(pp);
+        }
+    }
+    hasVolumeAutomation(trackVolumePoints) {
+        if (trackVolumePoints.length) {
+            if (trackVolumePoints[trackVolumePoints.length - 1].ms > 987) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        else {
+            return false;
         }
     }
     addInsTrack(project, allTracks, compresID) {
@@ -15532,15 +15558,17 @@ class EventsConverter {
             }
             let idxRatio = this.findVolumeInstrument(midiProgram);
             let iidx = idxRatio.idx;
-            let insData = '100/' + iidx + '/0';
+            let intitle = '' + parsedMIDItrack.trackTitle + ': ' + new ChordPitchPerformerUtil().tonechordinslist()[midiProgram];
+            let imode = this.findModeInstrument(midiProgram);
+            let insData = '100/' + iidx + '/' + imode;
             let insOut = [compresID];
-            if (parsedMIDItrack.trackVolumePoints.length > 1) {
+            if (this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints)) {
                 let filterID = 'fader' + Math.random();
                 let filterVolume = {
                     id: filterID,
-                    title: 'Fader for track ' + ii,
+                    title: 'Fader for  ' + intitle,
                     kind: 'miniumfader1',
-                    data: '99',
+                    data: '' + (100 * idxRatio.ratio),
                     outputs: [compresID],
                     iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 },
                     automation: [],
@@ -15553,7 +15581,7 @@ class EventsConverter {
                 }
                 for (let vv = 0; vv < parsedMIDItrack.trackVolumePoints.length; vv++) {
                     let gain = parsedMIDItrack.trackVolumePoints[vv];
-                    let vol = '' + Math.round(gain.value * 100) + '%';
+                    let vol = '' + Math.round(gain.value * 100 * idxRatio.ratio) + '%';
                     let pnt = this.findMeasureSkipByTime(gain.ms / 1000, project.timeline);
                     if (pnt) {
                         pnt.skip = MMUtil().set(pnt.skip).strip(16);
@@ -15568,8 +15596,20 @@ class EventsConverter {
                     }
                 }
             }
+            else {
+                if (parsedMIDItrack.trackVolumePoints.length) {
+                    let lastVolume = parsedMIDItrack.trackVolumePoints[parsedMIDItrack.trackVolumePoints.length - 1].value;
+                    insData = '' + Math.round(100 * idxRatio.ratio * lastVolume) + '/' + iidx + '/' + imode;
+                }
+                else {
+                    insData = '' + Math.round(idxRatio.ratio * 100) + '/' + iidx + '/' + imode;
+                }
+            }
+            if (midiProgram < 0 || midiProgram > 127) {
+                insOut = [];
+            }
             let tt = {
-                title: '' + (1 + ii) + '. ' + parsedMIDItrack.trackTitle,
+                title: '' + intitle,
                 measures: [],
                 performer: {
                     id: 'track' + (ii + Math.random()),
@@ -15586,6 +15626,22 @@ class EventsConverter {
             project.tracks.push(tt);
         }
     }
+    findModeInstrument(program) {
+        if (program == 24)
+            return 4;
+        if (program == 25)
+            return 4;
+        if (program == 26)
+            return 4;
+        if (program == 27)
+            return 4;
+        if (program == 29)
+            return 1;
+        if (program == 30)
+            return 1;
+        return 0;
+    }
+    ;
     arrangeIcons(project) {
         let tracksWidth = 9 * (8 + project.tracks.length);
         let perWidth = 9 * (8 + project.percussions.length);
@@ -15754,8 +15810,14 @@ class EventsConverter {
                         }
                     }
                     else {
-                        let duration = MMUtil().set(measure.metre).calculate(note.baseDuration / 1000, measure.tempo).metre();
-                        chord.slides = [{ duration: duration, delta: 0 }];
+                        let duration = MMUtil().set(measure.metre).calculate(note.baseDuration / 1000, measure.tempo);
+                        if (duration.less({ count: 1, part: 16 })) {
+                            duration.set({ count: 1, part: 16 });
+                        }
+                        if (duration.more({ count: 4, part: 1 })) {
+                            duration.set({ count: 4, part: 1 });
+                        }
+                        chord.slides = [{ duration: duration.metre(), delta: 0 }];
                     }
                 }
                 return;
