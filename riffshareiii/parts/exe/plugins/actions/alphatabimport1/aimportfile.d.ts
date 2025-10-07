@@ -2442,6 +2442,11 @@ declare type TicksAverageTime = {
     items: number[];
 };
 declare class MidiParser {
+    aligned: {
+        startMs: number;
+        avg: number;
+        events: MIDIEvent[];
+    }[];
     midiheader: MIDIFileHeader;
     parsedTracks: MIDIFileTrack[];
     instrumentNamesArray: string[];
@@ -2568,6 +2573,7 @@ declare class MIDIFileHeader {
         ms: number;
         count: number;
         division: number;
+        evnt: MIDIEvent | null;
     }[];
     lyricsList: {
         track: number;
@@ -2630,6 +2636,10 @@ declare class EventsConverter {
     parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(name: string): Zvoog_Project;
+    findMIDITempoBefore(ms: number): number;
+    findMIDIMeterBefore(ms: number): Zvoog_Metre;
+    findNearestPoint(ms: number): number;
+    fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]): void;
     addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string): void;
     hasVolumeAutomation(trackVolumePoints: {
         ms: number;

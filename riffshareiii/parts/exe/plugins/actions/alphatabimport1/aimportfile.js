@@ -14523,6 +14523,7 @@ MusicXmlImporter.allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiU
 let pluckDiff = 23;
 class MidiParser {
     constructor(arrayBuffer) {
+        this.aligned = [];
         this.instrumentNamesArray = [];
         this.drumNamesArray = [];
         this.EVENT_META = 0xff;
@@ -14838,7 +14839,7 @@ class MidiParser {
                     if (trevnt.basetype === this.EVENT_META) {
                         if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
                             tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
-                            this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempo ? trevnt.tempo : 12, trevnt);
+                            this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempoBPM ? trevnt.tempoBPM : 12, trevnt);
                         }
                     }
                 }
@@ -14848,7 +14849,6 @@ class MidiParser {
     alignEventsTime() {
         let maxDelta = 23;
         let starts = [];
-        let aligned = [];
         for (let tt = 0; tt < this.parsedTracks.length; tt++) {
             var singleParsedTrack = this.parsedTracks[tt];
             for (var ee = 0; ee < singleParsedTrack.trackevents.length; ee++) {
@@ -14863,28 +14863,28 @@ class MidiParser {
         starts.sort((a, b) => { return a.playTimeMs - b.playTimeMs; });
         if (starts.length) {
             let evnt = starts[0];
-            aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+            this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
             for (let ee = 1; ee < starts.length; ee++) {
                 let evnt = starts[ee];
-                let last = aligned[aligned.length - 1];
+                let last = this.aligned[this.aligned.length - 1];
                 let pretime = last.events[last.events.length - 1].playTimeMs;
                 if (evnt.playTimeMs < pretime + maxDelta) {
                     last.events.push(evnt);
                 }
                 else {
-                    aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+                    this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
                 }
             }
-            for (let ii = 0; ii < aligned.length; ii++) {
+            for (let ii = 0; ii < this.aligned.length; ii++) {
                 let smm = 0;
-                for (ee = 0; ee < aligned[ii].events.length; ee++) {
-                    smm = smm + aligned[ii].events[ee].playTimeMs;
+                for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
+                    smm = smm + this.aligned[ii].events[ee].playTimeMs;
                 }
-                aligned[ii].avg = Math.round(smm / aligned[ii].events.length);
+                this.aligned[ii].avg = Math.round(smm / this.aligned[ii].events.length);
             }
-            for (let ii = 0; ii < aligned.length; ii++) {
-                for (ee = 0; ee < aligned[ii].events.length; ee++) {
-                    aligned[ii].events[ee].playTimeMs = aligned[ii].avg;
+            for (let ii = 0; ii < this.aligned.length; ii++) {
+                for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
+                    this.aligned[ii].events[ee].playTimeMs = this.aligned[ii].avg;
                 }
             }
         }
@@ -15094,7 +15094,8 @@ class MidiParser {
                             this.midiheader.meterDivision = 1;
                         this.midiheader.metersList.push({
                             track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
-                            count: this.midiheader.meterCount, division: this.midiheader.meterDivision
+                            count: this.midiheader.meterCount, division: this.midiheader.meterDivision,
+                            evnt: evnt
                         });
                     }
                 }
@@ -15432,17 +15433,7 @@ class EventsConverter {
         let allTracks = [];
         let allPercussions = [];
         this.collectNotes(allNotes, allTracks, allPercussions);
-        let lastMs = allNotes[allNotes.length - 1].startMs;
-        let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
-        for (let ii = 0; ii < barCount; ii++) {
-            project.timeline.push({
-                tempo: 120,
-                metre: {
-                    count: 4,
-                    part: 4
-                }
-            });
-        }
+        this.fillTimeline(project, allNotes);
         let echoOutID = 'reverberation';
         let compresID = 'compression';
         let filterEcho = {
@@ -15479,6 +15470,51 @@ class EventsConverter {
         this.addComments(project);
         this.arrangeIcons(project);
         return project;
+    }
+    findMIDITempoBefore(ms) {
+        for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
+            if (this.parser.midiheader.changesResolutionTempo[ii].ms <= ms + 123) {
+                return this.parser.midiheader.changesResolutionTempo[ii].bpm;
+            }
+        }
+        return 120;
+    }
+    findMIDIMeterBefore(ms) {
+        for (var ii = this.parser.midiheader.metersList.length - 1; ii >= 0; ii--) {
+            if (this.parser.midiheader.metersList[ii].ms <= ms + 123) {
+                return {
+                    count: this.parser.midiheader.metersList[ii].count,
+                    part: this.parser.midiheader.metersList[ii].division
+                };
+            }
+        }
+        return { count: 4, part: 4 };
+    }
+    findNearestPoint(ms) {
+        let timeMs = -1;
+        for (let aa = 0; aa < this.parser.aligned.length; aa++) {
+            if (timeMs < 0 || Math.abs(this.parser.aligned[aa].avg - ms) < Math.abs(timeMs - ms)) {
+                timeMs = this.parser.aligned[aa].avg;
+            }
+        }
+        return timeMs;
+    }
+    fillTimeline(project, allNotes) {
+        console.log('tempo', this.parser.midiheader.changesResolutionTempo);
+        console.log('meter', this.parser.midiheader.metersList);
+        let lastMs = allNotes[allNotes.length - 1].startMs;
+        let wholeDurationMs = 0;
+        while (wholeDurationMs < lastMs) {
+            let tempo = this.findMIDITempoBefore(wholeDurationMs);
+            let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
+            let barDurationMs = meter.duration(tempo) * 1000;
+            let nextBar = { tempo: tempo, metre: meter.metre() };
+            project.timeline.push(nextBar);
+            console.log(wholeDurationMs, nextBar, wholeDurationMs + barDurationMs, this.findNearestPoint(wholeDurationMs + barDurationMs));
+            if (barDurationMs < 123)
+                barDurationMs = 123;
+            wholeDurationMs = wholeDurationMs + barDurationMs;
+        }
     }
     addPercussionTrack(project, allPercussions, compresID) {
         let filterPitch = [];

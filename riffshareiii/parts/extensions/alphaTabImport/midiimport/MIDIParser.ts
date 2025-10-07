@@ -9,6 +9,7 @@ type PP = {
 let pluckDiff = 23;
 type TicksAverageTime = { avgstartms: number, items: number[] };
 class MidiParser {
+	aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 	midiheader: MIDIFileHeader;
 	parsedTracks: MIDIFileTrack[];
 	instrumentNamesArray: string[] = [];
@@ -549,7 +550,7 @@ class MidiParser {
 						// tempo change events
 						if (trevnt.subtype === this.EVENT_META_SET_TEMPO) {
 							tickResolution = this.midiheader.getCalculatedTickResolution(trevnt.tempo ? trevnt.tempo : 0);
-							this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempo ? trevnt.tempo : 12, trevnt);
+							this.addResolutionPoint(-1, playTime, tickResolution, trevnt.tempoBPM ? trevnt.tempoBPM : 12, trevnt);
 						}
 					}
 
@@ -563,7 +564,7 @@ class MidiParser {
 	alignEventsTime() {
 		let maxDelta = 23;
 		let starts: MIDIEvent[] = [];
-		let aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
+		//let aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[tt];
 			for (var ee = 0; ee < singleParsedTrack.trackevents.length; ee++) {
@@ -579,28 +580,28 @@ class MidiParser {
 		//console.log(starts);
 		if (starts.length) {
 			let evnt = starts[0];
-			aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+			this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
 			for (let ee = 1; ee < starts.length; ee++) {
 				let evnt = starts[ee];
-				let last = aligned[aligned.length - 1];
+				let last = this.aligned[this.aligned.length - 1];
 				let pretime = last.events[last.events.length - 1].playTimeMs;
 				if (evnt.playTimeMs < pretime + maxDelta) {
 					last.events.push(evnt);
 				} else {
-					aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+					this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
 				}
 			}
-			for (let ii = 0; ii < aligned.length; ii++) {
+			for (let ii = 0; ii < this.aligned.length; ii++) {
 				let smm = 0;
-				for (ee = 0; ee < aligned[ii].events.length; ee++) {
-					smm = smm + aligned[ii].events[ee].playTimeMs;
+				for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
+					smm = smm + this.aligned[ii].events[ee].playTimeMs;
 				}
-				aligned[ii].avg = Math.round(smm / aligned[ii].events.length);
+				this.aligned[ii].avg = Math.round(smm / this.aligned[ii].events.length);
 			}
 			//console.log(aligned);
-			for (let ii = 0; ii < aligned.length; ii++) {
-				for (ee = 0; ee < aligned[ii].events.length; ee++) {
-					aligned[ii].events[ee].playTimeMs=aligned[ii].avg;
+			for (let ii = 0; ii < this.aligned.length; ii++) {
+				for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
+					this.aligned[ii].events[ee].playTimeMs = this.aligned[ii].avg;
 				}
 			}
 		}
@@ -825,6 +826,7 @@ class MidiParser {
 						this.midiheader.metersList.push({
 							track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
 							, count: this.midiheader.meterCount, division: this.midiheader.meterDivision
+							, evnt: evnt
 						});
 					}
 				}

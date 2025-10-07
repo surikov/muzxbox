@@ -60,17 +60,7 @@ class EventsConverter {
 		//console.log(allNotes);
 		//console.log(allTracks);
 		//console.log(allPercussions);
-		let lastMs = allNotes[allNotes.length - 1].startMs;
-		let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
-		for (let ii = 0; ii < barCount; ii++) {
-			project.timeline.push({
-				tempo: 120
-				, metre: {
-					count: 4
-					, part: 4
-				}
-			});
-		}
+		this.fillTimeline(project, allNotes);
 
 		let echoOutID = 'reverberation';
 		let compresID = 'compression';
@@ -112,6 +102,72 @@ class EventsConverter {
 		this.arrangeIcons(project);
 		return project;
 	}
+	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
+		let ss = 0;
+		for (let tt = 0; tt < timeline.length; tt++) {
+			let bar = timeline[tt];
+			ss = ss + MMUtil().set(bar.metre).duration(bar.tempo);
+		}
+		return ss;
+	}*/
+	findMIDITempoBefore(ms: number): number {
+		for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
+			if (this.parser.midiheader.changesResolutionTempo[ii].ms <= ms + 123) {
+				return this.parser.midiheader.changesResolutionTempo[ii].bpm;
+			}
+		}
+		return 120;
+	}
+	findMIDIMeterBefore(ms: number): Zvoog_Metre {
+		for (var ii = this.parser.midiheader.metersList.length - 1; ii >= 0; ii--) {
+			if (this.parser.midiheader.metersList[ii].ms <= ms + 123) {
+				//return this.parser.midiheader.changesResolutionTempo[ii].bpm;
+				return {
+					count: this.parser.midiheader.metersList[ii].count
+					, part: this.parser.midiheader.metersList[ii].division
+				};
+			}
+		}
+		return { count: 4, part: 4 };
+	}
+	findNearestPoint(ms: number) {
+		let timeMs = -1;
+		for (let aa = 0; aa < this.parser.aligned.length; aa++) {
+			if (timeMs < 0 || Math.abs(this.parser.aligned[aa].avg - ms) < Math.abs(timeMs - ms)) {
+				timeMs = this.parser.aligned[aa].avg;
+			}
+		}
+		return timeMs;
+	}
+	fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]) {
+		console.log('tempo', this.parser.midiheader.changesResolutionTempo);
+		console.log('meter', this.parser.midiheader.metersList);
+		let lastMs = allNotes[allNotes.length - 1].startMs;
+		let wholeDurationMs = 0;
+		while (wholeDurationMs < lastMs) {
+
+			let tempo = this.findMIDITempoBefore(wholeDurationMs);
+			let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
+			let barDurationMs = meter.duration(tempo) * 1000;
+
+			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre() };
+			project.timeline.push(nextBar);
+			console.log(wholeDurationMs, nextBar, wholeDurationMs + barDurationMs, this.findNearestPoint(wholeDurationMs + barDurationMs));
+			if (barDurationMs < 123) barDurationMs = 123;
+			wholeDurationMs = wholeDurationMs + barDurationMs;//this.wholeTimelineDuration(project.timeline) * 1000;
+		}
+		/*let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
+		for (let ii = 0; ii < barCount; ii++) {
+			project.timeline.push({
+				tempo: 120
+				, metre: {
+					count: 4
+					, part: 4
+				}
+			});
+		}*/
+	}
+
 	addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string) {
 		let filterPitch: { track: number, pitch: number, id: string }[] = [];
 		//console.log(project);
