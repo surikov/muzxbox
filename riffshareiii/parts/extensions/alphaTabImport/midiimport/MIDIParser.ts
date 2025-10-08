@@ -605,12 +605,13 @@ class MidiParser {
 				}
 			}
 		}
+		
 	}
 	parseNotes() {
-		console.log('parseNotes');
+		//console.log('parseNotes');
 		this.fillEventsTimeMs();
 		this.alignEventsTime();
-		console.log(this.midiheader.changesResolutionTempo);
+		//console.log(this.midiheader.changesResolutionTempo);
 		//this.dumpResolutionChanges();
 		// counts which pitch-bend range message can be expected next
 		//: number 1 (can be sent any time, except after pitch-bend range messages number 1 or 2)

@@ -14890,10 +14890,8 @@ class MidiParser {
         }
     }
     parseNotes() {
-        console.log('parseNotes');
         this.fillEventsTimeMs();
         this.alignEventsTime();
-        console.log(this.midiheader.changesResolutionTempo);
         var expectedState = 1;
         var expectedPitchBendRangeChannel = null;
         var pitchBendValuesRange = Array(16).fill(2);
@@ -15469,6 +15467,17 @@ class EventsConverter {
         }
         this.addComments(project);
         this.arrangeIcons(project);
+        for (let ii = 5; ii < this.parser.aligned.length; ii++) {
+            let avgcount = (this.parser.aligned[ii - 1].events.length
+                + this.parser.aligned[ii - 2].events.length
+                + this.parser.aligned[ii - 3].events.length
+                + this.parser.aligned[ii - 4].events.length
+                + this.parser.aligned[ii - 5].events.length) / 5;
+            if (this.parser.aligned[ii].events.length > avgcount * 2.9) {
+                console.log(avgcount, this.parser.aligned[ii]);
+            }
+        }
+        console.log('aligned', this.parser.aligned);
         return project;
     }
     findMIDITempoBefore(ms) {
@@ -15493,11 +15502,18 @@ class EventsConverter {
     findNearestPoint(ms) {
         let timeMs = -1;
         for (let aa = 0; aa < this.parser.aligned.length; aa++) {
-            if (timeMs < 0 || Math.abs(this.parser.aligned[aa].avg - ms) < Math.abs(timeMs - ms)) {
-                timeMs = this.parser.aligned[aa].avg;
+            let avg = this.parser.aligned[aa].avg;
+            if ((timeMs < 0 || Math.abs(avg - ms) < Math.abs(timeMs - ms))
+                && Math.abs(avg - ms) < 123) {
+                timeMs = avg;
             }
         }
-        return timeMs;
+        if (timeMs < 0) {
+            return ms;
+        }
+        else {
+            return timeMs;
+        }
     }
     fillTimeline(project, allNotes) {
         console.log('tempo', this.parser.midiheader.changesResolutionTempo);
@@ -15510,10 +15526,12 @@ class EventsConverter {
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = { tempo: tempo, metre: meter.metre() };
             project.timeline.push(nextBar);
-            console.log(wholeDurationMs, nextBar, wholeDurationMs + barDurationMs, this.findNearestPoint(wholeDurationMs + barDurationMs));
-            if (barDurationMs < 123)
-                barDurationMs = 123;
-            wholeDurationMs = wholeDurationMs + barDurationMs;
+            if (barDurationMs < 431)
+                barDurationMs = 431;
+            let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
+            let nearestBarMs = nearestDurationMs - wholeDurationMs;
+            nextBar.tempo = tempo * barDurationMs / nearestBarMs;
+            wholeDurationMs = wholeDurationMs + nearestBarMs;
         }
     }
     addPercussionTrack(project, allPercussions, compresID) {
@@ -15869,7 +15887,7 @@ class EventsConverter {
                 let insidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
                 let instrack = tracks[insidx];
                 let noteStartMs = note.startMs - barStart;
-                let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+                let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
                 let chord = this.takeChord(instrack.measures[ii], when);
                 chord.pitches.push(note.basePitch);
                 if (chord.slides.length == 0 || chord.slides.length == 1) {
@@ -15916,7 +15934,7 @@ class EventsConverter {
                 let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch, null);
                 let pertrack = percussions[peridx];
                 let noteStartMs = note.startMs - barStart;
-                let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+                let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
                 pertrack.measures[ii].skips.push(when);
                 return;
             }

@@ -98,8 +98,25 @@ class EventsConverter {
 				this.addTrackNote(project.tracks, project.timeline, allTracks, it);
 			}
 		}
+
 		this.addComments(project);
 		this.arrangeIcons(project);
+
+		//this.parser.aligned.sort((a, b) => { return b.events.length - a.events.length });
+		for (let ii = 5; ii < this.parser.aligned.length; ii++) {
+			let avgcount = (this.parser.aligned[ii - 1].events.length
+				+ this.parser.aligned[ii - 2].events.length
+				+ this.parser.aligned[ii - 3].events.length
+				+ this.parser.aligned[ii - 4].events.length
+				+ this.parser.aligned[ii - 5].events.length
+			) / 5;
+			if (this.parser.aligned[ii].events.length > avgcount * 2.9) {
+				console.log(avgcount, this.parser.aligned[ii]);
+			}
+		}
+
+		console.log('aligned', this.parser.aligned);
+
 		return project;
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
@@ -130,14 +147,22 @@ class EventsConverter {
 		}
 		return { count: 4, part: 4 };
 	}
-	findNearestPoint(ms: number) {
+	findNearestPoint(ms: number): number {
 		let timeMs = -1;
 		for (let aa = 0; aa < this.parser.aligned.length; aa++) {
-			if (timeMs < 0 || Math.abs(this.parser.aligned[aa].avg - ms) < Math.abs(timeMs - ms)) {
-				timeMs = this.parser.aligned[aa].avg;
+			let avg = this.parser.aligned[aa].avg;
+			if ((timeMs < 0 || Math.abs(avg - ms) < Math.abs(timeMs - ms))
+				&& Math.abs(avg - ms) < 123
+			) {
+				//console.log(timeMs,avg,ms);
+				timeMs = avg;
 			}
 		}
-		return timeMs;
+		if (timeMs < 0) {
+			return ms;
+		} else {
+			return timeMs;
+		}
 	}
 	fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]) {
 		console.log('tempo', this.parser.midiheader.changesResolutionTempo);
@@ -152,9 +177,16 @@ class EventsConverter {
 
 			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre() };
 			project.timeline.push(nextBar);
-			console.log(wholeDurationMs, nextBar, wholeDurationMs + barDurationMs, this.findNearestPoint(wholeDurationMs + barDurationMs));
-			if (barDurationMs < 123) barDurationMs = 123;
-			wholeDurationMs = wholeDurationMs + barDurationMs;//this.wholeTimelineDuration(project.timeline) * 1000;
+
+			if (barDurationMs < 431) barDurationMs = 431;
+			//wholeDurationMs = wholeDurationMs + barDurationMs;//this.wholeTimelineDuration(project.timeline) * 1000;
+			//console.log(wholeDurationMs, nextBar, wholeDurationMs, this.findNearestPoint(wholeDurationMs));
+			let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
+			let nearestBarMs = nearestDurationMs - wholeDurationMs;
+			//console.log(wholeDurationMs, barDurationMs, '->', nearestBarMs);
+			//wholeDurationMs = wholeDurationMs + barDurationMs;
+			nextBar.tempo = tempo * barDurationMs / nearestBarMs;
+			wholeDurationMs = wholeDurationMs + nearestBarMs;
 		}
 		/*let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
 		for (let ii = 0; ii < barCount; ii++) {
@@ -537,7 +569,7 @@ class EventsConverter {
 				let insidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
 				let instrack = tracks[insidx];
 				let noteStartMs = note.startMs - barStart;
-				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
 				//console.log(tracks, insidx, instrack);
 				//instrack.measures[ii]..skips.push(when);
 				let chord = this.takeChord(instrack.measures[ii], when);
@@ -588,7 +620,7 @@ class EventsConverter {
 				let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch, null);
 				let pertrack = percussions[peridx];
 				let noteStartMs = note.startMs - barStart;
-				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).metre();
+				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
 				//console.log(peridx,pertrack);
 				pertrack.measures[ii].skips.push(when);
 				return;
