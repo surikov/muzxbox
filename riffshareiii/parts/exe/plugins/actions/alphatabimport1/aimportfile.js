@@ -15391,20 +15391,23 @@ class DataViewStream {
     }
 }
 class MIDIReader {
-    constructor(filename, arrayBuffer) {
+    constructor(filename, filesize, arrayBuffer) {
         let parser = new MidiParser(arrayBuffer);
         console.log(parser);
         let converter = new EventsConverter(parser);
-        let project = converter.convertEvents(filename);
+        let project = converter.convertEvents(filename, filesize);
         console.log(project);
         parsedProject = project;
     }
 }
 class EventsConverter {
     constructor(parser) {
+        this.midiFileInfo = { fileName: '', fileSize: 0, duration: 0 };
         this.parser = parser;
     }
-    convertEvents(name) {
+    convertEvents(name, filesize) {
+        this.midiFileInfo.fileName = name;
+        this.midiFileInfo.fileSize = filesize;
         let project = {
             title: name,
             timeline: [],
@@ -15474,11 +15477,21 @@ class EventsConverter {
                 + this.parser.aligned[ii - 4].events.length
                 + this.parser.aligned[ii - 5].events.length) / 5;
             if (this.parser.aligned[ii].events.length > avgcount * 2.9) {
-                console.log(avgcount, this.parser.aligned[ii]);
             }
         }
+        console.log('allNotes', allNotes);
         console.log('aligned', this.parser.aligned);
+        this.fillInfoNotesDuration(allNotes);
+        console.log(this.midiFileInfo);
         return project;
+    }
+    fillInfoNotesDuration(allNotes) {
+        let sortedIns = allNotes.sort((a, b) => b.baseDuration - a.baseDuration);
+        let ins90 = sortedIns.filter((element, index) => index > 0.05 * sortedIns.length && index < 0.95 * sortedIns.length);
+        let insMedian = ins90.reduce((last, it) => last + it.baseDuration, 0) / ins90.length;
+        let insMin = ins90[ins90.length - 1].baseDuration;
+        let insMax = ins90[0].baseDuration;
+        console.log('ins', insMin, insMedian, insMax);
     }
     findMIDITempoBefore(ms) {
         for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
@@ -15519,6 +15532,7 @@ class EventsConverter {
         console.log('tempo', this.parser.midiheader.changesResolutionTempo);
         console.log('meter', this.parser.midiheader.metersList);
         let lastMs = allNotes[allNotes.length - 1].startMs;
+        this.midiFileInfo.duration = lastMs;
         let wholeDurationMs = 0;
         while (wholeDurationMs < lastMs) {
             let tempo = this.findMIDITempoBefore(wholeDurationMs);
@@ -16022,6 +16036,7 @@ class FileLoaderAlpha {
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
+        console.log('read', file);
         fileReader.onload = function (progressEvent) {
             if (progressEvent != null) {
                 let title = file.name;
@@ -16085,7 +16100,7 @@ class FileLoaderAlpha {
                             }
                             else {
                                 if (path.endsWith('.mid')) {
-                                    let mireader = new MIDIReader(title, arrayBuffer);
+                                    let mireader = new MIDIReader(file.name, file.size, arrayBuffer);
                                 }
                                 else {
                                     console.log('wrong path', path);

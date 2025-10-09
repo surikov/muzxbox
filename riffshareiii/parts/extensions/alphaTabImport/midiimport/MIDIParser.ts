@@ -102,6 +102,12 @@ class MidiParser {
 			this.parseTrackEvents(this.parsedTracks[i]);
 		}
 		this.parseNotes();
+		/*if (this.midiheader.metersList.length > 1) {
+			if (this.midiheader.metersList[1].ms < 4321) {
+				this.midiheader.metersList[0].count = this.midiheader.metersList[1].count
+				this.midiheader.metersList[0].division = this.midiheader.metersList[1].division
+			}
+		}*/
 		this.simplifyAllBendPaths();
 	}
 	toText(arr: number[]): string {
@@ -605,7 +611,7 @@ class MidiParser {
 				}
 			}
 		}
-		
+
 	}
 	parseNotes() {
 		//console.log('parseNotes');

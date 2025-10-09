@@ -2610,7 +2610,7 @@ declare class DataViewStream {
     end(): boolean;
 }
 declare class MIDIReader {
-    constructor(filename: string, arrayBuffer: ArrayBuffer);
+    constructor(filename: string, filesize: number, arrayBuffer: ArrayBuffer);
 }
 declare type MIDITrackInfo = {
     midiTrack: number;
@@ -2632,10 +2632,17 @@ declare type MIDIDrumInfo = {
     }[];
     title: string;
 };
+declare type MIDIFileInfo = {
+    fileName: string;
+    fileSize: number;
+    duration: number;
+};
 declare class EventsConverter {
+    midiFileInfo: MIDIFileInfo;
     parser: MidiParser;
     constructor(parser: MidiParser);
-    convertEvents(name: string): Zvoog_Project;
+    convertEvents(name: string, filesize: number): Zvoog_Project;
+    fillInfoNotesDuration(allNotes: TrackNote[]): void;
     findMIDITempoBefore(ms: number): number;
     findMIDIMeterBefore(ms: number): Zvoog_Metre;
     findNearestPoint(ms: number): number;

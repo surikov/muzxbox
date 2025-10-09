@@ -5,7 +5,7 @@ class FileLoaderAlpha {
 		var file = inputFile.files[0];
 		var fileReader = new FileReader();
 		let me = this;
-
+		console.log('read', file);
 
 		fileReader.onload = function (progressEvent: any) {
 			if (progressEvent != null) {
@@ -65,9 +65,9 @@ class FileLoaderAlpha {
 								let score = mxl.readScore();
 								me.convertProject(score);
 							} else {
-								if (path.endsWith('.mid') ) {
-									
-									let mireader: MIDIReader = new MIDIReader(title,arrayBuffer);
+								if (path.endsWith('.mid')) {
+
+									let mireader: MIDIReader = new MIDIReader(file.name, file.size, arrayBuffer);
 
 								} else {
 									console.log('wrong path', path);

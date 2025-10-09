@@ -11,12 +11,20 @@ type MIDIDrumInfo = {
 	, trackVolumePoints: { ms: number, value: number, channel: number }[]
 	, title: string
 };
+type MIDIFileInfo = {
+	fileName: string
+	, fileSize: number
+	, duration: number
+};
 class EventsConverter {
+	midiFileInfo: MIDIFileInfo = { fileName: '', fileSize: 0, duration: 0 };
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
 		this.parser = parser;
 	}
-	convertEvents(name: string): Zvoog_Project {
+	convertEvents(name: string, filesize: number): Zvoog_Project {
+		this.midiFileInfo.fileName = name;
+		this.midiFileInfo.fileSize = filesize;
 		let project: Zvoog_Project = {
 			title: name
 			, timeline: []
@@ -111,13 +119,23 @@ class EventsConverter {
 				+ this.parser.aligned[ii - 5].events.length
 			) / 5;
 			if (this.parser.aligned[ii].events.length > avgcount * 2.9) {
-				console.log(avgcount, this.parser.aligned[ii]);
+				//console.log(avgcount, this.parser.aligned[ii]);
 			}
 		}
 
+		console.log('allNotes', allNotes);
 		console.log('aligned', this.parser.aligned);
-
+		this.fillInfoNotesDuration(allNotes);
+		console.log(this.midiFileInfo);
 		return project;
+	}
+	fillInfoNotesDuration(allNotes: TrackNote[]) {
+		let sortedIns = allNotes.sort((a, b) => b.baseDuration - a.baseDuration);
+		let ins90 = sortedIns.filter((element, index) => index > 0.05 * sortedIns.length && index < 0.95 * sortedIns.length);
+		let insMedian = ins90.reduce((last, it) => last + it.baseDuration, 0) / ins90.length;
+		let insMin = ins90[ins90.length - 1].baseDuration;
+		let insMax = ins90[0].baseDuration
+		console.log('ins',insMin, insMedian, insMax);
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
 		let ss = 0;
@@ -168,6 +186,7 @@ class EventsConverter {
 		console.log('tempo', this.parser.midiheader.changesResolutionTempo);
 		console.log('meter', this.parser.midiheader.metersList);
 		let lastMs = allNotes[allNotes.length - 1].startMs;
+		this.midiFileInfo.duration = lastMs;
 		let wholeDurationMs = 0;
 		while (wholeDurationMs < lastMs) {
 
