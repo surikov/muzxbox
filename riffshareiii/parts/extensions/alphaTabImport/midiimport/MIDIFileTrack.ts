@@ -21,6 +21,8 @@ type TrackNote = {
 	, channelidx: number
 	, trackidx: number
 	, avgMs: number
+	//,cuprogram:number
+	,count?:number
 }
 class MIDIFileTrack {
 	currentEventIdx: number = -1;
@@ -33,7 +35,7 @@ class MIDIFileTrack {
 	trackevents: MIDIEvent[];
 	trackTitle: string;
 	instrumentName: string;
-	programChannel: { program: number, channel: number }[];
+	//programChannel: { eventProgram: number, eventChannel: number }[];
 	trackVolumePoints: { ms: number, value: number, channel: number }[];
 	//trackChords: TrackChord[] = [];
 	trackNotes: TrackNote[] = [];
@@ -44,7 +46,7 @@ class MIDIFileTrack {
 		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
 		this.trackevents = [];
 		this.trackVolumePoints = [];
-		this.programChannel = [];
+		//this.programChannel = [];
 	}
 	moveNextCuEvent(): void {
 		if (this.currentEventIdx < this.trackevents.length - 2) {

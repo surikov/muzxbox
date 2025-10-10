@@ -9,7 +9,7 @@ type PP = {
 let pluckDiff = 23;
 type TicksAverageTime = { avgstartms: number, items: number[] };
 class MidiParser {
-	aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
+	alignedMIDIevents: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 	midiheader: MIDIFileHeader;
 	parsedTracks: MIDIFileTrack[];
 	instrumentNamesArray: string[] = [];
@@ -46,6 +46,7 @@ class MidiParser {
 	midiEventChannel: number = 0;
 	midiEventParam1: number = 0;
 
+	programTrackChannel: { eventProgram: number, eventChannel: number, eventTrack: number, from: MIDIEvent }[]=[];
 
 	controller_BankSelectMSB = 0x00;
 	controller_ModulationWheel = 0x01;
@@ -244,7 +245,22 @@ class MidiParser {
 				}
 			}
 		}
-		var pi: TrackNote = { basePitch: first, startMs: when, avgMs: -1, trackidx: trackIdx, channelidx: channel, baseDuration: -1, closed: false, bendPoints: [] };
+		/*let program = -1;
+		for (let cc = 0; cc < track.programChannel.length; cc++) {
+			if (track.programChannel[cc].eventChannel == channel) {
+				program = track.programChannel[cc].eventProgram;
+			}
+		}*/
+		//console.log(program);
+		var pi: TrackNote = {
+			basePitch: first, startMs: when, avgMs: -1
+			, trackidx: trackIdx
+			, channelidx: channel
+			, baseDuration: -1
+			, closed: false
+			//, cuprogram: program
+			, bendPoints: []
+		};
 		track.trackNotes.push(pi);
 		return pi;
 	}
@@ -586,28 +602,28 @@ class MidiParser {
 		//console.log(starts);
 		if (starts.length) {
 			let evnt = starts[0];
-			this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+			this.alignedMIDIevents.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
 			for (let ee = 1; ee < starts.length; ee++) {
 				let evnt = starts[ee];
-				let last = this.aligned[this.aligned.length - 1];
+				let last = this.alignedMIDIevents[this.alignedMIDIevents.length - 1];
 				let pretime = last.events[last.events.length - 1].playTimeMs;
 				if (evnt.playTimeMs < pretime + maxDelta) {
 					last.events.push(evnt);
 				} else {
-					this.aligned.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
+					this.alignedMIDIevents.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });
 				}
 			}
-			for (let ii = 0; ii < this.aligned.length; ii++) {
+			for (let ii = 0; ii < this.alignedMIDIevents.length; ii++) {
 				let smm = 0;
-				for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
-					smm = smm + this.aligned[ii].events[ee].playTimeMs;
+				for (ee = 0; ee < this.alignedMIDIevents[ii].events.length; ee++) {
+					smm = smm + this.alignedMIDIevents[ii].events[ee].playTimeMs;
 				}
-				this.aligned[ii].avg = Math.round(smm / this.aligned[ii].events.length);
+				this.alignedMIDIevents[ii].avg = Math.round(smm / this.alignedMIDIevents[ii].events.length);
 			}
 			//console.log(aligned);
-			for (let ii = 0; ii < this.aligned.length; ii++) {
-				for (ee = 0; ee < this.aligned[ii].events.length; ee++) {
-					this.aligned[ii].events[ee].playTimeMs = this.aligned[ii].avg;
+			for (let ii = 0; ii < this.alignedMIDIevents.length; ii++) {
+				for (ee = 0; ee < this.alignedMIDIevents[ii].events.length; ee++) {
+					this.alignedMIDIevents[ii].events[ee].playTimeMs = this.alignedMIDIevents[ii].avg;
 				}
 			}
 		}
@@ -630,7 +646,7 @@ class MidiParser {
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			//this.parseTicks2time(singleParsedTrack);
-			//console.log('notes for track',t,singleParsedTrack);
+			console.log('notes for track', t);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
 				if (Math.floor(e / 1000) == e / 1000) {
 					//console.log('event',e);
@@ -663,11 +679,17 @@ class MidiParser {
 							}
 						} else {
 							if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
+								console.log('EVENT_MIDI_PROGRAM_CHANGE', t + '/' + evnt.midiChannel, evnt.param1);
 								if (evnt.param1 >= 0 && evnt.param1 <= 127) {
-									singleParsedTrack.programChannel.push({
-										program: evnt.param1 ? evnt.param1 : 0
-										, channel: evnt.midiChannel ? evnt.midiChannel : 0
-									});
+									let pair = {
+										eventProgram: evnt.param1 ? evnt.param1 : 0
+										, eventChannel: evnt.midiChannel ? evnt.midiChannel : 0
+										, eventTrack: t
+										, from: evnt
+									};
+									console.log(pair);
+									//singleParsedTrack.programChannel.push(pair);
+									this.programTrackChannel.push(pair);
 								}
 							} else {
 								if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {

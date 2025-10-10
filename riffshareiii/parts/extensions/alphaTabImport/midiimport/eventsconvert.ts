@@ -15,9 +15,23 @@ type MIDIFileInfo = {
 	fileName: string
 	, fileSize: number
 	, duration: number
+	, noteCount: number
+	, drumCount: number
+	, tracks: { program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, pitches: number[], title: string }[]
+	, drums: { pitch: number, count: number, title: string }[]
+	, bars: { idx: Number, meter: string, bpm: number, count: number }[]
 };
 class EventsConverter {
-	midiFileInfo: MIDIFileInfo = { fileName: '', fileSize: 0, duration: 0 };
+	midiFileInfo: MIDIFileInfo = {
+		fileName: ''
+		, fileSize: 0
+		, duration: 0
+		, noteCount: 0
+		, drumCount: 0
+		, tracks: []
+		, drums: []
+		, bars: []
+	};
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
 		this.parser = parser;
@@ -111,7 +125,7 @@ class EventsConverter {
 		this.arrangeIcons(project);
 
 		//this.parser.aligned.sort((a, b) => { return b.events.length - a.events.length });
-		for (let ii = 5; ii < this.parser.aligned.length; ii++) {
+		/*for (let ii = 5; ii < this.parser.aligned.length; ii++) {
 			let avgcount = (this.parser.aligned[ii - 1].events.length
 				+ this.parser.aligned[ii - 2].events.length
 				+ this.parser.aligned[ii - 3].events.length
@@ -121,21 +135,145 @@ class EventsConverter {
 			if (this.parser.aligned[ii].events.length > avgcount * 2.9) {
 				//console.log(avgcount, this.parser.aligned[ii]);
 			}
-		}
+		}*/
 
 		console.log('allNotes', allNotes);
-		console.log('aligned', this.parser.aligned);
-		this.fillInfoNotesDuration(allNotes);
-		console.log(this.midiFileInfo);
+		console.log('alignedMIDIevents', this.parser.alignedMIDIevents);
+		this.fillInfoMIDI(project, allNotes, allTracks);
+
 		return project;
 	}
-	fillInfoNotesDuration(allNotes: TrackNote[]) {
+	/*
+	findTrackProgram(nt: TrackNote, allTracks: MIDITrackInfo[]): number {//midiTrackIdx: number, chanelTrackIdx: number): number {
+		let inf = this.parser.parsedTracks[nt.trackidx];
+		for (let ii = 0; ii < inf.programChannel.length; ii++) {
+			if (inf.programChannel[ii].eventChannel == nt.channelidx) {
+				return inf.programChannel[ii].eventProgram;
+			}
+		}
+		return -1;
+	}
+	*/
+	findProgramForChannel(chanIdx: number): number {
+		let program = -1;
+		for (let ii = 0; ii < this.parser.programTrackChannel.length; ii++) {
+			if (this.parser.programTrackChannel[ii].eventChannel == chanIdx) {
+				return this.parser.programTrackChannel[ii].eventProgram;
+			}
+		}
+		return program;
+	}
+	fillInfoMIDI(project: Zvoog_Project, allNotes: TrackNote[], allTracks: MIDITrackInfo[]) {
+		console.log('fillInfoMIDI');
+		/*
 		let sortedIns = allNotes.sort((a, b) => b.baseDuration - a.baseDuration);
 		let ins90 = sortedIns.filter((element, index) => index > 0.05 * sortedIns.length && index < 0.95 * sortedIns.length);
 		let insMedian = ins90.reduce((last, it) => last + it.baseDuration, 0) / ins90.length;
 		let insMin = ins90[ins90.length - 1].baseDuration;
 		let insMax = ins90[0].baseDuration
 		console.log('ins',insMin, insMedian, insMax);
+		*/
+		let insList: number[] = [];
+		for (let ii = 0; ii < allNotes.length; ii++) {
+			let anote = allNotes[ii];
+			//console.log(anote.program);
+			if (anote.channelidx != 9) {
+				//console.log(anote,allTracks);
+				//let prog = this.findTrackProgram(anote, allTracks);
+				let prog = this.findProgramForChannel(anote.channelidx);
+				if (insList.indexOf(prog) < 0) {
+					insList.push(prog);
+				}
+			}
+		}
+		//console.log('insList', insList);
+		for (let kk = 0; kk < insList.length; kk++) {
+			let program = insList[kk];
+			//let progNotes = allNotes.filter((it) => this.findTrackProgram(it, allTracks) == program);
+			let progNotes = allNotes.filter((it) => this.findProgramForChannel(it.channelidx) == program);
+			let starts: TrackNote[] = [];
+			for (let cc = 0; cc < progNotes.length; cc++) {
+				let pnote = progNotes[cc];
+				let xsts = starts.find((it) => it.startMs == pnote.startMs);
+				if (xsts) {
+					xsts.count = 1 + (xsts.count ? xsts.count : 1);
+				} else {
+					starts.push(pnote);
+				}
+			}
+			let chords = starts.filter((it) => (it.count ? it.count : 1) > 2);
+			let choDur = chords.reduce((last, it) => last + it.baseDuration, 0);
+			let singles = starts.filter((it) => (it.count ? it.count : 1) < 2);
+			let snglDur = singles.reduce((last, it) => last + it.baseDuration, 0);
+			let pitches: number[] = []
+			for (let ss = 0; ss < starts.length; ss++) {
+				let pitch = starts[ss].basePitch;
+				if (pitches.indexOf(pitch) < 0) {
+					pitches.push(pitch);
+				}
+			}
+
+			/*
+						console.log('program', program
+							, 'single', singles.length, Math.round(snglDur)
+							, 'chords', chords.length, Math.round(choDur)
+							, new ChordPitchPerformerUtil().tonechordinslist()[program]);
+			*/
+			//console.log('single', singles.length, 'chords', chords.length);
+			this.midiFileInfo.tracks.push({
+				program: program
+				, singlCount: singles.length
+				, chordCount: chords.length
+				, singleDuration: Math.round(snglDur)
+				, chordDuration: Math.round(choDur)
+				, pitches: pitches
+				, title: new ChordPitchPerformerUtil().tonechordinslist()[program]
+			});
+		}
+		let drumList: number[] = [];
+		for (let ii = 0; ii < allNotes.length; ii++) {
+			let anote = allNotes[ii];
+			if (anote.channelidx == 9) {
+				if (drumList.indexOf(anote.basePitch) < 0) {
+					drumList.push(anote.basePitch);
+				}
+			}
+		}
+		for (let ii = 0; ii < drumList.length; ii++) {
+			let pitch = drumList[ii];
+			let dritem = {
+				pitch: pitch
+				, count: allNotes
+					.filter((it) => it.channelidx == 9 && it.basePitch == pitch)
+					.reduce((last, it) => last + 1, 0)
+				, title: allPercussionDrumTitles()[pitch]
+			};
+			this.midiFileInfo.drums.push(dritem);
+		}
+		//let barMeterBPM: { idx: Number, meter: string, bpm: number, count: number }[] = [];
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let bar = project.timeline[ii];
+			if (bar) {
+				//console.log(ii, bar);
+				let descr = {
+					idx: ii
+					, meter: '' + bar.metre.count + '/' + bar.metre.part
+					, bpm: 15 * Math.round(bar.tempo / 15)
+					, count: 1
+				};
+				let xsts = this.midiFileInfo.bars.find((it) => it.meter == descr.meter && it.bpm == descr.bpm);
+				if (xsts) {
+					xsts.count = 1 + (xsts.count ? xsts.count : 1);
+				} else {
+					this.midiFileInfo.bars.push(descr);
+				}
+			}
+		}
+		this.midiFileInfo.bars.sort((a, b) => b.count - a.count);
+		this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
+		this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
+		//console.log(barMeterBPM);
+		console.log(this.midiFileInfo);
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
 		let ss = 0;
@@ -167,8 +305,8 @@ class EventsConverter {
 	}
 	findNearestPoint(ms: number): number {
 		let timeMs = -1;
-		for (let aa = 0; aa < this.parser.aligned.length; aa++) {
-			let avg = this.parser.aligned[aa].avg;
+		for (let aa = 0; aa < this.parser.alignedMIDIevents.length; aa++) {
+			let avg = this.parser.alignedMIDIevents[aa].avg;
 			if ((timeMs < 0 || Math.abs(avg - ms) < Math.abs(timeMs - ms))
 				&& Math.abs(avg - ms) < 123
 			) {
@@ -337,12 +475,13 @@ class EventsConverter {
 		}
 		for (let ii = 0; ii < allTracks.length; ii++) {
 			let parsedMIDItrack: MIDIFileTrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
-			let midiProgram = 0;
-			for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
-				if (parsedMIDItrack.programChannel[kk].channel == allTracks[ii].midiChan) {
-					midiProgram = parsedMIDItrack.programChannel[kk].program;
+			let midiProgram = this.findProgramForChannel(allTracks[ii].midiChan);
+			/*for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
+				if (parsedMIDItrack.programChannel[kk].eventChannel == allTracks[ii].midiChan) {
+					midiProgram = parsedMIDItrack.programChannel[kk].eventProgram;
 				}
-			}
+			}*/
+
 			let idxRatio = this.findVolumeInstrument(midiProgram);
 			//let volumeRatio = idxRatio.ratio;
 			let iidx = idxRatio.idx;

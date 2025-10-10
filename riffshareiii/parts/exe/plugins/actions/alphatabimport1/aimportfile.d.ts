@@ -2442,7 +2442,7 @@ declare type TicksAverageTime = {
     items: number[];
 };
 declare class MidiParser {
-    aligned: {
+    alignedMIDIevents: {
         startMs: number;
         avg: number;
         events: MIDIEvent[];
@@ -2480,6 +2480,12 @@ declare class MidiParser {
     midiEventType: number;
     midiEventChannel: number;
     midiEventParam1: number;
+    programTrackChannel: {
+        eventProgram: number;
+        eventChannel: number;
+        eventTrack: number;
+        from: MIDIEvent;
+    }[];
     controller_BankSelectMSB: number;
     controller_ModulationWheel: number;
     controller_coarseDataEntrySlider: number;
@@ -2531,6 +2537,7 @@ declare type TrackNote = {
     channelidx: number;
     trackidx: number;
     avgMs: number;
+    count?: number;
 };
 declare class MIDIFileTrack {
     currentEventIdx: number;
@@ -2542,10 +2549,6 @@ declare class MIDIFileTrack {
     trackevents: MIDIEvent[];
     trackTitle: string;
     instrumentName: string;
-    programChannel: {
-        program: number;
-        channel: number;
-    }[];
     trackVolumePoints: {
         ms: number;
         value: number;
@@ -2636,13 +2639,36 @@ declare type MIDIFileInfo = {
     fileName: string;
     fileSize: number;
     duration: number;
+    noteCount: number;
+    drumCount: number;
+    tracks: {
+        program: number;
+        singlCount: number;
+        chordCount: number;
+        singleDuration: number;
+        chordDuration: number;
+        pitches: number[];
+        title: string;
+    }[];
+    drums: {
+        pitch: number;
+        count: number;
+        title: string;
+    }[];
+    bars: {
+        idx: Number;
+        meter: string;
+        bpm: number;
+        count: number;
+    }[];
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
     parser: MidiParser;
     constructor(parser: MidiParser);
     convertEvents(name: string, filesize: number): Zvoog_Project;
-    fillInfoNotesDuration(allNotes: TrackNote[]): void;
+    findProgramForChannel(chanIdx: number): number;
+    fillInfoMIDI(project: Zvoog_Project, allNotes: TrackNote[], allTracks: MIDITrackInfo[]): void;
     findMIDITempoBefore(ms: number): number;
     findMIDIMeterBefore(ms: number): Zvoog_Metre;
     findNearestPoint(ms: number): number;
