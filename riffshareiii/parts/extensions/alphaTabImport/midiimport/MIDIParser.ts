@@ -46,7 +46,7 @@ class MidiParser {
 	midiEventChannel: number = 0;
 	midiEventParam1: number = 0;
 
-	programTrackChannel: { eventProgram: number, eventChannel: number, eventTrack: number, from: MIDIEvent }[]=[];
+	programTrackChannel: { eventProgram: number, eventChannel: number, eventTrack: number, from: MIDIEvent }[] = [];
 
 	controller_BankSelectMSB = 0x00;
 	controller_ModulationWheel = 0x01;
@@ -679,7 +679,7 @@ class MidiParser {
 							}
 						} else {
 							if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
-								console.log('EVENT_MIDI_PROGRAM_CHANGE', t + '/' + evnt.midiChannel, evnt.param1);
+								//console.log('EVENT_MIDI_PROGRAM_CHANGE', t + '/' + evnt.midiChannel, evnt.param1);
 								if (evnt.param1 >= 0 && evnt.param1 <= 127) {
 									let pair = {
 										eventProgram: evnt.param1 ? evnt.param1 : 0
@@ -687,9 +687,15 @@ class MidiParser {
 										, eventTrack: t
 										, from: evnt
 									};
-									console.log(pair);
+
 									//singleParsedTrack.programChannel.push(pair);
-									this.programTrackChannel.push(pair);
+									let xsts = this.programTrackChannel.find((it) => it.eventChannel == pair.eventChannel && it.eventTrack == pair.eventTrack);
+									if (xsts) {
+										console.log('skip', pair);
+									} else {
+										console.log('add', pair);
+										this.programTrackChannel.push(pair);
+									}
 								}
 							} else {
 								if (evnt.subtype == this.EVENT_MIDI_PITCH_BEND) {

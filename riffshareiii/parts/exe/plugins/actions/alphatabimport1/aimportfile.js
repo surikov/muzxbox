@@ -14941,7 +14941,6 @@ class MidiParser {
                         }
                         else {
                             if (evnt.subtype == this.EVENT_MIDI_PROGRAM_CHANGE) {
-                                console.log('EVENT_MIDI_PROGRAM_CHANGE', t + '/' + evnt.midiChannel, evnt.param1);
                                 if (evnt.param1 >= 0 && evnt.param1 <= 127) {
                                     let pair = {
                                         eventProgram: evnt.param1 ? evnt.param1 : 0,
@@ -14949,8 +14948,14 @@ class MidiParser {
                                         eventTrack: t,
                                         from: evnt
                                     };
-                                    console.log(pair);
-                                    this.programTrackChannel.push(pair);
+                                    let xsts = this.programTrackChannel.find((it) => it.eventChannel == pair.eventChannel && it.eventTrack == pair.eventTrack);
+                                    if (xsts) {
+                                        console.log('skip', pair);
+                                    }
+                                    else {
+                                        console.log('add', pair);
+                                        this.programTrackChannel.push(pair);
+                                    }
                                 }
                             }
                             else {
