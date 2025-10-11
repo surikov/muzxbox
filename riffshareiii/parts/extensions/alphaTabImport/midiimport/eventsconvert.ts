@@ -1,9 +1,10 @@
 //type TrackNumChanNum = { trackNum: number, channelNum: number, zvoogtrack: Zvoog_MusicTrack };
 type MIDITrackInfo = {
 	midiTrack: number
-	, midiChan: number
+	//, midiChan: number
+	, midiProgram: number
 	, trackVolumePoints: { ms: number, value: number, channel: number }[]
-	, title: string
+	, midiTitle: string
 };
 type MIDIDrumInfo = {
 	midiTrack: number
@@ -117,6 +118,9 @@ class EventsConverter {
 			if (it.channelidx == 9) {
 				this.addDrumkNote(project.percussions, project.timeline, allPercussions, it);
 			} else {
+				//let tidx=it.trackidx;
+				//let chidx=it.channelidx;
+				//if(it.trackidx==3)console.log('addTrackNote',it.trackidx, it.channelidx);
 				this.addTrackNote(project.tracks, project.timeline, allTracks, it);
 			}
 		}
@@ -154,11 +158,22 @@ class EventsConverter {
 		return -1;
 	}
 	*/
-	findProgramForChannel(chanIdx: number): number {
+	/*findProgramForChannel(trackIdx: number, chanIdx: number): number {
 		let program = -1;
 		for (let ii = 0; ii < this.parser.programTrackChannel.length; ii++) {
-			if (this.parser.programTrackChannel[ii].eventChannel == chanIdx) {
+			if (this.parser.programTrackChannel[ii].eventChannel == chanIdx
+				&& this.parser.programTrackChannel[ii].eventTrack == trackIdx
+			) {
 				return this.parser.programTrackChannel[ii].eventProgram;
+			}
+		}
+		return program;
+	}*/
+	findProgramForChannel(chanIdx: number): number {
+		let program = -1;
+		for (let ii = 0; ii < this.parser.programChannel.length; ii++) {
+			if (this.parser.programChannel[ii].midiChannel == chanIdx) {
+				return this.parser.programChannel[ii].midiProgram;
 			}
 		}
 		return program;
@@ -323,7 +338,7 @@ class EventsConverter {
 	fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]) {
 		console.log('tempo', this.parser.midiheader.changesResolutionTempo);
 		console.log('meter', this.parser.midiheader.metersList);
-		let lastMs = allNotes[allNotes.length - 1].startMs;
+		let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
 		this.midiFileInfo.duration = lastMs;
 		let wholeDurationMs = 0;
 		while (wholeDurationMs < lastMs) {
@@ -475,7 +490,8 @@ class EventsConverter {
 		}
 		for (let ii = 0; ii < allTracks.length; ii++) {
 			let parsedMIDItrack: MIDIFileTrack = this.parser.parsedTracks[allTracks[ii].midiTrack];
-			let midiProgram = this.findProgramForChannel(allTracks[ii].midiChan);
+			//let midiProgram = this.findProgramForChannel(allTracks[ii].midiChan);
+			let midiProgram = allTracks[ii].midiProgram;
 			/*for (let kk = 0; kk < parsedMIDItrack.programChannel.length; kk++) {
 				if (parsedMIDItrack.programChannel[kk].eventChannel == allTracks[ii].midiChan) {
 					midiProgram = parsedMIDItrack.programChannel[kk].eventProgram;
@@ -600,6 +616,7 @@ class EventsConverter {
 				if (parsedtrack.trackNotes[nn].channelidx == 9) {
 					this.takeProSamplerNo(allPercussions, ii, parsedtrack.trackNotes[nn].basePitch, parsedtrack.trackVolumePoints);
 				} else {
+					//if(ii==3 )console.log('collectNotes chan', parsedtrack.trackNotes[nn].channelidx);
 					this.takeProTrackNo(allTracks, ii, parsedtrack.trackNotes[nn].channelidx, parsedtrack.trackVolumePoints);
 				}
 			}
@@ -719,18 +736,21 @@ class EventsConverter {
 	}
 	addTrackNote(tracks: Zvoog_MusicTrack[], timeline: Zvoog_SongMeasure[], allTracks: MIDITrackInfo[], note: TrackNote) {
 		let barStart = 0;
+
 		for (let ii = 0; ii < timeline.length; ii++) {
 			let measure = timeline[ii];
 			let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
+			//if(note.trackidx==3 && note.channelidx==5)console.log('check',note.trackidx, note.channelidx,note.startMs,ii,barStart,durationMs);
 			if (note.startMs >= barStart && note.startMs < barStart + durationMs) {
-				//console.log();
-				let insidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
-				let instrack = tracks[insidx];
+				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx);
+				let zvootraidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
+				let zvooginstrack = tracks[zvootraidx];
 				let noteStartMs = note.startMs - barStart;
 				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
 				//console.log(tracks, insidx, instrack);
 				//instrack.measures[ii]..skips.push(when);
-				let chord = this.takeChord(instrack.measures[ii], when);
+				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx,zvootraidx);
+				let chord = this.takeChord(zvooginstrack.measures[ii], when);
 				chord.pitches.push(note.basePitch);
 
 				if (chord.slides.length == 0 || chord.slides.length == 1) {
@@ -767,6 +787,7 @@ class EventsConverter {
 			}
 			barStart = barStart + durationMs;
 		}
+		//if(note.trackidx==3)console.log('skip addTrackNote',note.trackidx, note.channelidx);
 	}
 	addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: MIDIDrumInfo[]
 		, note: TrackNote) {
@@ -799,20 +820,21 @@ class EventsConverter {
 	}*/
 	takeProTrackNo(allTracks: MIDITrackInfo[], midiTrack: number, midiChannel: number
 		, trackVolumePoints: null | { ms: number, value: number, channel: number }[]): number {
+			let midiProgram = this.findProgramForChannel(midiChannel);
 		for (let ii = 0; ii < allTracks.length; ii++) {
 			let it = allTracks[ii];
-			if (it.midiTrack == midiTrack && it.midiChan == midiChannel) {
+			if (it.midiTrack == midiTrack && it.midiProgram == midiProgram) {
 				return ii;
 			}
 		}
-		let title: string = '';
+		//let title: string = '';
 		if (trackVolumePoints) {
 
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: trackVolumePoints });
+			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: ''+midiProgram, trackVolumePoints: trackVolumePoints });
 		} else {
-			allTracks.push({ midiTrack: midiTrack, midiChan: midiChannel, title: title, trackVolumePoints: [] });
+			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: ''+midiProgram, trackVolumePoints: [] });
 		}
-		//console.log(allTracks.length);
+		console.log('add track', midiTrack, midiChannel, midiProgram);
 		return allTracks.length - 1;
 	}
 	takeProSamplerNo(allPercussions: MIDIDrumInfo[], midiTrack: number, midiPitch: number
