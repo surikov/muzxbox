@@ -3,6 +3,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 	let newEmptyProject: Zvoog_Project = {
 		title: 'New Project'
 		, versionCode: '1'
+		, farorder: []
 		, list: false
 		, selectedPart: { startMeasure: -1, endMeasure: -1 }
 		, position: { x: 0, y: -0, z: 33 }
@@ -43,6 +44,7 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 	title: 'test data for debug'
 	, versionCode: '1'
 	, list: false
+	, farorder: []
 	, selectedPart: { startMeasure: 1, endMeasure: 1 }
 	//, undo: []
 	//, redo: []

@@ -15444,6 +15444,7 @@ class EventsConverter {
                 startMeasure: -1,
                 endMeasure: -1
             },
+            farorder: [],
             versionCode: '1',
             list: false,
             position: { x: 0, y: 0, z: 30 },
@@ -16225,6 +16226,7 @@ class FileLoaderAlpha {
             percussions: [],
             comments: [],
             filters: [],
+            farorder: [],
             selectedPart: { startMeasure: -1, endMeasure: -1 },
             position: { x: 0, y: 0, z: 30 },
             list: false,

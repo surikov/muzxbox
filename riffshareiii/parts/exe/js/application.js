@@ -6231,6 +6231,7 @@ function createNewEmptyProjectData() {
     let newEmptyProject = {
         title: 'New Project',
         versionCode: '1',
+        farorder: [],
         list: false,
         selectedPart: { startMeasure: -1, endMeasure: -1 },
         position: { x: 0, y: -0, z: 33 },
@@ -6258,6 +6259,7 @@ let _______mzxbxProjectForTesting2 = {
     title: 'test data for debug',
     versionCode: '1',
     list: false,
+    farorder: [],
     selectedPart: { startMeasure: 1, endMeasure: 1 },
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
     timeline: [
