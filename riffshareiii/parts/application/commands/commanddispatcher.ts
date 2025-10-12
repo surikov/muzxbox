@@ -890,6 +890,16 @@ class CommandDispatcher {
 			//console.log(globalCommandDispatcher.cfg().data);
 		}
 	}
+	calculateRealTrackFarOrder(): number[] {
+		let realOrder: number[] = this.cfg().data.farorder.map((it) => it);
+		for (let ii = 0; ii < this.cfg().data.tracks.length; ii++) {
+			if (realOrder.indexOf(ii) < 0) {
+				realOrder.push(ii);
+			}
+		}
+		return realOrder;
+	}
+	
 	dropSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;

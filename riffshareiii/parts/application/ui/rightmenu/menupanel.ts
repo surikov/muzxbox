@@ -227,41 +227,41 @@ class RightMenuPanel {
 */
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
 		//console.log('fillMenuItemChildren',infos);
-		if(globalCommandDispatcher.cfg()){
-			if(globalCommandDispatcher.cfg().data.menuPerformers){
-				menuPointInsTracks.itemKind=kindOpenedFolder;
-			}else{
-				menuPointInsTracks.itemKind=kindClosedFolder;
+		if (globalCommandDispatcher.cfg()) {
+			if (globalCommandDispatcher.cfg().data.menuPerformers) {
+				menuPointInsTracks.itemKind = kindOpenedFolder;
+			} else {
+				menuPointInsTracks.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuSamplers){
-				menuPointDrumTracks.itemKind=kindOpenedFolder;
-			}else{
-				menuPointDrumTracks.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuSamplers) {
+				menuPointDrumTracks.itemKind = kindOpenedFolder;
+			} else {
+				menuPointDrumTracks.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuFilters){
-				menuPointFxTracks.itemKind=kindOpenedFolder;
-			}else{
-				menuPointFxTracks.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuFilters) {
+				menuPointFxTracks.itemKind = kindOpenedFolder;
+			} else {
+				menuPointFxTracks.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuPlugins){
-				menuPointAddPlugin.itemKind=kindOpenedFolder;
-			}else{
-				menuPointAddPlugin.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuPlugins) {
+				menuPointAddPlugin.itemKind = kindOpenedFolder;
+			} else {
+				menuPointAddPlugin.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuClipboard){
-				menuPointStore.itemKind=kindOpenedFolder;
-			}else{
-				menuPointStore.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuClipboard) {
+				menuPointStore.itemKind = kindOpenedFolder;
+			} else {
+				menuPointStore.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuActions){
-				menuPointActions.itemKind=kindOpenedFolder;
-			}else{
-				menuPointActions.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuActions) {
+				menuPointActions.itemKind = kindOpenedFolder;
+			} else {
+				menuPointActions.itemKind = kindClosedFolder;
 			}
-			if(globalCommandDispatcher.cfg().data.menuSettings){
-				menuPointSettings.itemKind=kindOpenedFolder;
-			}else{
-				menuPointSettings.itemKind=kindClosedFolder;
+			if (globalCommandDispatcher.cfg().data.menuSettings) {
+				menuPointSettings.itemKind = kindOpenedFolder;
+			} else {
+				menuPointSettings.itemKind = kindClosedFolder;
 			}
 		}
 		let me = this;
@@ -289,7 +289,7 @@ class RightMenuPanel {
 						it.focused = true;
 						it.itemKind = kindClosedFolder;
 						me.rerenderMenuContent(so);
-						
+
 					});
 					this.items.push(so);
 					it.menuTop = this.items.length - 1;
@@ -333,7 +333,7 @@ class RightMenuPanel {
 						it.focused = true;
 						it.itemKind = kindOpenedFolder;
 						me.rerenderMenuContent(si);
-						
+
 					});
 					this.items.push(si);
 					it.menuTop = this.items.length - 1;
@@ -593,7 +593,9 @@ class RightMenuPanel {
 		menuPointInsTracks.children = [];
 		menuPointDrumTracks.children = [];
 		menuPointFxTracks.children = [];
-		for (let tt = 0; tt < project.tracks.length; tt++) {
+		let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+		for (let farIdx = 0; farIdx < farorder.length; farIdx++) {
+			let tt = farorder[farIdx];
 			let track = project.tracks[tt];
 			let item: MenuInfo = {
 				text: track.title
@@ -617,7 +619,7 @@ class RightMenuPanel {
 				, itemKind: kindAction2
 			};
 			if (track.performer.state == 1 || (solo && track.performer.state != 2)) item.lightTitle = true;
-			if (tt > 0) {
+			if (farIdx > 0) {
 				item.onClick = () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 						let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
