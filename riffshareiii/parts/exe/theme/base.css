@@ -109,6 +109,8 @@
 	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
 	--line-color75: color-mix(in lab, transparent 75%, var(--line-color));
 	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
+	--line-color30: color-mix(in lab, transparent 30%, var(--line-color));
+	--line-color15: color-mix(in lab, transparent 15%, var(--line-color));
 	--line-color6: color-mix(in lab, transparent 6%, var(--line-color));
 
 	--background-color10: color-mix(in lab, transparent 10%, var(--background-color));
@@ -118,7 +120,8 @@
 	--selectedbgground-color: color-mix(in lab, transparent 0%, var(--background-color));
 	--unselectedbg-color: color-mix(in lab, transparent 0%, var(--background-color));
 
-	
+	--disable-drag-color: color-mix(in lab, transparent 75%, var(--drag-color));
+	--disable-click-color: color-mix(in lab, transparent 75%, var(--click-color));
 
 }
 

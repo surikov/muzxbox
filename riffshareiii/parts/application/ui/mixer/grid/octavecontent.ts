@@ -13,6 +13,10 @@ class OctaveContent {
 			}
 		}
 	}
+
+
+
+
 	addUpperNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
 		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
@@ -33,8 +37,12 @@ class OctaveContent {
 					break;
 				}
 			}
-			
-			let track = globalCommandDispatcher.cfg().data.tracks[0];
+
+
+			//let track = globalCommandDispatcher.cfg().data.tracks[0];
+			let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+			let track = globalCommandDispatcher.cfg().data.tracks[farorder[0]];
+
 			let css = 'mixNoteLine';
 			//css = 'mixMuteLine';
 			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
@@ -43,6 +51,10 @@ class OctaveContent {
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
 		}
 	}
+
+
+
+
 	addOtherNotes(barIdx: number, octaveIdx: number
 		, left: number, top: number, width: number, height: number
 		, barOctaveAnchor: TileAnchor//, data: Zvoog_Project
@@ -50,22 +62,27 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		let soloOnly = false;
-			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-					soloOnly = true;
-					break;
-				}
-
-			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-					soloOnly = true;
-					break;
-				}
+		for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+			if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+				soloOnly = true;
+				break;
 			}
-		for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+
+		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+				soloOnly = true;
+				break;
+			}
+		}
+		let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+		//for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+		//console.log(farorder);
+		for (let kk = 1; kk<farorder.length; kk++) {
+			let ii = farorder[kk];
+			//console.log(kk, ii);
 			let track = globalCommandDispatcher.cfg().data.tracks[ii];
 			let css = 'mixNoteSub';
-			
+
 			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
 				css = 'mixMuteSub';
 			}

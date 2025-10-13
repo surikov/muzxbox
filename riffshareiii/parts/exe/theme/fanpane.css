@@ -5,6 +5,13 @@
 	dominant-baseline22: middle;
 	text-anchor2: middle;
 }
+.fanDisabledLabel {
+	fill: var(--line-color75);
+	font-size: var(--label-2cm);
+	pointer-events: none;
+	dominant-baseline22: middle;
+	text-anchor2: middle;
+}
 .fanIconLabelSize0 {
 	font-size: var(--label-025cm);
 }
@@ -25,11 +32,20 @@
 }
 
 
-.fanSamplerMoveIcon {
+.fanSamplerMoveIconBase {
 	fill: var(--drag-color);
 	font-size: calc(0.25*var(--tapSize));
 	cursor: move;
 	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerMoveIconDisabled {
+	fill: var(--disable-drag-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: move;
+	stroke: var(--line-color75);
 	stroke-width: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
@@ -61,6 +77,15 @@
 	font-size: calc(0.25*var(--tapSize));
 	cursor: pointer;
 	stroke: var(--line-color);
+	stroke-width2: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerInterDisabledIcon {
+	fill: var(--disable-click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: pointer;
+	stroke: var(--line-color90);
 	stroke-width2: calc(0.125*var(--tapSize));
 	stroke-linejoin: round;
 	paint-order: stroke fill;
@@ -130,14 +155,14 @@
 
 .fanConnectionBase {
 	pointer-events: none;
-	stroke: var(--line-color);
+	stroke: var(--line-color50);
 	stroke-width2: 0.5cm;
 	stroke-linejoin: round;
 	paint-order: stroke;
 	fill:none;
 }
 .fanConnectionSecondary{
-	stroke: var(--line-color75);
+	stroke: var(--line-color90);
 }
 .fanConnection0 {stroke-width: 0.02cm;}
 .fanConnection1 {stroke-width: 0.04cm;}

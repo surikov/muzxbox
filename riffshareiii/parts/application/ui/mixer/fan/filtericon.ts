@@ -130,7 +130,12 @@ class FilterIcon {
 					}
 				}
 			}
-			rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+			if (filterTarget.state == 1) {
+				rec.css = 'fanSamplerMoveIconDisabled fanSamplerMoveIcon' + zidx;
+			} else {
+				rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+			}
+
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -145,16 +150,21 @@ class FilterIcon {
 		if (zidx < 5) {
 			let px: number = globalCommandDispatcher.renderer.tiler.tapPxSize();
 			//let url: string = MZXBX_currentPlugins()[order].ui;
+			let cssstring: string = 'fanSamplerInteractionIcon fanButton' + zidx;
+			if (filterTarget.state == 1) {
+				cssstring = 'fanSamplerInterDisabledIcon fanButton' + zidx;
+			}
 			let btn: TilePath = {
 				x: xx - sz / 2
 				, y: yy
 				, points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z'
-				, css: 'fanSamplerInteractionIcon fanButton' + zidx
+				//, css: 'fanSamplerInteractionIcon fanButton' + zidx
+				, css: cssstring
 				, activation: (x: number, y: number) => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
 					//console.log(filterTarget.kind,info);
 					//if (info) {
-						globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
+					globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
 					//}
 				}
 			};
@@ -166,19 +176,22 @@ class FilterIcon {
 				text: filterTarget.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
 				, x: xx - sz * 0.4
 				, y: yy - sz * 0.1
-				, css: 'fanIconLabel fanIconLabelSize' + zidx
+				//, css: 'fanIconLabel fanIconLabelSize' + zidx
+				, css: (filterTarget.state == 1 ? 'fanDisabledLabel' : 'fanIconLabel') + ' fanIconLabelSize' + zidx
 			};
 			dragAnchor.content.push(txt);
 		}
 		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
 		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		let css = 'fanConnectionBase fanConnection' + zidx;
-		if (order) {
-			css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
-		}
+		//if (order) {
+		//	css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		//}
 		let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
 		spearsAnchor.content.push(hoLine);
-		new SpearConnection().addSpear(order > 0, zidx,
+		new SpearConnection().addSpear(//order > 0
+			false
+			, zidx,
 			xx
 			, filterFromY
 			, sz

@@ -622,15 +622,19 @@ class RightMenuPanel {
 			if (farIdx > 0) {
 				item.onClick = () => {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-						let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
-						globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+						//let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
+						//globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+						let nn = farorder.splice(farIdx, 1)[0];
+						farorder.splice(0, 0, nn);
+						globalCommandDispatcher.cfg().data.farorder = farorder;
+						//console.log(globalCommandDispatcher.cfg().data.farorder);
 					});
 				};
 			} else {
 				item.onClick = () => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					if (info) {
-						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
+						globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farIdx, tt, track, info);
 					} else {
 						globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
 					}

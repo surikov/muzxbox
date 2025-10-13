@@ -825,9 +825,17 @@ class SequencerPluginDialog {
             }
         }
     }
-    openSequencerPluginDialogFrame(order, track, trackPlugin) {
+    openSequencerPluginDialogFrame(farNo, trackNo, track, trackPlugin) {
+        if (farNo) {
+            globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
+                let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+                let nn = farorder.splice(farNo, 1)[0];
+                farorder.splice(0, 0, nn);
+                globalCommandDispatcher.cfg().data.farorder = farorder;
+            });
+        }
         this.track = track;
-        this.order = order;
+        this.order = trackNo;
         this.pluginRawData = track.performer.data;
         this.resetSequencerTitle();
         let pluginFrame = document.getElementById("pluginSequencerFrame");
@@ -1774,6 +1782,16 @@ class CommandDispatcher {
             });
             globalCommandDispatcher.resetProject();
         }
+    }
+    calculateRealTrackFarOrder() {
+        let realOrder = this.cfg().data.farorder.map((it) => it);
+        let trcnt = this.cfg().data.tracks.length;
+        for (let ii = 0; ii < trcnt; ii++) {
+            if (realOrder.indexOf(ii) < 0) {
+                realOrder.push(ii);
+            }
+        }
+        return realOrder.filter((it) => it >= 0 && it < trcnt);
     }
     dropSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
@@ -3110,7 +3128,9 @@ class RightMenuPanel {
         menuPointInsTracks.children = [];
         menuPointDrumTracks.children = [];
         menuPointFxTracks.children = [];
-        for (let tt = 0; tt < project.tracks.length; tt++) {
+        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+        for (let farIdx = 0; farIdx < farorder.length; farIdx++) {
+            let tt = farorder[farIdx];
             let track = project.tracks[tt];
             let item = {
                 text: track.title,
@@ -3137,11 +3157,12 @@ class RightMenuPanel {
             };
             if (track.performer.state == 1 || (solo && track.performer.state != 2))
                 item.lightTitle = true;
-            if (tt > 0) {
+            if (farIdx > 0) {
                 item.onClick = () => {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                        let track = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
-                        globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
+                        let nn = farorder.splice(farIdx, 1)[0];
+                        farorder.splice(0, 0, nn);
+                        globalCommandDispatcher.cfg().data.farorder = farorder;
                     });
                 };
             }
@@ -3149,7 +3170,7 @@ class RightMenuPanel {
                 item.onClick = () => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
                     if (info) {
-                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(tt, track, info);
+                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farIdx, tt, track, info);
                     }
                     else {
                         globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
@@ -3934,6 +3955,7 @@ class LeftPanel {
             }
             if (zz < 5) {
                 if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
+                    let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
                     let preCSS = 'firstTrackLabel';
                     if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[0].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[0].performer.state == 1)) {
                         preCSS = 'firstTrackMute';
@@ -3941,11 +3963,12 @@ class LeftPanel {
                     let trackLabel = {
                         x: 0,
                         y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight(),
-                        text: globalCommandDispatcher.cfg().data.tracks[0].title,
+                        text: globalCommandDispatcher.cfg().data.tracks[farorder[0]].title,
                         css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(trackLabel);
-                    for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
+                    for (let farIdx = 1; farIdx < farorder.length; farIdx++) {
+                        let tr = farorder[farIdx];
                         let preCSS = 'otherTrackLabel';
                         if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[tr].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[tr].performer.state == 1)) {
                             preCSS = 'otherTrackMute';
@@ -4125,7 +4148,8 @@ class OctaveContent {
                     break;
                 }
             }
-            let track = globalCommandDispatcher.cfg().data.tracks[0];
+            let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+            let track = globalCommandDispatcher.cfg().data.tracks[farorder[0]];
             let css = 'mixNoteLine';
             if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
                 css = 'mixMuteLine';
@@ -4146,7 +4170,9 @@ class OctaveContent {
                 break;
             }
         }
-        for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+        for (let kk = 1; kk < farorder.length; kk++) {
+            let ii = farorder[kk];
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
             let css = 'mixNoteSub';
             if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
@@ -5198,14 +5224,19 @@ class PerformerIcon {
         this.performerId = performerId;
     }
     buildPerformerSpot(fanLevelAnchor, spearsAnchor, zidx) {
-        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
-            if (globalCommandDispatcher.cfg().data.tracks[ii].performer.id == this.performerId) {
-                this.addPerformerSpot(ii > 0, ii, globalCommandDispatcher.cfg().data.tracks[ii], fanLevelAnchor, spearsAnchor, zidx);
+        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+        for (let ff = 0; ff < farorder.length; ff++) {
+            let trackNo = farorder[ff];
+            if (globalCommandDispatcher.cfg().data.tracks[trackNo].performer.id == this.performerId) {
+                this.addPerformerSpot(ff, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addPerformerSpot(secondary, trackNo, track, fanLevelAnchor, spearsAnchor, zidx) {
+    addPerformerSpot(farNo, fanLevelAnchor, spearsAnchor, zidx) {
+        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+        let trackNo = farorder[farNo];
+        let track = globalCommandDispatcher.cfg().data.tracks[trackNo];
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
@@ -5229,6 +5260,13 @@ class PerformerIcon {
             x: xx - sz / 2, y: yy - sz / 2,
             w: sz, h: sz
         };
+        let showSoloOnly = false;
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
+            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2)
+                showSoloOnly = true;
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
+            if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2)
+                showSoloOnly = true;
         if (zidx < 7) {
             rec.draggable = true;
             let toFilter = null;
@@ -5265,6 +5303,16 @@ class PerformerIcon {
                         }
                     }
                     dragAnchor.translation = { x: 0, y: 0 };
+                    let curfarorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+                    let curTrackFar = curfarorder.indexOf(trackNo);
+                    if (curTrackFar) {
+                        globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
+                            let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+                            let nn = farorder.splice(curTrackFar, 1)[0];
+                            farorder.splice(0, 0, nn);
+                            globalCommandDispatcher.cfg().data.farorder = farorder;
+                        });
+                    }
                     globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
                 }
                 else {
@@ -5325,7 +5373,12 @@ class PerformerIcon {
                     }
                 }
             };
-            rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+            let dragSamplerCss = 'fanSamplerMoveIconBase';
+            if (track.performer.state == 0 && showSoloOnly)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
+            if (track.performer.state == 1)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
+            rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
         }
         else {
             rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
@@ -5337,30 +5390,40 @@ class PerformerIcon {
             css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
         });
         if (zidx < 5) {
+            let interSamplerCss = 'fanSamplerInteractionIcon';
+            if (track.performer.state == 0 && showSoloOnly)
+                interSamplerCss = 'fanSamplerInterDisabledIcon';
+            if (track.performer.state == 1)
+                interSamplerCss = 'fanSamplerInterDisabledIcon';
             let btn = {
                 x: xx - sz / 2,
                 y: yy,
                 w: sz,
                 h: sz / 2,
-                css: 'fanSamplerInteractionIcon fanButton' + zidx,
+                css: interSamplerCss + ' fanButton' + zidx,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
-                    globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(trackNo, track, info);
+                    globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, track, info);
                 }
             };
             dragAnchor.content.push(btn);
         }
         if (zidx <= 5) {
+            let labelSamplerCss = 'fanIconLabel';
+            if (track.performer.state == 0 && showSoloOnly)
+                labelSamplerCss = 'fanDisabledLabel';
+            if (track.performer.state == 1)
+                labelSamplerCss = 'fanDisabledLabel';
             let txt = {
                 text: track.title,
                 x: xx - sz * 0.45,
                 y: yy - sz * 0.1,
-                css: 'fanIconLabel fanIconLabelSize' + zidx
+                css: labelSamplerCss + ' fanIconLabelSize' + zidx
             };
             dragAnchor.content.push(txt);
         }
         let performerFromY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2;
-        new ControlConnection().addAudioStreamLineFlow(secondary, zidx, performerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(farNo > 0, zidx, performerFromY, xx, yy, spearsAnchor);
         let fol = new FanOutputLine();
         for (let oo = 0; oo < track.performer.outputs.length; oo++) {
             let outId = track.performer.outputs[oo];
@@ -5424,7 +5487,19 @@ class SamplerIcon {
             y: yy - sz,
             dots: [0, 0, sz * 2 * 0.8, sz, 0, sz * 2]
         };
+        let showSoloOnly = false;
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
+            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2)
+                showSoloOnly = true;
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
+            if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2)
+                showSoloOnly = true;
         if (zidx < 7) {
+            let dragSamplerCss = 'fanSamplerMoveIconBase';
+            if (samplerTrack.sampler.state == 0 && showSoloOnly)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
+            if (samplerTrack.sampler.state == 1)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
             rec.draggable = true;
             let toFilter = null;
             let toSpeaker = false;
@@ -5519,7 +5594,7 @@ class SamplerIcon {
                     }
                 }
             };
-            rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+            rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
         }
         else {
             rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
@@ -5532,11 +5607,16 @@ class SamplerIcon {
             css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
         });
         if (zidx < 5) {
+            let interSamplerCss = 'fanSamplerInteractionIcon';
+            if (samplerTrack.sampler.state == 0 && showSoloOnly)
+                interSamplerCss = 'fanSamplerInterDisabledIcon';
+            if (samplerTrack.sampler.state == 1)
+                interSamplerCss = 'fanSamplerInterDisabledIcon';
             let btn = {
                 x: xx - sz * 0.6,
                 y: yy - sz,
                 dots: [0, sz, sz * 2 * 0.8, sz, 0, sz * 2],
-                css: 'fanSamplerInteractionIcon fanButton' + zidx,
+                css: interSamplerCss + ' fanButton' + zidx,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
                     globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
@@ -5545,17 +5625,22 @@ class SamplerIcon {
             dragAnchor.content.push(btn);
         }
         if (zidx <= 5) {
+            let labelSamplerCss = 'fanIconLabel';
+            if (samplerTrack.sampler.state == 0 && showSoloOnly)
+                labelSamplerCss = 'fanDisabledLabel';
+            if (samplerTrack.sampler.state == 1)
+                labelSamplerCss = 'fanDisabledLabel';
             let txt = {
                 text: samplerTrack.title,
                 x: xx - sz * 0.5,
                 y: yy - sz * 0.2,
-                css: 'fanIconLabel fanIconLabelSize' + zidx
+                css: labelSamplerCss + ' fanIconLabelSize' + zidx
             };
             dragAnchor.content.push(txt);
         }
         let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
             + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
-        new ControlConnection().addAudioStreamLineFlow(order > 0, zidx, samplerFromY, xx, yy, spearsAnchor);
+        new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
         let fol = new FanOutputLine();
         for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
             let outId = samplerTrack.sampler.outputs[oo];
@@ -5716,7 +5801,12 @@ class FilterIcon {
                     }
                 }
             };
-            rec.css = 'fanSamplerMoveIcon fanSamplerMoveIcon' + zidx;
+            if (filterTarget.state == 1) {
+                rec.css = 'fanSamplerMoveIconDisabled fanSamplerMoveIcon' + zidx;
+            }
+            else {
+                rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+            }
         }
         else {
             rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
@@ -5731,11 +5821,15 @@ class FilterIcon {
         });
         if (zidx < 5) {
             let px = globalCommandDispatcher.renderer.tiler.tapPxSize();
+            let cssstring = 'fanSamplerInteractionIcon fanButton' + zidx;
+            if (filterTarget.state == 1) {
+                cssstring = 'fanSamplerInterDisabledIcon fanButton' + zidx;
+            }
             let btn = {
                 x: xx - sz / 2,
                 y: yy,
                 points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z',
-                css: 'fanSamplerInteractionIcon fanButton' + zidx,
+                css: cssstring,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
                     globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
@@ -5748,19 +5842,16 @@ class FilterIcon {
                 text: filterTarget.title,
                 x: xx - sz * 0.4,
                 y: yy - sz * 0.1,
-                css: 'fanIconLabel fanIconLabelSize' + zidx
+                css: (filterTarget.state == 1 ? 'fanDisabledLabel' : 'fanIconLabel') + ' fanIconLabelSize' + zidx
             };
             dragAnchor.content.push(txt);
         }
         let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
         let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         let css = 'fanConnectionBase fanConnection' + zidx;
-        if (order) {
-            css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
-        }
         let hoLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
         spearsAnchor.content.push(hoLine);
-        new SpearConnection().addSpear(order > 0, zidx, xx, filterFromY, sz, xx, yy, spearsAnchor);
+        new SpearConnection().addSpear(false, zidx, xx, filterFromY, sz, xx, yy, spearsAnchor);
         let fol = new FanOutputLine();
         for (let oo = 0; oo < filterTarget.outputs.length; oo++) {
             let outId = filterTarget.outputs[oo];

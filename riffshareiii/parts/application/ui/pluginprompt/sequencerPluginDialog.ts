@@ -32,7 +32,7 @@ class SequencerPluginDialog {
 			(document.getElementById("pluginSequencerSetPasstrough") as any).className = 'pluginNoneButton';
 			(document.getElementById("pluginSequencerSetSolo") as any).className = 'pluginDoButton';
 		} else {
-			if (this.track.performer.state == 2) { 
+			if (this.track.performer.state == 2) {
 				(document.getElementById("pluginSequencerSetPlay") as any).className = 'pluginDoButton';
 				(document.getElementById("pluginSequencerSetPasstrough") as any).className = 'pluginDoButton';
 				(document.getElementById("pluginSequencerSetSolo") as any).className = 'pluginNoneButton';
@@ -72,11 +72,11 @@ class SequencerPluginDialog {
 		globalCommandDispatcher.reConnectPluginsIfPlay();
 	}
 	openEmptySequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack) {
-		
-		
+
+
 		this.track = track;
 		this.order = order;
-		
+
 		this.resetSequencerTitle();
 		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
 		let pluginDiv = document.getElementById("pluginSequencerDiv") as any;
@@ -88,10 +88,23 @@ class SequencerPluginDialog {
 			}
 		}
 	}
-	openSequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack, trackPlugin: null|MZXBX_PluginRegistrationInformation) {
-		//console.log('openSequencerPluginDialogFrame',order, track, trackPlugin);
+	openSequencerPluginDialogFrame(farNo: number, trackNo: number, track: Zvoog_MusicTrack, trackPlugin: null | MZXBX_PluginRegistrationInformation) {
+		//console.log('openSequencerPluginDialogFrame far', farNo, 'track', trackNo, track.title);
+		//console.log(globalCommandDispatcher.cfg().data.farorder);
+		//for (let kk = 0; kk < globalCommandDispatcher.cfg().data.tracks.length; kk++) {
+		//	console.log(kk, globalCommandDispatcher.cfg().data.tracks[kk].title);
+		//}
+		if (farNo) {
+			globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
+				let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+				let nn = farorder.splice(farNo, 1)[0];
+				farorder.splice(0, 0, nn);
+				globalCommandDispatcher.cfg().data.farorder = farorder;
+				//console.log(globalCommandDispatcher.cfg().data.farorder);
+			});
+		}
 		this.track = track;
-		this.order = order;
+		this.order = trackNo;
 		this.pluginRawData = track.performer.data;
 		this.resetSequencerTitle();
 		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
@@ -99,8 +112,8 @@ class SequencerPluginDialog {
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitSequencerPluginInit = true;
-				if(trackPlugin){
-				pluginFrame.src = trackPlugin.ui;
+				if (trackPlugin) {
+					pluginFrame.src = trackPlugin.ui;
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
