@@ -2646,12 +2646,18 @@ declare type MIDIFileInfo = {
         chordCount: number;
         singleDuration: number;
         chordDuration: number;
-        pitches: number[];
         title: string;
+        pitches: {
+            pitch: number;
+            count: number;
+            tone: number;
+        }[];
     }[];
     drums: {
         pitch: number;
         count: number;
+        ratio: number;
+        baravg: number;
         title: string;
     }[];
     bars: {
@@ -2660,6 +2666,7 @@ declare type MIDIFileInfo = {
         bpm: number;
         count: number;
     }[];
+    barCount: number;
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
@@ -2688,7 +2695,7 @@ declare class EventsConverter {
         idx: number;
         skip: Zvoog_Metre;
     };
-    findVolumeDrum(midi: number): {
+    findVolumeDrum(midipitch: number): {
         idx: number;
         ratio: number;
     };

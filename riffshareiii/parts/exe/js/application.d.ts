@@ -214,6 +214,7 @@ declare class CommandDispatcher {
     promptTempoForSelectedBars(): void;
     promptMeterForSelectedBars(): void;
     setPlayPositionFromSelectedPart(): void;
+    rollTracksClick(left: number, top: number): void;
     adjustTimeLineLength(): void;
     adjustRemoveEmptyChords(): void;
     appendBar(): void;
@@ -492,12 +493,14 @@ declare class MixerUI {
     sliderAnchor: TileAnchor;
     sliderRectangle: TileRectangle;
     fanPane: FanPane;
+    gridClickAnchor: TileAnchor;
+    gridClickRectangle: TileRectangle;
     constructor();
     reFillMixerUI(): void;
     resetSliderMark(): void;
     resetEditMark(): void;
     createMixerLayers(): TileLayerDefinition[];
-    reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number): void;
+    reFillSingleRatio(clicks: boolean, yy: number, hh: number, countFunction: (barIdx: number) => number): void;
     barTrackCount(bb: number): number;
     barDrumCount(bb: number): number;
     barAutoCount(bb: number): number;

@@ -21,6 +21,8 @@ class MixerUI {
 	//samplerUI: SamplerRows;
 	fanPane: FanPane = new FanPane();
 	//iconsFanAnchor: TileAnchor;
+	gridClickAnchor: TileAnchor;
+	gridClickRectangle: TileRectangle;
 	constructor() {
 
 	}
@@ -28,7 +30,7 @@ class MixerUI {
 	reFillMixerUI(//data: Zvoog_Project
 
 	) {
-		//console.log('reFillMixerUI', this.fanLayer.anchors.length);
+
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = globalCommandDispatcher.cfg().wholeWidth();
 		let hh = globalCommandDispatcher.cfg().wholeHeight();
@@ -67,21 +69,33 @@ class MixerUI {
 		this.fillerAnchor.content = [];
 		//this.reFillWholeRatio();
 		//this.reFillSingleRatio();
-		this.reFillSingleRatio(globalCommandDispatcher.cfg().samplerTop()
+		this.reFillSingleRatio(false, globalCommandDispatcher.cfg().samplerTop()
 			, globalCommandDispatcher.cfg().samplerHeight()
 			, this.barDrumCount);
-		this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop()
+		this.reFillSingleRatio(true, globalCommandDispatcher.cfg().gridTop()
 			, globalCommandDispatcher.cfg().gridHeight()
 			, this.barTrackCount);
 
-		this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop()
+		this.reFillSingleRatio(false, globalCommandDispatcher.cfg().automationTop()
 			, globalCommandDispatcher.cfg().automationHeight()
 			, this.barAutoCount);
 
-		this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop()
+		this.reFillSingleRatio(false, globalCommandDispatcher.cfg().commentsTop()
 			, globalCommandDispatcher.cfg().commentsMaxHeight()
 			, this.barCommentsCount);
+
+		this.gridClickAnchor.xx = globalCommandDispatcher.cfg().leftPad;
+		this.gridClickAnchor.yy = globalCommandDispatcher.cfg().gridTop();
+		this.gridClickAnchor.ww = globalCommandDispatcher.cfg().timelineWidth();
+		this.gridClickAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
+		this.gridClickRectangle.x = globalCommandDispatcher.cfg().leftPad;
+		this.gridClickRectangle.y = globalCommandDispatcher.cfg().gridTop();
+		this.gridClickRectangle.w = globalCommandDispatcher.cfg().timelineWidth();
+		this.gridClickRectangle.h = globalCommandDispatcher.cfg().gridHeight();
+
+		//console.log('reFillMixerUI', this.gridClickAnchor, this.gridClickRectangle);
 	}
+
 	resetSliderMark() {
 
 		let mark = globalCommandDispatcher.cfg().slidemark;
@@ -100,17 +114,17 @@ class MixerUI {
 			let top = globalCommandDispatcher.cfg().gridTop()
 				+ globalCommandDispatcher.cfg().gridHeight()
 				- mark.pitch
-				+ 11 - mark.chord.slides[mark.chord.slides.length-1].delta
+				+ 11 - mark.chord.slides[mark.chord.slides.length - 1].delta
 				;
 			let len = 0;
 			for (let ss = 0; ss < mark.chord.slides.length; ss++) {
 				let duration = MMUtil().set(mark.chord.slides[ss].duration);
-				len=len+duration.duration(globalCommandDispatcher.cfg().data.timeline[mark.barIdx].tempo)*globalCommandDispatcher.cfg().widthDurationRatio;
+				len = len + duration.duration(globalCommandDispatcher.cfg().data.timeline[mark.barIdx].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 			}
 
 			let rr = globalCommandDispatcher.cfg().notePathHeight;
 			let skipX = mm.set(mark.chord.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
-			this.sliderAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX + len - rr / 2-rr;
+			this.sliderAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX + len - rr / 2 - rr;
 			this.sliderAnchor.yy = top - rr / 2;
 			this.sliderAnchor.ww = rr;
 			this.sliderAnchor.hh = rr;
@@ -189,6 +203,18 @@ class MixerUI {
 			, css: 'slidePointFill'
 		};
 
+		this.gridClickRectangle = {
+			x: 0
+			, y: 0
+			, w: 2222
+			, h: 2222
+			, css: 'gridRollTracks'
+			, activation: (x, y) => {
+				//console.log('grid click roll', x, y);
+				globalCommandDispatcher.rollTracksClick(x, y);
+			}
+		};
+
 
 		/*
 		this.iconsFanAnchor = {
@@ -242,6 +268,15 @@ class MixerUI {
 
 			//
 		}
+
+		this.gridClickAnchor = {
+			minZoom: zoomPrefixLevelsCSS[3].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[6].minZoom
+			, xx: 0, yy: 0, ww: 1, hh: 1, content: [this.gridClickRectangle]
+		};
+		this.gridLayers.anchors.push(this.gridClickAnchor);
+
+
 		this.markAnchor = {
 			minZoom: 0
 			, beforeZoom: zoomPrefixLevelsCSS[6].minZoom
@@ -264,7 +299,7 @@ class MixerUI {
 
 		return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
 	}
-	reFillSingleRatio(yy: number, hh: number, countFunction: (barIdx: number) => number) {
+	reFillSingleRatio(clicks: boolean, yy: number, hh: number, countFunction: (barIdx: number) => number) {
 
 		let mxItems = 0;
 		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
@@ -278,7 +313,12 @@ class MixerUI {
 		for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
 			let itemcount = countFunction(bb);
 			let filIdx = 1 + Math.round(7 * itemcount / mxItems);
+
+
+
+
 			let css = 'mixFiller' + filIdx;
+
 
 			let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
 			if (!(timebar)) {
@@ -287,6 +327,7 @@ class MixerUI {
 
 			//let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 			let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+			let barLeft = barX;
 			let fillRectangle: TileRectangle = {
 				x: globalCommandDispatcher.cfg().leftPad + barX
 				, y: yy
@@ -294,6 +335,15 @@ class MixerUI {
 				, h: hh
 				, css: css
 			};
+			if (clicks) {
+				fillRectangle.activation = (x, y) => {
+					//console.log('bar click roll', x, y);
+					globalCommandDispatcher.rollTracksClick(
+						barLeft + x
+						, yy + y - globalCommandDispatcher.cfg().gridTop()
+					);
+				};
+			}
 
 			this.fillerAnchor.content.push(fillRectangle);
 			barX = barX + barwidth;

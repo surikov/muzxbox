@@ -18,9 +18,13 @@ type MIDIFileInfo = {
 	, duration: number
 	, noteCount: number
 	, drumCount: number
-	, tracks: { program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, pitches: number[], title: string }[]
-	, drums: { pitch: number, count: number, title: string }[]
+	, tracks: {
+		program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, title: string
+		, pitches: { pitch: number, count: number, tone: number }[]
+	}[]
+	, drums: { pitch: number, count: number, ratio: number, baravg: number, title: string }[]
 	, bars: { idx: Number, meter: string, bpm: number, count: number }[]
+	, barCount: number
 };
 class EventsConverter {
 	midiFileInfo: MIDIFileInfo = {
@@ -32,6 +36,7 @@ class EventsConverter {
 		, tracks: []
 		, drums: []
 		, bars: []
+		, barCount: 0
 	};
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
@@ -129,6 +134,11 @@ class EventsConverter {
 		this.addComments(project);
 		this.arrangeIcons(project);
 
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let bar = project.timeline[ii];
+			bar.tempo = 10 * Math.round(bar.tempo / 10);
+		}
+
 		//this.parser.aligned.sort((a, b) => { return b.events.length - a.events.length });
 		/*for (let ii = 5; ii < this.parser.aligned.length; ii++) {
 			let avgcount = (this.parser.aligned[ii - 1].events.length
@@ -221,11 +231,18 @@ class EventsConverter {
 			let choDur = chords.reduce((last, it) => last + it.baseDuration, 0);
 			let singles = starts.filter((it) => (it.count ? it.count : 1) < 2);
 			let snglDur = singles.reduce((last, it) => last + it.baseDuration, 0);
-			let pitches: number[] = []
+			let pitches: { pitch: number, count: number, tone: number }[] = []
 			for (let ss = 0; ss < starts.length; ss++) {
-				let pitch = starts[ss].basePitch;
-				if (pitches.indexOf(pitch) < 0) {
-					pitches.push(pitch);
+				let pitch = Math.round(starts[ss].basePitch);
+				//if (pitches.indexOf(pitch) < 0) {
+				//	pitches.push(pitch);
+				//}
+				let found = pitches.find((it) => it.pitch == pitch);
+				if (found) {
+					found.count++;
+				} else {
+					found = { pitch: pitch, count: 1, tone: pitch % 12 };
+					pitches.push(found);
 				}
 			}
 
@@ -242,7 +259,7 @@ class EventsConverter {
 				, chordCount: chords.length
 				, singleDuration: Math.round(snglDur)
 				, chordDuration: Math.round(choDur)
-				, pitches: pitches
+				, pitches: pitches.sort((a, b) => b.count - a.count)
 				, title: new ChordPitchPerformerUtil().tonechordinslist()[program]
 			});
 		}
@@ -255,6 +272,7 @@ class EventsConverter {
 				}
 			}
 		}
+		this.midiFileInfo.barCount = project.timeline.length;
 		for (let ii = 0; ii < drumList.length; ii++) {
 			let pitch = drumList[ii];
 			let dritem = {
@@ -263,10 +281,18 @@ class EventsConverter {
 					.filter((it) => it.channelidx == 9 && it.basePitch == pitch)
 					.reduce((last, it) => last + 1, 0)
 				, title: allPercussionDrumTitles()[pitch]
+				, ratio: 0
+				, baravg: 0
 			};
 			this.midiFileInfo.drums.push(dritem);
+			this.midiFileInfo.drumCount = this.midiFileInfo.drumCount + dritem.count;
+		}
+		for (let ii = 0; ii < this.midiFileInfo.drums.length; ii++) {
+			this.midiFileInfo.drums[ii].ratio = Math.round(100 * this.midiFileInfo.drums[ii].count / this.midiFileInfo.drumCount);
+			this.midiFileInfo.drums[ii].baravg = Math.round(this.midiFileInfo.drums[ii].count / this.midiFileInfo.barCount);
 		}
 		//let barMeterBPM: { idx: Number, meter: string, bpm: number, count: number }[] = [];
+
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			let bar = project.timeline[ii];
 			if (bar) {
@@ -274,7 +300,8 @@ class EventsConverter {
 				let descr = {
 					idx: ii
 					, meter: '' + bar.metre.count + '/' + bar.metre.part
-					, bpm: 15 * Math.round(bar.tempo / 15)
+					//, bpm: 15 * Math.round(bar.tempo / 15)
+					, bpm: bar.tempo 
 					, count: 1
 				};
 				let xsts = this.midiFileInfo.bars.find((it) => it.meter == descr.meter && it.bpm == descr.bpm);
@@ -448,7 +475,25 @@ class EventsConverter {
 					drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
 				}
 			}
-			if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
+			//if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
+			if (allPercussions[ii].midiPitch < 27 || allPercussions[ii].midiPitch > 87) {
+				/*
+				General MIDI 2 (Expanded Range)
+				27/Eb1 High Q
+				28/E1 Slap
+				29/F1 Scratch Push
+				30/Gb1 Scratch Pull
+				31/G1 Sticks
+				32/Ab1 Square Click
+				33/A1 Metronome Click
+				34/Bb1 Metronome Bell
+				82/Bb5 Shaker (GM2)
+				83/B5 Jingle Bell (GM2)
+				84/C5 Belltree (GM2)
+				85/Db5 Castanets (GM2)
+				86/D5 Mute Surdo (GM2)
+				87/Eb5 Open Surdo (GM2)
+				*/
 				insOut = [];
 			}
 			//console.log(filterPitch);
@@ -551,6 +596,9 @@ class EventsConverter {
 
 			}
 			if (midiProgram < 0 || midiProgram > 127) {
+				/*
+				
+				*/
 				insOut = [];
 			}
 			let tt: Zvoog_MusicTrack = {
@@ -668,7 +716,39 @@ class EventsConverter {
 		}
 		return null;
 	}
-	findVolumeDrum(midi: number): { idx: number, ratio: number } {
+	findVolumeDrum(midipitch: number): { idx: number, ratio: number } {
+		let midi = midipitch;
+		//General MIDI 2 (Expanded Range)
+		//27/Eb1 High Q
+		if (midipitch == 27) midi = 78
+		//28/E1 Slap
+		if (midipitch == 28) midi = 79
+		//29/F1 Scratch Push
+		if (midipitch == 29) midi = 80
+		//30/Gb1 Scratch Pull
+		if (midipitch == 30) midi = 81
+		//31/G1 Sticks
+		if (midipitch == 31) midi = 60
+		//32/Ab1 Square Click
+		if (midipitch == 32) midi = 63
+		//33/A1 Metronome Click
+		if (midipitch == 33) midi = 70
+		//34/Bb1 Metronome Bell
+		if (midipitch == 34) midi = 56
+		//82/Bb5 Shaker (GM2)
+		if (midipitch == 82) midi = 73
+		//83/B5 Jingle Bell (GM2)
+		if (midipitch == 83) midi = 53
+		//84/C5 Belltree (GM2)
+		if (midipitch == 84) midi = 67
+		//85/Db5 Castanets (GM2)
+		if (midipitch == 85) midi = 37
+		//86/D5 Mute Surdo (GM2)
+		if (midipitch == 86) midi = 70
+		//87/Eb5 Open Surdo (GM2)
+		if (midipitch == 87) midi = 63
+
+
 		let re = { idx: 0, ratio: 1 };
 		let pre = '' + midi;
 		for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
@@ -821,7 +901,7 @@ class EventsConverter {
 	}*/
 	takeProTrackNo(allTracks: MIDITrackInfo[], midiTrack: number, midiChannel: number
 		, trackVolumePoints: null | { ms: number, value: number, channel: number }[]): number {
-			let midiProgram = this.findProgramForChannel(midiChannel);
+		let midiProgram = this.findProgramForChannel(midiChannel);
 		for (let ii = 0; ii < allTracks.length; ii++) {
 			let it = allTracks[ii];
 			if (it.midiTrack == midiTrack && it.midiProgram == midiProgram) {
@@ -831,9 +911,9 @@ class EventsConverter {
 		//let title: string = '';
 		if (trackVolumePoints) {
 
-			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: ''+midiProgram, trackVolumePoints: trackVolumePoints });
+			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: '' + midiProgram, trackVolumePoints: trackVolumePoints });
 		} else {
-			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: ''+midiProgram, trackVolumePoints: [] });
+			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: '' + midiProgram, trackVolumePoints: [] });
 		}
 		console.log('add track', midiTrack, midiChannel, midiProgram);
 		return allTracks.length - 1;

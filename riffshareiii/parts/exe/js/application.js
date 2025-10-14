@@ -1948,6 +1948,24 @@ class CommandDispatcher {
             }
         }
     }
+    rollTracksClick(left, top) {
+        console.log('rollTracksClick', left, top, this.renderer.tiler.getCurrentPointPosition());
+        let leftSelect = left - 2 * this.renderer.tiler.getCurrentPointPosition().z;
+        let righSelect = left + 2 * this.renderer.tiler.getCurrentPointPosition().z;
+        let topSelect = top - 2 * this.renderer.tiler.getCurrentPointPosition().z;
+        let bottomSelect = top + 2 * this.renderer.tiler.getCurrentPointPosition().z;
+        let curStart = MMUtil().set({ count: 0, part: 1 });
+        for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+            let bar = this.cfg().data.timeline[ii];
+            if (curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio > left) {
+                console.log(ii);
+                break;
+            }
+            else {
+                curStart = curStart.plus(bar.metre);
+            }
+        }
+    }
     adjustTimeLineLength() {
         console.log('adjustTimeLineLength');
         if (this.cfg().data.timeline.length > 1) {
@@ -4811,10 +4829,18 @@ class MixerUI {
         this.fillerAnchor.ww = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().leftPad - globalCommandDispatcher.cfg().rightPad;
         this.fillerAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
         this.fillerAnchor.content = [];
-        this.reFillSingleRatio(globalCommandDispatcher.cfg().samplerTop(), globalCommandDispatcher.cfg().samplerHeight(), this.barDrumCount);
-        this.reFillSingleRatio(globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
-        this.reFillSingleRatio(globalCommandDispatcher.cfg().automationTop(), globalCommandDispatcher.cfg().automationHeight(), this.barAutoCount);
-        this.reFillSingleRatio(globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
+        this.reFillSingleRatio(false, globalCommandDispatcher.cfg().samplerTop(), globalCommandDispatcher.cfg().samplerHeight(), this.barDrumCount);
+        this.reFillSingleRatio(true, globalCommandDispatcher.cfg().gridTop(), globalCommandDispatcher.cfg().gridHeight(), this.barTrackCount);
+        this.reFillSingleRatio(false, globalCommandDispatcher.cfg().automationTop(), globalCommandDispatcher.cfg().automationHeight(), this.barAutoCount);
+        this.reFillSingleRatio(false, globalCommandDispatcher.cfg().commentsTop(), globalCommandDispatcher.cfg().commentsMaxHeight(), this.barCommentsCount);
+        this.gridClickAnchor.xx = globalCommandDispatcher.cfg().leftPad;
+        this.gridClickAnchor.yy = globalCommandDispatcher.cfg().gridTop();
+        this.gridClickAnchor.ww = globalCommandDispatcher.cfg().timelineWidth();
+        this.gridClickAnchor.hh = globalCommandDispatcher.cfg().gridHeight();
+        this.gridClickRectangle.x = globalCommandDispatcher.cfg().leftPad;
+        this.gridClickRectangle.y = globalCommandDispatcher.cfg().gridTop();
+        this.gridClickRectangle.w = globalCommandDispatcher.cfg().timelineWidth();
+        this.gridClickRectangle.h = globalCommandDispatcher.cfg().gridHeight();
     }
     resetSliderMark() {
         let mark = globalCommandDispatcher.cfg().slidemark;
@@ -4911,6 +4937,16 @@ class MixerUI {
             h: 222,
             css: 'slidePointFill'
         };
+        this.gridClickRectangle = {
+            x: 0,
+            y: 0,
+            w: 2222,
+            h: 2222,
+            css: 'gridRollTracks',
+            activation: (x, y) => {
+                globalCommandDispatcher.rollTracksClick(x, y);
+            }
+        };
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             let mixerGridAnchor = {
                 minZoom: zoomPrefixLevelsCSS[ii].minZoom,
@@ -4944,6 +4980,12 @@ class MixerUI {
             this.spearsLayer.anchors.push(spearAnchor);
             this.levels.push(new MixerZoomLevel(ii, mixerGridAnchor, mixerTrackAnchor, mixerFirstAnchor));
         }
+        this.gridClickAnchor = {
+            minZoom: zoomPrefixLevelsCSS[3].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[6].minZoom,
+            xx: 0, yy: 0, ww: 1, hh: 1, content: [this.gridClickRectangle]
+        };
+        this.gridLayers.anchors.push(this.gridClickAnchor);
         this.markAnchor = {
             minZoom: 0,
             beforeZoom: zoomPrefixLevelsCSS[6].minZoom,
@@ -4964,7 +5006,7 @@ class MixerUI {
         this.gridLayers.anchors.push(this.fillerAnchor);
         return [this.gridLayers, this.trackLayers, this.firstLayers, this.fanLayer, this.spearsLayer];
     }
-    reFillSingleRatio(yy, hh, countFunction) {
+    reFillSingleRatio(clicks, yy, hh, countFunction) {
         let mxItems = 0;
         for (let bb = 0; bb < globalCommandDispatcher.cfg().data.timeline.length; bb++) {
             let itemcount = countFunction(bb);
@@ -4984,6 +5026,7 @@ class MixerUI {
                 timebar = { tempo: 120, metre: { count: 4, part: 4 } };
             }
             let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            let barLeft = barX;
             let fillRectangle = {
                 x: globalCommandDispatcher.cfg().leftPad + barX,
                 y: yy,
@@ -4991,6 +5034,11 @@ class MixerUI {
                 h: hh,
                 css: css
             };
+            if (clicks) {
+                fillRectangle.activation = (x, y) => {
+                    globalCommandDispatcher.rollTracksClick(barLeft + x, yy + y - globalCommandDispatcher.cfg().gridTop());
+                };
+            }
             this.fillerAnchor.content.push(fillRectangle);
             barX = barX + barwidth;
         }

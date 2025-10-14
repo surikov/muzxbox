@@ -1118,6 +1118,24 @@ class CommandDispatcher {
 			//console.log('playPosition', this.playPosition);
 		}
 	}
+	rollTracksClick(left: number, top: number) {
+		console.log('rollTracksClick', left, top, this.renderer.tiler.getCurrentPointPosition());
+		let leftSelect = left - 2 * this.renderer.tiler.getCurrentPointPosition().z;
+		let righSelect = left + 2 * this.renderer.tiler.getCurrentPointPosition().z;
+		let topSelect = top - 2 * this.renderer.tiler.getCurrentPointPosition().z;
+		let bottomSelect = top + 2 * this.renderer.tiler.getCurrentPointPosition().z;
+		let curStart = MMUtil().set({ count: 0, part: 1 });
+		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+			let bar = this.cfg().data.timeline[ii];
+			//console.log(ii, bar, curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio);
+			if (curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio > left) {
+				let clkickBarNo=ii;
+				break;
+			} else {
+				curStart = curStart.plus(bar.metre);
+			}
+		}
+	}
 	adjustTimeLineLength() {
 		console.log('adjustTimeLineLength');
 		if (this.cfg().data.timeline.length > 1) {
