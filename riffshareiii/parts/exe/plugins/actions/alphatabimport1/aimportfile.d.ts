@@ -2647,10 +2647,17 @@ declare type MIDIFileInfo = {
         singleDuration: number;
         chordDuration: number;
         title: string;
+        tones: {
+            pitches: {
+                pitch: number;
+                count: number;
+            }[];
+            tone: number;
+            toneCount: number;
+        }[];
         pitches: {
             pitch: number;
             count: number;
-            tone: number;
         }[];
     }[];
     drums: {

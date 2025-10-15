@@ -20,7 +20,18 @@ type MIDIFileInfo = {
 	, drumCount: number
 	, tracks: {
 		program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, title: string
-		, pitches: { pitch: number, count: number, tone: number }[]
+		, tones: {
+			pitches: {
+				pitch: number
+				, count: number
+			}[]
+			, tone: number
+			, toneCount: number
+		}[]
+		, pitches: {
+			pitch: number
+			, count: number
+		}[]
 	}[]
 	, drums: { pitch: number, count: number, ratio: number, baravg: number, title: string }[]
 	, bars: { idx: Number, meter: string, bpm: number, count: number }[]
@@ -231,18 +242,51 @@ class EventsConverter {
 			let choDur = chords.reduce((last, it) => last + it.baseDuration, 0);
 			let singles = starts.filter((it) => (it.count ? it.count : 1) < 2);
 			let snglDur = singles.reduce((last, it) => last + it.baseDuration, 0);
-			let pitches: { pitch: number, count: number, tone: number }[] = []
+			//let pitches: { pitch: number, count: number, tone: number }[] = []
+			let tones: {
+				pitches: {
+					pitch: number
+					, count: number
+				}[]
+				, tone: number
+				, toneCount: number
+
+			}[] = [];
+			let sipitches: {
+				pitch: number
+				, count: number
+			}[] = [];
+
 			for (let ss = 0; ss < starts.length; ss++) {
 				let pitch = Math.round(starts[ss].basePitch);
-				//if (pitches.indexOf(pitch) < 0) {
-				//	pitches.push(pitch);
-				//}
-				let found = pitches.find((it) => it.pitch == pitch);
+				let tone = pitch % 12;
+
+				let foundedTone = tones.find((it) => it.tone == tone);
+				if (foundedTone) {
+					let foundedPitch = foundedTone.pitches.find((it) => it.pitch == pitch);
+					if (foundedPitch) {
+						foundedPitch.count++;
+						foundedTone.toneCount++;
+					} else {
+						foundedTone.pitches.push({ pitch: pitch, count: 1 });
+					}
+				} else {
+					tones.push({
+						pitches: [{
+							pitch: pitch
+							, count: 1
+						}]
+						, tone: tone
+						, toneCount: 1
+
+					});
+				}
+				let found = sipitches.find((it) => it.pitch == pitch);
 				if (found) {
 					found.count++;
 				} else {
-					found = { pitch: pitch, count: 1, tone: pitch % 12 };
-					pitches.push(found);
+					found = { pitch: pitch, count: 1 };
+					sipitches.push(found);
 				}
 			}
 
@@ -259,7 +303,9 @@ class EventsConverter {
 				, chordCount: chords.length
 				, singleDuration: Math.round(snglDur)
 				, chordDuration: Math.round(choDur)
-				, pitches: pitches.sort((a, b) => b.count - a.count)
+				//, pitches: pitches.sort((a, b) => b.count - a.count)
+				, tones: tones.sort((a, b) => b.toneCount - a.toneCount)
+				, pitches: sipitches.sort((a, b) => b.count - a.count)
 				, title: new ChordPitchPerformerUtil().tonechordinslist()[program]
 			});
 		}
@@ -301,7 +347,7 @@ class EventsConverter {
 					idx: ii
 					, meter: '' + bar.metre.count + '/' + bar.metre.part
 					//, bpm: 15 * Math.round(bar.tempo / 15)
-					, bpm: bar.tempo 
+					, bpm: bar.tempo
 					, count: 1
 				};
 				let xsts = this.midiFileInfo.bars.find((it) => it.meter == descr.meter && it.bpm == descr.bpm);
@@ -317,6 +363,18 @@ class EventsConverter {
 		this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
 		//console.log(barMeterBPM);
 		console.log(this.midiFileInfo);
+		let durationCategory = '';
+		if (this.midiFileInfo.duration < 1 * 60 * 1000) durationCategory = 'excerpt'
+		else if (this.midiFileInfo.duration < 2.5 * 60 * 1000) durationCategory = 'short'
+		else if (this.midiFileInfo.duration < 4 * 60 * 1000) durationCategory = 'medium'
+		else if (this.midiFileInfo.duration < 6 * 60 * 1000) durationCategory = 'long'
+		else durationCategory = 'lingering'
+		console.log('durationCategory', durationCategory, this.midiFileInfo.duration);
+		let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
+		let avgdrum = 0;
+		if (basedrums.length)
+			avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
+		console.log('avgdrum', avgdrum, basedrums);
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
 		let ss = 0;
