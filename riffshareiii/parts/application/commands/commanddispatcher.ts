@@ -1119,21 +1119,70 @@ class CommandDispatcher {
 		}
 	}
 	rollTracksClick(left: number, top: number) {
-		console.log('rollTracksClick', left, top, this.renderer.tiler.getCurrentPointPosition());
-		let leftSelect = left - 2 * this.renderer.tiler.getCurrentPointPosition().z;
-		let righSelect = left + 2 * this.renderer.tiler.getCurrentPointPosition().z;
-		let topSelect = top - 2 * this.renderer.tiler.getCurrentPointPosition().z;
-		let bottomSelect = top + 2 * this.renderer.tiler.getCurrentPointPosition().z;
-		let curStart = MMUtil().set({ count: 0, part: 1 });
-		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-			let bar = this.cfg().data.timeline[ii];
-			//console.log(ii, bar, curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio);
-			if (curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio > left) {
-				let clkickBarNo=ii;
-				break;
-			} else {
-				curStart = curStart.plus(bar.metre);
+
+		let zz = this.renderer.tiler.getCurrentPointPosition().z;
+		if (zz < 64) {
+			let centerPitch = (globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - top) - 3.5 - 12;
+			let upper = Math.round(centerPitch + zz / 3);
+			let lower = Math.round(centerPitch - zz / 3);
+			let barStart = 0;
+			let areaTrack: number[] = [];
+			for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+				let bar = this.cfg().data.timeline[ii];
+				let barWidth = MMUtil().set(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio;
+				if (barStart + barWidth > left) {
+					let clickBarNo = ii;
+					let leftSelect = left - 0.5 * zz - barStart;
+					let rightSelect = left + 0.5 * zz - barStart;
+					for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+						let track = globalCommandDispatcher.cfg().data.tracks[tt];
+						let measure = track.measures[clickBarNo];
+						for (let cc = 0; cc < measure.chords.length; cc++) {
+							let chord = measure.chords[cc];
+							let skipStart = MMUtil().set(chord.skip).duration(bar.tempo) * this.cfg().widthDurationRatio;
+							let chordWidth = 0;
+							for (let ss = 0; ss < chord.slides.length; ss++) {
+								chordWidth = chordWidth + MMUtil().set(chord.slides[ss].duration).duration(bar.tempo) * this.cfg().widthDurationRatio;
+							}
+							if (skipStart <= rightSelect && skipStart + chordWidth >= leftSelect) {
+								for (let pp = 0; pp < chord.pitches.length; pp++) {
+									let pitch = chord.pitches[pp];
+									if (pitch <= upper && pitch >= lower) {
+										//console.log(pitch, track.title, tt);
+										if (areaTrack.indexOf(tt) < 0) {
+											areaTrack.push(tt);
+										}
+									}
+								}
+							}
+						}
+					}
+					break;
+				} else {
+					barStart = barStart + barWidth;
+				}
 			}
+			//console.log('area', areaTrack);
+			let farorder = this.calculateRealTrackFarOrder();
+			let pairs: { far: number, track: number }[] = [];
+			let mostDistantIdx = farorder.length - 1;
+			for (let ii = 0; ii < farorder.length; ii++) {
+				let trackIdx = farorder[ii];
+				if (areaTrack.indexOf(trackIdx) > -1) {
+					pairs.push({ far: ii, track: farorder[ii] });
+				}
+			}
+			if (pairs.length > 0) {
+				if (pairs[pairs.length - 1].far > 0) {
+					mostDistantIdx = pairs[pairs.length - 1].far;
+				}
+			}
+			globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
+				let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+				let nn = farorder.splice(mostDistantIdx, 1)[0];
+				farorder.splice(0, 0, nn);
+				globalCommandDispatcher.cfg().data.farorder = farorder;
+			});
 		}
 	}
 	adjustTimeLineLength() {

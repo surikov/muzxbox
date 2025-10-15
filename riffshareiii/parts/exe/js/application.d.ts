@@ -426,9 +426,6 @@ declare let menuPointActions: MenuInfo;
 declare let menuPointStore: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
-declare let menuPointInsTracks: MenuInfo;
-declare let menuPointDrumTracks: MenuInfo;
-declare let menuPointFxTracks: MenuInfo;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {

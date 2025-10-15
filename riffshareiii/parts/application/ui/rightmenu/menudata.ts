@@ -182,11 +182,10 @@ let menuPointSettings: MenuInfo = {
 		}
 	], itemKind: kindClosedFolder
 };
-
+/*
 let menuPointInsTracks: MenuInfo = {
 	text: localMenuInsTracksFolder
 	, onFolderCloseOpen: () => {
-		//console.log('menuPerformers', menuPointInsTracks.itemKind);
 		if (globalCommandDispatcher.cfg()) {
 			if (menuPointInsTracks.itemKind == kindClosedFolder) {
 				globalCommandDispatcher.cfg().data.menuPerformers = true;
@@ -194,21 +193,8 @@ let menuPointInsTracks: MenuInfo = {
 				globalCommandDispatcher.cfg().data.menuPerformers = false;
 			}
 		}
-		/*let closed = true;
-		if (globalCommandDispatcher.cfg()) {
-			if (globalCommandDispatcher.cfg().data.menuPerformers) {
-				closed = false;
-			}
-		}
-		console.log('menuPerformers', closed);
-		if (globalCommandDispatcher.cfg().data.menuPerformers) {
-			globalCommandDispatcher.cfg().data.menuPerformers = false;
-		} else {
-			globalCommandDispatcher.cfg().data.menuPerformers = true;
-		}*/
 	}, itemKind: kindClosedFolder
 };
-//console.log('menuPointInsTracks', menuPointInsTracks.itemKind);
 let menuPointDrumTracks: MenuInfo = {
 	text: localMenuDrumTracksFolder
 	, onFolderCloseOpen: () => {
@@ -235,6 +221,7 @@ let menuPointFxTracks: MenuInfo = {
 	}
 	, itemKind: kindClosedFolder
 };
+*/
 
 /*
 let menuPlayStop: MenuInfo = {
@@ -465,10 +452,11 @@ function composeBaseMenu(): MenuInfo[] {
 		fillPluginsLists();
 		menuItemsData = [
 			//menuPlayStop
-			menuPointInsTracks
-			, menuPointDrumTracks
-			, menuPointFxTracks
-			, menuPointActions
+			//menuPointInsTracks
+			//, menuPointDrumTracks
+			//, menuPointFxTracks
+			//, 
+			menuPointActions
 			, menuPointAddPlugin
 			, menuPointStore
 			, menuPointSettings

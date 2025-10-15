@@ -228,7 +228,7 @@ class RightMenuPanel {
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
 		//console.log('fillMenuItemChildren',infos);
 		if (globalCommandDispatcher.cfg()) {
-			if (globalCommandDispatcher.cfg().data.menuPerformers) {
+			/*if (globalCommandDispatcher.cfg().data.menuPerformers) {
 				menuPointInsTracks.itemKind = kindOpenedFolder;
 			} else {
 				menuPointInsTracks.itemKind = kindClosedFolder;
@@ -242,7 +242,7 @@ class RightMenuPanel {
 				menuPointFxTracks.itemKind = kindOpenedFolder;
 			} else {
 				menuPointFxTracks.itemKind = kindClosedFolder;
-			}
+			}*/
 			if (globalCommandDispatcher.cfg().data.menuPlugins) {
 				menuPointAddPlugin.itemKind = kindOpenedFolder;
 			} else {
@@ -590,7 +590,7 @@ class RightMenuPanel {
 		let solo = false;
 		for (let tt = 0; tt < project.tracks.length; tt++) if (project.tracks[tt].performer.state == 2) solo = true;
 		for (let tt = 0; tt < project.percussions.length; tt++) if (project.percussions[tt].sampler.state == 2) solo = true;
-		menuPointInsTracks.children = [];
+		/*menuPointInsTracks.children = [];
 		menuPointDrumTracks.children = [];
 		menuPointFxTracks.children = [];
 		let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
@@ -621,7 +621,7 @@ class RightMenuPanel {
 			if (track.performer.state == 1 || (solo && track.performer.state != 2)) item.lightTitle = true;
 			if (farIdx > 0) {
 				item.onClick = () => {
-					globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+					globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
 						//let track: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks.splice(tt, 1)[0];
 						//globalCommandDispatcher.cfg().data.tracks.splice(0, 0, track);
 						let nn = farorder.splice(farIdx, 1)[0];
@@ -642,7 +642,8 @@ class RightMenuPanel {
 				item.highlight = icon_sliders;
 			}
 			menuPointInsTracks.children.push(item);
-		}
+		}*/
+		/*
 		for (let tt = 0; tt < project.percussions.length; tt++) {
 			let drum = project.percussions[tt];
 			let item: MenuInfo = {
@@ -686,82 +687,53 @@ class RightMenuPanel {
 				item.highlight = icon_sliders;
 			}
 			menuPointDrumTracks.children.push(item);
-		}
+		}*/
 
 
-
-		//menuPointAutomation.children = [];
-		for (let ff = 0; ff < project.filters.length; ff++) {
-			let filter: Zvoog_FilterTarget = project.filters[ff];
-			//if (filter.automation) {
-			let item: MenuInfo = {
-				text: filter.title
-				, noLocalization: true
-				, itemStates: [icon_equalizer, icon_power]
-				, selectedState: filter.state
-				, itemKind: kindAction
-			};
-			item.onSubClick = () => {
-				//item.selectedState = item.selectedState ? item.selectedState : 0;
-				//if (item.selectedState > 1) {
-				//	item.selectedState = 0;
-				//}
-				//console.log(item.selectedState, filter);
-				globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-					if (item.selectedState == 1) {
-						filter.state = 1;
-					} else {
-						filter.state = 0;
+		/*
+				//menuPointAutomation.children = [];
+				for (let ff = 0; ff < project.filters.length; ff++) {
+					let filter: Zvoog_FilterTarget = project.filters[ff];
+					let item: MenuInfo = {
+						text: filter.title
+						, noLocalization: true
+						, itemStates: [icon_equalizer, icon_power]
+						, selectedState: filter.state
+						, itemKind: kindAction
+					};
+					item.onSubClick = () => {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+							if (item.selectedState == 1) {
+								filter.state = 1;
+							} else {
+								filter.state = 0;
+							}
+						});
+						globalCommandDispatcher.reConnectPluginsIfPlay();
+					};
+					if (filter.state) {
+						item.lightTitle = true;
 					}
-				});
-				globalCommandDispatcher.reConnectPluginsIfPlay();
-			};
-			if (filter.state) {
-				item.lightTitle = true;
-			}
-			if (ff > 0) {
-				item.onClick = () => {
-					globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-						let fltr: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters.splice(ff, 1)[0];
-						globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
-					});
-					//globalCommandDispatcher.relaunchPlayer();
-				};
-			} else {
-				item.onClick = () => {
-					let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
-					if (info) {
-						globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
-						/*let url = info.ui;
-						globalCommandDispatcher.promptPluginPointDialog(filter.title, url, filter.data, (obj: any) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
-								filter.data = obj;
-							});
-							//globalCommandDispatcher.reStartPlayIfPlay();
-							return true;
-						}, LO(localDropFilterTrack), () => {
-							//console.log(localDropFilterTrack);
+					if (ff > 0) {
+						item.onClick = () => {
 							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-								globalCommandDispatcher.cfg().data.filters.splice(ff, 1);
+								let fltr: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters.splice(ff, 1)[0];
+								globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
 							});
-							globalCommandDispatcher.cancelPluginGUI();
-						}, (newTitle: string) => {
-							globalCommandDispatcher.exe.commitProjectChanges(['filters', ff], () => {
-								filter.title = newTitle;
-							});
-							globalCommandDispatcher.cancelPluginGUI();
-						});*/
+						};
 					} else {
-						globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
+						item.onClick = () => {
+							let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
+							if (info) {
+								globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
+							} else {
+								globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
+							}
+						};
+						item.highlight = icon_sliders;
 					}
-					//console.log('first',track);
-				};
-				item.highlight = icon_sliders;
-				//
-			}
-			menuPointFxTracks.children.push(item);
-			//}
-		}
+					menuPointFxTracks.children.push(item);
+				}*/
 
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {

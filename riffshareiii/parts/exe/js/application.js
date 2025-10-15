@@ -1949,21 +1949,68 @@ class CommandDispatcher {
         }
     }
     rollTracksClick(left, top) {
-        console.log('rollTracksClick', left, top, this.renderer.tiler.getCurrentPointPosition());
-        let leftSelect = left - 2 * this.renderer.tiler.getCurrentPointPosition().z;
-        let righSelect = left + 2 * this.renderer.tiler.getCurrentPointPosition().z;
-        let topSelect = top - 2 * this.renderer.tiler.getCurrentPointPosition().z;
-        let bottomSelect = top + 2 * this.renderer.tiler.getCurrentPointPosition().z;
-        let curStart = MMUtil().set({ count: 0, part: 1 });
-        for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-            let bar = this.cfg().data.timeline[ii];
-            if (curStart.plus(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio > left) {
-                console.log(ii);
-                break;
+        let zz = this.renderer.tiler.getCurrentPointPosition().z;
+        if (zz < 64) {
+            let centerPitch = (globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - top) - 3.5 - 12;
+            let upper = Math.round(centerPitch + zz / 3);
+            let lower = Math.round(centerPitch - zz / 3);
+            let barStart = 0;
+            let areaTrack = [];
+            for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
+                let bar = this.cfg().data.timeline[ii];
+                let barWidth = MMUtil().set(bar.metre).duration(bar.tempo) * this.cfg().widthDurationRatio;
+                if (barStart + barWidth > left) {
+                    let clickBarNo = ii;
+                    let leftSelect = left - 0.5 * zz - barStart;
+                    let rightSelect = left + 0.5 * zz - barStart;
+                    for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+                        let track = globalCommandDispatcher.cfg().data.tracks[tt];
+                        let measure = track.measures[clickBarNo];
+                        for (let cc = 0; cc < measure.chords.length; cc++) {
+                            let chord = measure.chords[cc];
+                            let skipStart = MMUtil().set(chord.skip).duration(bar.tempo) * this.cfg().widthDurationRatio;
+                            let chordWidth = 0;
+                            for (let ss = 0; ss < chord.slides.length; ss++) {
+                                chordWidth = chordWidth + MMUtil().set(chord.slides[ss].duration).duration(bar.tempo) * this.cfg().widthDurationRatio;
+                            }
+                            if (skipStart <= rightSelect && skipStart + chordWidth >= leftSelect) {
+                                for (let pp = 0; pp < chord.pitches.length; pp++) {
+                                    let pitch = chord.pitches[pp];
+                                    if (pitch <= upper && pitch >= lower) {
+                                        if (areaTrack.indexOf(tt) < 0) {
+                                            areaTrack.push(tt);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+                }
+                else {
+                    barStart = barStart + barWidth;
+                }
             }
-            else {
-                curStart = curStart.plus(bar.metre);
+            let farorder = this.calculateRealTrackFarOrder();
+            let pairs = [];
+            let mostDistantIdx = farorder.length - 1;
+            for (let ii = 0; ii < farorder.length; ii++) {
+                let trackIdx = farorder[ii];
+                if (areaTrack.indexOf(trackIdx) > -1) {
+                    pairs.push({ far: ii, track: farorder[ii] });
+                }
             }
+            if (pairs.length > 0) {
+                if (pairs[pairs.length - 1].far > 0) {
+                    mostDistantIdx = pairs[pairs.length - 1].far;
+                }
+            }
+            globalCommandDispatcher.exe.commitProjectChanges(['farorder'], () => {
+                let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+                let nn = farorder.splice(mostDistantIdx, 1)[0];
+                farorder.splice(0, 0, nn);
+                globalCommandDispatcher.cfg().data.farorder = farorder;
+            });
         }
     }
     adjustTimeLineLength() {
@@ -2942,24 +2989,6 @@ class RightMenuPanel {
     }
     fillMenuItemChildren(pad, infos) {
         if (globalCommandDispatcher.cfg()) {
-            if (globalCommandDispatcher.cfg().data.menuPerformers) {
-                menuPointInsTracks.itemKind = kindOpenedFolder;
-            }
-            else {
-                menuPointInsTracks.itemKind = kindClosedFolder;
-            }
-            if (globalCommandDispatcher.cfg().data.menuSamplers) {
-                menuPointDrumTracks.itemKind = kindOpenedFolder;
-            }
-            else {
-                menuPointDrumTracks.itemKind = kindClosedFolder;
-            }
-            if (globalCommandDispatcher.cfg().data.menuFilters) {
-                menuPointFxTracks.itemKind = kindOpenedFolder;
-            }
-            else {
-                menuPointFxTracks.itemKind = kindClosedFolder;
-            }
             if (globalCommandDispatcher.cfg().data.menuPlugins) {
                 menuPointAddPlugin.itemKind = kindOpenedFolder;
             }
@@ -3143,155 +3172,6 @@ class RightMenuPanel {
         for (let tt = 0; tt < project.percussions.length; tt++)
             if (project.percussions[tt].sampler.state == 2)
                 solo = true;
-        menuPointInsTracks.children = [];
-        menuPointDrumTracks.children = [];
-        menuPointFxTracks.children = [];
-        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
-        for (let farIdx = 0; farIdx < farorder.length; farIdx++) {
-            let tt = farorder[farIdx];
-            let track = project.tracks[tt];
-            let item = {
-                text: track.title,
-                noLocalization: true,
-                selectedState: track.performer.state,
-                itemStates: [icon_sound_loud, icon_power, icon_flash],
-                onSubClick: () => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                        if (item.selectedState == 1) {
-                            track.performer.state = 1;
-                        }
-                        else {
-                            if (item.selectedState == 2) {
-                                track.performer.state = 2;
-                            }
-                            else {
-                                track.performer.state = 0;
-                            }
-                        }
-                    });
-                    globalCommandDispatcher.reConnectPluginsIfPlay();
-                },
-                itemKind: kindAction2
-            };
-            if (track.performer.state == 1 || (solo && track.performer.state != 2))
-                item.lightTitle = true;
-            if (farIdx > 0) {
-                item.onClick = () => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                        let nn = farorder.splice(farIdx, 1)[0];
-                        farorder.splice(0, 0, nn);
-                        globalCommandDispatcher.cfg().data.farorder = farorder;
-                    });
-                };
-            }
-            else {
-                item.onClick = () => {
-                    let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
-                    if (info) {
-                        globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farIdx, tt, track, info);
-                    }
-                    else {
-                        globalCommandDispatcher.sequencerPluginDialog.openEmptySequencerPluginDialogFrame(tt, track);
-                    }
-                };
-                item.highlight = icon_sliders;
-            }
-            menuPointInsTracks.children.push(item);
-        }
-        for (let tt = 0; tt < project.percussions.length; tt++) {
-            let drum = project.percussions[tt];
-            let item = {
-                text: drum.title,
-                noLocalization: true,
-                onSubClick: () => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                        if (item.selectedState == 1) {
-                            drum.sampler.state = 1;
-                        }
-                        else {
-                            if (item.selectedState == 2) {
-                                drum.sampler.state = 2;
-                            }
-                            else {
-                                drum.sampler.state = 0;
-                            }
-                        }
-                    });
-                    globalCommandDispatcher.reConnectPluginsIfPlay();
-                },
-                itemStates: [icon_sound_loud, icon_power, icon_flash],
-                selectedState: drum.sampler.state,
-                itemKind: kindAction2
-            };
-            if (drum.sampler.state == 1 || (solo && drum.sampler.state != 2))
-                item.lightTitle = true;
-            if (tt > 0) {
-                item.onClick = () => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                        let smpl = globalCommandDispatcher.cfg().data.percussions.splice(tt, 1)[0];
-                        globalCommandDispatcher.cfg().data.percussions.splice(0, 0, smpl);
-                    });
-                };
-            }
-            else {
-                item.onClick = () => {
-                    let info = globalCommandDispatcher.findPluginRegistrationByKind(drum.sampler.kind);
-                    if (info) {
-                        globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(tt, drum, info);
-                    }
-                    else {
-                        globalCommandDispatcher.samplerPluginDialog.openEmptyDrumPluginDialogFrame(tt, drum);
-                    }
-                };
-                item.highlight = icon_sliders;
-            }
-            menuPointDrumTracks.children.push(item);
-        }
-        for (let ff = 0; ff < project.filters.length; ff++) {
-            let filter = project.filters[ff];
-            let item = {
-                text: filter.title,
-                noLocalization: true,
-                itemStates: [icon_equalizer, icon_power],
-                selectedState: filter.state,
-                itemKind: kindAction
-            };
-            item.onSubClick = () => {
-                globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                    if (item.selectedState == 1) {
-                        filter.state = 1;
-                    }
-                    else {
-                        filter.state = 0;
-                    }
-                });
-                globalCommandDispatcher.reConnectPluginsIfPlay();
-            };
-            if (filter.state) {
-                item.lightTitle = true;
-            }
-            if (ff > 0) {
-                item.onClick = () => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                        let fltr = globalCommandDispatcher.cfg().data.filters.splice(ff, 1)[0];
-                        globalCommandDispatcher.cfg().data.filters.splice(0, 0, fltr);
-                    });
-                };
-            }
-            else {
-                item.onClick = () => {
-                    let info = globalCommandDispatcher.findPluginRegistrationByKind(filter.kind);
-                    if (info) {
-                        globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(ff, filter, info);
-                    }
-                    else {
-                        globalCommandDispatcher.filterPluginDialog.openEmptyFilterPluginDialogFrame(ff, filter);
-                    }
-                };
-                item.highlight = icon_sliders;
-            }
-            menuPointFxTracks.children.push(item);
-        }
     }
     rerenderMenuContent(folder) {
         this.contentAnchor.content = [];
@@ -3638,47 +3518,6 @@ let menuPointSettings = {
         }
     ], itemKind: kindClosedFolder
 };
-let menuPointInsTracks = {
-    text: localMenuInsTracksFolder,
-    onFolderCloseOpen: () => {
-        if (globalCommandDispatcher.cfg()) {
-            if (menuPointInsTracks.itemKind == kindClosedFolder) {
-                globalCommandDispatcher.cfg().data.menuPerformers = true;
-            }
-            else {
-                globalCommandDispatcher.cfg().data.menuPerformers = false;
-            }
-        }
-    }, itemKind: kindClosedFolder
-};
-let menuPointDrumTracks = {
-    text: localMenuDrumTracksFolder,
-    onFolderCloseOpen: () => {
-        if (globalCommandDispatcher.cfg()) {
-            if (menuPointDrumTracks.itemKind == kindClosedFolder) {
-                globalCommandDispatcher.cfg().data.menuSamplers = true;
-            }
-            else {
-                globalCommandDispatcher.cfg().data.menuSamplers = false;
-            }
-        }
-    },
-    itemKind: kindClosedFolder
-};
-let menuPointFxTracks = {
-    text: localMenuFxTracksFolder,
-    onFolderCloseOpen: () => {
-        if (globalCommandDispatcher.cfg()) {
-            if (menuPointFxTracks.itemKind == kindClosedFolder) {
-                globalCommandDispatcher.cfg().data.menuFilters = true;
-            }
-            else {
-                globalCommandDispatcher.cfg().data.menuFilters = false;
-            }
-        }
-    },
-    itemKind: kindClosedFolder
-};
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
     menuPointActions.children = [];
@@ -3879,9 +3718,6 @@ function composeBaseMenu() {
     else {
         fillPluginsLists();
         menuItemsData = [
-            menuPointInsTracks,
-            menuPointDrumTracks,
-            menuPointFxTracks,
             menuPointActions,
             menuPointAddPlugin,
             menuPointStore,
