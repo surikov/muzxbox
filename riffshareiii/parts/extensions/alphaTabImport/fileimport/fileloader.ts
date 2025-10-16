@@ -5,7 +5,7 @@ class FileLoaderAlpha {
 		var file = inputFile.files[0];
 		var fileReader = new FileReader();
 		let me = this;
-		console.log('read', file);
+		//console.log('read', file);
 
 		fileReader.onload = function (progressEvent: any) {
 			if (progressEvent != null) {

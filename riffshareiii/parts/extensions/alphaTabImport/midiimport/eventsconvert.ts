@@ -163,8 +163,8 @@ class EventsConverter {
 			}
 		}*/
 
-		console.log('allNotes', allNotes);
-		console.log('alignedMIDIevents', this.parser.alignedMIDIevents);
+		//console.log('allNotes', allNotes);
+		//console.log('alignedMIDIevents', this.parser.alignedMIDIevents);
 		this.fillInfoMIDI(project, allNotes, allTracks);
 
 		return project;
@@ -201,7 +201,7 @@ class EventsConverter {
 		return program;
 	}
 	fillInfoMIDI(project: Zvoog_Project, allNotes: TrackNote[], allTracks: MIDITrackInfo[]) {
-		console.log('fillInfoMIDI');
+		//console.log('fillInfoMIDI');
 		/*
 		let sortedIns = allNotes.sort((a, b) => b.baseDuration - a.baseDuration);
 		let ins90 = sortedIns.filter((element, index) => index > 0.05 * sortedIns.length && index < 0.95 * sortedIns.length);
@@ -362,19 +362,19 @@ class EventsConverter {
 		this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
 		this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
 		//console.log(barMeterBPM);
-		console.log(this.midiFileInfo);
+		//console.log(this.midiFileInfo);
 		let durationCategory = '';
 		if (this.midiFileInfo.duration < 1 * 60 * 1000) durationCategory = 'excerpt'
 		else if (this.midiFileInfo.duration < 2.5 * 60 * 1000) durationCategory = 'short'
 		else if (this.midiFileInfo.duration < 4 * 60 * 1000) durationCategory = 'medium'
 		else if (this.midiFileInfo.duration < 6 * 60 * 1000) durationCategory = 'long'
 		else durationCategory = 'lingering'
-		console.log('durationCategory', durationCategory, this.midiFileInfo.duration);
+		//console.log('durationCategory', durationCategory, this.midiFileInfo.duration);
 		let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
 		let avgdrum = 0;
 		if (basedrums.length)
 			avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
-		console.log('avgdrum', avgdrum, basedrums);
+		//console.log('avgdrum', avgdrum, basedrums);
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
 		let ss = 0;
@@ -422,8 +422,8 @@ class EventsConverter {
 		}
 	}
 	fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]) {
-		console.log('tempo', this.parser.midiheader.changesResolutionTempo);
-		console.log('meter', this.parser.midiheader.metersList);
+		//console.log('tempo', this.parser.midiheader.changesResolutionTempo);
+		//console.log('meter', this.parser.midiheader.metersList);
 		let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
 		this.midiFileInfo.duration = lastMs;
 		let wholeDurationMs = 0;
@@ -716,6 +716,7 @@ class EventsConverter {
 		project.filters[1].iconPosition.y = 2 * 9 + 11;
 	}
 	collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]) {
+		
 		for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
 			let parsedtrack: MIDIFileTrack = this.parser.parsedTracks[ii];
 			for (let nn = 0; nn < parsedtrack.trackNotes.length; nn++) {
@@ -729,6 +730,7 @@ class EventsConverter {
 			}
 		}
 		allNotes.sort((a, b) => { return a.startMs - b.startMs; });
+		//console.log(this.parser);
 	}
 	addComments(project: Zvoog_Project) {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
@@ -973,7 +975,7 @@ class EventsConverter {
 		} else {
 			allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: '' + midiProgram, trackVolumePoints: [] });
 		}
-		console.log('add track', midiTrack, midiChannel, midiProgram);
+		//console.log('add track', midiTrack, midiChannel, midiProgram);
 		return allTracks.length - 1;
 	}
 	takeProSamplerNo(allPercussions: MIDIDrumInfo[], midiTrack: number, midiPitch: number

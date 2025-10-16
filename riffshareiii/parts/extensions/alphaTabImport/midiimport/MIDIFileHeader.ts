@@ -17,7 +17,7 @@ class MIDIFileHeader {
 		this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
 		this.format = this.datas.getUint16(8);
 		this.trackCount = this.datas.getUint16(10);
-		console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
+		//console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
 	}
 	/*
 	// Tick compute

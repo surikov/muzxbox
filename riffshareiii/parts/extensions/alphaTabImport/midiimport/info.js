@@ -2,17 +2,21 @@ var fs = require('fs');
 let folder = 'D:\\projects\\muzxbox\\test\\music\\';
 console.log('start', folder);
 
+function toArrayBuffer(buffer) {
+	const arrayBuffer = new ArrayBuffer(buffer.length);
+	const view = new Uint8Array(arrayBuffer);
+	for (let i = 0; i < buffer.length; ++i) {
+		view[i] = buffer[i];
+	}
+	return arrayBuffer;
+}
+
 function readOneFile(path,name) {
-	/*fs.readFileSync(path+name, 'utf-8', function (error, content) {
-		//console.log('name', name);
-		if (error) {
-			console.log('error', name,error);
-		} else {
-			console.log('content', name,content.length);
-		}
-	});*/
 	let buff=fs.readFileSync(path+name);
-	console.log('buff', name,buff.length);
+	let arrayBuffer=toArrayBuffer(buff);
+	console.log('buff', name, buff.length);
+	//let mireader: MIDIReader = new MIDIReader(name, 0, arrayBuffer);
+	
 }
 
 function readFiles(path) {

@@ -2,7 +2,7 @@ console.log('Alpha Tab Import *.mid v1.0.1');
 let parsedProject: Zvoog_Project | null = null;
 class AlphaTabImportMusicPlugin {
 	callbackID = '';
-	
+
 	constructor() {
 		this.init();
 	}
@@ -41,8 +41,8 @@ class AlphaTabImportMusicPlugin {
 		//console.log('loadMusicfile');
 		//console.dir(inputFile);
 		let loader = new FileLoaderAlpha(inputFile);
-		console.log('loadMusicfile',inputFile);
-		
+		//console.log('loadMusicfile', inputFile);
+
 	}
 
 }

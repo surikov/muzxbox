@@ -515,16 +515,16 @@ class MidiParser {
 		this.midiheader.changesResolutionTempo.sort((a, b) => { return a.ms - b.ms; });
 	}
 	fillEventsTimeMs() {
-		console.log('fillEventsTimeMs');
+		//console.log('fillEventsTimeMs');
 		//this.dumpResolutionChanges();
 		let tickResolutionAt0: number = this.midiheader.get0TickResolution();
 		//let reChange = { track: -1, ms: -1, newresolution: tickResolution, bpm: 120, evnt: null };
 		//this.midiheader.changesResolutionBPM.push(reChange);
 		this.addResolutionPoint(-1, -1, tickResolutionAt0, 120, null);
 		var format = this.midiheader.getFormat();
-		console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
+		//console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
 		if (format == 1) {//|| this.midiheader.trackCount > 1) {
-			console.log('multi track');
+			//console.log('multi track');
 			/*for (let t = 0; t < this.parsedTracks.length; t++) {
 				var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 				this.parseTicks2time(singleParsedTrack);
@@ -553,7 +553,7 @@ class MidiParser {
 				cuevnt = this.nextByAllTracksEvent();
 			}
 		} else {
-			console.log('single track');
+			//console.log('single track');
 			let playTime = 0;
 			let tickResolution = this.midiheader.getCalculatedTickResolution(0);
 			for (let t = 0; t < this.parsedTracks.length; t++) {
@@ -647,7 +647,7 @@ class MidiParser {
 		for (let t = 0; t < this.parsedTracks.length; t++) {
 			var singleParsedTrack: MIDIFileTrack = this.parsedTracks[t];
 			//this.parseTicks2time(singleParsedTrack);
-			console.log('notes for track', t);
+			//console.log('notes for track', t);
 			for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
 				if (Math.floor(e / 1000) == e / 1000) {
 					//console.log('event',e);
@@ -710,7 +710,7 @@ class MidiParser {
 									if (xsts) {
 										console.log('skip programChannel', pair);
 									} else {
-										console.log('add', pair);
+										//console.log('add', pair);
 										this.programChannel.push(pair);
 									}
 								}

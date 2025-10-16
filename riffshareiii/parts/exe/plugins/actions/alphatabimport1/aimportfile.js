@@ -14802,13 +14802,10 @@ class MidiParser {
         this.midiheader.changesResolutionTempo.sort((a, b) => { return a.ms - b.ms; });
     }
     fillEventsTimeMs() {
-        console.log('fillEventsTimeMs');
         let tickResolutionAt0 = this.midiheader.get0TickResolution();
         this.addResolutionPoint(-1, -1, tickResolutionAt0, 120, null);
         var format = this.midiheader.getFormat();
-        console.log('format', format, 'tracks', this.midiheader.trackCount, this.parsedTracks.length);
         if (format == 1) {
-            console.log('multi track');
             let playTime = 0;
             let tickResolution = this.midiheader.getCalculatedTickResolution(0);
             for (let tt = 0; tt < this.parsedTracks.length; tt++) {
@@ -14830,7 +14827,6 @@ class MidiParser {
             }
         }
         else {
-            console.log('single track');
             let playTime = 0;
             let tickResolution = this.midiheader.getCalculatedTickResolution(0);
             for (let t = 0; t < this.parsedTracks.length; t++) {
@@ -14905,7 +14901,6 @@ class MidiParser {
         var pitchBendValuesRange = Array(16).fill(2);
         for (let t = 0; t < this.parsedTracks.length; t++) {
             var singleParsedTrack = this.parsedTracks[t];
-            console.log('notes for track', t);
             for (var e = 0; e < singleParsedTrack.trackevents.length; e++) {
                 if (Math.floor(e / 1000) == e / 1000) {
                 }
@@ -14951,7 +14946,6 @@ class MidiParser {
                                         console.log('skip programChannel', pair);
                                     }
                                     else {
-                                        console.log('add', pair);
                                         this.programChannel.push(pair);
                                     }
                                 }
@@ -15308,7 +15302,6 @@ class MIDIFileHeader {
         this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
         this.format = this.datas.getUint16(8);
         this.trackCount = this.datas.getUint16(10);
-        console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
     }
     getCalculatedTickResolution(tempo) {
         this.lastNonZeroQuarter = tempo;
@@ -15409,10 +15402,8 @@ class DataViewStream {
 class MIDIReader {
     constructor(filename, filesize, arrayBuffer) {
         let parser = new MidiParser(arrayBuffer);
-        console.log(parser);
         let converter = new EventsConverter(parser);
         let project = converter.convertEvents(filename, filesize);
-        console.log(project);
         parsedProject = project;
     }
 }
@@ -15501,8 +15492,6 @@ class EventsConverter {
             let bar = project.timeline[ii];
             bar.tempo = 10 * Math.round(bar.tempo / 10);
         }
-        console.log('allNotes', allNotes);
-        console.log('alignedMIDIevents', this.parser.alignedMIDIevents);
         this.fillInfoMIDI(project, allNotes, allTracks);
         return project;
     }
@@ -15516,7 +15505,6 @@ class EventsConverter {
         return program;
     }
     fillInfoMIDI(project, allNotes, allTracks) {
-        console.log('fillInfoMIDI');
         let insList = [];
         for (let ii = 0; ii < allNotes.length; ii++) {
             let anote = allNotes[ii];
@@ -15640,7 +15628,6 @@ class EventsConverter {
         this.midiFileInfo.bars.sort((a, b) => b.count - a.count);
         this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
         this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
-        console.log(this.midiFileInfo);
         let durationCategory = '';
         if (this.midiFileInfo.duration < 1 * 60 * 1000)
             durationCategory = 'excerpt';
@@ -15652,12 +15639,10 @@ class EventsConverter {
             durationCategory = 'long';
         else
             durationCategory = 'lingering';
-        console.log('durationCategory', durationCategory, this.midiFileInfo.duration);
         let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
         let avgdrum = 0;
         if (basedrums.length)
             avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
-        console.log('avgdrum', avgdrum, basedrums);
     }
     findMIDITempoBefore(ms) {
         for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
@@ -15695,8 +15680,6 @@ class EventsConverter {
         }
     }
     fillTimeline(project, allNotes) {
-        console.log('tempo', this.parser.midiheader.changesResolutionTempo);
-        console.log('meter', this.parser.midiheader.metersList);
         let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
         this.midiFileInfo.duration = lastMs;
         let wholeDurationMs = 0;
@@ -16159,7 +16142,6 @@ class EventsConverter {
         else {
             allTracks.push({ midiTrack: midiTrack, midiProgram: midiProgram, midiTitle: '' + midiProgram, trackVolumePoints: [] });
         }
-        console.log('add track', midiTrack, midiChannel, midiProgram);
         return allTracks.length - 1;
     }
     takeProSamplerNo(allPercussions, midiTrack, midiPitch, trackVolumePoints) {
@@ -16218,7 +16200,6 @@ class AlphaTabImportMusicPlugin {
     }
     loadMusicfile(inputFile) {
         let loader = new FileLoaderAlpha(inputFile);
-        console.log('loadMusicfile', inputFile);
     }
 }
 class FileLoaderAlpha {
@@ -16227,7 +16208,6 @@ class FileLoaderAlpha {
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
-        console.log('read', file);
         fileReader.onload = function (progressEvent) {
             if (progressEvent != null) {
                 let title = file.name;
