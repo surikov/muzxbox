@@ -1,0 +1,60 @@
+{
+	"compilerOptions": {
+		"target": "es2020"
+		//"target": "es2015"
+        ,"outFile": "gofolder.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+		//,"module": "es2020"
+        ,"lib": [
+			"ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            //"es2022.regexp",
+            //"es2022.error",
+            //"ES2024.Promise",
+            "DOM",
+            "DOM.Iterable",
+            //"ES2017.ArrayBuffer",
+            //"ES2024.ArrayBuffer"
+            //"dom"
+            //,"es2015"
+            //,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		
+        "../riffshareiii/parts/mzxbxapi/musicenginetypes.ts"
+		//,"../riffshareiii/parts/mzxbxapi/musicenginedeclarations.ts"
+		,"../riffshareiii/parts/extensions/minium.percussion/list/names.ts"
+		,"../riffshareiii/parts/extensions/minium.pitch/list/names.ts"
+
+		,"MIDIEvent.ts"
+		,"MIDIParser.ts"
+		,"MIDIFileTrack.ts"
+		,"MIDIFileHeader.ts"
+		,"DataViewStream.ts"
+		,"midiimport.ts"
+		,"eventsconvert.ts"
+
+		,"metre.ts"
+		
+		,"startup.ts"
+
+	]
+}

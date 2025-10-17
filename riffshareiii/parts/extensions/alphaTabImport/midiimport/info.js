@@ -14,7 +14,7 @@ function toArrayBuffer(buffer) {
 function readOneFile(path,name) {
 	let buff=fs.readFileSync(path+name);
 	let arrayBuffer=toArrayBuffer(buff);
-	console.log('buff', name, buff.length);
+	console.log('--', name, buff.length);
 	//let mireader: MIDIReader = new MIDIReader(name, 0, arrayBuffer);
 	
 }

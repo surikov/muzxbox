@@ -54,6 +54,7 @@ class ChordPitchPerformerUtil {
 		insNames[21] = "Accordion: Organ";
 		insNames[22] = "Harmonica: Organ";
 		insNames[23] = "Tango Accordion: Organ";
+
 		insNames[24] = "Acoustic Guitar (nylon): Guitar";
 		insNames[25] = "Acoustic Guitar (steel): Guitar";
 		insNames[26] = "Electric Guitar (jazz): Guitar";
@@ -61,6 +62,7 @@ class ChordPitchPerformerUtil {
 		insNames[28] = "Electric Guitar (muted): Guitar";
 		insNames[29] = "Overdriven Guitar: Guitar";
 		insNames[30] = "Distortion Guitar: Guitar";
+		
 		insNames[31] = "Guitar Harmonics: Guitar";
 		insNames[32] = "Acoustic Bass: Bass";
 		insNames[33] = "Electric Bass (finger): Bass";
