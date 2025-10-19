@@ -708,7 +708,8 @@ class MidiParser {
 									//singleParsedTrack.programChannel.push(pair);
 									let xsts = this.programChannel.find((it) => it.midiChannel == pair.midiChannel);
 									if (xsts) {
-										console.log('skip programChannel', pair);
+										//console.log('skip programChannel', pair,evnt,this.programChannel);
+										xsts.midiProgram=pair.midiProgram;
 									} else {
 										//console.log('add', pair);
 										this.programChannel.push(pair);

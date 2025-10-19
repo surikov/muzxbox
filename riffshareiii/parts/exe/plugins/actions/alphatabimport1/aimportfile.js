@@ -440,6 +440,14 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
+    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -454,14 +462,6 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
-    }
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
     }
 }
 var LogLevel;
@@ -3538,11 +3538,6 @@ class Chord {
     }
 }
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3643,6 +3638,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,10 +8893,6 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8912,6 +8908,10 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
+    get inputCrc() {
+        return this._engine.inputCrc.value;
+    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
-    }
-    get inputCrc() {
-        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,16 +9591,6 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
-    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9629,6 +9619,16 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+    }
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,6 +9951,13 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
+    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9969,13 +9976,6 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
-    }
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
+    get isFlushed() {
+        return this._end === 0;
+    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
-    }
-    get isFlushed() {
-        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -14943,7 +14943,7 @@ class MidiParser {
                                     };
                                     let xsts = this.programChannel.find((it) => it.midiChannel == pair.midiChannel);
                                     if (xsts) {
-                                        console.log('skip programChannel', pair);
+                                        xsts.midiProgram = pair.midiProgram;
                                     }
                                     else {
                                         this.programChannel.push(pair);
@@ -15564,10 +15564,11 @@ class EventsConverter {
                     found.count++;
                 }
                 else {
-                    found = { pitch: pitch, count: 1 };
+                    found = { pitch: pitch, count: 1, ratio: 0 };
                     sipitches.push(found);
                 }
             }
+            let pitchCount = sipitches.reduce((last, it) => last + it.count, 0);
             this.midiFileInfo.tracks.push({
                 program: program,
                 singlCount: singles.length,
@@ -15575,7 +15576,7 @@ class EventsConverter {
                 singleDuration: Math.round(snglDur),
                 chordDuration: Math.round(choDur),
                 tones: tones.sort((a, b) => b.toneCount - a.toneCount),
-                pitches: sipitches.sort((a, b) => b.count - a.count),
+                pitches: sipitches.map((it) => { it.ratio = it.count / pitchCount; return it; }).sort((a, b) => b.count - a.count),
                 title: new ChordPitchPerformerUtil().tonechordinslist()[program]
             });
         }
@@ -15643,6 +15644,40 @@ class EventsConverter {
         let avgdrum = 0;
         if (basedrums.length)
             avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
+        let bassTrack;
+        let curAvg = 0;
+        for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
+            let track = this.midiFileInfo.tracks[ii];
+            if ((track.program < 96 || (track.program > 103 && track.program < 120))
+                && track.singleDuration + track.chordDuration > this.midiFileInfo.duration / 10) {
+                let halfsize = Math.ceil(track.pitches.length / 3);
+                let sm = 0;
+                for (let kk = 0; kk < halfsize; kk++) {
+                    sm = sm + track.pitches[kk].pitch;
+                }
+                let avgPitch = Math.round(sm / halfsize);
+                if (avgPitch < 48) {
+                    if (avgPitch > 0 && (bassTrack)) {
+                        if (avgPitch < curAvg && track.singlCount > bassTrack.singlCount * 0.7) {
+                            curAvg = avgPitch;
+                            bassTrack = track;
+                        }
+                    }
+                    else {
+                        bassTrack = track;
+                        curAvg = avgPitch;
+                    }
+                }
+            }
+        }
+        if (bassTrack) {
+            let piline = '';
+            for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
+                piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+            }
+            console.log('bass pitch', curAvg, bassTrack.title, piline);
+        }
+        console.log(this.midiFileInfo);
     }
     findMIDITempoBefore(ms) {
         for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
@@ -15683,15 +15718,17 @@ class EventsConverter {
         let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
         this.midiFileInfo.duration = lastMs;
         let wholeDurationMs = 0;
+        console.log(this.parser);
         while (wholeDurationMs < lastMs) {
             let tempo = this.findMIDITempoBefore(wholeDurationMs);
             let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = { tempo: tempo, metre: meter.metre() };
             project.timeline.push(nextBar);
-            if (barDurationMs < 431)
-                barDurationMs = 431;
+            if (barDurationMs < 100)
+                barDurationMs = 100;
             let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
+            console.log(wholeDurationMs, '+', Math.round(barDurationMs), '=', Math.round(wholeDurationMs + barDurationMs), '/', nearestDurationMs, meter.count + '/' + meter.part, Math.round(tempo));
             let nearestBarMs = nearestDurationMs - wholeDurationMs;
             nextBar.tempo = tempo * barDurationMs / nearestBarMs;
             wholeDurationMs = wholeDurationMs + nearestBarMs;
@@ -15828,7 +15865,7 @@ class EventsConverter {
                     kind: 'miniumfader1',
                     data: '' + (100 * idxRatio.ratio),
                     outputs: [compresID],
-                    iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 },
+                    iconPosition: { x: (ii + 7) * wwCell * 1.1, y: ii * hhCell * 0.8 },
                     automation: [],
                     state: 0
                 };

@@ -31,6 +31,7 @@ type MIDIFileInfo = {
 		, pitches: {
 			pitch: number
 			, count: number
+			, ratio: number
 		}[]
 	}[]
 	, drums: { pitch: number, count: number, ratio: number, baravg: number, title: string }[]
@@ -255,6 +256,7 @@ class EventsConverter {
 			let sipitches: {
 				pitch: number
 				, count: number
+				, ratio: number
 			}[] = [];
 
 			for (let ss = 0; ss < starts.length; ss++) {
@@ -285,7 +287,7 @@ class EventsConverter {
 				if (found) {
 					found.count++;
 				} else {
-					found = { pitch: pitch, count: 1 };
+					found = { pitch: pitch, count: 1, ratio: 0 };
 					sipitches.push(found);
 				}
 			}
@@ -297,6 +299,8 @@ class EventsConverter {
 							, new ChordPitchPerformerUtil().tonechordinslist()[program]);
 			*/
 			//console.log('single', singles.length, 'chords', chords.length);
+			let pitchCount = sipitches.reduce((last, it) => last + it.count, 0);
+
 			this.midiFileInfo.tracks.push({
 				program: program
 				, singlCount: singles.length
@@ -305,7 +309,7 @@ class EventsConverter {
 				, chordDuration: Math.round(choDur)
 				//, pitches: pitches.sort((a, b) => b.count - a.count)
 				, tones: tones.sort((a, b) => b.toneCount - a.toneCount)
-				, pitches: sipitches.sort((a, b) => b.count - a.count)
+				, pitches: sipitches.map((it) => { it.ratio = it.count / pitchCount; return it; }).sort((a, b) => b.count - a.count)
 				, title: new ChordPitchPerformerUtil().tonechordinslist()[program]
 			});
 		}
@@ -362,7 +366,7 @@ class EventsConverter {
 		this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
 		this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
 		//console.log(barMeterBPM);
-		//console.log(this.midiFileInfo);
+		//
 		let durationCategory = '';
 		if (this.midiFileInfo.duration < 1 * 60 * 1000) durationCategory = 'excerpt'
 		else if (this.midiFileInfo.duration < 2.5 * 60 * 1000) durationCategory = 'short'
@@ -375,6 +379,40 @@ class EventsConverter {
 		if (basedrums.length)
 			avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
 		//console.log('avgdrum', avgdrum, basedrums);
+		let bassTrack;
+		let curAvg = 0;
+		for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
+			let track = this.midiFileInfo.tracks[ii];
+			if ((track.program < 96 || (track.program > 103 && track.program < 120))
+				&& track.singleDuration + track.chordDuration > this.midiFileInfo.duration / 10) {
+				let halfsize = Math.ceil(track.pitches.length / 3);
+				let sm = 0;
+				for (let kk = 0; kk < halfsize; kk++) {
+					sm = sm + track.pitches[kk].pitch;
+				}
+				let avgPitch = Math.round(sm / halfsize);
+				if (avgPitch < 48) {
+					//console.log(avgPitch, track.title);
+					if (avgPitch > 0 && (bassTrack)) {
+						if (avgPitch < curAvg && track.singlCount > bassTrack.singlCount * 0.7) {
+							curAvg = avgPitch;
+							bassTrack = track;
+						}
+					} else {
+						bassTrack = track;
+						curAvg = avgPitch;
+					}
+				}
+			}
+		}
+		if (bassTrack) {
+			let piline = '';
+			for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
+				piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+			}
+			console.log('bass pitch', curAvg, bassTrack.title, piline);
+		}
+		console.log(this.midiFileInfo);
 	}
 	/*wholeTimelineDuration(timeline: Zvoog_SongMeasure[]): number {
 		let ss = 0;
@@ -416,46 +454,33 @@ class EventsConverter {
 			}
 		}
 		if (timeMs < 0) {
+			//console.log('not found near',ms);
 			return ms;
 		} else {
 			return timeMs;
 		}
 	}
 	fillTimeline(project: Zvoog_Project, allNotes: TrackNote[]) {
-		//console.log('tempo', this.parser.midiheader.changesResolutionTempo);
-		//console.log('meter', this.parser.midiheader.metersList);
 		let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
 		this.midiFileInfo.duration = lastMs;
 		let wholeDurationMs = 0;
+		console.log(this.parser);
 		while (wholeDurationMs < lastMs) {
-
 			let tempo = this.findMIDITempoBefore(wholeDurationMs);
 			let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
 			let barDurationMs = meter.duration(tempo) * 1000;
-
 			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre() };
 			project.timeline.push(nextBar);
-
-			if (barDurationMs < 431) barDurationMs = 431;
-			//wholeDurationMs = wholeDurationMs + barDurationMs;//this.wholeTimelineDuration(project.timeline) * 1000;
-			//console.log(wholeDurationMs, nextBar, wholeDurationMs, this.findNearestPoint(wholeDurationMs));
+			if (barDurationMs < 100) barDurationMs = 100;
 			let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
+			console.log(wholeDurationMs, '+', Math.round(barDurationMs)
+				, '=', Math.round(wholeDurationMs + barDurationMs), '/', nearestDurationMs
+				, meter.count + '/' + meter.part, Math.round(tempo)
+			);
 			let nearestBarMs = nearestDurationMs - wholeDurationMs;
-			//console.log(wholeDurationMs, barDurationMs, '->', nearestBarMs);
-			//wholeDurationMs = wholeDurationMs + barDurationMs;
 			nextBar.tempo = tempo * barDurationMs / nearestBarMs;
 			wholeDurationMs = wholeDurationMs + nearestBarMs;
 		}
-		/*let barCount = 1 + Math.ceil(0.5 * lastMs / 1000);
-		for (let ii = 0; ii < barCount; ii++) {
-			project.timeline.push({
-				tempo: 120
-				, metre: {
-					count: 4
-					, part: 4
-				}
-			});
-		}*/
 	}
 
 	addPercussionTrack(project: Zvoog_Project, allPercussions: MIDIDrumInfo[], compresID: string) {
@@ -619,7 +644,7 @@ class EventsConverter {
 					, kind: 'miniumfader1'
 					, data: '' + (100 * idxRatio.ratio)
 					, outputs: [compresID]
-					, iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 }
+					, iconPosition: { x: (ii + 7) * wwCell * 1.1, y: ii * hhCell * 0.8 }
 					, automation: []
 					, state: 0
 				};
@@ -716,7 +741,7 @@ class EventsConverter {
 		project.filters[1].iconPosition.y = 2 * 9 + 11;
 	}
 	collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]) {
-		
+
 		for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
 			let parsedtrack: MIDIFileTrack = this.parser.parsedTracks[ii];
 			for (let nn = 0; nn < parsedtrack.trackNotes.length; nn++) {
