@@ -1,5 +1,9 @@
 class RightMenuPanel {
 	menuCloseButton: IconLabelButton;
+	menuRedoButton: IconLabelButton;
+	menuUndoButton: IconLabelButton;
+	menuPlayButton: IconLabelButton;
+
 	menuUpButton: IconLabelButton;
 	//showState: boolean = true;
 	lastWidth: number = 0;
@@ -109,13 +113,22 @@ class RightMenuPanel {
 
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
 		this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-			/*
-			globalCommandDispatcher.cfg().data.list = false;
-			this.resizeMenu(this.lastWidth, this.lastHeight);
-			this.resetAllAnchors();
-			*/
 			globalCommandDispatcher.hideRightMenu();
 		});
+		this.menuRedoButton = new IconLabelButton([icon_redo], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+			globalCommandDispatcher.exe.redo(1);
+		});
+		this.menuUndoButton = new IconLabelButton([icon_undo], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+			globalCommandDispatcher.exe.undo(1);
+		});
+		this.menuPlayButton = new IconLabelButton([icon_play, icon_pause], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+			globalCommandDispatcher.toggleStartStop();
+		});
+
+
+
+
+
 		this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
@@ -168,6 +181,9 @@ class RightMenuPanel {
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
 				this.menuCloseButton.anchor, this.menuUpButton.anchor
+				, this.menuRedoButton.anchor
+				, this.menuUndoButton.anchor
+				, this.menuPlayButton.anchor
 			]
 		};
 		this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
@@ -819,6 +835,10 @@ class RightMenuPanel {
 		this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 
 		this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
+		this.menuRedoButton.resize(this.shiftX + this.itemsWidth - 2, viewHeight - 1, 1);
+		this.menuUndoButton.resize(this.shiftX + this.itemsWidth - 3, viewHeight - 1, 1);
+		this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
+
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 
 
