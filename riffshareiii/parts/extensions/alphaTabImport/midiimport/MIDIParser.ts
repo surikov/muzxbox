@@ -760,7 +760,7 @@ class MidiParser {
 												//console.log(expectedState,'->',evnt.param1,evnt.param2);
 												//console.log('bend range',evnt.param2,evnt.midiChannel,expectedPitchBendRangeMessageNumber,pitchBendValuesRange);
 												if (expectedState > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
-													console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
+													//console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
 												}
 												expectedPitchBendRangeChannel = evnt.midiChannel;
 												let idx: number = evnt.midiChannel ? evnt.midiChannel : 0;

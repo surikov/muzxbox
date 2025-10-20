@@ -431,7 +431,7 @@ declare type TrackNote = {
     channelidx: number;
     trackidx: number;
     avgMs: number;
-    chordTones: number[];
+    count?: number;
 };
 declare class MIDIFileTrack {
     currentEventIdx: number;
@@ -507,8 +507,8 @@ declare class DataViewStream {
     end(): boolean;
 }
 declare class MIDIReader {
-    project: Zvoog_Project;
     info: MIDIFileInfo;
+    project: Zvoog_Project;
     constructor(filename: string, filesize: number, arrayBuffer: ArrayBuffer);
 }
 declare type MIDITrackInfo = {
@@ -536,11 +536,11 @@ declare type MIDIFileInfo = {
     fileSize: number;
     duration: number;
     durationCategory: string;
+    baseDrumCategory: string;
+    baseDrumPerBar: number;
+    avgTempoCategory: string;
     noteCount: number;
     drumCount: number;
-    baseDrumPerBar: number;
-    baseDrumCategory: string;
-    avgTempoCategory: string;
     tracks: {
         program: number;
         singlCount: number;
@@ -559,6 +559,7 @@ declare type MIDIFileInfo = {
         pitches: {
             pitch: number;
             count: number;
+            ratio: number;
         }[];
     }[];
     drums: {
@@ -575,6 +576,8 @@ declare type MIDIFileInfo = {
         count: number;
     }[];
     barCount: number;
+    bassTrackNum: number;
+    bassAvg: number;
     guitarChordDuration: number;
     guitarChordCategory: string;
 };
@@ -582,7 +585,7 @@ declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
     parser: MidiParser;
     constructor(parser: MidiParser);
-    convertEvents(name: string, filesize: number, reader: MIDIReader): MIDIFileInfo;
+    convertEvents(name: string, filesize: number): Zvoog_Project;
     findProgramForChannel(chanIdx: number): number;
     fillInfoMIDI(project: Zvoog_Project, allNotes: TrackNote[], allTracks: MIDITrackInfo[]): void;
     findMIDITempoBefore(ms: number): number;

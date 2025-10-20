@@ -440,14 +440,6 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
-    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -462,6 +454,14 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
+    }
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
     }
 }
 var LogLevel;
@@ -3538,6 +3538,11 @@ class Chord {
     }
 }
 class Tuning {
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
+    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3638,11 +3643,6 @@ class Tuning {
             }
         }
         return null;
-    }
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,6 +8893,10 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8908,10 +8912,6 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
-    get inputCrc() {
-        return this._engine.inputCrc.value;
-    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
+    }
+    get inputCrc() {
+        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,6 +9591,16 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
+    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9619,16 +9629,6 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
-    }
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,13 +9951,6 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
-    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9976,6 +9969,13 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
+    }
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
-    get isFlushed() {
-        return this._end === 0;
-    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
+    }
+    get isFlushed() {
+        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -14986,7 +14986,6 @@ class MidiParser {
                                                 (expectedState == 3 && evnt.param1 == this.controller_coarseDataEntrySlider) ||
                                                 (expectedState == 4 && evnt.param1 == this.controller_fineDataEntrySlider)) {
                                                 if (expectedState > 1 && evnt.midiChannel != expectedPitchBendRangeChannel) {
-                                                    console.log('Unexpected channel number in non-first pitch-bend RANGE (SENSITIVITY) message. MIDI file might be corrupt.');
                                                 }
                                                 expectedPitchBendRangeChannel = evnt.midiChannel;
                                                 let idx = evnt.midiChannel ? evnt.midiChannel : 0;
@@ -15403,8 +15402,8 @@ class MIDIReader {
     constructor(filename, filesize, arrayBuffer) {
         let parser = new MidiParser(arrayBuffer);
         let converter = new EventsConverter(parser);
-        let project = converter.convertEvents(filename, filesize);
-        parsedProject = project;
+        this.project = converter.convertEvents(filename, filesize);
+        this.info = converter.midiFileInfo;
     }
 }
 class EventsConverter {
@@ -15417,8 +15416,16 @@ class EventsConverter {
             drumCount: 0,
             tracks: [],
             drums: [],
+            avgTempoCategory: '',
+            baseDrumCategory: '',
+            baseDrumPerBar: 0,
             bars: [],
-            barCount: 0
+            barCount: 0,
+            bassTrackNum: -1,
+            bassAvg: -1,
+            durationCategory: '',
+            guitarChordDuration: 0,
+            guitarChordCategory: ''
         };
         this.parser = parser;
     }
@@ -15629,22 +15636,13 @@ class EventsConverter {
         this.midiFileInfo.bars.sort((a, b) => b.count - a.count);
         this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
         this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
-        let durationCategory = '';
-        if (this.midiFileInfo.duration < 1 * 60 * 1000)
-            durationCategory = 'excerpt';
-        else if (this.midiFileInfo.duration < 2.5 * 60 * 1000)
-            durationCategory = 'short';
-        else if (this.midiFileInfo.duration < 4 * 60 * 1000)
-            durationCategory = 'medium';
-        else if (this.midiFileInfo.duration < 6 * 60 * 1000)
-            durationCategory = 'long';
-        else
-            durationCategory = 'lingering';
         let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
         let avgdrum = 0;
-        if (basedrums.length)
+        if (basedrums.length) {
             avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
+        }
         let bassTrack;
+        let bassTrackNo = -1;
         let curAvg = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
             let track = this.midiFileInfo.tracks[ii];
@@ -15661,11 +15659,13 @@ class EventsConverter {
                         if (avgPitch < curAvg && track.singlCount > bassTrack.singlCount * 0.7) {
                             curAvg = avgPitch;
                             bassTrack = track;
+                            bassTrackNo = ii;
                         }
                     }
                     else {
                         bassTrack = track;
                         curAvg = avgPitch;
+                        bassTrackNo = ii;
                     }
                 }
             }
@@ -15675,9 +15675,62 @@ class EventsConverter {
             for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
                 piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
             }
-            console.log('bass pitch', curAvg, bassTrack.title, piline);
+            this.midiFileInfo.bassTrackNum = bassTrackNo;
+            this.midiFileInfo.bassAvg = curAvg;
         }
-        console.log(this.midiFileInfo);
+        if (this.midiFileInfo.duration < 1 * 60 * 1000)
+            this.midiFileInfo.durationCategory = 'excerpt';
+        else if (this.midiFileInfo.duration < 2.5 * 60 * 1000)
+            this.midiFileInfo.durationCategory = 'short';
+        else if (this.midiFileInfo.duration < 4 * 60 * 1000)
+            this.midiFileInfo.durationCategory = 'medium';
+        else if (this.midiFileInfo.duration < 6 * 60 * 1000)
+            this.midiFileInfo.durationCategory = 'long';
+        else
+            this.midiFileInfo.durationCategory = 'lingering';
+        let bpm = 0;
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            bpm = bpm + project.timeline[ii].tempo;
+        }
+        let avgbpm = bpm / project.timeline.length;
+        if (avgbpm < 80)
+            this.midiFileInfo.avgTempoCategory = 'very slow';
+        else if (avgbpm < 110)
+            this.midiFileInfo.avgTempoCategory = 'slow';
+        else if (avgbpm < 140)
+            this.midiFileInfo.avgTempoCategory = 'medium';
+        else if (avgbpm < 200)
+            this.midiFileInfo.avgTempoCategory = 'fast';
+        else
+            this.midiFileInfo.avgTempoCategory = 'very fast';
+        let maxTrackChordDuration = 0;
+        for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
+            let track = this.midiFileInfo.tracks[ii];
+            if (track.program >= 24 && track.program <= 30 && track.chordDuration > 5 * 1000) {
+                if (maxTrackChordDuration < track.chordDuration) {
+                    maxTrackChordDuration = track.chordDuration;
+                }
+            }
+        }
+        this.midiFileInfo.guitarChordDuration = maxTrackChordDuration / this.midiFileInfo.duration;
+        if (this.midiFileInfo.guitarChordDuration < 0.1)
+            this.midiFileInfo.guitarChordCategory = 'none';
+        else if (this.midiFileInfo.guitarChordDuration < 0.3)
+            this.midiFileInfo.guitarChordCategory = 'few';
+        else if (this.midiFileInfo.guitarChordDuration < 0.5)
+            this.midiFileInfo.guitarChordCategory = 'medium';
+        else
+            this.midiFileInfo.guitarChordCategory = 'many';
+        this.midiFileInfo.baseDrumCategory = 'none';
+        if (basedrums.length) {
+            this.midiFileInfo.baseDrumPerBar = Math.round(basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount);
+            if (this.midiFileInfo.baseDrumPerBar < 2)
+                this.midiFileInfo.baseDrumCategory = 'few';
+            else if (this.midiFileInfo.baseDrumPerBar < 6)
+                this.midiFileInfo.baseDrumCategory = 'medium';
+            else
+                this.midiFileInfo.baseDrumCategory = 'many';
+        }
     }
     findMIDITempoBefore(ms) {
         for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
@@ -15718,7 +15771,6 @@ class EventsConverter {
         let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
         this.midiFileInfo.duration = lastMs;
         let wholeDurationMs = 0;
-        console.log(this.parser);
         while (wholeDurationMs < lastMs) {
             let tempo = this.findMIDITempoBefore(wholeDurationMs);
             let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
@@ -15728,7 +15780,6 @@ class EventsConverter {
             if (barDurationMs < 100)
                 barDurationMs = 100;
             let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
-            console.log(wholeDurationMs, '+', Math.round(barDurationMs), '=', Math.round(wholeDurationMs + barDurationMs), '/', nearestDurationMs, meter.count + '/' + meter.part, Math.round(tempo));
             let nearestBarMs = nearestDurationMs - wholeDurationMs;
             nextBar.tempo = tempo * barDurationMs / nearestBarMs;
             wholeDurationMs = wholeDurationMs + nearestBarMs;
@@ -16309,6 +16360,7 @@ class FileLoaderAlpha {
                             else {
                                 if (path.endsWith('.mid')) {
                                     let mireader = new MIDIReader(file.name, file.size, arrayBuffer);
+                                    parsedProject = mireader.project;
                                 }
                                 else {
                                     console.log('wrong path', path);

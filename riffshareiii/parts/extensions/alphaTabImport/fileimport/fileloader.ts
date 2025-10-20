@@ -68,6 +68,7 @@ class FileLoaderAlpha {
 								if (path.endsWith('.mid')) {
 
 									let mireader: MIDIReader = new MIDIReader(file.name, file.size, arrayBuffer);
+									parsedProject = mireader.project;
 
 								} else {
 									console.log('wrong path', path);

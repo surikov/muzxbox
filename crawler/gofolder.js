@@ -557,8 +557,7 @@ class MidiParser {
             channelidx: channel,
             baseDuration: -1,
             closed: false,
-            bendPoints: [],
-            chordTones: []
+            bendPoints: []
         };
         track.trackNotes.push(pi);
         return pi;
@@ -835,6 +834,7 @@ class MidiParser {
                                     };
                                     let xsts = this.programChannel.find((it) => it.midiChannel == pair.midiChannel);
                                     if (xsts) {
+                                        xsts.midiProgram = pair.midiProgram;
                                     }
                                     else {
                                         this.programChannel.push(pair);
@@ -1293,14 +1293,36 @@ class MIDIReader {
     constructor(filename, filesize, arrayBuffer) {
         let parser = new MidiParser(arrayBuffer);
         let converter = new EventsConverter(parser);
-        this.info = converter.convertEvents(filename, filesize, this);
+        this.project = converter.convertEvents(filename, filesize);
+        this.info = converter.midiFileInfo;
     }
 }
 class EventsConverter {
     constructor(parser) {
+        this.midiFileInfo = {
+            fileName: '',
+            fileSize: 0,
+            duration: 0,
+            noteCount: 0,
+            drumCount: 0,
+            tracks: [],
+            drums: [],
+            avgTempoCategory: '',
+            baseDrumCategory: '',
+            baseDrumPerBar: 0,
+            bars: [],
+            barCount: 0,
+            bassTrackNum: -1,
+            bassAvg: -1,
+            durationCategory: '',
+            guitarChordDuration: 0,
+            guitarChordCategory: ''
+        };
         this.parser = parser;
     }
-    convertEvents(name, filesize, reader) {
+    convertEvents(name, filesize) {
+        this.midiFileInfo.fileName = name;
+        this.midiFileInfo.fileSize = filesize;
         let project = {
             title: name,
             timeline: [],
@@ -1323,23 +1345,6 @@ class EventsConverter {
             menuPlugins: false,
             menuClipboard: false,
             menuSettings: false
-        };
-        this.midiFileInfo = {
-            fileName: name,
-            fileSize: filesize,
-            duration: 0,
-            noteCount: 0,
-            drumCount: 0,
-            baseDrumPerBar: 0,
-            tracks: [],
-            drums: [],
-            bars: [],
-            barCount: 0,
-            durationCategory: '',
-            baseDrumCategory: '',
-            avgTempoCategory: '',
-            guitarChordDuration: 0,
-            guitarChordCategory: ''
         };
         let allNotes = [];
         let allTracks = [];
@@ -1386,8 +1391,7 @@ class EventsConverter {
             bar.tempo = 10 * Math.round(bar.tempo / 10);
         }
         this.fillInfoMIDI(project, allNotes, allTracks);
-        reader.project = project;
-        return this.midiFileInfo;
+        return project;
     }
     findProgramForChannel(chanIdx) {
         let program = -1;
@@ -1415,21 +1419,17 @@ class EventsConverter {
             let starts = [];
             for (let cc = 0; cc < progNotes.length; cc++) {
                 let pnote = progNotes[cc];
-                let tone = pnote.basePitch % 12;
                 let xsts = starts.find((it) => it.startMs == pnote.startMs);
                 if (xsts) {
-                    if (xsts.chordTones.indexOf(tone) < 0) {
-                        xsts.chordTones.push(tone);
-                    }
+                    xsts.count = 1 + (xsts.count ? xsts.count : 1);
                 }
                 else {
-                    pnote.chordTones = [tone];
                     starts.push(pnote);
                 }
             }
-            let chords = starts.filter((it) => it.chordTones.length > 2);
+            let chords = starts.filter((it) => (it.count ? it.count : 1) > 2);
             let choDur = chords.reduce((last, it) => last + it.baseDuration, 0);
-            let singles = starts.filter((it) => it.chordTones.length < 2);
+            let singles = starts.filter((it) => (it.count ? it.count : 1) < 2);
             let snglDur = singles.reduce((last, it) => last + it.baseDuration, 0);
             let tones = [];
             let sipitches = [];
@@ -1462,10 +1462,11 @@ class EventsConverter {
                     found.count++;
                 }
                 else {
-                    found = { pitch: pitch, count: 1 };
+                    found = { pitch: pitch, count: 1, ratio: 0 };
                     sipitches.push(found);
                 }
             }
+            let pitchCount = sipitches.reduce((last, it) => last + it.count, 0);
             this.midiFileInfo.tracks.push({
                 program: program,
                 singlCount: singles.length,
@@ -1473,7 +1474,7 @@ class EventsConverter {
                 singleDuration: Math.round(snglDur),
                 chordDuration: Math.round(choDur),
                 tones: tones.sort((a, b) => b.toneCount - a.toneCount),
-                pitches: sipitches.sort((a, b) => b.count - a.count),
+                pitches: sipitches.map((it) => { it.ratio = it.count / pitchCount; return it; }).sort((a, b) => b.count - a.count),
                 title: new ChordPitchPerformerUtil().tonechordinslist()[program]
             });
         }
@@ -1526,6 +1527,48 @@ class EventsConverter {
         this.midiFileInfo.bars.sort((a, b) => b.count - a.count);
         this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
         this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
+        let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
+        let avgdrum = 0;
+        if (basedrums.length) {
+            avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
+        }
+        let bassTrack;
+        let bassTrackNo = -1;
+        let curAvg = 0;
+        for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
+            let track = this.midiFileInfo.tracks[ii];
+            if ((track.program < 96 || (track.program > 103 && track.program < 120))
+                && track.singleDuration + track.chordDuration > this.midiFileInfo.duration / 10) {
+                let halfsize = Math.ceil(track.pitches.length / 3);
+                let sm = 0;
+                for (let kk = 0; kk < halfsize; kk++) {
+                    sm = sm + track.pitches[kk].pitch;
+                }
+                let avgPitch = Math.round(sm / halfsize);
+                if (avgPitch < 48) {
+                    if (avgPitch > 0 && (bassTrack)) {
+                        if (avgPitch < curAvg && track.singlCount > bassTrack.singlCount * 0.7) {
+                            curAvg = avgPitch;
+                            bassTrack = track;
+                            bassTrackNo = ii;
+                        }
+                    }
+                    else {
+                        bassTrack = track;
+                        curAvg = avgPitch;
+                        bassTrackNo = ii;
+                    }
+                }
+            }
+        }
+        if (bassTrack) {
+            let piline = '';
+            for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
+                piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+            }
+            this.midiFileInfo.bassTrackNum = bassTrackNo;
+            this.midiFileInfo.bassAvg = curAvg;
+        }
         if (this.midiFileInfo.duration < 1 * 60 * 1000)
             this.midiFileInfo.durationCategory = 'excerpt';
         else if (this.midiFileInfo.duration < 2.5 * 60 * 1000)
@@ -1536,17 +1579,6 @@ class EventsConverter {
             this.midiFileInfo.durationCategory = 'long';
         else
             this.midiFileInfo.durationCategory = 'lingering';
-        let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
-        this.midiFileInfo.baseDrumCategory = 'none';
-        if (basedrums.length) {
-            this.midiFileInfo.baseDrumPerBar = Math.round(basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount);
-            if (this.midiFileInfo.baseDrumPerBar < 2)
-                this.midiFileInfo.baseDrumCategory = 'few';
-            else if (this.midiFileInfo.baseDrumPerBar < 6)
-                this.midiFileInfo.baseDrumCategory = 'medium';
-            else
-                this.midiFileInfo.baseDrumCategory = 'many';
-        }
         let bpm = 0;
         for (let ii = 0; ii < project.timeline.length; ii++) {
             bpm = bpm + project.timeline[ii].tempo;
@@ -1580,6 +1612,16 @@ class EventsConverter {
             this.midiFileInfo.guitarChordCategory = 'medium';
         else
             this.midiFileInfo.guitarChordCategory = 'many';
+        this.midiFileInfo.baseDrumCategory = 'none';
+        if (basedrums.length) {
+            this.midiFileInfo.baseDrumPerBar = Math.round(basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount);
+            if (this.midiFileInfo.baseDrumPerBar < 2)
+                this.midiFileInfo.baseDrumCategory = 'few';
+            else if (this.midiFileInfo.baseDrumPerBar < 6)
+                this.midiFileInfo.baseDrumCategory = 'medium';
+            else
+                this.midiFileInfo.baseDrumCategory = 'many';
+        }
     }
     findMIDITempoBefore(ms) {
         for (var ii = this.parser.midiheader.changesResolutionTempo.length - 1; ii >= 0; ii--) {
@@ -1626,8 +1668,8 @@ class EventsConverter {
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = { tempo: tempo, metre: meter.metre() };
             project.timeline.push(nextBar);
-            if (barDurationMs < 431)
-                barDurationMs = 431;
+            if (barDurationMs < 100)
+                barDurationMs = 100;
             let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
             let nearestBarMs = nearestDurationMs - wholeDurationMs;
             nextBar.tempo = tempo * barDurationMs / nearestBarMs;
@@ -1765,7 +1807,7 @@ class EventsConverter {
                     kind: 'miniumfader1',
                     data: '' + (100 * idxRatio.ratio),
                     outputs: [compresID],
-                    iconPosition: { x: (ii + 7) * wwCell, y: ii * hhCell * 0.8 },
+                    iconPosition: { x: (ii + 7) * wwCell * 1.1, y: ii * hhCell * 0.8 },
                     automation: [],
                     state: 0
                 };
@@ -2212,7 +2254,7 @@ function readOneFile(path, name) {
     let arrayBuffer = toArrayBuffer(buff);
     try {
         let mifi = new MIDIReader(name, 0, arrayBuffer);
-        console.log('--', name, Math.round(buff.length / 1000), mifi.info.durationCategory, (Math.floor(mifi.info.duration / 60000) + "'" + (Math.floor(mifi.info.duration / 1000) % 60) + '"'), 'drums', mifi.info.baseDrumCategory, mifi.info.baseDrumPerBar, 'bpm', mifi.info.avgTempoCategory, 'gchords', Math.round(mifi.info.guitarChordDuration * 100), mifi.info.guitarChordCategory);
+        console.log('', mifi.info.fileName, Math.round(mifi.info.fileSize / 1000), mifi.info.durationCategory, (Math.floor(mifi.info.duration / 60000) + "'" + (Math.floor(mifi.info.duration / 1000) % 60) + '"'), 'drums', mifi.info.baseDrumCategory, mifi.info.baseDrumPerBar, 'bpm', mifi.info.avgTempoCategory, 'gchords', Math.round(mifi.info.guitarChordDuration * 100), mifi.info.guitarChordCategory);
     }
     catch (xx) {
         console.log('/*');

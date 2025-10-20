@@ -17,7 +17,8 @@ function readOneFile(path, name) {
 	let arrayBuffer = toArrayBuffer(buff);
 	try {
 		let mifi: MIDIReader = new MIDIReader(name, 0, arrayBuffer);
-		console.log('--', name, Math.round(buff.length / 1000)
+		console.log(''//, //name, Math.round(buff.length / 1000)
+			, mifi.info.fileName, Math.round(mifi.info.fileSize / 1000)
 			, mifi.info.durationCategory, (Math.floor(mifi.info.duration / 60000) + "'" + (Math.floor(mifi.info.duration / 1000) % 60) + '"')
 			, 'drums', mifi.info.baseDrumCategory, mifi.info.baseDrumPerBar
 			, 'bpm', mifi.info.avgTempoCategory
