@@ -1,10 +1,11 @@
 class MIDIReader {
 	info: MIDIFileInfo;
 	project: Zvoog_Project;
+	parser: MidiParser 
 	constructor(filename: string, filesize: number, arrayBuffer: ArrayBuffer) {
-		let parser: MidiParser = new MidiParser(arrayBuffer);
+		this.parser = new MidiParser(arrayBuffer);
 		//console.log(parser);
-		let converter = new EventsConverter(parser);
+		let converter = new EventsConverter(this.parser);
 		//let project = converter.convertEvents(filename, filesize);
 		//console.log(project);
 		//parsedProject = project;

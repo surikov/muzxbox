@@ -1,8 +1,8 @@
 class RightMenuPanel {
-	menuCloseButton: IconLabelButton;
-	menuRedoButton: IconLabelButton;
-	menuUndoButton: IconLabelButton;
-	menuPlayButton: IconLabelButton;
+	//menuCloseButton: IconLabelButton;
+	//menuRedoButton: IconLabelButton;
+	//menuUndoButton: IconLabelButton;
+	//menuPlayButton: IconLabelButton;
 
 	menuUpButton: IconLabelButton;
 	//showState: boolean = true;
@@ -112,9 +112,10 @@ class RightMenuPanel {
 		this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
 
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-		this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-			globalCommandDispatcher.hideRightMenu();
-		});
+		//this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+		//	globalCommandDispatcher.hideRightMenu();
+		//});
+		/*
 		this.menuRedoButton = new IconLabelButton([icon_redo], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			globalCommandDispatcher.exe.redo(1);
 		});
@@ -124,7 +125,7 @@ class RightMenuPanel {
 		this.menuPlayButton = new IconLabelButton([icon_play, icon_pause], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			globalCommandDispatcher.toggleStartStop();
 		});
-
+*/
 
 
 
@@ -180,10 +181,11 @@ class RightMenuPanel {
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
-				this.menuCloseButton.anchor, this.menuUpButton.anchor
-				, this.menuRedoButton.anchor
-				, this.menuUndoButton.anchor
-				, this.menuPlayButton.anchor
+				//this.menuCloseButton.anchor, 
+				this.menuUpButton.anchor
+				//, this.menuRedoButton.anchor
+				//, this.menuUndoButton.anchor
+				//, this.menuPlayButton.anchor
 			]
 		};
 		this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
@@ -834,10 +836,10 @@ class RightMenuPanel {
 
 		this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 
-		this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
-		this.menuRedoButton.resize(this.shiftX + this.itemsWidth - 2, viewHeight - 1, 1);
-		this.menuUndoButton.resize(this.shiftX + this.itemsWidth - 3, viewHeight - 1, 1);
-		this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
+		//this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
+		//this.menuRedoButton.resize(this.shiftX + this.itemsWidth - 2, viewHeight - 1, 1);
+		//this.menuUndoButton.resize(this.shiftX + this.itemsWidth - 3, viewHeight - 1, 1);
+		//this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
 
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 

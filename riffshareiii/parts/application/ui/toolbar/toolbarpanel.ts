@@ -12,9 +12,14 @@ class UIToolbar {
 		//
 	}
 	createToolbar(): TileLayerDefinition[] {
-		this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn: number) => {
+		this.openRightMenuButton = new ToolBarButton([/*icon_moveright,*/icon_ver_menu], 1, 0, (nn: number) => {
 			globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-			globalCommandDispatcher.showRightMenu();
+
+			if (globalCommandDispatcher.cfg().data.list) {
+				globalCommandDispatcher.hideRightMenu();
+			} else {
+				globalCommandDispatcher.showRightMenu();
+			}
 		});
 		this.redoButton = new ToolBarButton([icon_redo], 1, 1, (nn: number) => {
 			globalCommandDispatcher.exe.redo(1);

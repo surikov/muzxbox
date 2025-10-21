@@ -2614,6 +2614,7 @@ declare class DataViewStream {
 declare class MIDIReader {
     info: MIDIFileInfo;
     project: Zvoog_Project;
+    parser: MidiParser;
     constructor(filename: string, filesize: number, arrayBuffer: ArrayBuffer);
 }
 declare type MIDITrackInfo = {
@@ -2707,9 +2708,9 @@ declare class EventsConverter {
     findModeInstrument(program: number): number;
     arrangeIcons(project: Zvoog_Project): void;
     collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]): void;
-    addComments(project: Zvoog_Project): void;
+    addMIDIComments(project: Zvoog_Project): void;
     addLyricsPoints(bar: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string): void;
-    findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
+    findMeasureSkipByTime(timeFromStart: number, measures: Zvoog_SongMeasure[]): null | {
         idx: number;
         skip: Zvoog_Metre;
     };
@@ -2747,11 +2748,11 @@ declare class AlphaTabImportMusicPlugin {
 declare class FileLoaderAlpha {
     inames: ChordPitchPerformerUtil;
     constructor(inputFile: any);
-    convertProject(score: Score): void;
+    convertScore2Project(score: Score): void;
     addRepeats(project: Zvoog_Project, score: Score): void;
     cloneAndRepeat(project: Zvoog_Project, start: number, altEnd: number, end: number, count: number): number;
     cloneOneMeasure(project: Zvoog_Project, from: number, to: number): void;
-    addLyrics(project: Zvoog_Project, score: Score): void;
+    addScoreLyrics(project: Zvoog_Project, score: Score): void;
     addBarText(text: string, project: Zvoog_Project, barIdx: number): void;
     addHeaderText(text: string, label: string, firstBar: Zvoog_CommentMeasure): void;
     arrangeTracks(project: Zvoog_Project): void;

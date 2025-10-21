@@ -336,10 +336,6 @@ declare class ToolBarButton {
     resize(viewWIdth: number, viewHeight: number): void;
 }
 declare class RightMenuPanel {
-    menuCloseButton: IconLabelButton;
-    menuRedoButton: IconLabelButton;
-    menuUndoButton: IconLabelButton;
-    menuPlayButton: IconLabelButton;
     menuUpButton: IconLabelButton;
     lastWidth: number;
     lastHeight: number;

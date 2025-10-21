@@ -160,7 +160,7 @@ class EventsConverter {
 			}
 		}
 
-		this.addComments(project);
+		this.addMIDIComments(project);
 		this.arrangeIcons(project);
 
 		for (let ii = 0; ii < project.timeline.length; ii++) {
@@ -845,7 +845,7 @@ class EventsConverter {
 		allNotes.sort((a, b) => { return a.startMs - b.startMs; });
 		//console.log(this.parser);
 	}
-	addComments(project: Zvoog_Project) {
+	addMIDIComments(project: Zvoog_Project) {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
 		}
@@ -854,38 +854,42 @@ class EventsConverter {
 			let textpoint = this.parser.midiheader.lyricsList[ii];
 			let pnt = this.findMeasureSkipByTime(textpoint.ms / 1000, project.timeline);
 			if (pnt) {
-				//console.log(pnt.skip, textpoint.ms, textpoint.txt);
+				//console.log(pnt.idx, pnt.skip.count + '/' + pnt.skip.part, textpoint.ms, textpoint.txt);
 				this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
 			}
 		}
-		this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid');
+		//this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid');
 	}
 	addLyricsPoints(bar: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string) {
 		let cnt = bar.points.length;
 		bar.points[cnt] = {
 			skip: skip
-			, text: txt
+			, text: //cnt + ':' + skip.count + '/' + skip.part + ':' + 
+				txt
 			, row: cnt
 		}
 	}
-	findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
-		let curTime = 0;
+	findMeasureSkipByTime(timeFromStart: number, measures: Zvoog_SongMeasure[]): null | { idx: number, skip: Zvoog_Metre } {
+		let curMeasureStartS = 0;
 		let mm = MMUtil();
 		for (let ii = 0; ii < measures.length; ii++) {
-			let cumea = measures[ii];
-			let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-			if (curTime + measureDurationS > time) {
+			let curMeasure = measures[ii];
+			let measureDurationS = mm.set(curMeasure.metre).duration(curMeasure.tempo);
 
-				let delta = time - curTime;
+			if (curMeasureStartS + measureDurationS > timeFromStart + 0.001) {
+				let delta = timeFromStart - curMeasureStartS;
 				if (delta < 0) {
 					delta = 0;
 				}
-				/*if(ii==85){
-					console.log(cmnt,ii,round1000(curTime + measureDurationS), round1000(time), mm.calculate(delta, cumea.tempo),curTime + measureDurationS, time);
-					}*/
-				return { idx: ii, skip: mm.calculate(delta, cumea.tempo).strip(8) };
+				//let curSkip = mm.calculate(delta, curMeasure.tempo).strip(8);
+				//let timeSkip = mm.set(curSkip).duration(curMeasure.tempo);
+				//console.log(delta, measureDurationS);
+				return {
+					idx: ii
+					, skip: mm.calculate(delta, curMeasure.tempo).floor(8)
+				};
 			}
-			curTime = curTime + measureDurationS;
+			curMeasureStartS = curMeasureStartS + measureDurationS;
 		}
 		return null;
 	}

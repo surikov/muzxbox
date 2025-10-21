@@ -15400,8 +15400,8 @@ class DataViewStream {
 }
 class MIDIReader {
     constructor(filename, filesize, arrayBuffer) {
-        let parser = new MidiParser(arrayBuffer);
-        let converter = new EventsConverter(parser);
+        this.parser = new MidiParser(arrayBuffer);
+        let converter = new EventsConverter(this.parser);
         this.project = converter.convertEvents(filename, filesize);
         this.info = converter.midiFileInfo;
     }
@@ -15493,7 +15493,7 @@ class EventsConverter {
                 this.addTrackNote(project.tracks, project.timeline, allTracks, it);
             }
         }
-        this.addComments(project);
+        this.addMIDIComments(project);
         this.arrangeIcons(project);
         for (let ii = 0; ii < project.timeline.length; ii++) {
             let bar = project.timeline[ii];
@@ -16011,7 +16011,7 @@ class EventsConverter {
         }
         allNotes.sort((a, b) => { return a.startMs - b.startMs; });
     }
-    addComments(project) {
+    addMIDIComments(project) {
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ points: [] });
         }
@@ -16022,7 +16022,6 @@ class EventsConverter {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
             }
         }
-        this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid');
     }
     addLyricsPoints(bar, skip, txt) {
         let cnt = bar.points.length;
@@ -16032,20 +16031,23 @@ class EventsConverter {
             row: cnt
         };
     }
-    findMeasureSkipByTime(time, measures) {
-        let curTime = 0;
+    findMeasureSkipByTime(timeFromStart, measures) {
+        let curMeasureStartS = 0;
         let mm = MMUtil();
         for (let ii = 0; ii < measures.length; ii++) {
-            let cumea = measures[ii];
-            let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-            if (curTime + measureDurationS > time) {
-                let delta = time - curTime;
+            let curMeasure = measures[ii];
+            let measureDurationS = mm.set(curMeasure.metre).duration(curMeasure.tempo);
+            if (curMeasureStartS + measureDurationS > timeFromStart + 0.001) {
+                let delta = timeFromStart - curMeasureStartS;
                 if (delta < 0) {
                     delta = 0;
                 }
-                return { idx: ii, skip: mm.calculate(delta, cumea.tempo).strip(8) };
+                return {
+                    idx: ii,
+                    skip: mm.calculate(delta, curMeasure.tempo).floor(8)
+                };
             }
-            curTime = curTime + measureDurationS;
+            curMeasureStartS = curMeasureStartS + measureDurationS;
         }
         return null;
     }
@@ -16331,7 +16333,7 @@ class FileLoaderAlpha {
                     settings.importer.encoding = 'windows-1251';
                     gp35.init(data, settings);
                     let score = gp35.readScore();
-                    me.convertProject(score);
+                    me.convertScore2Project(score);
                 }
                 else {
                     if (path.endsWith('.gpx')) {
@@ -16339,7 +16341,7 @@ class FileLoaderAlpha {
                         settings.importer.encoding = 'windows-1251';
                         gpx.init(data, settings);
                         let score = gpx.readScore();
-                        me.convertProject(score);
+                        me.convertScore2Project(score);
                     }
                     else {
                         if (path.endsWith('.gp')) {
@@ -16347,7 +16349,7 @@ class FileLoaderAlpha {
                             settings.importer.encoding = 'windows-1251';
                             gp78.init(data, settings);
                             let score = gp78.readScore();
-                            me.convertProject(score);
+                            me.convertScore2Project(score);
                         }
                         else {
                             if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
@@ -16355,12 +16357,14 @@ class FileLoaderAlpha {
                                 settings.importer.encoding = 'windows-1251';
                                 mxl.init(data, settings);
                                 let score = mxl.readScore();
-                                me.convertProject(score);
+                                me.convertScore2Project(score);
                             }
                             else {
                                 if (path.endsWith('.mid')) {
                                     let mireader = new MIDIReader(file.name, file.size, arrayBuffer);
                                     parsedProject = mireader.project;
+                                    console.log(mireader.parser);
+                                    console.log(mireader.info);
                                 }
                                 else {
                                     console.log('wrong path', path);
@@ -16373,7 +16377,7 @@ class FileLoaderAlpha {
         };
         fileReader.readAsArrayBuffer(file);
     }
-    convertProject(score) {
+    convertScore2Project(score) {
         console.log(score);
         let project = {
             versionCode: '1',
@@ -16446,7 +16450,7 @@ class FileLoaderAlpha {
         };
         project.filters.push(filterEcho);
         project.filters.push(filterCompression);
-        this.addLyrics(project, score);
+        this.addScoreLyrics(project, score);
         this.addRepeats(project, score);
         this.arrangeTracks(project);
         this.arrangeDrums(project);
@@ -16518,7 +16522,7 @@ class FileLoaderAlpha {
         let oo2 = JSON.parse(JSON.stringify(clone2));
         project.comments.splice(to, 0, oo2);
     }
-    addLyrics(project, score) {
+    addScoreLyrics(project, score) {
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ points: [] });
         }

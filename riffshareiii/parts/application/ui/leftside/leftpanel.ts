@@ -137,8 +137,8 @@ class LeftPanel {
 					};
 					this.leftZoomAnchors[zz].content.push(trackLabel);
 					//for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
-					
-					for (let farIdx = 1; farIdx < farorder.length; farIdx++) {	
+
+					for (let farIdx = 1; farIdx < farorder.length; farIdx++) {
 						let tr = farorder[farIdx];
 						let preCSS = 'otherTrackLabel';
 						if ((soloOnly && globalCommandDispatcher.cfg().data.tracks[tr].performer.state != 2) || ((!soloOnly) && globalCommandDispatcher.cfg().data.tracks[tr].performer.state == 1)) {
@@ -146,7 +146,8 @@ class LeftPanel {
 						}
 						let trackLabel: TileText = {
 							x: 0
-							, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - (1 + tr) * globalCommandDispatcher.cfg().notePathHeight
+							, y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
+								- (1 + farIdx) * globalCommandDispatcher.cfg().notePathHeight
 							, text: globalCommandDispatcher.cfg().data.tracks[tr].title
 							, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 						};

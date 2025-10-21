@@ -2788,7 +2788,12 @@ class UIToolbar {
     createToolbar() {
         this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn) => {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            globalCommandDispatcher.showRightMenu();
+            if (globalCommandDispatcher.cfg().data.list) {
+                globalCommandDispatcher.hideRightMenu();
+            }
+            else {
+                globalCommandDispatcher.showRightMenu();
+            }
         });
         this.redoButton = new ToolBarButton([icon_redo], 1, 1, (nn) => {
             globalCommandDispatcher.exe.redo(1);
@@ -2904,18 +2909,6 @@ class RightMenuPanel {
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuCloseButton = new IconLabelButton([icon_moveright], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            globalCommandDispatcher.hideRightMenu();
-        });
-        this.menuRedoButton = new IconLabelButton([icon_redo], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            globalCommandDispatcher.exe.redo(1);
-        });
-        this.menuUndoButton = new IconLabelButton([icon_undo], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            globalCommandDispatcher.exe.undo(1);
-        });
-        this.menuPlayButton = new IconLabelButton([icon_play, icon_pause], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            globalCommandDispatcher.toggleStartStop();
-        });
         this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
@@ -2956,10 +2949,7 @@ class RightMenuPanel {
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.menuCloseButton.anchor, this.menuUpButton.anchor,
-                this.menuRedoButton.anchor,
-                this.menuUndoButton.anchor,
-                this.menuPlayButton.anchor
+                this.menuUpButton.anchor
             ]
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
@@ -3249,10 +3239,6 @@ class RightMenuPanel {
         this.contentAnchor.ww = viewWidth;
         this.contentAnchor.hh = viewHeight;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
-        this.menuCloseButton.resize(this.shiftX + this.itemsWidth - 1, viewHeight - 1, 1);
-        this.menuRedoButton.resize(this.shiftX + this.itemsWidth - 2, viewHeight - 1, 1);
-        this.menuUndoButton.resize(this.shiftX + this.itemsWidth - 3, viewHeight - 1, 1);
-        this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         this.rerenderMenuContent(null);
     }
@@ -3844,7 +3830,8 @@ class LeftPanel {
                         }
                         let trackLabel = {
                             x: 0,
-                            y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() - (1 + tr) * globalCommandDispatcher.cfg().notePathHeight,
+                            y: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight()
+                                - (1 + farIdx) * globalCommandDispatcher.cfg().notePathHeight,
                             text: globalCommandDispatcher.cfg().data.tracks[tr].title,
                             css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                         };

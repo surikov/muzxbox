@@ -42,34 +42,35 @@ class FileLoaderAlpha {
 					settings.importer.encoding = 'windows-1251';
 					gp35.init(data, settings);
 					let score = gp35.readScore();
-					me.convertProject(score);
+					me.convertScore2Project(score);
 				} else {
 					if (path.endsWith('.gpx')) {
 						let gpx: GpxImporter = new GpxImporter();
 						settings.importer.encoding = 'windows-1251';
 						gpx.init(data, settings);
 						let score = gpx.readScore();
-						me.convertProject(score);
+						me.convertScore2Project(score);
 					} else {
 						if (path.endsWith('.gp')) {
 							let gp78: Gp7To8Importer = new Gp7To8Importer();
 							settings.importer.encoding = 'windows-1251';
 							gp78.init(data, settings);
 							let score = gp78.readScore();
-							me.convertProject(score);
+							me.convertScore2Project(score);
 						} else {
 							if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
 								let mxl: MusicXmlImporter = new MusicXmlImporter();
 								settings.importer.encoding = 'windows-1251';
 								mxl.init(data, settings);
 								let score = mxl.readScore();
-								me.convertProject(score);
+								me.convertScore2Project(score);
 							} else {
 								if (path.endsWith('.mid')) {
 
 									let mireader: MIDIReader = new MIDIReader(file.name, file.size, arrayBuffer);
 									parsedProject = mireader.project;
-
+									console.log(mireader.parser);
+									console.log(mireader.info);
 								} else {
 									console.log('wrong path', path);
 								}
@@ -86,7 +87,7 @@ class FileLoaderAlpha {
 		};
 		fileReader.readAsArrayBuffer(file);
 	}
-	convertProject(score: Score) {
+	convertScore2Project(score: Score) {
 		console.log(score);
 
 		let project: Zvoog_Project = {
@@ -161,7 +162,7 @@ class FileLoaderAlpha {
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
 
-		this.addLyrics(project, score);
+		this.addScoreLyrics(project, score);
 		//console.log(project);
 		this.addRepeats(project, score);
 
@@ -245,7 +246,7 @@ class FileLoaderAlpha {
 		let oo2 = JSON.parse(JSON.stringify(clone2));
 		project.comments.splice(to, 0, oo2);
 	}
-	addLyrics(project: Zvoog_Project, score: Score) {
+	addScoreLyrics(project: Zvoog_Project, score: Score) {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			project.comments.push({ points: [] });
 		}
