@@ -509,6 +509,7 @@ declare class DataViewStream {
 declare class MIDIReader {
     info: MIDIFileInfo;
     project: Zvoog_Project;
+    parser: MidiParser;
     constructor(filename: string, filesize: number, arrayBuffer: ArrayBuffer);
 }
 declare type MIDITrackInfo = {
@@ -531,6 +532,27 @@ declare type MIDIDrumInfo = {
     }[];
     title: string;
 };
+declare type MIDIFileTrackInfo = {
+    program: number;
+    singlCount: number;
+    chordCount: number;
+    singleDuration: number;
+    chordDuration: number;
+    title: string;
+    tones: {
+        pitches: {
+            pitch: number;
+            count: number;
+        }[];
+        tone: number;
+        toneCount: number;
+    }[];
+    pitches: {
+        pitch: number;
+        count: number;
+        ratio: number;
+    }[];
+};
 declare type MIDIFileInfo = {
     fileName: string;
     fileSize: number;
@@ -541,27 +563,7 @@ declare type MIDIFileInfo = {
     avgTempoCategory: string;
     noteCount: number;
     drumCount: number;
-    tracks: {
-        program: number;
-        singlCount: number;
-        chordCount: number;
-        singleDuration: number;
-        chordDuration: number;
-        title: string;
-        tones: {
-            pitches: {
-                pitch: number;
-                count: number;
-            }[];
-            tone: number;
-            toneCount: number;
-        }[];
-        pitches: {
-            pitch: number;
-            count: number;
-            ratio: number;
-        }[];
-    }[];
+    tracks: MIDIFileTrackInfo[];
     drums: {
         pitch: number;
         count: number;
@@ -577,7 +579,9 @@ declare type MIDIFileInfo = {
     }[];
     barCount: number;
     bassTrackNum: number;
+    bassLine: string;
     bassAvg: number;
+    bassTone50: number;
     guitarChordDuration: number;
     guitarChordCategory: string;
 };
@@ -602,9 +606,9 @@ declare class EventsConverter {
     findModeInstrument(program: number): number;
     arrangeIcons(project: Zvoog_Project): void;
     collectNotes(allNotes: TrackNote[], allTracks: MIDITrackInfo[], allPercussions: MIDIDrumInfo[]): void;
-    addComments(project: Zvoog_Project): void;
+    addMIDIComments(project: Zvoog_Project): void;
     addLyricsPoints(bar: Zvoog_CommentMeasure, skip: Zvoog_Metre, txt: string): void;
-    findMeasureSkipByTime(time: number, measures: Zvoog_SongMeasure[]): null | {
+    findMeasureSkipByTime(timeFromStart: number, measures: Zvoog_SongMeasure[]): null | {
         idx: number;
         skip: Zvoog_Metre;
     };

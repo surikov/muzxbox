@@ -12,6 +12,22 @@ type MIDIDrumInfo = {
 	, trackVolumePoints: { ms: number, value: number, channel: number }[]
 	, title: string
 };
+type MIDIFileTrackInfo = {
+	program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, title: string
+	, tones: {
+		pitches: {
+			pitch: number
+			, count: number
+		}[]
+		, tone: number
+		, toneCount: number
+	}[]
+	, pitches: {
+		pitch: number
+		, count: number
+		, ratio: number
+	}[]
+};
 type MIDIFileInfo = {
 	fileName: string
 	, fileSize: number
@@ -22,27 +38,14 @@ type MIDIFileInfo = {
 	, avgTempoCategory: string
 	, noteCount: number
 	, drumCount: number
-	, tracks: {
-		program: number, singlCount: number, chordCount: number, singleDuration: number, chordDuration: number, title: string
-		, tones: {
-			pitches: {
-				pitch: number
-				, count: number
-			}[]
-			, tone: number
-			, toneCount: number
-		}[]
-		, pitches: {
-			pitch: number
-			, count: number
-			, ratio: number
-		}[]
-	}[]
+	, tracks: MIDIFileTrackInfo[]
 	, drums: { pitch: number, count: number, ratio: number, baravg: number, title: string }[]
 	, bars: { idx: Number, meter: string, bpm: number, count: number }[]
 	, barCount: number
 	, bassTrackNum: number
+	, bassLine: string
 	, bassAvg: number
+	, bassTone50: number
 	, guitarChordDuration: number
 	, guitarChordCategory: string
 
@@ -66,12 +69,15 @@ class EventsConverter {
 		, durationCategory: ''
 		, guitarChordDuration: 0
 		, guitarChordCategory: ''
+		, bassLine: ''
+		, bassTone50: -1
 	};
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
 		this.parser = parser;
 	}
-	convertEvents(name: string, filesize: number): Zvoog_Project {
+	convertEvents(name: string, filesize: number
+	): Zvoog_Project {
 		this.midiFileInfo.fileName = name;
 		this.midiFileInfo.fileSize = filesize;
 		let project: Zvoog_Project = {
@@ -399,7 +405,7 @@ class EventsConverter {
 			avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
 		}
 		//console.log('avgdrum', avgdrum, basedrums);
-		let bassTrack;
+		let bassTrack: MIDIFileTrackInfo | null = null;
 		let bassTrackNo = -1;
 		let curAvg = 0;
 		for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
@@ -429,14 +435,28 @@ class EventsConverter {
 				}
 			}
 		}
+		//console.log('bassTrack', bassTrack);
 		if (bassTrack) {
-			let piline = '';
-			for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
-				piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+			//let piline = '';
+			let piSum = 0;
+			//let allbasspitchescount = bassTrack.pitches.reduce((last, it) => last + it.count, 0);
+			let allbasspitchescount = bassTrack.tones.reduce((last, it) => last + it.toneCount, 0);
+			this.midiFileInfo.bassTone50 = 0;
+			piSum = piSum + bassTrack.tones[0].toneCount;
+			//console.log('leb', bassTrack.tones.length);
+			for (let ii = 1; ii < bassTrack.tones.length; ii++) {
+				//piline = piline + '/' + Math.round(bassTrack.tones[ii].ratio * 100);
+				piSum = piSum + bassTrack.tones[ii].toneCount;
+				//console.log(ii,piSum , allbasspitchescount / 1.9);
+				if (piSum < allbasspitchescount / 1.5) {
+					this.midiFileInfo.bassTone50 = ii;
+					//console.log(ii);
+				}
 			}
 			//console.log('bass pitch', curAvg, bassTrack.title, piline);
 			this.midiFileInfo.bassTrackNum = bassTrackNo;
 			this.midiFileInfo.bassAvg = curAvg;
+			//this.midiFileInfo.bassLine = piline;
 		}
 		if (this.midiFileInfo.duration < 1 * 60 * 1000) this.midiFileInfo.durationCategory = 'excerpt'
 		else if (this.midiFileInfo.duration < 2.5 * 60 * 1000) this.midiFileInfo.durationCategory = 'short'
@@ -454,7 +474,7 @@ class EventsConverter {
 		else if (avgbpm < 110)
 			this.midiFileInfo.avgTempoCategory = 'slow';
 		else if (avgbpm < 140)
-			this.midiFileInfo.avgTempoCategory = 'medium';
+			this.midiFileInfo.avgTempoCategory = 'moderate';
 		else if (avgbpm < 200)
 			this.midiFileInfo.avgTempoCategory = 'fast';
 		else

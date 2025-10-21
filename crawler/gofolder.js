@@ -1291,8 +1291,8 @@ class DataViewStream {
 }
 class MIDIReader {
     constructor(filename, filesize, arrayBuffer) {
-        let parser = new MidiParser(arrayBuffer);
-        let converter = new EventsConverter(parser);
+        this.parser = new MidiParser(arrayBuffer);
+        let converter = new EventsConverter(this.parser);
         this.project = converter.convertEvents(filename, filesize);
         this.info = converter.midiFileInfo;
     }
@@ -1316,7 +1316,9 @@ class EventsConverter {
             bassAvg: -1,
             durationCategory: '',
             guitarChordDuration: 0,
-            guitarChordCategory: ''
+            guitarChordCategory: '',
+            bassLine: '',
+            bassTone50: -1
         };
         this.parser = parser;
     }
@@ -1384,7 +1386,7 @@ class EventsConverter {
                 this.addTrackNote(project.tracks, project.timeline, allTracks, it);
             }
         }
-        this.addComments(project);
+        this.addMIDIComments(project);
         this.arrangeIcons(project);
         for (let ii = 0; ii < project.timeline.length; ii++) {
             let bar = project.timeline[ii];
@@ -1532,7 +1534,7 @@ class EventsConverter {
         if (basedrums.length) {
             avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
         }
-        let bassTrack;
+        let bassTrack = null;
         let bassTrackNo = -1;
         let curAvg = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
@@ -1562,9 +1564,15 @@ class EventsConverter {
             }
         }
         if (bassTrack) {
-            let piline = '';
-            for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
-                piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+            let piSum = 0;
+            let allbasspitchescount = bassTrack.tones.reduce((last, it) => last + it.toneCount, 0);
+            this.midiFileInfo.bassTone50 = 0;
+            piSum = piSum + bassTrack.tones[0].toneCount;
+            for (let ii = 1; ii < bassTrack.tones.length; ii++) {
+                piSum = piSum + bassTrack.tones[ii].toneCount;
+                if (piSum < allbasspitchescount / 1.5) {
+                    this.midiFileInfo.bassTone50 = ii;
+                }
             }
             this.midiFileInfo.bassTrackNum = bassTrackNo;
             this.midiFileInfo.bassAvg = curAvg;
@@ -1589,7 +1597,7 @@ class EventsConverter {
         else if (avgbpm < 110)
             this.midiFileInfo.avgTempoCategory = 'slow';
         else if (avgbpm < 140)
-            this.midiFileInfo.avgTempoCategory = 'medium';
+            this.midiFileInfo.avgTempoCategory = 'moderate';
         else if (avgbpm < 200)
             this.midiFileInfo.avgTempoCategory = 'fast';
         else
@@ -1902,7 +1910,7 @@ class EventsConverter {
         }
         allNotes.sort((a, b) => { return a.startMs - b.startMs; });
     }
-    addComments(project) {
+    addMIDIComments(project) {
         for (let ii = 0; ii < project.timeline.length; ii++) {
             project.comments.push({ points: [] });
         }
@@ -1913,7 +1921,6 @@ class EventsConverter {
                 this.addLyricsPoints(project.comments[pnt.idx], { count: pnt.skip.count, part: pnt.skip.part }, textpoint.txt);
             }
         }
-        this.addLyricsPoints(project.comments[0], { count: 0, part: 4 }, 'import from .mid');
     }
     addLyricsPoints(bar, skip, txt) {
         let cnt = bar.points.length;
@@ -1923,20 +1930,23 @@ class EventsConverter {
             row: cnt
         };
     }
-    findMeasureSkipByTime(time, measures) {
-        let curTime = 0;
+    findMeasureSkipByTime(timeFromStart, measures) {
+        let curMeasureStartS = 0;
         let mm = MMUtil();
         for (let ii = 0; ii < measures.length; ii++) {
-            let cumea = measures[ii];
-            let measureDurationS = mm.set(cumea.metre).duration(cumea.tempo);
-            if (curTime + measureDurationS > time) {
-                let delta = time - curTime;
+            let curMeasure = measures[ii];
+            let measureDurationS = mm.set(curMeasure.metre).duration(curMeasure.tempo);
+            if (curMeasureStartS + measureDurationS > timeFromStart + 0.001) {
+                let delta = timeFromStart - curMeasureStartS;
                 if (delta < 0) {
                     delta = 0;
                 }
-                return { idx: ii, skip: mm.calculate(delta, cumea.tempo).strip(8) };
+                return {
+                    idx: ii,
+                    skip: mm.calculate(delta, curMeasure.tempo).floor(8)
+                };
             }
-            curTime = curTime + measureDurationS;
+            curMeasureStartS = curMeasureStartS + measureDurationS;
         }
         return null;
     }
@@ -2253,13 +2263,10 @@ function readOneFile(path, name) {
     let buff = fs.readFileSync(path + name);
     let arrayBuffer = toArrayBuffer(buff);
     try {
-        let mifi = new MIDIReader(name, 0, arrayBuffer);
-        console.log('', mifi.info.fileName, Math.round(mifi.info.fileSize / 1000), mifi.info.durationCategory, (Math.floor(mifi.info.duration / 60000) + "'" + (Math.floor(mifi.info.duration / 1000) % 60) + '"'), 'drums', mifi.info.baseDrumCategory, mifi.info.baseDrumPerBar, 'bpm', mifi.info.avgTempoCategory, 'gchords', Math.round(mifi.info.guitarChordDuration * 100), mifi.info.guitarChordCategory);
+        let mifi = new MIDIReader(name, arrayBuffer.byteLength, arrayBuffer);
+        console.log('', mifi.info.fileName, '-', Math.round(mifi.info.fileSize / 1000), 'kb', 'bass:', mifi.info.bassTone50);
     }
     catch (xx) {
-        console.log('/*');
-        console.log(xx);
-        console.log('*/');
     }
 }
 function readFiles(path) {

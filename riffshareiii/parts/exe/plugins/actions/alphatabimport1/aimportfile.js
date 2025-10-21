@@ -15425,7 +15425,9 @@ class EventsConverter {
             bassAvg: -1,
             durationCategory: '',
             guitarChordDuration: 0,
-            guitarChordCategory: ''
+            guitarChordCategory: '',
+            bassLine: '',
+            bassTone50: 0
         };
         this.parser = parser;
     }
@@ -15641,7 +15643,7 @@ class EventsConverter {
         if (basedrums.length) {
             avgdrum = basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount;
         }
-        let bassTrack;
+        let bassTrack = null;
         let bassTrackNo = -1;
         let curAvg = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
@@ -15670,10 +15672,17 @@ class EventsConverter {
                 }
             }
         }
+        console.log('bassTrack', bassTrack);
         if (bassTrack) {
-            let piline = '';
-            for (let ii = 0; ii < bassTrack.pitches.length; ii++) {
-                piline = piline + '/' + Math.round(bassTrack.pitches[ii].ratio * 100);
+            let piSum = 0;
+            let allbasspitchescount = bassTrack.tones.reduce((last, it) => last + it.toneCount, 0);
+            this.midiFileInfo.bassTone50 = 0;
+            piSum = piSum + bassTrack.tones[0].toneCount;
+            for (let ii = 1; ii < bassTrack.tones.length; ii++) {
+                piSum = piSum + bassTrack.tones[ii].toneCount;
+                if (piSum < allbasspitchescount / 1.9) {
+                    this.midiFileInfo.bassTone50 = ii;
+                }
             }
             this.midiFileInfo.bassTrackNum = bassTrackNo;
             this.midiFileInfo.bassAvg = curAvg;
@@ -15698,7 +15707,7 @@ class EventsConverter {
         else if (avgbpm < 110)
             this.midiFileInfo.avgTempoCategory = 'slow';
         else if (avgbpm < 140)
-            this.midiFileInfo.avgTempoCategory = 'medium';
+            this.midiFileInfo.avgTempoCategory = 'moderate';
         else if (avgbpm < 200)
             this.midiFileInfo.avgTempoCategory = 'fast';
         else

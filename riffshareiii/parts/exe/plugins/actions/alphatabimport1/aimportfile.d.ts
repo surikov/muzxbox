@@ -2637,6 +2637,27 @@ declare type MIDIDrumInfo = {
     }[];
     title: string;
 };
+declare type MIDIFileTrackInfo = {
+    program: number;
+    singlCount: number;
+    chordCount: number;
+    singleDuration: number;
+    chordDuration: number;
+    title: string;
+    tones: {
+        pitches: {
+            pitch: number;
+            count: number;
+        }[];
+        tone: number;
+        toneCount: number;
+    }[];
+    pitches: {
+        pitch: number;
+        count: number;
+        ratio: number;
+    }[];
+};
 declare type MIDIFileInfo = {
     fileName: string;
     fileSize: number;
@@ -2647,27 +2668,7 @@ declare type MIDIFileInfo = {
     avgTempoCategory: string;
     noteCount: number;
     drumCount: number;
-    tracks: {
-        program: number;
-        singlCount: number;
-        chordCount: number;
-        singleDuration: number;
-        chordDuration: number;
-        title: string;
-        tones: {
-            pitches: {
-                pitch: number;
-                count: number;
-            }[];
-            tone: number;
-            toneCount: number;
-        }[];
-        pitches: {
-            pitch: number;
-            count: number;
-            ratio: number;
-        }[];
-    }[];
+    tracks: MIDIFileTrackInfo[];
     drums: {
         pitch: number;
         count: number;
@@ -2683,7 +2684,9 @@ declare type MIDIFileInfo = {
     }[];
     barCount: number;
     bassTrackNum: number;
+    bassLine: string;
     bassAvg: number;
+    bassTone50: number;
     guitarChordDuration: number;
     guitarChordCategory: string;
 };
