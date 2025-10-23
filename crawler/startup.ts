@@ -18,12 +18,13 @@ function readOneFile(path, name) {
 	try {
 		let mifi: MIDIReader = new MIDIReader(name, arrayBuffer.byteLength, arrayBuffer);
 		console.log(''//, //name, Math.round(buff.length / 1000)
-			, mifi.info.fileName, '-', Math.round(mifi.info.fileSize / 1000), 'kb'
+			, mifi.info.fileName//, '-', Math.round(mifi.info.fileSize / 1000), 'kb'
 			//, mifi.info.durationCategory//, (Math.floor(mifi.info.duration / 60000) + "'" + (Math.floor(mifi.info.duration / 1000) % 60) + '"')
 			//, mifi.info.avgTempoCategory + ','
 			//, 'drums:', mifi.info.baseDrumCategory + ','//, mifi.info.baseDrumPerBar
 			//, 'chords:', mifi.info.guitarChordCategory//, Math.round(mifi.info.guitarChordDuration * 100)
-			, 'bass:', mifi.info.bassTone50//, mifi.info.bassLine
+			//, 'bass:', mifi.info.bassTone50//, mifi.info.bassLine
+			, 'overdrive:', Math.round(100 * mifi.info.overDriveRatio)
 		);
 		//console.log(mifi.info);
 	} catch (xx) {

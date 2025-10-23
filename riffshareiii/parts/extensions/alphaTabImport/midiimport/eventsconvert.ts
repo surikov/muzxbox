@@ -48,6 +48,8 @@ type MIDIFileInfo = {
 	, bassTone50: number
 	, guitarChordDuration: number
 	, guitarChordCategory: string
+	, overDriveRatio: number
+
 
 };//console.log('bass pitch', curAvg, bassTrack.title, piline);
 class EventsConverter {
@@ -71,6 +73,7 @@ class EventsConverter {
 		, guitarChordCategory: ''
 		, bassLine: ''
 		, bassTone50: -1
+		, overDriveRatio: 0
 	};
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
@@ -171,7 +174,9 @@ class EventsConverter {
 
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			let bar = project.timeline[ii];
-			bar.tempo = 10 * Math.round(bar.tempo / 10);
+			//console.log(bar.tempo,10 * Math.round(bar.tempo / 10));
+			//bar.tempo = 10 * Math.round(bar.tempo / 10);
+			bar.tempo = 1 * Math.round(bar.tempo / 1);
 		}
 
 		//this.parser.aligned.sort((a, b) => { return b.events.length - a.events.length });
@@ -432,6 +437,13 @@ class EventsConverter {
 						bassTrackNo = ii;
 					}
 					//console.log(bassTrack.title);
+				}
+			}
+			if (track.program == 29 || track.program == 30) {
+				let rr = (track.singleDuration + track.chordDuration) / this.midiFileInfo.duration;
+				//let rr = track.singleDuration / this.midiFileInfo.duration;
+				if (rr > this.midiFileInfo.overDriveRatio) {
+					this.midiFileInfo.overDriveRatio = rr;
 				}
 			}
 		}

@@ -1318,7 +1318,8 @@ class EventsConverter {
             guitarChordDuration: 0,
             guitarChordCategory: '',
             bassLine: '',
-            bassTone50: -1
+            bassTone50: -1,
+            overDriveRatio: 0
         };
         this.parser = parser;
     }
@@ -1390,7 +1391,7 @@ class EventsConverter {
         this.arrangeIcons(project);
         for (let ii = 0; ii < project.timeline.length; ii++) {
             let bar = project.timeline[ii];
-            bar.tempo = 10 * Math.round(bar.tempo / 10);
+            bar.tempo = 1 * Math.round(bar.tempo / 1);
         }
         this.fillInfoMIDI(project, allNotes, allTracks);
         return project;
@@ -1560,6 +1561,12 @@ class EventsConverter {
                         curAvg = avgPitch;
                         bassTrackNo = ii;
                     }
+                }
+            }
+            if (track.program == 29 || track.program == 30) {
+                let rr = (track.singleDuration + track.chordDuration) / this.midiFileInfo.duration;
+                if (rr > this.midiFileInfo.overDriveRatio) {
+                    this.midiFileInfo.overDriveRatio = rr;
                 }
             }
         }
@@ -2264,7 +2271,7 @@ function readOneFile(path, name) {
     let arrayBuffer = toArrayBuffer(buff);
     try {
         let mifi = new MIDIReader(name, arrayBuffer.byteLength, arrayBuffer);
-        console.log('', mifi.info.fileName, '-', Math.round(mifi.info.fileSize / 1000), 'kb', 'bass:', mifi.info.bassTone50);
+        console.log('', mifi.info.fileName, 'overdrive:', Math.round(100 * mifi.info.overDriveRatio));
     }
     catch (xx) {
     }

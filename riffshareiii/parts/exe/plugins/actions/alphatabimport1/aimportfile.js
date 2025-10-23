@@ -15427,7 +15427,8 @@ class EventsConverter {
             guitarChordDuration: 0,
             guitarChordCategory: '',
             bassLine: '',
-            bassTone50: 0
+            bassTone50: -1,
+            overDriveRatio: 0
         };
         this.parser = parser;
     }
@@ -15499,7 +15500,7 @@ class EventsConverter {
         this.arrangeIcons(project);
         for (let ii = 0; ii < project.timeline.length; ii++) {
             let bar = project.timeline[ii];
-            bar.tempo = 10 * Math.round(bar.tempo / 10);
+            bar.tempo = 1 * Math.round(bar.tempo / 1);
         }
         this.fillInfoMIDI(project, allNotes, allTracks);
         return project;
@@ -15671,8 +15672,13 @@ class EventsConverter {
                     }
                 }
             }
+            if (track.program == 29 || track.program == 30) {
+                let rr = (track.singleDuration + track.chordDuration) / this.midiFileInfo.duration;
+                if (rr > this.midiFileInfo.overDriveRatio) {
+                    this.midiFileInfo.overDriveRatio = rr;
+                }
+            }
         }
-        console.log('bassTrack', bassTrack);
         if (bassTrack) {
             let piSum = 0;
             let allbasspitchescount = bassTrack.tones.reduce((last, it) => last + it.toneCount, 0);
@@ -15680,7 +15686,7 @@ class EventsConverter {
             piSum = piSum + bassTrack.tones[0].toneCount;
             for (let ii = 1; ii < bassTrack.tones.length; ii++) {
                 piSum = piSum + bassTrack.tones[ii].toneCount;
-                if (piSum < allbasspitchescount / 1.9) {
+                if (piSum < allbasspitchescount / 1.5) {
                     this.midiFileInfo.bassTone50 = ii;
                 }
             }

@@ -2689,6 +2689,7 @@ declare type MIDIFileInfo = {
     bassTone50: number;
     guitarChordDuration: number;
     guitarChordCategory: string;
+    overDriveRatio: number;
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
