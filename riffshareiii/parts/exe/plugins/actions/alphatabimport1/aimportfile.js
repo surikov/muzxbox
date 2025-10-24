@@ -15428,7 +15428,8 @@ class EventsConverter {
             guitarChordCategory: '',
             bassLine: '',
             bassTone50: -1,
-            overDriveRatio: 0
+            overDriveRatio: 0,
+            proCategories: []
         };
         this.parser = parser;
     }
@@ -15533,15 +15534,22 @@ class EventsConverter {
                 let pnote = progNotes[cc];
                 let xsts = starts.find((it) => it.startMs == pnote.startMs);
                 if (xsts) {
-                    xsts.count = 1 + (xsts.count ? xsts.count : 1);
+                    if (!xsts.tones.find((it) => it == pnote.basePitch % 12)) {
+                        xsts.tones.push(pnote.basePitch % 12);
+                    }
                 }
                 else {
-                    starts.push(pnote);
+                    starts.push({
+                        startMs: pnote.startMs,
+                        baseDuration: pnote.baseDuration,
+                        tones: [pnote.basePitch % 12],
+                        basePitch: pnote.basePitch
+                    });
                 }
             }
-            let chords = starts.filter((it) => (it.count ? it.count : 1) > 2);
+            let chords = starts.filter((it) => it.tones.length > 2);
             let choDur = chords.reduce((last, it) => last + it.baseDuration, 0);
-            let singles = starts.filter((it) => (it.count ? it.count : 1) < 2);
+            let singles = starts.filter((it) => it.tones.length < 3);
             let snglDur = singles.reduce((last, it) => last + it.baseDuration, 0);
             let tones = [];
             let sipitches = [];
@@ -15581,15 +15589,17 @@ class EventsConverter {
             let pitchCount = sipitches.reduce((last, it) => last + it.count, 0);
             this.midiFileInfo.tracks.push({
                 program: program,
+                ratio: 0,
+                title: new ChordPitchPerformerUtil().tonechordinslist()[program],
                 singlCount: singles.length,
                 chordCount: chords.length,
                 singleDuration: Math.round(snglDur),
                 chordDuration: Math.round(choDur),
                 tones: tones.sort((a, b) => b.toneCount - a.toneCount),
-                pitches: sipitches.map((it) => { it.ratio = it.count / pitchCount; return it; }).sort((a, b) => b.count - a.count),
-                title: new ChordPitchPerformerUtil().tonechordinslist()[program]
+                pitches: sipitches.map((it) => { it.ratio = it.count / pitchCount; return it; }).sort((a, b) => b.count - a.count)
             });
         }
+        this.midiFileInfo.tracks.map((it) => it.ratio = Math.round(100 * (it.chordDuration + it.singleDuration) / this.midiFileInfo.duration));
         let drumList = [];
         for (let ii = 0; ii < allNotes.length; ii++) {
             let anote = allNotes[ii];
@@ -15637,8 +15647,27 @@ class EventsConverter {
             }
         }
         this.midiFileInfo.bars.sort((a, b) => b.count - a.count);
-        this.midiFileInfo.tracks.sort((a, b) => (b.chordCount + b.singlCount) - (a.chordCount + a.singlCount));
+        this.midiFileInfo.tracks.sort((a, b) => b.ratio - a.ratio);
         this.midiFileInfo.drums.sort((a, b) => b.count - a.count);
+        for (let tt = 0; tt < this.midiFileInfo.tracks.length; tt++) {
+            let cat = Math.floor(this.midiFileInfo.tracks[tt].program / 8);
+            if (!this.midiFileInfo.proCategories.find((it) => cat == it.cat)) {
+                let ratio = this.midiFileInfo.tracks[tt].ratio;
+                if (ratio > 49) {
+                    ratio = 2;
+                }
+                else {
+                    if (ratio > 9) {
+                        ratio = 1;
+                    }
+                    else {
+                        ratio = 0;
+                    }
+                }
+                let title = new ChordPitchPerformerUtil().tonechordinslist()[this.midiFileInfo.tracks[tt].program].split(':')[1].trim();
+                this.midiFileInfo.proCategories.push({ cat: cat, title: title, ratio: ratio });
+            }
+        }
         let basedrums = this.midiFileInfo.drums.filter((it) => it.pitch == 35 || it.pitch == 36 || it.pitch == 38 || it.pitch == 40);
         let avgdrum = 0;
         if (basedrums.length) {

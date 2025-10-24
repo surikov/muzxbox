@@ -30,7 +30,7 @@ class ChordPitchPerformerUtil {
 	 
 	tonechordinslist(): string[] {
 		var insNames: string[] = [];
-		insNames[0] = "Acoustic Grand Piano: Piano";
+		insNames[0] = "Acoustic Grand Piano: Piano";//Пианино
 		insNames[1] = "Bright Acoustic Piano: Piano";
 		insNames[2] = "Electric Grand Piano: Piano";
 		insNames[3] = "Honky-tonk Piano: Piano";
@@ -38,7 +38,7 @@ class ChordPitchPerformerUtil {
 		insNames[5] = "Electric Piano 2: Piano";
 		insNames[6] = "Harpsichord: Piano";
 		insNames[7] = "Clavinet: Piano";
-		insNames[8] = "Celesta: Chromatic Percussion";
+		insNames[8] = "Celesta: Chromatic Percussion";//Перкуссии
 		insNames[9] = "Glockenspiel: Chromatic Percussion";
 		insNames[10] = "Music Box: Chromatic Percussion";
 		insNames[11] = "Vibraphone: Chromatic Percussion";
@@ -46,7 +46,7 @@ class ChordPitchPerformerUtil {
 		insNames[13] = "Xylophone: Chromatic Percussion";
 		insNames[14] = "Tubular Bells: Chromatic Percussion";
 		insNames[15] = "Dulcimer: Chromatic Percussion";
-		insNames[16] = "Drawbar Organ: Organ";
+		insNames[16] = "Drawbar Organ: Organ";//Органы
 		insNames[17] = "Percussive Organ: Organ";
 		insNames[18] = "Rock Organ: Organ";
 		insNames[19] = "Church Organ: Organ";
@@ -55,7 +55,7 @@ class ChordPitchPerformerUtil {
 		insNames[22] = "Harmonica: Organ";
 		insNames[23] = "Tango Accordion: Organ";
 
-		insNames[24] = "Acoustic Guitar (nylon): Guitar";
+		insNames[24] = "Acoustic Guitar (nylon): Guitar";//Гитары
 		insNames[25] = "Acoustic Guitar (steel): Guitar";
 		insNames[26] = "Electric Guitar (jazz): Guitar";
 		insNames[27] = "Electric Guitar (clean): Guitar";
@@ -64,7 +64,7 @@ class ChordPitchPerformerUtil {
 		insNames[30] = "Distortion Guitar: Guitar";
 		
 		insNames[31] = "Guitar Harmonics: Guitar";
-		insNames[32] = "Acoustic Bass: Bass";
+		insNames[32] = "Acoustic Bass: Bass";//Басы
 		insNames[33] = "Electric Bass (finger): Bass";
 		insNames[34] = "Electric Bass (pick): Bass";
 		insNames[35] = "Fretless Bass: Bass";
@@ -72,7 +72,7 @@ class ChordPitchPerformerUtil {
 		insNames[37] = "Slap Bass 2: Bass";
 		insNames[38] = "Synth Bass 1: Bass";
 		insNames[39] = "Synth Bass 2: Bass";
-		insNames[40] = "Violin: Strings";
+		insNames[40] = "Violin: Strings";//Струнные
 		insNames[41] = "Viola: Strings";
 		insNames[42] = "Cello: Strings";
 		insNames[43] = "Contrabass: Strings";
@@ -80,7 +80,7 @@ class ChordPitchPerformerUtil {
 		insNames[45] = "Pizzicato Strings: Strings";
 		insNames[46] = "Orchestral Harp: Strings";
 		insNames[47] = "Timpani: Strings";
-		insNames[48] = "String Ensemble 1: Ensemble";
+		insNames[48] = "String Ensemble 1: Ensemble";//Унисон
 		insNames[49] = "String Ensemble 2: Ensemble";
 		insNames[50] = "Synth Strings 1: Ensemble";
 		insNames[51] = "Synth Strings 2: Ensemble";
@@ -88,7 +88,7 @@ class ChordPitchPerformerUtil {
 		insNames[53] = "Voice Oohs: Ensemble";
 		insNames[54] = "Synth Choir: Ensemble";
 		insNames[55] = "Orchestra Hit: Ensemble";
-		insNames[56] = "Trumpet: Brass";
+		insNames[56] = "Trumpet: Brass";//Медные
 		insNames[57] = "Trombone: Brass";
 		insNames[58] = "Tuba: Brass";
 		insNames[59] = "Muted Trumpet: Brass";
@@ -96,7 +96,7 @@ class ChordPitchPerformerUtil {
 		insNames[61] = "Brass Section: Brass";
 		insNames[62] = "Synth Brass 1: Brass";
 		insNames[63] = "Synth Brass 2: Brass";
-		insNames[64] = "Soprano Sax: Reed";
+		insNames[64] = "Soprano Sax: Reed";//Гармоники
 		insNames[65] = "Alto Sax: Reed";
 		insNames[66] = "Tenor Sax: Reed";
 		insNames[67] = "Baritone Sax: Reed";
@@ -104,7 +104,7 @@ class ChordPitchPerformerUtil {
 		insNames[69] = "English Horn: Reed";
 		insNames[70] = "Bassoon: Reed";
 		insNames[71] = "Clarinet: Reed";
-		insNames[72] = "Piccolo: Pipe";
+		insNames[72] = "Piccolo: Pipe";//Деревянные
 		insNames[73] = "Flute: Pipe";
 		insNames[74] = "Recorder: Pipe";
 		insNames[75] = "Pan Flute: Pipe";
@@ -113,7 +113,7 @@ class ChordPitchPerformerUtil {
 
 		insNames[78] = "Whistle: Pipe";
 		insNames[79] = "Ocarina: Pipe";
-		insNames[80] = "Lead 1 (square): Synth Lead";
+		insNames[80] = "Lead 1 (square): Synth Lead";//Лиды
 		insNames[81] = "Lead 2 (sawtooth): Synth Lead";
 		insNames[82] = "Lead 3 (calliope): Synth Lead";
 		insNames[83] = "Lead 4 (chiff): Synth Lead";
@@ -121,7 +121,7 @@ class ChordPitchPerformerUtil {
 		insNames[85] = "Lead 6 (voice): Synth Lead";
 		insNames[86] = "Lead 7 (fifths): Synth Lead";
 		insNames[87] = "Lead 8 (bass + lead): Synth Lead";
-		insNames[88] = "Pad 1 (new age): Synth Pad";
+		insNames[88] = "Pad 1 (new age): Synth Pad";//Пэды
 		insNames[89] = "Pad 2 (warm): Synth Pad";
 		insNames[90] = "Pad 3 (polysynth): Synth Pad";
 		insNames[91] = "Pad 4 (choir): Synth Pad";
@@ -129,7 +129,7 @@ class ChordPitchPerformerUtil {
 		insNames[93] = "Pad 6 (metallic): Synth Pad";
 		insNames[94] = "Pad 7 (halo): Synth Pad";
 		insNames[95] = "Pad 8 (sweep): Synth Pad";
-		insNames[96] = "FX 1 (rain): Synth Effects";
+		insNames[96] = "FX 1 (rain): Synth Effects";//Сигналы
 		insNames[97] = "FX 2 (soundtrack): Synth Effects";
 		insNames[98] = "FX 3 (crystal): Synth Effects";
 		insNames[99] = "FX 4 (atmosphere): Synth Effects";
@@ -137,7 +137,7 @@ class ChordPitchPerformerUtil {
 		insNames[101] = "FX 6 (goblins): Synth Effects";
 		insNames[102] = "FX 7 (echoes): Synth Effects";
 		insNames[103] = "FX 8 (sci-fi): Synth Effects";
-		insNames[104] = "Sitar: Ethnic";
+		insNames[104] = "Sitar: Ethnic";//Национальные
 		insNames[105] = "Banjo: Ethnic";
 		insNames[106] = "Shamisen: Ethnic";
 		insNames[107] = "Koto: Ethnic";
@@ -145,7 +145,7 @@ class ChordPitchPerformerUtil {
 		insNames[109] = "Bagpipe: Ethnic";
 		insNames[110] = "Fiddle: Ethnic";
 		insNames[111] = "Shanai: Ethnic";
-		insNames[112] = "Tinkle Bell: Percussive";
+		insNames[112] = "Tinkle Bell: Percussive";//Ударные
 		insNames[113] = "Agogo: Percussive";
 		insNames[114] = "Steel Drums: Percussive";
 		insNames[115] = "Woodblock: Percussive";
@@ -153,7 +153,7 @@ class ChordPitchPerformerUtil {
 		insNames[117] = "Melodic Tom: Percussive";
 		insNames[118] = "Synth Drum: Percussive";
 		insNames[119] = "Reverse Cymbal: Percussive";
-		insNames[120] = "Guitar Fret Noise: Sound effects";
+		insNames[120] = "Guitar Fret Noise: Sound effects";//Эффекты
 		insNames[121] = "Breath Noise: Sound effects";
 		insNames[122] = "Seashore: Sound effects";
 		insNames[123] = "Bird Tweet: Sound effects";

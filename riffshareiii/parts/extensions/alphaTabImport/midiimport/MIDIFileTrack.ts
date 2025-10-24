@@ -24,6 +24,12 @@ type TrackNote = {
 	//,cuprogram:number
 	,count?:number
 }
+type TrackChord={
+	startMs: number
+	,baseDuration: number
+	,tones:number[]
+	,basePitch:number
+};
 class MIDIFileTrack {
 	currentEventIdx: number = -1;
 	currentEvent: MIDIEvent | null = null;

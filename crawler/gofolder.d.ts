@@ -433,6 +433,12 @@ declare type TrackNote = {
     avgMs: number;
     count?: number;
 };
+declare type TrackChord = {
+    startMs: number;
+    baseDuration: number;
+    tones: number[];
+    basePitch: number;
+};
 declare class MIDIFileTrack {
     currentEventIdx: number;
     currentEvent: MIDIEvent | null;
@@ -552,6 +558,7 @@ declare type MIDIFileTrackInfo = {
         count: number;
         ratio: number;
     }[];
+    ratio: number;
 };
 declare type MIDIFileInfo = {
     fileName: string;
@@ -585,6 +592,11 @@ declare type MIDIFileInfo = {
     guitarChordDuration: number;
     guitarChordCategory: string;
     overDriveRatio: number;
+    proCategories: {
+        cat: number;
+        ratio: number;
+        title: string;
+    }[];
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
