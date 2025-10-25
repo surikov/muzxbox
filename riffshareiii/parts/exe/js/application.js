@@ -2707,13 +2707,7 @@ class TimeSelectBar {
             let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
             let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
                 + '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-            this.addSelectionMenuButton(tempoLabel, left, 1, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptTempoForSelectedBars);
-            this.addSelectionMenuButton(meterLabel, left, 2, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptMeterForSelectedBars);
-            this.addSelectionMenuButton(icon_addbars, left, 3, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.insertAfterSelectedBars);
-            this.addSelectionMenuButton(icon_deletebars, left, 4, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.dropSelectedBars);
-            this.addSelectionMenuButton(icon_mergebars, left, 5, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.mergeSelectedBars);
-            this.addSelectionMenuButton(icon_shiftbarcontent, left, 6, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.moveAsideSelectedBars);
-            this.addSelectionMenuButton(icon_copybarcontent, left, 7, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.copySelectedBars);
+            this.addSelectionMenuButton(icon_copybarcontent, left, 1, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.copySelectedBars);
         }
     }
     fillTimeBar() {

@@ -11,6 +11,7 @@
 	--line-color80: color-mix(in lab, transparent 80%, var(--main-color));
 	--bgfill2: radial-gradient(circle, var(--click-color) 0%, var(--background-color) 100%);
 	--bgfill: var(--background-color);
+	--bgfill3: color-mix(in lab, transparent 10%, var(--background-color));
 }
 
 html {
@@ -21,7 +22,7 @@ body {
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
-	background-color: var(--background-color);
+	background-color: var(--bgfill3);
 	color: var(--main-color);
 }
 
