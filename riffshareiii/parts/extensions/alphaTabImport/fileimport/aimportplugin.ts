@@ -34,7 +34,22 @@ class AlphaTabImportMusicPlugin {
 			//
 		} else {
 			this.callbackID = message.hostData;
+			this.setupColors(message.colors);
 		}
+	}
+	setupColors(colors: {
+		background: string// #101;
+		, main: string//#9cf;
+		, drag: string//#03f;
+		, line: string//#ffc;
+		, click: string// #c39;
+	}) {
+		//console.log('setipColors', colors.background, window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'));
+		document.documentElement.style.setProperty('--background-color', colors.background);
+		document.documentElement.style.setProperty('--main-color', colors.main);
+		document.documentElement.style.setProperty('--drag-color', colors.drag);
+		document.documentElement.style.setProperty('--line-color', colors.line);
+		document.documentElement.style.setProperty('--click-color', colors.click);
 	}
 
 	loadMusicfile(inputFile) {

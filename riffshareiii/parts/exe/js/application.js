@@ -457,14 +457,14 @@ class FilterPluginDialog {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -614,14 +614,14 @@ class SamplerPluginDialog {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -666,14 +666,14 @@ class ActionPluginDialog {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendCurrentProjectToActionPlugin() {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
-            let message = { hostData: globalCommandDispatcher.cfg().data };
+            let message = { hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -865,14 +865,14 @@ class SequencerPluginDialog {
         let pluginFrame = document.getElementById("pluginSequencerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
-        let pluginFrame = document.getElementById("pluginSequencerFrame");
+        let pluginFrame = document.getElementById('pluginSequencerFrame');
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -967,14 +967,14 @@ class PointPluginDialog {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginPoint.stateBlob };
+            let message = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors() };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -1731,6 +1731,14 @@ class CommandDispatcher {
     }
     moveAsideSelectedBars() {
         console.log('move aside');
+    }
+    readThemeColors() {
+        return { background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'),
+            main: window.getComputedStyle(document.documentElement).getPropertyValue('--main-color'),
+            drag: window.getComputedStyle(document.documentElement).getPropertyValue('--drag-color'),
+            line: window.getComputedStyle(document.documentElement).getPropertyValue('--line-color'),
+            click: window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
+        };
     }
     mergeSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;

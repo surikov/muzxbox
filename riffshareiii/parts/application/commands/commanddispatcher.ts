@@ -832,6 +832,20 @@ class CommandDispatcher {
 	moveAsideSelectedBars() {
 		console.log('move aside');
 	}
+	readThemeColors():{
+		background: string// #101;
+		, main: string//#9cf;
+		, drag: string//#03f;
+		, line: string//#ffc;
+		, click: string// #c39;
+	}{
+		return { background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color')
+			, main:window.getComputedStyle(document.documentElement).getPropertyValue('--main-color')
+			, drag: window.getComputedStyle(document.documentElement).getPropertyValue('--drag-color')
+			, line: window.getComputedStyle(document.documentElement).getPropertyValue('--line-color')
+			, click:window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
+		};
+	}
 	mergeSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;

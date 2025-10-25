@@ -9,14 +9,14 @@ class ActionPluginDialog {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
-			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID };
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() }
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
 	sendCurrentProjectToActionPlugin() {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
-			let message: MZXBX_MessageToPlugin = { hostData: globalCommandDispatcher.cfg().data };
+			let message: MZXBX_MessageToPlugin = { hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors() };
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}

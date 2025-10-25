@@ -178,7 +178,7 @@ type Zvoog_Project = {
 	title: string;
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
-	farorder:number[];
+	farorder: number[];
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
@@ -352,6 +352,13 @@ type MZXBX_PluginMessage = {
 };*/
 type MZXBX_MessageToPlugin = {
 	hostData: any
+	, colors: {
+		background: string// #101;
+		, main: string//#9cf;
+		, drag: string//#03f;
+		, line: string//#ffc;
+		, click: string// #c39;
+	}
 };
 type MZXBX_MessageToHost = {
 	dialogID: string

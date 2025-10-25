@@ -66,14 +66,14 @@ class PointPluginDialog {
 		let pluginFrame = document.getElementById("pluginPointFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
-			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID };
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
 	sendPointToPlugin() {
 		let pluginFrame = document.getElementById("pluginPointFrame") as any;
 		if (pluginFrame) {
-			let message: MZXBX_MessageToPlugin = { hostData: this.pluginPoint.stateBlob };
+			let message: MZXBX_MessageToPlugin = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors() };
 			pluginFrame.contentWindow.postMessage(message, '*');
 			//console.log('sendPointToPlugin', message);
 		}
