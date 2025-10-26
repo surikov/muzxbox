@@ -39,18 +39,18 @@
 		
 		
 		
-        "../riffshareiii/parts/mzxbxapi/musicenginetypes.ts"
-		//,"../riffshareiii/parts/mzxbxapi/musicenginedeclarations.ts"
-		,"../riffshareiii/parts/extensions/minium.percussion/list/names.ts"
-		,"../riffshareiii/parts/extensions/minium.pitch/list/names.ts"
+        "../mzxbxapi/musicenginetypes.ts"
+		//,"../mzxbxapi/musicenginedeclarations.ts"
+		,"../extensions/minium.percussion/list/names.ts"
+		,"../extensions/minium.pitch/list/names.ts"
 
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/MIDIEvent.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/MIDIParser.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/MIDIFileTrack.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/MIDIFileHeader.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/DataViewStream.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/midiimport.ts"
-		,"../riffshareiii/parts/extensions/alphaTabImport/midiimport/eventsconvert.ts"
+		,"../extensions/alphaTabImport/midiimport/MIDIEvent.ts"
+		,"../extensions/alphaTabImport/midiimport/MIDIParser.ts"
+		,"../extensions/alphaTabImport/midiimport/MIDIFileTrack.ts"
+		,"../extensions/alphaTabImport/midiimport/MIDIFileHeader.ts"
+		,"../extensions/alphaTabImport/midiimport/DataViewStream.ts"
+		,"../extensions/alphaTabImport/midiimport/midiimport.ts"
+		,"../extensions/alphaTabImport/midiimport/eventsconvert.ts"
 
 		,"metre.ts"
 		

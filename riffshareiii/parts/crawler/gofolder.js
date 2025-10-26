@@ -1307,18 +1307,18 @@ class EventsConverter {
             drumCount: 0,
             tracks: [],
             drums: [],
-            avgTempoCategory: '',
-            baseDrumCategory: '',
+            avgTempoCategory04: 0,
+            baseDrumCategory03: 0,
             baseDrumPerBar: 0,
             bars: [],
             barCount: 0,
             bassTrackNum: -1,
             bassAvg: -1,
-            durationCategory: '',
+            durationCategory04: 0,
             guitarChordDuration: 0,
-            guitarChordCategory: '',
+            guitarChordCategory03: 0,
             bassLine: '',
-            bassTone50: -1,
+            bassTone50: 0,
             overDriveRatio: 0,
             proCategories: []
         };
@@ -1555,7 +1555,14 @@ class EventsConverter {
                         ratio = 0;
                     }
                 }
-                let title = new ChordPitchPerformerUtil().tonechordinslist()[this.midiFileInfo.tracks[tt].program].split(':')[1].trim();
+                let title = '' + this.midiFileInfo.tracks[tt].program;
+                let path = new ChordPitchPerformerUtil().tonechordinslist()[this.midiFileInfo.tracks[tt].program];
+                if (path) {
+                    let parts = path.split(':');
+                    title = path.split(':')[1].trim();
+                }
+                else {
+                }
                 this.midiFileInfo.proCategories.push({ cat: cat, title: title, ratio: ratio });
             }
         }
@@ -1612,32 +1619,33 @@ class EventsConverter {
             }
             this.midiFileInfo.bassTrackNum = bassTrackNo;
             this.midiFileInfo.bassAvg = curAvg;
+            this.midiFileInfo.bassTone50++;
         }
         if (this.midiFileInfo.duration < 1 * 60 * 1000)
-            this.midiFileInfo.durationCategory = 'excerpt';
+            this.midiFileInfo.durationCategory04 = 0;
         else if (this.midiFileInfo.duration < 2.5 * 60 * 1000)
-            this.midiFileInfo.durationCategory = 'short';
+            this.midiFileInfo.durationCategory04 = 1;
         else if (this.midiFileInfo.duration < 4 * 60 * 1000)
-            this.midiFileInfo.durationCategory = 'medium';
+            this.midiFileInfo.durationCategory04 = 2;
         else if (this.midiFileInfo.duration < 6 * 60 * 1000)
-            this.midiFileInfo.durationCategory = 'long';
+            this.midiFileInfo.durationCategory04 = 3;
         else
-            this.midiFileInfo.durationCategory = 'lingering';
+            this.midiFileInfo.durationCategory04 = 4;
         let bpm = 0;
         for (let ii = 0; ii < project.timeline.length; ii++) {
             bpm = bpm + project.timeline[ii].tempo;
         }
         let avgbpm = bpm / project.timeline.length;
         if (avgbpm < 80)
-            this.midiFileInfo.avgTempoCategory = 'very slow';
+            this.midiFileInfo.avgTempoCategory04 = 0;
         else if (avgbpm < 110)
-            this.midiFileInfo.avgTempoCategory = 'slow';
+            this.midiFileInfo.avgTempoCategory04 = 1;
         else if (avgbpm < 140)
-            this.midiFileInfo.avgTempoCategory = 'moderate';
+            this.midiFileInfo.avgTempoCategory04 = 2;
         else if (avgbpm < 200)
-            this.midiFileInfo.avgTempoCategory = 'fast';
+            this.midiFileInfo.avgTempoCategory04 = 3;
         else
-            this.midiFileInfo.avgTempoCategory = 'very fast';
+            this.midiFileInfo.avgTempoCategory04 = 4;
         let maxTrackChordDuration = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
             let track = this.midiFileInfo.tracks[ii];
@@ -1649,22 +1657,21 @@ class EventsConverter {
         }
         this.midiFileInfo.guitarChordDuration = maxTrackChordDuration / this.midiFileInfo.duration;
         if (this.midiFileInfo.guitarChordDuration < 0.1)
-            this.midiFileInfo.guitarChordCategory = 'none';
+            this.midiFileInfo.guitarChordCategory03 = 0;
         else if (this.midiFileInfo.guitarChordDuration < 0.3)
-            this.midiFileInfo.guitarChordCategory = 'few';
+            this.midiFileInfo.guitarChordCategory03 = 1;
         else if (this.midiFileInfo.guitarChordDuration < 0.5)
-            this.midiFileInfo.guitarChordCategory = 'medium';
+            this.midiFileInfo.guitarChordCategory03 = 2;
         else
-            this.midiFileInfo.guitarChordCategory = 'many';
-        this.midiFileInfo.baseDrumCategory = 'none';
+            this.midiFileInfo.guitarChordCategory03 = 3;
         if (basedrums.length) {
             this.midiFileInfo.baseDrumPerBar = Math.round(basedrums.reduce((last, it) => last + it.count, 0) / this.midiFileInfo.barCount);
             if (this.midiFileInfo.baseDrumPerBar < 2)
-                this.midiFileInfo.baseDrumCategory = 'few';
+                this.midiFileInfo.baseDrumCategory03 = 1;
             else if (this.midiFileInfo.baseDrumPerBar < 6)
-                this.midiFileInfo.baseDrumCategory = 'medium';
+                this.midiFileInfo.baseDrumCategory03 = 2;
             else
-                this.midiFileInfo.baseDrumCategory = 'many';
+                this.midiFileInfo.baseDrumCategory03 = 3;
         }
     }
     findMIDITempoBefore(ms) {
@@ -2285,7 +2292,7 @@ function MMUtil() {
     return new MZXBX_MetreMathUtil().set({ count: 0, part: 1 });
 }
 var fs = require('fs');
-let folder = 'D:\\projects\\muzxbox\\test\\music\\';
+let folder = process.cwd();
 console.log('start', folder);
 function toArrayBuffer(buffer) {
     const arrayBuffer = new ArrayBuffer(buffer.length);
@@ -2295,27 +2302,39 @@ function toArrayBuffer(buffer) {
     }
     return arrayBuffer;
 }
-function readOneFile(path, name) {
-    let buff = fs.readFileSync(path + name);
+function readOneFile(num, path, name) {
+    let buff = fs.readFileSync(path + '/' + name);
     let arrayBuffer = toArrayBuffer(buff);
     try {
         let mifi = new MIDIReader(name, arrayBuffer.byteLength, arrayBuffer);
-        let cat = '';
-        for (let kk = 0; kk < mifi.info.proCategories.length; kk++) {
-            cat = cat + ' / ' + mifi.info.proCategories[kk].ratio + ' ' + mifi.info.proCategories[kk].title;
-        }
-        console.log('', mifi.info.fileName, cat);
+        let fname = name.trim();
+        let parts = fname.split('\\.');
+        let oname = parts[0];
+        let mainTxt = 'file: "' + oname + '"';
+        mainTxt = mainTxt + ", size: " + Math.round(buff.length / 1000) + 'kb';
+        mainTxt = mainTxt + ", duration: " + mifi.info.durationCategory04;
+        mainTxt = mainTxt + ", bpm: " + mifi.info.avgTempoCategory04;
+        mainTxt = mainTxt + ", drums: " + mifi.info.baseDrumCategory03;
+        mainTxt = mainTxt + ", guitar chords: " + mifi.info.guitarChordCategory03;
+        mainTxt = mainTxt + ", bass: " + mifi.info.bassTone50;
+        mainTxt = mainTxt + ", overdrive: " + Math.round(100 * mifi.info.overDriveRatio);
+        console.log(num + '. ' + mainTxt);
     }
     catch (xx) {
+        console.log('/*');
+        console.log(path, name);
+        console.log(xx);
+        console.log('*/');
     }
 }
 function readFiles(path) {
     fs.readdir(path, function (error, filenames) {
         console.log('error', error);
+        console.log('count', filenames.length);
         for (let ii = 0; ii < filenames.length; ii++) {
             let filename = filenames[ii];
             if (filename.toLowerCase().trim().endsWith('mid')) {
-                readOneFile(path, filename);
+                readOneFile(ii, path, filename);
             }
         }
     });
