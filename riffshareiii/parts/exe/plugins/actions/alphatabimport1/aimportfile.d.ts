@@ -2676,10 +2676,10 @@ type MIDIFileInfo = {
     fileName: string;
     fileSize: number;
     duration: number;
-    durationCategory: string;
-    baseDrumCategory: string;
+    durationCategory04: number;
+    baseDrumCategory03: number;
     baseDrumPerBar: number;
-    avgTempoCategory: string;
+    avgTempoCategory04: number;
     noteCount: number;
     drumCount: number;
     tracks: MIDIFileTrackInfo[];
@@ -2702,8 +2702,8 @@ type MIDIFileInfo = {
     bassAvg: number;
     bassTone50: number;
     guitarChordDuration: number;
-    guitarChordCategory: string;
-    overDriveRatio: number;
+    guitarChordCategory03: number;
+    overDriveRatio01: number;
     proCategories: {
         cat: number;
         ratio: number;

@@ -1319,7 +1319,7 @@ class EventsConverter {
             guitarChordCategory03: 0,
             bassLine: '',
             bassTone50: 0,
-            overDriveRatio: 0,
+            overDriveRatio01: 0,
             proCategories: []
         };
         this.parser = parser;
@@ -1601,8 +1601,8 @@ class EventsConverter {
             }
             if (track.program == 29 || track.program == 30) {
                 let rr = (track.singleDuration + track.chordDuration) / this.midiFileInfo.duration;
-                if (rr > this.midiFileInfo.overDriveRatio) {
-                    this.midiFileInfo.overDriveRatio = rr;
+                if (rr > this.midiFileInfo.overDriveRatio01) {
+                    this.midiFileInfo.overDriveRatio01 = rr;
                 }
             }
         }
@@ -1716,6 +1716,10 @@ class EventsConverter {
         while (wholeDurationMs < lastMs) {
             let tempo = this.findMIDITempoBefore(wholeDurationMs);
             let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
+            if (meter.less({ count: 1, part: 2 })) {
+                meter.count = 1;
+                meter.part = 2;
+            }
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = { tempo: tempo, metre: meter.metre() };
             project.timeline.push(nextBar);
@@ -1723,6 +1727,8 @@ class EventsConverter {
                 barDurationMs = 100;
             let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
             let nearestBarMs = nearestDurationMs - wholeDurationMs;
+            if (nearestBarMs < 99)
+                nearestBarMs = 99;
             nextBar.tempo = tempo * barDurationMs / nearestBarMs;
             wholeDurationMs = wholeDurationMs + nearestBarMs;
         }
@@ -2317,7 +2323,7 @@ function readOneFile(num, path, name) {
         mainTxt = mainTxt + ", drums: " + mifi.info.baseDrumCategory03;
         mainTxt = mainTxt + ", guitar chords: " + mifi.info.guitarChordCategory03;
         mainTxt = mainTxt + ", bass: " + mifi.info.bassTone50;
-        mainTxt = mainTxt + ", overdrive: " + Math.round(100 * mifi.info.overDriveRatio);
+        mainTxt = mainTxt + ", overdrive: " + Math.round(100 * mifi.info.overDriveRatio01);
         console.log(num + '. ' + mainTxt);
     }
     catch (xx) {

@@ -598,7 +598,7 @@ type MIDIFileInfo = {
     bassTone50: number;
     guitarChordDuration: number;
     guitarChordCategory03: number;
-    overDriveRatio: number;
+    overDriveRatio01: number;
     proCategories: {
         cat: number;
         ratio: number;

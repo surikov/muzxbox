@@ -83,6 +83,7 @@ class EventsConverter {
 	}
 	convertEvents(name: string, filesize: number
 	): Zvoog_Project {
+		//console.log('test1');
 		this.midiFileInfo.fileName = name;
 		this.midiFileInfo.fileSize = filesize;
 		let project: Zvoog_Project = {
@@ -112,6 +113,7 @@ class EventsConverter {
 		let allTracks: MIDITrackInfo[] = [];
 		let allPercussions: MIDIDrumInfo[] = [];
 		this.collectNotes(allNotes, allTracks, allPercussions);
+		//console.log('test2');
 		/*
 		for (let ii = 0; ii < this.parser.parsedTracks.length; ii++) {
 			let parsedtrack: MIDIFileTrack = this.parser.parsedTracks[ii];
@@ -130,7 +132,7 @@ class EventsConverter {
 		//console.log(allTracks);
 		//console.log(allPercussions);
 		this.fillTimeline(project, allNotes);
-
+		//console.log('test2a');
 		let echoOutID = 'reverberation';
 		let compresID = 'compression';
 		let filterEcho: Zvoog_FilterTarget = {
@@ -153,7 +155,7 @@ class EventsConverter {
 		};
 		project.filters.push(filterEcho);
 		project.filters.push(filterCompression);
-
+		//console.log('test3');
 
 		this.addInsTrack(project, allTracks, compresID);
 		this.addPercussionTrack(project, allPercussions, compresID);
@@ -197,7 +199,7 @@ class EventsConverter {
 		//console.log('allNotes', allNotes);
 		//console.log('alignedMIDIevents', this.parser.alignedMIDIevents);
 		this.fillInfoMIDI(project, allNotes, allTracks);
-
+		//console.log('test return');
 		return project;
 	}
 	/*
@@ -629,10 +631,15 @@ class EventsConverter {
 		let lastMs = allNotes[allNotes.length - 1].startMs + 1000;
 		this.midiFileInfo.duration = lastMs;
 		let wholeDurationMs = 0;
-		//console.log(this.parser);
+		//console.log(this.parser.midiheader.metersList);
 		while (wholeDurationMs < lastMs) {
 			let tempo = this.findMIDITempoBefore(wholeDurationMs);
 			let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
+			if(meter.less({count:1,part:4})){
+				meter.count=1;
+				meter.part=4;
+			}
+			//console.log(tempo, meter);
 			let barDurationMs = meter.duration(tempo) * 1000;
 			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre() };
 			project.timeline.push(nextBar);
@@ -643,8 +650,11 @@ class EventsConverter {
 			//	, meter.count + '/' + meter.part, Math.round(tempo)
 			//);
 			let nearestBarMs = nearestDurationMs - wholeDurationMs;
+			if (nearestBarMs < 99) nearestBarMs = 99;
 			nextBar.tempo = tempo * barDurationMs / nearestBarMs;
+
 			wholeDurationMs = wholeDurationMs + nearestBarMs;
+			//console.log(wholeDurationMs);
 		}
 	}
 

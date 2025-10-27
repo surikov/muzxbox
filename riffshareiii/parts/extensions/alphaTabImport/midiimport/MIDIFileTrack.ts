@@ -22,13 +22,13 @@ type TrackNote = {
 	, trackidx: number
 	, avgMs: number
 	//,cuprogram:number
-	,count?:number
+	, count?: number
 }
-type TrackChord={
+type TrackChord = {
 	startMs: number
-	,baseDuration: number
-	,tones:number[]
-	,basePitch:number
+	, baseDuration: number
+	, tones: number[]
+	, basePitch: number
 };
 class MIDIFileTrack {
 	currentEventIdx: number = -1;
@@ -48,11 +48,14 @@ class MIDIFileTrack {
 	constructor(buffer: ArrayBuffer, start: number) {
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH);
 		this.trackLength = this.datas.getUint32(4);
+		//console.log('track', start, this.HDR_LENGTH, this.trackLength);
 		this.datas = new DataView(buffer, start, this.HDR_LENGTH + this.trackLength);
+		//console.log(this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
 		this.trackContent = new DataView(this.datas.buffer, this.datas.byteOffset + this.HDR_LENGTH, this.datas.byteLength - this.HDR_LENGTH);
 		this.trackevents = [];
 		this.trackVolumePoints = [];
 		//this.programChannel = [];
+		//console.log('done');
 	}
 	moveNextCuEvent(): void {
 		if (this.currentEventIdx < this.trackevents.length - 2) {

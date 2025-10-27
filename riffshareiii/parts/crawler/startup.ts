@@ -1,3 +1,7 @@
+//declare var v8;
+//console.log(v8.getHeapStatistics().heap_size_limit/(1024*1024));
+//export NODE_OPTIONS="--max-old-space-size=8192" # Increase to 8 GB
+//Set NODE_OPTIONS="--max-old-space-size=8192"
 declare function require(a);
 declare var process;
 var fs = require('fs');
@@ -16,6 +20,7 @@ function toArrayBuffer(buffer) {
 }
 
 function readOneFile(num: number, path: string, name: string) {
+	//console.log('readOneFile '+name);
 	let buff = fs.readFileSync(path + '/' + name);
 	let arrayBuffer = toArrayBuffer(buff);
 	try {
@@ -60,6 +65,7 @@ function readFiles(path) {
 	fs.readdir(path, function (error, filenames) {
 		console.log('error', error);
 		console.log('count', filenames.length);
+		//filenames.sort((a, b) => b.localeCompare(a) );
 		for (let ii = 0; ii < filenames.length; ii++) {
 			let filename = filenames[ii];
 			if (filename.toLowerCase().trim().endsWith('mid')) {

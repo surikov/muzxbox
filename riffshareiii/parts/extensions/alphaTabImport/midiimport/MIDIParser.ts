@@ -47,7 +47,7 @@ class MidiParser {
 	midiEventParam1: number = 0;
 
 	//programTrackChannel: { midiProgram: number, midiChannel: number, Track: number, from: MIDIEvent }[] = [];
-	programChannel: { midiProgram: number, midiChannel: number}[] = [];
+	programChannel: { midiProgram: number, midiChannel: number }[] = [];
 
 	controller_BankSelectMSB = 0x00;
 	controller_ModulationWheel = 0x01;
@@ -72,8 +72,9 @@ class MidiParser {
 
 
 	constructor(arrayBuffer: ArrayBuffer) {
-		//console.log(this);
+		//console.log(arrayBuffer.byteLength);
 		this.midiheader = new MIDIFileHeader(arrayBuffer);
+		//console.log('parseTracks');
 		this.parseTracks(arrayBuffer);
 
 	}
@@ -83,11 +84,14 @@ class MidiParser {
 		var trackCount: number = this.midiheader.trackCount;
 		this.parsedTracks = [];
 		for (var i = 0; i < trackCount; i++) {
+			//console.log(i,'pase track');
 			var track: MIDIFileTrack = new MIDIFileTrack(arrayBuffer, curIndex);
+			//console.log('done');
 			this.parsedTracks.push(track);
 			// Updating index to the track end
 			curIndex = curIndex + track.trackLength + 8;
 		}
+		//console.log('next part');
 		/*var format = this.midiheader.getFormat();
 		if (1 == format || 1 == this.midiheader.trackCount) {
 			console.log('format', format,'tracks',this.midiheader.trackCount);
@@ -103,6 +107,7 @@ class MidiParser {
 		for (var i = 0; i < this.parsedTracks.length; i++) {
 			this.parseTrackEvents(this.parsedTracks[i]);
 		}
+		//console.log('next');
 		this.parseNotes();
 		/*if (this.midiheader.metersList.length > 1) {
 			if (this.midiheader.metersList[1].ms < 4321) {
@@ -110,7 +115,9 @@ class MidiParser {
 				this.midiheader.metersList[0].division = this.midiheader.metersList[1].division
 			}
 		}*/
+		//console.log('next 2');
 		this.simplifyAllBendPaths();
+		//console.log('next 3');
 	}
 	toText(arr: number[]): string {
 		let txt = '';
@@ -709,7 +716,7 @@ class MidiParser {
 									let xsts = this.programChannel.find((it) => it.midiChannel == pair.midiChannel);
 									if (xsts) {
 										//console.log('skip programChannel', pair,evnt,this.programChannel);
-										xsts.midiProgram=pair.midiProgram;
+										xsts.midiProgram = pair.midiProgram;
 									} else {
 										//console.log('add', pair);
 										this.programChannel.push(pair);
@@ -868,6 +875,7 @@ class MidiParser {
 						//console.log('tempo', this.midiheader.tempoBPM, evnt);
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
+						console.log('EVENT_META_TIME_SIGNATURE',evnt.param1 ,evnt.param2);
 						this.midiheader.meterCount = evnt.param1 ? evnt.param1 : 4;
 						var dvsn: number = evnt.param2 ? evnt.param2 : 2;
 						if (dvsn == 1) this.midiheader.meterDivision = 2
@@ -877,8 +885,10 @@ class MidiParser {
 						else if (dvsn == 5) this.midiheader.meterDivision = 32
 						else if (dvsn == 0) this.midiheader.meterDivision = 1
 						this.midiheader.metersList.push({
-							track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
-							, count: this.midiheader.meterCount, division: this.midiheader.meterDivision
+							track: t
+							, ms: evnt.playTimeMs ? evnt.playTimeMs : 0
+							, count: this.midiheader.meterCount
+							, division: this.midiheader.meterDivision
 							, evnt: evnt
 						});
 					}
