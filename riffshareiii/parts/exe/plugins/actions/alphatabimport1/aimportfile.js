@@ -15086,7 +15086,6 @@ class MidiParser {
                         this.midiheader.tempoBPM = evnt.tempoBPM ? evnt.tempoBPM : 120;
                     }
                     if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
-                        console.log('EVENT_META_TIME_SIGNATURE', evnt.param1, evnt.param2);
                         this.midiheader.meterCount = evnt.param1 ? evnt.param1 : 4;
                         var dvsn = evnt.param2 ? evnt.param2 : 2;
                         if (dvsn == 1)
@@ -15432,7 +15431,8 @@ class EventsConverter {
             bassLine: '',
             bassTone50: 0,
             overDriveRatio01: 0,
-            proCategories: []
+            proCategories: [],
+            meters: []
         };
         this.parser = parser;
     }
@@ -15758,6 +15758,19 @@ class EventsConverter {
             this.midiFileInfo.avgTempoCategory04 = 3;
         else
             this.midiFileInfo.avgTempoCategory04 = 4;
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            let bar = project.timeline[ii];
+            let label = '' + bar.metre.count + '/' + bar.metre.part;
+            let xsts = this.midiFileInfo.meters.find((it) => it.label == label);
+            if (xsts) {
+                xsts.count++;
+            }
+            else {
+                this.midiFileInfo.meters.push({ label: label, count: 1 });
+            }
+        }
+        this.midiFileInfo.meters.map((it) => it.count = Math.round(100 * it.count / project.timeline.length));
+        this.midiFileInfo.meters.sort((a, b) => b.count - a.count);
         let maxTrackChordDuration = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
             let track = this.midiFileInfo.tracks[ii];

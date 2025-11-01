@@ -192,6 +192,7 @@ function init() {
 	datarows = readParseStat(dataBalls);
 
 }
+/*
 function dumpStatLeftRed(datarows: BallsRow[]) {
 	console.log('dumpStatLeftRed', datarows);
 	let counts: number[] = [];
@@ -215,7 +216,7 @@ function dumpStatLeftRed(datarows: BallsRow[]) {
 	}
 	//console.log('mins',sm,counts);
 }
-
+*/
 function randomizedatarows() {
 	for (var ii = 0; ii < datarows.length; ii++) {
 		var row = datarows[ii];
@@ -698,6 +699,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	let blue2 = '#3333ff33';
 	let blue = '#3333ffff';
 
+	let blueLeftRight: { left: number, right: number }[] = [];
+
 	for (let rr = 0; rr < rowsVisibleCount; rr++) {
 		if (rr > rows.length - 6) break;
 		let calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[];
@@ -737,9 +740,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		for (let kk = 0; kk < first.length; kk++) {
 
 			if (ballExists(first[kk].ball, rows[rr])) {
-				/*if(rr==1 && (kk==0 || kk==first.length-1)){
-console.log(kk,first[kk].ball);
-				}*/
+
 				if (showFirstRow || rr > 0) {
 
 					lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
@@ -809,6 +810,9 @@ console.log(kk,first[kk].ball);
 			markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
 
 		}
+		//console.log(begin1,end);
+		blueLeftRight.push({ left: rowLen - end, right: begin1 });
+
 		if (showFirstRow || rr > 0) {
 			begin1 = rowLen + 1;
 			end = 0;
@@ -862,11 +866,24 @@ console.log(kk,first[kk].ball);
 		if (blueNotGree) {
 			paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr);
 		} else {
-			paintCellsGreen(svg,  rr, rows);
+			paintCellsGreen(svg, rr, rows);
 		}
 		//paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
 	}
-
+	let blueLeftDiffSumm = 0;
+	let blueRighDiffSumm = 0;
+	//console.log('blueLeftRight', blueLeftRight);
+	let szDiff = 12;
+	for (let ii = 1; ii < szDiff; ii++) {
+		blueLeftDiffSumm = blueLeftDiffSumm + Math.abs(blueLeftRight[ii].left - blueLeftRight[ii + 1].left);
+		blueRighDiffSumm = blueRighDiffSumm + Math.abs(blueLeftRight[ii].right - blueLeftRight[ii + 1].right);
+	}
+	blueLeftDiffSumm = Math.round(100 * blueLeftDiffSumm / szDiff) / 100;
+	blueRighDiffSumm = Math.round(100 * blueRighDiffSumm / szDiff) / 100;
+	//console.log(blueLeftDiffSumm, blueRighDiffSumm);
+	//addBigText(svg, 22, 55, "" + blueLeftDiffSumm + ' | ' + blueRighDiffSumm);
+	var span: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+	span.innerText = ''+szDiff+": blue diff: " + blueLeftDiffSumm + ' | ' + blueRighDiffSumm;
 }
 
 function paintCellsBlue(ratioPre: number
@@ -901,7 +918,7 @@ function paintCellsBlue(ratioPre: number
 function paintCellsGreen(//ratioPre: number
 	//, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
 	//, minCnt: number
-	 svg: SVGElement
+	svg: SVGElement
 	//, df: number
 	, rr: number
 	, rows: BallsRow[]
@@ -912,10 +929,10 @@ function paintCellsGreen(//ratioPre: number
 		let stepColor = 4 * ballsInRow;
 		for (let kk = 1; kk <= stepColor; kk++) {
 			if (ballExists(ii + 1, rows[rr + kk])) {
-				idx = idx+4*ballsInRow / kk;
+				idx = idx + 4 * ballsInRow / kk;
 			}
 		}
-		idx=1-idx/ballsInRow;
+		idx = 1 - idx / ballsInRow;
 		//idx = ballsInRow * (idx * idx) / (stepColor * stepColor);
 		//console.log(idx);
 
@@ -926,7 +943,7 @@ function paintCellsGreen(//ratioPre: number
 		//if (colorP > 150) colorP = 150;
 		if (idx < 0) idx = 0;
 		if (idx > 1) idx = 1;
-		let color = 'rgba(0,200,0,'+idx+')';
+		let color = 'rgba(0,200,0,' + idx + ')';
 		//color='rgba(0,0,255,0.5)';
 
 		addRect(svg
@@ -1218,8 +1235,8 @@ function addTails() {
 	resetNumbs();
 
 	//testTest2();
-
-
+	//testAbsDiff(skipRowsCount);
+	//dumpDiffStat();
 
 }
 
@@ -1269,209 +1286,7 @@ function arrHas0(arr: number[]): boolean {
 	}
 	return false;
 }
-function testTest2() {
-	/*
-	sortedBlue = sortedBlue.reverse();
-	console.log('sortedBlue', sortedBlue);
-	console.log('sortedGreen', sortedGreen);
-	console.log('sortedGrey', sortedGrey);
 
-	console.log('mxdata', mxdata);
-	console.log('mincopy', mincopy);
-*/
-	let sumar: number[] = [];
-	for (let ii = 0; ii <= rowLen; ii++) {
-		sumar[ii] = 0;
-	}
-	let ii = 0;
-	for (ii = 0; ii < rowLen && arrHas0(sumar); ii++) {
-		sumar[sortedBlue[ii]]++;
-		sumar[sortedGreen[ii]]++;
-		sumar[sortedGrey[ii]]++;
-		sumar[mxdata[ii].ball]++;
-		sumar[mincopy[ii].ball]++;
-	}
-	//console.log(ii, sumar);
-	let bas = 19;
-	for (let ii = 1; ii < sumar.length; ii++) {
-		markLines.push({
-			fromX: ii - 1
-			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX: ii - 1
-			, toY: skipRowsCount + bas
-			, color: '#33990033', manual: false
-		});
-		markLines.push({
-			fromX: ii - 1 + rowLen
-			, fromY: skipRowsCount - (sumar[ii] - 1) * 4 + bas
-			, toX: ii - 1 + rowLen
-			, toY: skipRowsCount + bas
-			, color: '#33990033', manual: false
-		});
-	}
-	drawLines();
-	let statsum: number[] = [];
-	for (let ii = 0; ii < sumar.length; ii++) {
-		statsum[sumar[ii]] = (statsum[sumar[ii]]) ? statsum[sumar[ii]] : 0;
-		statsum[sumar[ii]]++;
-	}
-	let sumtext = '';
-	let veroyat1 = ballsInRow / rowLen;
-	for (let ii = 1; ii < statsum.length; ii++) {
-		//
-		let countCurHeigth = statsum[ii];
-
-		if (showFirstRow) {
-			let cntExists = 0;
-			for (let kk = 0; kk < lastfirst.balls.length; kk++) {
-				let ball = lastfirst.balls[kk];
-				let level = sumar[ball]
-				if (level == ii) {
-					cntExists++;
-				}
-			}
-			//sumtext = sumtext + '=' + cnt;
-			//sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-			//	+ cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
-			let verCount = Math.round(100 * veroyat1 * countCurHeigth) / 100;
-			//let exstsVero=(Math.round(100 * cntExists/countCurHeigth) / 100);
-			let verCountDiff = -100 + Math.round(100 * (1 - cntExists / verCount));
-			let verCountDiffTxt = '' + (-1 * verCountDiff);
-			//if(verCountDiff<0){
-			//	verCountDiffTxt='+'+(-verCountDiff);
-			//}
-			sumtext = sumtext + '\n[' + (ii - 1) + ']' + countCurHeigth
-				+ ' \t' + verCount + '/' + cntExists
-				+ ' \t' + verCountDiffTxt + '%';
-		} else {
-			//sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-			//	+ countCurHeigth;
-			sumtext = sumtext + '\n[' + (ii - 1) + ']' + countCurHeigth + '\t' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
-		}
-		sumtext = sumtext + ' ';
-	}
-	//console.log(statsum);
-	//console.log(sumar, lastfirst);
-	let span = (document.getElementById('sumstat') as any) as HTMLElement;
-	span.innerText = sumtext;
-	/*if (showFirstRow) {
-		let ballstat = '';
-		for (let ii = 0; ii < lastfirst.balls.length; ii++) {
-			ballstat = ballstat + ' | ' + lastfirst.balls[ii] + ' in ' + (sumar[lastfirst.balls[ii] ]-1);
-		}
-		span.innerText = sumtext + ' = ' + ballstat;;
-		console.log(sumar, lastfirst);
-	}*/
-}
-function testTest() {
-	let yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
-	console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
-	let rightBlue = Math.ceil(0 * rowLen / 2);
-	let leftBlue = Math.ceil(1 * rowLen / 2) - 1;
-
-	let leftGreen = Math.ceil(1 * rowLen / 2);
-	let rightGreen = Math.ceil(2 * rowLen / 2) - 1;
-	let leftGrey = Math.ceil(2 * rowLen / 2);
-	let rightGrey = Math.ceil(3 * rowLen / 2) - 1;
-	let leftRed = Math.ceil(3 * rowLen / 2);
-	let rightRed = Math.ceil(4 * rowLen / 2) - 1;
-
-	for (let mm = 0; mm < markLines.length; mm++) {
-		let line = markLines[mm];
-		if (line.fromY == yyy && line.toY == yyy) {
-			if (line.fromX == leftBlue || line.toX == leftBlue) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let orders: number[] = sortedBlue.slice(0, nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
-				}
-				console.log('rightBlue', nn, data);
-				addTestLines1(data);
-
-			}
-			if (line.fromX == rightBlue || line.toX == rightBlue) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-
-				let orders: number[] = sortedBlue.slice(sortedBlue.length - nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
-				}
-				console.log('leftBlue', nn, data);
-				addTestLines2(data);
-			}
-			if (line.fromX == leftGreen || line.toX == leftGreen) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-
-				let orders: number[] = sortedGreen.slice(0, nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
-				}
-				console.log('leftGreen', nn, data);
-				addTestLines1(data);
-			}
-			if (line.fromX == rightGreen || line.toX == rightGreen) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-
-				let orders: number[] = sortedGreen.slice(sortedGreen.length - nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
-				}
-				console.log('rightGreen', nn, data);
-				addTestLines2(data);
-			}
-			if (line.fromX == leftGrey || line.toX == leftGrey) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-
-				let orders: number[] = sortedGrey.slice(0, nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
-				}
-				console.log('leftGrey', nn, data);
-				addTestLines1(data);
-			}
-			if (line.fromX == rightGrey || line.toX == rightGrey) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-
-				let orders: number[] = sortedGrey.slice(sortedGrey.length - nn);
-				let data: { ball: number, color: string }[] = [];
-				for (let bb = 0; bb < orders.length; bb++) {
-					data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
-				}
-				console.log('rightGrey', nn, data);
-				addTestLines2(data);
-			}
-
-			if (line.fromX == leftRed || line.toX == leftRed) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data: { ball: number, color: string }[] = [];
-				for (let rr = 0; rr < nn; rr++) {
-					let kk: number = rr;
-					data.push({ ball: 1 + kk, color: '#ff000099' });
-				}
-				console.log('leftRed', nn, data);
-				addTestLines1(data);
-			}
-			if (line.fromX == rightRed || line.toX == rightRed) {
-				let nn = 2 * Math.abs(line.fromX - line.toX);
-				let data: { ball: number, color: string }[] = [];
-				for (let rr = 0; rr < nn; rr++) {
-					let kk: number = rowLen - rr - 1;
-					data.push({ ball: 1 + kk, color: '#ff000099' });
-				}
-				console.log('rightRed', nn, data);
-				addTestLines1(data);
-			}
-
-
-		}
-	}
-	drawLines();
-}
 /*
 function dumpStat22() {
 	console.log('dumpStat22');
@@ -1608,59 +1423,124 @@ function test4(){
 	console.log(cntx,cless,cmore,cmore/cntx);
 }
 */
-function yetAnotherStat(){
-	let cnts:number[]=[];
-	for(let ii=1;ii<datarows.length;ii++){
-		let nn=datarows[ii].balls[0];
-		if(!(cnts[nn]))cnts[nn]=0;
+function yetAnotherStat() {
+	let cnts: number[] = [];
+	for (let ii = 1; ii < datarows.length; ii++) {
+		let nn = datarows[ii].balls[0];
+		if (!(cnts[nn])) cnts[nn] = 0;
 		cnts[nn]++;
 	}
-	console.log('empty left',cnts);
-	for(let ii=0;ii<cnts.length;ii++){
-		console.log(ii,cnts[ii]/datarows.length);
+	console.log('empty left', cnts);
+	for (let ii = 0; ii < cnts.length; ii++) {
+		console.log(ii, cnts[ii] / datarows.length);
 	}
 }
-function anotherStat(){
+function anotherStat() {
 	//let randProbe:number[]=[];
-	let sz=15;
-	let ln=4321;
-	let sm0=0;
-	let sm1=0;
-	let sm2=0;
-	let sm3=0;
-	let sm4=0;
-	let sm5=0;
-	let sm6=0;
-	for(let rn=1;rn<ln;rn++){
+	let sz = 15;
+	let ln = 4321;
+	let sm0 = 0;
+	let sm1 = 0;
+	let sm2 = 0;
+	let sm3 = 0;
+	let sm4 = 0;
+	let sm5 = 0;
+	let sm6 = 0;
+	for (let rn = 1; rn < ln; rn++) {
 		//let rn=1+Math.floor(Math.random()*datarows.length-1);
-		let hitCount=0;
-		for(let ii=0;ii<sz;ii++){
-			let nxt=1+Math.floor(Math.random()*rowLen);
+		let hitCount = 0;
+		for (let ii = 0; ii < sz; ii++) {
+			let nxt = 1 + Math.floor(Math.random() * rowLen);
 			//console.log(nxt);
-			if(ballExists(nxt,datarows[rn])){
+			if (ballExists(nxt, datarows[rn])) {
 				hitCount++;
 			}
 		}
-		if(hitCount==0)sm0++;
-		if(hitCount==1)sm1++;
-		if(hitCount==2)sm2++;
-		if(hitCount==3)sm3++;
-		if(hitCount==4)sm4++;
-		if(hitCount==5)sm5++;
-		if(hitCount==6)sm6++;
+		if (hitCount == 0) sm0++;
+		if (hitCount == 1) sm1++;
+		if (hitCount == 2) sm2++;
+		if (hitCount == 3) sm3++;
+		if (hitCount == 4) sm4++;
+		if (hitCount == 5) sm5++;
+		if (hitCount == 6) sm6++;
 		//sm=sm+hitCount;
 		//if(hitCount>ballsInRow)console.log(rn,':',hitCount);
 	}
-	console.log('random',sz,ln,'0-6:',sm0/ln,sm1/ln,sm2/ln,sm3/ln,sm4/ln,sm5/ln,sm6/ln);
+	console.log('random', sz, ln, '0-6:', sm0 / ln, sm1 / ln, sm2 / ln, sm3 / ln, sm4 / ln, sm5 / ln, sm6 / ln);
+}
+function testAbsDiff() {
+	testDumpAbsDiff(1);
+	testDumpAbsDiff(1001);
+	testDumpAbsDiff(2001);
+	testDumpAbsDiff(3001);
+	testDumpAbsDiff(4001);
+	/*testDumpAbsDiff(1, 2);
+	testDumpAbsDiff(1, 3);
+	testDumpAbsDiff(1, 4);
+	let frstcnt: number[] = [];
+	for (let ff = 1; ff < 5000; ff++) {
+		let bl = datarows[ff].balls[0];
+		frstcnt[bl] = frstcnt[bl] ? frstcnt[bl] : 0;
+		frstcnt[bl]++;
+	}
+	console.log(frstcnt);*/
+}
+function testDumpAbsDiff(strt: number) {//}, maxpre: number) {//, mincur: number) {
+	let count1 = 0;
+	let preDiffX: number[] = [];
+	let preDiffNo: number[] = [];
+	for (let ff = strt; ff < strt + 1000; ff++) {
+
+		//if (datarows[ff + 1].balls[0] >= maxpre) {
+		let sz = 6;
+		let smm = 0;
+		for (let ii = ff + 1; ii < ff + 1 + sz; ii++) {
+			smm = smm + Math.abs(datarows[ii].balls[0] - datarows[ii + 1].balls[0]);
+		}
+		let avg = Math.round(1 * smm / sz);
+		//avg = datarows[ff].balls[0];
+		preDiffX[avg] = preDiffX[avg] ? preDiffX[avg] : 0;
+		preDiffNo[avg] = preDiffNo[avg] ? preDiffNo[avg] : 0;
+		//if (datarows[ff].balls[0] >= mincur) {
+		if (datarows[ff].balls[0] > 4) {
+			count1++;
+			preDiffX[avg]++;
+		} else {
+			preDiffNo[avg]++;
+		}
+		//}
+		/*let frst = datarows[ff].balls[0];
+		let sz = 9;
+		let smm = 0;
+		for (let ii = ff + 1; ii < ff + 1 + sz; ii++) {
+			smm = smm + Math.abs(datarows[ii].balls[0] - datarows[ii + 1].balls[0]);
+		}
+		let avg = smm / sz;
+		if (Math.round(avg) == 3) {
+			let line = '';
+			for (let ii = 0; ii < frst; ii++) {
+				line = line + '◼';
+			}
+			console.log(line, frst, ff,avg);
+		} else {
+			//console.log(frst);
+		}*/
+	}
+	console.log(count1, preDiffX, preDiffNo);
+	let end = Math.max(preDiffX.length, preDiffNo.length);
+	for (let ii = 0; ii < end; ii++) {
+		console.log(ii, preDiffX[ii] / preDiffNo[ii], '' + preDiffX[ii] + '+' + preDiffNo[ii] + '=' + (preDiffX[ii] + preDiffNo[ii]));
+	}
 }
 
 init();
 addTails();
+
 //dumpPairsCounts();
 //let chk=randBalls(20);
 //anotherStat();
 //yetAnotherStat();
-console.log(datarows);
+//testAbsDiff();
 //test4();
 /*
 checkAllRows(rowLen * 1 / 4);

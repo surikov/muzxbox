@@ -992,8 +992,10 @@ class MidiParser {
                         else if (dvsn == 0)
                             this.midiheader.meterDivision = 1;
                         this.midiheader.metersList.push({
-                            track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
-                            count: this.midiheader.meterCount, division: this.midiheader.meterDivision,
+                            track: t,
+                            ms: evnt.playTimeMs ? evnt.playTimeMs : 0,
+                            count: this.midiheader.meterCount,
+                            division: this.midiheader.meterDivision,
                             evnt: evnt
                         });
                     }
@@ -1320,7 +1322,8 @@ class EventsConverter {
             bassLine: '',
             bassTone50: 0,
             overDriveRatio01: 0,
-            proCategories: []
+            proCategories: [],
+            meters: []
         };
         this.parser = parser;
     }
@@ -1646,6 +1649,19 @@ class EventsConverter {
             this.midiFileInfo.avgTempoCategory04 = 3;
         else
             this.midiFileInfo.avgTempoCategory04 = 4;
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            let bar = project.timeline[ii];
+            let label = '' + bar.metre.count + '/' + bar.metre.part;
+            let xsts = this.midiFileInfo.meters.find((it) => it.label == label);
+            if (xsts) {
+                xsts.count++;
+            }
+            else {
+                this.midiFileInfo.meters.push({ label: label, count: 1 });
+            }
+        }
+        this.midiFileInfo.meters.map((it) => it.count = Math.round(100 * it.count / project.timeline.length));
+        this.midiFileInfo.meters.sort((a, b) => b.count - a.count);
         let maxTrackChordDuration = 0;
         for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
             let track = this.midiFileInfo.tracks[ii];
@@ -1716,9 +1732,9 @@ class EventsConverter {
         while (wholeDurationMs < lastMs) {
             let tempo = this.findMIDITempoBefore(wholeDurationMs);
             let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
-            if (meter.less({ count: 1, part: 2 })) {
+            if (meter.less({ count: 1, part: 4 })) {
                 meter.count = 1;
-                meter.part = 2;
+                meter.part = 4;
             }
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = { tempo: tempo, metre: meter.metre() };
@@ -2308,23 +2324,29 @@ function toArrayBuffer(buffer) {
     }
     return arrayBuffer;
 }
+function sstr(txt) {
+    return '"' + txt.replace('"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ') + '"';
+}
 function readOneFile(num, path, name) {
     let buff = fs.readFileSync(path + '/' + name);
     let arrayBuffer = toArrayBuffer(buff);
     try {
         let mifi = new MIDIReader(name, arrayBuffer.byteLength, arrayBuffer);
         let fname = name.trim();
-        let parts = fname.split('\\.');
+        let parts = fname.split('\.');
         let oname = parts[0];
-        let mainTxt = 'file: "' + oname + '"';
-        mainTxt = mainTxt + ", size: " + Math.round(buff.length / 1000) + 'kb';
-        mainTxt = mainTxt + ", duration: " + mifi.info.durationCategory04;
-        mainTxt = mainTxt + ", bpm: " + mifi.info.avgTempoCategory04;
-        mainTxt = mainTxt + ", drums: " + mifi.info.baseDrumCategory03;
-        mainTxt = mainTxt + ", guitar chords: " + mifi.info.guitarChordCategory03;
-        mainTxt = mainTxt + ", bass: " + mifi.info.bassTone50;
-        mainTxt = mainTxt + ", overdrive: " + Math.round(100 * mifi.info.overDriveRatio01);
-        console.log(num + '. ' + mainTxt);
+        let sqlLine = 'insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values (';
+        sqlLine = sqlLine + sstr(oname);
+        sqlLine = sqlLine + ',' + sstr('');
+        sqlLine = sqlLine + ',' + (buff.length < 25 ? 0 : buff.length < 90 ? 1 : 2);
+        sqlLine = sqlLine + ',' + mifi.info.durationCategory04;
+        sqlLine = sqlLine + ',' + mifi.info.avgTempoCategory04;
+        sqlLine = sqlLine + ',' + mifi.info.baseDrumCategory03;
+        sqlLine = sqlLine + ',' + mifi.info.guitarChordCategory03;
+        sqlLine = sqlLine + ',' + mifi.info.bassTone50;
+        sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
+        sqlLine = sqlLine + ');';
+        console.log(sqlLine);
     }
     catch (xx) {
         console.log('/*');

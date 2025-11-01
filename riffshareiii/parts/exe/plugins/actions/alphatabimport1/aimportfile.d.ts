@@ -2709,6 +2709,10 @@ type MIDIFileInfo = {
         ratio: number;
         title: string;
     }[];
+    meters: {
+        label: string;
+        count: number;
+    }[];
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;

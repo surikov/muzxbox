@@ -18,6 +18,9 @@ function toArrayBuffer(buffer) {
 	}
 	return arrayBuffer;
 }
+function sstr(txt: string): string {
+	return '"' + txt.replace('"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ') + '"';
+}
 
 function readOneFile(num: number, path: string, name: string) {
 	//console.log('readOneFile '+name);
@@ -41,18 +44,71 @@ function readOneFile(num: number, path: string, name: string) {
 		//);
 		//console.log(mifi.info);
 		let fname = name.trim();
-		let parts = fname.split('\\.');
+		let parts = fname.split('\.');
+		//console.log(parts[0],parts[1]);
 		let oname = parts[0];
+		/*
 		let mainTxt = 'file: "' + oname + '"';
 		mainTxt = mainTxt + ", size: " + Math.round(buff.length / 1000) + 'kb';
+		
 		mainTxt = mainTxt + ", duration: " + mifi.info.durationCategory04;
 		mainTxt = mainTxt + ", bpm: " + mifi.info.avgTempoCategory04;
 		mainTxt = mainTxt + ", drums: " + mifi.info.baseDrumCategory03;
 		mainTxt = mainTxt + ", guitar chords: " + mifi.info.guitarChordCategory03;
 		mainTxt = mainTxt + ", bass: " + mifi.info.bassTone50;
 		mainTxt = mainTxt + ", overdrive: " + Math.round(100 * mifi.info.overDriveRatio01);
+		mainTxt = mainTxt + ", meters: " + mifi.info.meters.reduce((last,it)=>last+', '+it.label+': '+it.count,'');
+		*/
+		//insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values;
+		let sqlLine = 'insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values (';
+		sqlLine = sqlLine + sstr(oname);
+		sqlLine = sqlLine + ',' + sstr('');
+		sqlLine = sqlLine + ',' + (buff.length < 25 ? 0 : buff.length < 90 ? 1 : 2);
+		sqlLine = sqlLine + ',' + mifi.info.durationCategory04;
+		sqlLine = sqlLine + ',' + mifi.info.avgTempoCategory04;
+		sqlLine = sqlLine + ',' + mifi.info.baseDrumCategory03;
+		sqlLine = sqlLine + ',' + mifi.info.guitarChordCategory03;
+		sqlLine = sqlLine + ',' + mifi.info.bassTone50;
+		sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
+		sqlLine = sqlLine + ');';
+		console.log(sqlLine);
+		/*
+CREATE TABLE "parsecomments" (
+	"id"	INTEGER NOT NULL,
+	"fileid"	INTEGER,
+	"txt"	TEXT,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+CREATE TABLE "parsedfile" (
+	"id"	INTEGER NOT NULL,
+	"filename"	TEXT,
+	"filepath"	TEXT,
+	"filesize"	INTEGER,
+	"songduration"	INTEGER,
+	"avgtempo"	INTEGER,
+	"drums"	INTEGER,
+	"chords"	INTEGER,
+	"bass"	INTEGER,
+	"overdrive"	INTEGER,
+	"fileid"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+CREATE TABLE "parsedinstruments" (
+	"id"	INTEGER NOT NULL,
+	"fileid"	INTEGER,
+	"inscat"	INTEGER,
+	"inscount"	INTEGER,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+CREATE TABLE "tempid" (
+	"lastfileid"	INTEGER
+)
+		delete from tempid;
+		insert into tempid (lastfileid) values (last_insert_rowid());
+		insert into parsecomments (fileid,txt) select lastfileid as fileid, 'cmnt' as txt from tempid;
+		insert into parsedinstruments (fileid,inscat,inscount) select lastfileid as fileid, 1321 as inscat, 33344 as inscount from tempid;
 
-		console.log(num + '. ' + mainTxt);
+		*/
 	} catch (xx) {
 		console.log('/*');
 		console.log(path, name);

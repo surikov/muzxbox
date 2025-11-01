@@ -51,6 +51,7 @@ type MIDIFileInfo = {
 	, guitarChordCategory03: number
 	, overDriveRatio01: number
 	, proCategories: { cat: number, ratio: number, title: string }[]
+	, meters: { label: string, count: number }[]
 
 };//console.log('bass pitch', curAvg, bassTrack.title, piline);
 class EventsConverter {
@@ -76,6 +77,7 @@ class EventsConverter {
 		, bassTone50: 0
 		, overDriveRatio01: 0
 		, proCategories: []
+		, meters: []
 	};
 	parser: MidiParser;
 	constructor(parser: MidiParser) {
@@ -539,6 +541,19 @@ class EventsConverter {
 		else if (avgbpm < 200) this.midiFileInfo.avgTempoCategory04 = 3;
 		else this.midiFileInfo.avgTempoCategory04 = 4;
 
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let bar= project.timeline[ii];
+			let label=''+bar.metre.count+'/'+bar.metre.part;
+			let xsts=this.midiFileInfo.meters.find((it)=>it.label==label);
+			if(xsts){
+				xsts.count++;
+			}else{
+				this.midiFileInfo.meters.push({label:label,count:1});
+			}
+		}
+		this.midiFileInfo.meters.map((it)=>it.count=Math.round(100*it.count/project.timeline.length));
+		this.midiFileInfo.meters.sort((a,b)=>b.count-a.count);
+
 
 		let maxTrackChordDuration = 0;
 		for (let ii = 0; ii < this.midiFileInfo.tracks.length; ii++) {
@@ -635,9 +650,9 @@ class EventsConverter {
 		while (wholeDurationMs < lastMs) {
 			let tempo = this.findMIDITempoBefore(wholeDurationMs);
 			let meter = MMUtil().set(this.findMIDIMeterBefore(wholeDurationMs));
-			if(meter.less({count:1,part:4})){
-				meter.count=1;
-				meter.part=4;
+			if (meter.less({ count: 1, part: 4 })) {
+				meter.count = 1;
+				meter.part = 4;
 			}
 			//console.log(tempo, meter);
 			let barDurationMs = meter.duration(tempo) * 1000;

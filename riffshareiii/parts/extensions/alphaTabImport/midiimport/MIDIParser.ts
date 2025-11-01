@@ -875,7 +875,7 @@ class MidiParser {
 						//console.log('tempo', this.midiheader.tempoBPM, evnt);
 					}
 					if (evnt.subtype == this.EVENT_META_TIME_SIGNATURE) {
-						console.log('EVENT_META_TIME_SIGNATURE',evnt.param1 ,evnt.param2);
+						//console.log('EVENT_META_TIME_SIGNATURE',evnt.param1 ,evnt.param2);
 						this.midiheader.meterCount = evnt.param1 ? evnt.param1 : 4;
 						var dvsn: number = evnt.param2 ? evnt.param2 : 2;
 						if (dvsn == 1) this.midiheader.meterDivision = 2

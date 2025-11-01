@@ -1,0 +1,225 @@
+start /home/sss/Documents/GitHub/muzxbox/test/music
+error null
+count 229
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("04HALLEL.MID","",2,2,2,0,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("2_pac-california_love.mid","",2,2,1,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("9 PM (4).mid","",2,2,2,3,1,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("A Tout le Monde (3).mid","",2,3,1,2,1,3,89);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Accept — Metal Heart (5) [MIDIfind.com .mid","",2,3,2,0,1,2,92);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Ace Of Spades (4).mid","",2,2,3,3,2,1,100);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Alan Parsons Project - Sirius & Eye In The Sky.mid","",2,4,2,3,0,2,44);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Angel of Death (0).mid","",2,3,4,3,0,1,101);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Axel-F-1.mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("BFG Division.mid","",2,3,3,3,0,1,50);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Beethoven_FurElise.mid","",2,2,2,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Billie Jean (7).mid","",2,3,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Crazy-Frog-Axel-F.mid","",2,2,2,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("D.I.S.C.O (2).mid","",2,2,2,3,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Doom_4_-_BFG_Division_-Alt-.mid","",2,3,2,3,0,1,65);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Enjoy The Silence (10).mid","",2,3,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Every Day I Have The Blues (11).mid","",2,3,2,3,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Felicita (1).mid","",2,2,2,2,1,2,45);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Flames of love (2).mid","",2,3,2,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Forever young (mix'88) (6).mid","",2,3,0,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("GoodTheBadAndTheUgly.mid","",2,2,2,3,3,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Greegsleeves (1).mid","",2,2,3,2,1,4,24);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Greensleeves (0).mid","",2,1,0,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Hangar 18 (4).mid","",2,3,3,3,0,2,108);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Hans_Zimmer_-_Pirates_Of_The_Caribbean2.mid","",2,1,3,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Helloween — I'm Alive (2) [MIDIfind.com .mid","",2,2,4,3,0,2,95);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Heynanan.mid","",2,2,2,3,1,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("House of the rising sun (21).mid","",2,3,0,0,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("In A Death Car (19).mid","",2,3,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("JAZZ_D.MID","",2,1,4,1,1,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Jerry_Lee_Lewis_-_Great_Balls_of_Fire.mid","",2,1,3,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Kings Of Metal (0).mid","",2,2,2,2,0,1,100);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("L.BRANNIGAN.Self control  K.mid","",2,3,1,2,3,2,27);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Metallica - Master Of Puppets.mid","",2,4,4,2,1,3,97);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Movie_Themes_-_Beverly_Hills_Cop_-_Axel's_Theme_by_Harold_Faltermeyer.mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Movie_Themes_-_James_Bond.mid","",2,1,3,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Movie_Themes_-_Mission_Impossible.mid","",2,2,1,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Movie_Themes_-_Mission_Impossible_-_by_Lalo_Schiffrin.mid","",2,2,1,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Movie_Themes_-_Phantom_Of_The_Opera.mid","",2,3,2,2,0,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Nikita2 (2).mid","",2,3,1,2,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Nirvana_-_Come_As_You_Are.mid","",2,2,2,3,1,3,35);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("No Limit (0).mid","",2,2,3,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("On The Radio (3).mid","",2,3,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Painkiller (1).mid","",2,3,1,3,0,3,105);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Personal Jesus (1).mid","",2,2,2,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Right Here Right Now (2).mid","",2,3,2,2,0,2,4);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Russian Vodka (1).mid","",2,2,2,2,0,1,99);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("So What (4).mid","",2,2,4,2,0,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Stayin' Alive (9).mid","",2,3,1,2,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Staying Alive (2).mid","",2,3,1,2,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Take on me(4) (0).mid","",2,3,3,2,0,3,0);
+/*
+/home/sss/Documents/GitHub/muzxbox/test/music The Magic Key (1).mid
+RangeError: Invalid DataView length 738197556
+    at new DataView (<anonymous>)
+    at new MIDIFileTrack (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:1157:22)
+    at MidiParser.parseTracks (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:476:25)
+    at new MidiParser (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:469:14)
+    at new MIDIReader (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:1296:23)
+    at readOneFile (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:2334:20)
+    at /home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:2365:17
+    at FSReqCallback.oncomplete (node:fs:192:23)
+*/
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Tico-Tico no Fuba (25).mid","",2,1,2,2,3,4,20);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Touch by touch (9).mid","",2,3,2,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Tu m'as promis (2).mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Venus 2005 (Global Deejays Remix) (12).mid","",2,3,2,2,3,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Venus Шизгара - Shes got it (3).mid","",2,1,2,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Walking In The Air (0).mid","",2,3,2,2,0,1,81);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_JEUXDEAU (3).MID","",2,3,0,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_JingleBell (1).mid","",2,1,3,2,0,1,7);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Partida (5).mid","",2,2,2,0,3,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Prelude from La Traviata (3).mid","",2,1,0,1,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Sandstorm (0).mid","",2,1,2,3,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Sandstorm! (1).mid","",2,0,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Sandstorm!(1).mid","",2,0,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_Tarkus_1.mid","",2,4,3,3,0,5,48);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("__Moonlight Shadow (0).mid","",2,3,0,2,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_boney_m-daddy_cool.mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_cheri_cheri_lady_[evg4 .mid","",2,2,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_chris_rea-road_to_hell.mid","",2,3,2,2,0,3,35);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_e1m1.mid","",2,1,1,3,0,1,101);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_gypsy_kings-bamboleo.mid","",2,2,2,2,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_heat of the moment (0).mid","",2,2,2,2,2,2,77);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_iron_maiden-the_trooper.mid","",2,3,3,3,1,1,100);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_metallica-enter_sandman.mid","",2,3,2,2,0,1,85);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_modern_talking-cheri_cheri_lady.mid","",2,2,2,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_oasis-wonderwall.mid","",2,2,1,3,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_psy-gangnam_style.mid","",2,2,2,3,0,1,18);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_symphony_9_1_(c)cvikl.mid","",2,4,1,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_uriah_heep-easy_livin.mid","",2,1,2,3,1,2,104);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("_van_halen-jump.mid","",2,2,2,2,0,1,48);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("a_flock_of_seagulls-i_ran_so_far_away.mid","",2,3,3,2,1,1,40);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("a_song_about_the_bears_[barmash_boris .mid","",2,2,4,2,2,5,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("a_summer_rains_are_over_[gumenov_oleg .mid","",2,3,1,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("ace_of_base-all_that_she_wants.mid","",2,2,1,3,0,2,3);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("aerosmith-walk_this_way.mid","",2,2,2,2,0,3,82);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("alla-turca.mid","",2,2,2,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("aqua-roses_are_red.mid","",2,2,3,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("army_of_lovers-crucified.mid","",2,2,2,3,0,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("axelf.mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("blackmores_night-shadow_of_the_moon.mid","",2,3,3,2,1,1,52);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("blondie-heart_of_glass.mid","",2,2,2,2,0,1,43);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("bon_jovi-its_my_life.mid","",2,2,2,2,1,3,72);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("brubeck_dave-take_five.mid","",2,2,3,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("buratino_song_[krotov_juriy .mid","",2,1,3,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("cantaloup.mid","",2,3,2,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("cherry_lady_[kostikov_aleksandr .mid","",2,2,2,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("creedence_clearwater-have_you_ever_seen.mid","",2,2,2,2,3,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("deff_leppard-hysteria.mid","",2,3,2,2,2,1,70);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("dire_straits-money_for_nothing.mid","",2,4,2,2,0,2,74);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("dizzy_gillespie-groovin_high.mid","",2,3,4,2,0,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("eagles-hotel_california.mid","",2,4,3,2,3,3,71);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("entersandman.mid","",2,3,2,2,0,1,80);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("erasure-always.mid","",2,2,1,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("europe-final_countdown.mid","",2,3,2,3,0,3,59);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("eyeofbeholder.mid","",2,4,2,3,0,1,90);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("flying_[alexeev_alexander .mid","",2,1,0,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("freddie_mercury-living_on_my_own.mid","",2,2,2,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("gary_moore-still_got_the_blues.mid","",2,2,0,3,1,3,43);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("good_night_kids_[vitalis .mid","",2,1,2,2,2,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("jethro_tull-aqualung.mid","",2,4,3,2,3,4,47);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("judas_priest-painkiller.mid","",2,0,1,3,0,1,68);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("krylatye_kacheli_[davydov .mid","",2,2,3,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("le_jouet_[sheshko_kolja .mid","",2,1,2,3,2,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("louis_armstrong-hello_dolly.mid","",2,1,3,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("modjo-lady.mid","",2,3,2,3,3,2,16);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("muzyka_nas_svjazala_[gosha_gorshkov99 .mid","",2,3,2,3,0,2,87);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("net_tebya_prekrasnei.mid","",2,3,2,2,0,3,32);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("oasis-dont_look_back_in_anger.mid","",2,3,1,3,1,2,190);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("oasis-supersonic.mid","",2,3,1,2,1,2,210);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("ozzy_osbourne-crazy_train.mid","",2,3,2,3,2,2,191);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("pachka_sigaret_[virtuon .mid","",2,3,1,2,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("passport.mid","",2,1,3,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("police-every_breath_you_take.mid","",2,2,2,2,1,2,28);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("rainbow-long_live_rock_and_roll.mid","",2,3,3,3,1,1,103);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("red_hot_chili_peppers-californication.mid","",2,3,1,3,2,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("ricky_martin-livin_la_vida_loca.mid","",2,2,3,3,0,2,33);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("right_said_fred-im_too_sexy.mid","",2,2,2,3,0,3,35);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("rolling_stones-brown_sugar.mid","",2,2,2,2,3,3,59);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("roxette-listen_to_your_heart.mid","",2,3,1,2,1,3,32);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("roy_orbison-pretty_woman.mid","",2,2,2,3,3,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("sade-smooth_operator.mid","",2,3,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("scorpions-rock_you_like_a_hurricane.mid","",2,3,2,2,0,2,61);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("sepultura-refuse_resist.mid","",2,2,4,2,1,2,102);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("shadows-kontiki.mid","",2,1,3,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("soft_cell-tainted_love.mid","",2,2,3,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("solnyshko_[collection_rusmidicom .mid","",2,3,3,3,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("space-just_blue.mid","",2,2,2,3,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("stevie_wonder-i_just_called_to_say_i_love_you.mid","",2,3,1,2,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("styx-boat_on_the_river.mid","",2,2,1,2,3,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("suzi_quatro-stumblin_in.mid","",2,2,2,2,1,2,5);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("sviridovvremyavpered.mid","",2,1,3,0,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("sym40-1.mid","",2,4,4,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("technotronic-pump_up_the_jam.mid","",2,1,2,2,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("three_white_horses_[barmash_boris .mid","",2,1,3,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("tool-schism.mid","",2,4,1,2,0,2,71);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("ufo-doctor_doctor.mid","",2,3,2,3,0,2,66);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("verju_ja_[collection_fedorov_sergey .mid","",2,2,2,1,1,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("village_people-ymca.mid","",2,2,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("walking_in_the_air_[rudovich_sergei .mid","",2,2,1,0,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("white_stripes-seven_nation_army.mid","",2,2,2,2,0,2,37);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("yes-roundabout.mid","",2,4,2,3,1,3,38);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("yiruma-river_flows_in_you.mid","",2,2,0,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("zabytuju_pesnju_neset_veterok_[tsirjuk_pavel .mid","",2,2,2,2,1,3,37);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("zaviruha_belyi_sneg_[collection_rusmidicom .mid","",2,3,2,2,3,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("zz_top-gimme_all_your_lovin.mid","",2,2,2,3,1,1,140);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Баюшки-баю (По следам Бременских музыкантов) (2).mid","",2,1,2,3,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Белая ночь (26).mid","",2,2,2,2,3,2,31);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Белые розы (0).mid","",2,3,2,0,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Белые розы (1).mid","",2,3,2,2,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Белые розы (5).mid","",2,4,2,3,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Вальс (5).mid","",2,3,3,1,0,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Венгерская Рапсодия №2 (10).mid","",2,4,2,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Венгерская рапсодия №2.mid","",2,3,2,1,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Владимирская Русь (2).mid","",2,4,0,2,1,1,106);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Воскрешение (2).mid","",2,3,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Время, вперед! (3).mid","",2,1,3,0,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Гимн СССР.mid","",2,1,1,0,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Губит людей не пиво... (0).mid","",2,1,3,3,3,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Звезда по имени Солнце (1).mid","",2,3,2,2,2,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Каламбур Деревня дураков.mid","",2,1,2,3,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Колыбельная (Russian Lullaby) (2).mid","",2,2,2,2,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Колыбельная медведицы (10).mid","",2,1,2,1,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Кони привередливые (0).mid","",2,3,1,2,3,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Коррозия металла - Russian vodka [MIDIfind.com .mid","",2,2,1,2,0,1,84);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Коррозия металла - Героин [MIDIfind.com .mid","",2,2,3,3,0,1,100);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Коррозия металла - Люцифер (2) [MIDIfind.com .mid","",2,3,1,2,0,1,88);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Косил Ясь конюшину (3).mid","",2,2,1,2,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Кострома (18).mid","",2,2,2,0,1,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Лирическая Рай в шалаше (3).mid","",2,2,0,1,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Мой адрес Советский Союз.mid","",2,1,3,2,2,5,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("На острие атаки (0).mid","",2,2,2,2,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Новогодняя (2).mid","",2,0,2,3,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Ой мороз, мороз (3).mid","",2,1,3,1,0,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Перезагрузка (2).mid","",2,1,2,0,0,1,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Песня остается с человеком.mid","",2,1,2,3,1,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Плот (2).mid","",2,3,1,2,3,2,3);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Плот (6).mid","",2,3,3,1,3,2,4);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("По следам Бременских музыкантов (0).mid","",2,4,3,3,2,6,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Полонез (2).mid","",2,2,1,2,3,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Профессионал (6).mid","",2,1,1,2,0,0,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Птица счастья Пахмутова (3).mid","",2,3,2,0,0,1,57);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Сормовская лирическая (8).mid","",2,1,3,1,2,3,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Трава у дома (3).mid","",2,1,2,0,0,0,0);
+/*
+/home/sss/Documents/GitHub/muzxbox/test/music Травиата (15).mid
+RangeError: Invalid DataView length 19804
+    at new DataView (<anonymous>)
+    at new MIDIFileTrack (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:1157:22)
+    at MidiParser.parseTracks (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:476:25)
+    at new MidiParser (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:469:14)
+    at new MIDIReader (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:1296:23)
+    at readOneFile (/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:2334:20)
+    at /home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/crawler/gofolder.js:2365:17
+    at FSReqCallback.oncomplete (node:fs:192:23)
+*/
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Турецкий марш (0).mid","",2,2,2,3,3,2,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Ты мне не снишься (23).mid","",2,2,2,2,3,6,27);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Человек и кошка (5).mid","",2,2,1,0,1,4,0);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Я иду тебе навстечу (3).mid","",2,2,2,2,0,3,36);
+insert into parsedfile (filename,filepath,filesize,songduration,avgtempo,drums,chords,bass,overdrive) values ("Я свободен (4).mid","",2,4,0,2,3,3,47);

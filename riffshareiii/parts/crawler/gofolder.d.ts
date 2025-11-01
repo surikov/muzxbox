@@ -604,6 +604,10 @@ type MIDIFileInfo = {
         ratio: number;
         title: string;
     }[];
+    meters: {
+        label: string;
+        count: number;
+    }[];
 };
 declare class EventsConverter {
     midiFileInfo: MIDIFileInfo;
@@ -677,5 +681,6 @@ declare var process: any;
 declare var fs: any;
 declare let folder: any;
 declare function toArrayBuffer(buffer: any): ArrayBuffer;
+declare function sstr(txt: string): string;
 declare function readOneFile(num: number, path: string, name: string): void;
 declare function readFiles(path: any): void;

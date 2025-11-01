@@ -169,28 +169,31 @@ function init() {
     dataBalls = window[dataName];
     datarows = readParseStat(dataBalls);
 }
-function dumpStatLeftRed(datarows) {
+/*
+function dumpStatLeftRed(datarows: BallsRow[]) {
     console.log('dumpStatLeftRed', datarows);
-    var counts = [];
-    for (var rr = 0; rr <= rowLen; rr++) {
+    let counts: number[] = [];
+    for (let rr = 0; rr <= rowLen; rr++) {
         counts[rr] = 0;
     }
-    for (var rr = 0; rr < datarows.length; rr++) {
-        var min = 9999;
-        for (var bb = 0; bb < datarows[rr].balls.length; bb++) {
+
+    for (let rr = 0; rr < datarows.length; rr++) {
+        let min = 9999;
+        for (let bb = 0; bb < datarows[rr].balls.length; bb++) {
             if (min > datarows[rr].balls[bb]) {
                 min = datarows[rr].balls[bb];
             }
         }
         counts[min]++;
     }
-    var sm = 0;
-    for (var rr = 0; rr <= rowLen; rr++) {
+    let sm = 0;
+    for (let rr = 0; rr <= rowLen; rr++) {
         sm = sm + counts[rr];
         console.log(rr, counts[rr], ('' + (100 * counts[rr] / datarows.length) + '%'), ('' + (100 * sm / datarows.length) + '%'));
     }
     //console.log('mins',sm,counts);
 }
+*/
 function randomizedatarows() {
     for (var ii = 0; ii < datarows.length; ii++) {
         var row = datarows[ii];
@@ -619,6 +622,7 @@ function dumpTriads(svg, rows) {
     var red2 = '#ff663366';
     var blue2 = '#3333ff33';
     var blue = '#3333ffff';
+    var blueLeftRight = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
             break;
@@ -656,9 +660,6 @@ function dumpTriads(svg, rows) {
         var end2 = -1;
         for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
-                /*if(rr==1 && (kk==0 || kk==first.length-1)){
-console.log(kk,first[kk].ball);
-                }*/
                 if (showFirstRow || rr > 0) {
                     lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
                     end = kk;
@@ -718,6 +719,8 @@ console.log(kk,first[kk].ball);
             markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin1 / 2, toY: yyy, color: blue, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end / 2, toY: yyy, color: blue, manual: false });
         }
+        //console.log(begin1,end);
+        blueLeftRight.push({ left: rowLen - end, right: begin1 });
         if (showFirstRow || rr > 0) {
             begin1 = rowLen + 1;
             end = 0;
@@ -775,6 +778,20 @@ console.log(kk,first[kk].ball);
         }
         //paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
     }
+    var blueLeftDiffSumm = 0;
+    var blueRighDiffSumm = 0;
+    //console.log('blueLeftRight', blueLeftRight);
+    var szDiff = 12;
+    for (var ii = 1; ii < szDiff; ii++) {
+        blueLeftDiffSumm = blueLeftDiffSumm + Math.abs(blueLeftRight[ii].left - blueLeftRight[ii + 1].left);
+        blueRighDiffSumm = blueRighDiffSumm + Math.abs(blueLeftRight[ii].right - blueLeftRight[ii + 1].right);
+    }
+    blueLeftDiffSumm = Math.round(100 * blueLeftDiffSumm / szDiff) / 100;
+    blueRighDiffSumm = Math.round(100 * blueRighDiffSumm / szDiff) / 100;
+    //console.log(blueLeftDiffSumm, blueRighDiffSumm);
+    //addBigText(svg, 22, 55, "" + blueLeftDiffSumm + ' | ' + blueRighDiffSumm);
+    var span = document.getElementById('statdump');
+    span.innerText = '' + szDiff + ": blue diff: " + blueLeftDiffSumm + ' | ' + blueRighDiffSumm;
 }
 function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
     for (var ii = 0; ii < rowLen; ii++) {
@@ -1078,6 +1095,8 @@ function addTails() {
     });
     resetNumbs();
     //testTest2();
+    //testAbsDiff(skipRowsCount);
+    //dumpDiffStat();
 }
 function addTestLines1(data) {
     var bas = 19;
@@ -1124,198 +1143,6 @@ function arrHas0(arr) {
         }
     }
     return false;
-}
-function testTest2() {
-    /*
-    sortedBlue = sortedBlue.reverse();
-    console.log('sortedBlue', sortedBlue);
-    console.log('sortedGreen', sortedGreen);
-    console.log('sortedGrey', sortedGrey);
-
-    console.log('mxdata', mxdata);
-    console.log('mincopy', mincopy);
-*/
-    var sumar = [];
-    for (var ii_1 = 0; ii_1 <= rowLen; ii_1++) {
-        sumar[ii_1] = 0;
-    }
-    var ii = 0;
-    for (ii = 0; ii < rowLen && arrHas0(sumar); ii++) {
-        sumar[sortedBlue[ii]]++;
-        sumar[sortedGreen[ii]]++;
-        sumar[sortedGrey[ii]]++;
-        sumar[mxdata[ii].ball]++;
-        sumar[mincopy[ii].ball]++;
-    }
-    //console.log(ii, sumar);
-    var bas = 19;
-    for (var ii_2 = 1; ii_2 < sumar.length; ii_2++) {
-        markLines.push({
-            fromX: ii_2 - 1,
-            fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
-            toX: ii_2 - 1,
-            toY: skipRowsCount + bas,
-            color: '#33990033', manual: false
-        });
-        markLines.push({
-            fromX: ii_2 - 1 + rowLen,
-            fromY: skipRowsCount - (sumar[ii_2] - 1) * 4 + bas,
-            toX: ii_2 - 1 + rowLen,
-            toY: skipRowsCount + bas,
-            color: '#33990033', manual: false
-        });
-    }
-    drawLines();
-    var statsum = [];
-    for (var ii_3 = 0; ii_3 < sumar.length; ii_3++) {
-        statsum[sumar[ii_3]] = (statsum[sumar[ii_3]]) ? statsum[sumar[ii_3]] : 0;
-        statsum[sumar[ii_3]]++;
-    }
-    var sumtext = '';
-    var veroyat1 = ballsInRow / rowLen;
-    for (var ii_4 = 1; ii_4 < statsum.length; ii_4++) {
-        //
-        var countCurHeigth = statsum[ii_4];
-        if (showFirstRow) {
-            var cntExists = 0;
-            for (var kk = 0; kk < lastfirst.balls.length; kk++) {
-                var ball = lastfirst.balls[kk];
-                var level = sumar[ball];
-                if (level == ii_4) {
-                    cntExists++;
-                }
-            }
-            //sumtext = sumtext + '=' + cnt;
-            //sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-            //	+ cntExists + '/' + countCurHeigth + '=' + Math.round((cntExists / ballsInRow) / (countCurHeigth / rowLen) * 100) / 100;
-            var verCount = Math.round(100 * veroyat1 * countCurHeigth) / 100;
-            //let exstsVero=(Math.round(100 * cntExists/countCurHeigth) / 100);
-            var verCountDiff = -100 + Math.round(100 * (1 - cntExists / verCount));
-            var verCountDiffTxt = '' + (-1 * verCountDiff);
-            //if(verCountDiff<0){
-            //	verCountDiffTxt='+'+(-verCountDiff);
-            //}
-            sumtext = sumtext + '\n[' + (ii_4 - 1) + ']' + countCurHeigth
-                + ' \t' + verCount + '/' + cntExists
-                + ' \t' + verCountDiffTxt + '%';
-        }
-        else {
-            //sumtext = sumtext +  (ii - 1) + '(' + Math.round(100 * veroyat1 * countCurHeigth) / 100 + ')'
-            //	+ countCurHeigth;
-            sumtext = sumtext + '\n[' + (ii_4 - 1) + ']' + countCurHeigth + '\t' + Math.round(100 * veroyat1 * countCurHeigth) / 100;
-        }
-        sumtext = sumtext + ' ';
-    }
-    //console.log(statsum);
-    //console.log(sumar, lastfirst);
-    var span = document.getElementById('sumstat');
-    span.innerText = sumtext;
-    /*if (showFirstRow) {
-        let ballstat = '';
-        for (let ii = 0; ii < lastfirst.balls.length; ii++) {
-            ballstat = ballstat + ' | ' + lastfirst.balls[ii] + ' in ' + (sumar[lastfirst.balls[ii] ]-1);
-        }
-        span.innerText = sumtext + ' = ' + ballstat;;
-        console.log(sumar, lastfirst);
-    }*/
-}
-function testTest() {
-    var yyy = rowsVisibleCount + 22 + skipRowsCount - 1;
-    console.log('TESTtEST', sortedBlue, sortedGreen, sortedGrey);
-    var rightBlue = Math.ceil(0 * rowLen / 2);
-    var leftBlue = Math.ceil(1 * rowLen / 2) - 1;
-    var leftGreen = Math.ceil(1 * rowLen / 2);
-    var rightGreen = Math.ceil(2 * rowLen / 2) - 1;
-    var leftGrey = Math.ceil(2 * rowLen / 2);
-    var rightGrey = Math.ceil(3 * rowLen / 2) - 1;
-    var leftRed = Math.ceil(3 * rowLen / 2);
-    var rightRed = Math.ceil(4 * rowLen / 2) - 1;
-    for (var mm = 0; mm < markLines.length; mm++) {
-        var line = markLines[mm];
-        if (line.fromY == yyy && line.toY == yyy) {
-            if (line.fromX == leftBlue || line.toX == leftBlue) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedBlue.slice(0, nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
-                }
-                console.log('rightBlue', nn, data);
-                addTestLines1(data);
-            }
-            if (line.fromX == rightBlue || line.toX == rightBlue) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedBlue.slice(sortedBlue.length - nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] + 0.1, color: '#0000ff99' });
-                }
-                console.log('leftBlue', nn, data);
-                addTestLines2(data);
-            }
-            if (line.fromX == leftGreen || line.toX == leftGreen) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedGreen.slice(0, nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
-                }
-                console.log('leftGreen', nn, data);
-                addTestLines1(data);
-            }
-            if (line.fromX == rightGreen || line.toX == rightGreen) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedGreen.slice(sortedGreen.length - nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] - 0.1, color: '#00990099' });
-                }
-                console.log('rightGreen', nn, data);
-                addTestLines2(data);
-            }
-            if (line.fromX == leftGrey || line.toX == leftGrey) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedGrey.slice(0, nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
-                }
-                console.log('leftGrey', nn, data);
-                addTestLines1(data);
-            }
-            if (line.fromX == rightGrey || line.toX == rightGrey) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var orders = sortedGrey.slice(sortedGrey.length - nn);
-                var data = [];
-                for (var bb = 0; bb < orders.length; bb++) {
-                    data.push({ ball: orders[bb] - 0.2, color: '#66666699' });
-                }
-                console.log('rightGrey', nn, data);
-                addTestLines2(data);
-            }
-            if (line.fromX == leftRed || line.toX == leftRed) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var data = [];
-                for (var rr = 0; rr < nn; rr++) {
-                    var kk = rr;
-                    data.push({ ball: 1 + kk, color: '#ff000099' });
-                }
-                console.log('leftRed', nn, data);
-                addTestLines1(data);
-            }
-            if (line.fromX == rightRed || line.toX == rightRed) {
-                var nn = 2 * Math.abs(line.fromX - line.toX);
-                var data = [];
-                for (var rr = 0; rr < nn; rr++) {
-                    var kk = rowLen - rr - 1;
-                    data.push({ ball: 1 + kk, color: '#ff000099' });
-                }
-                console.log('rightRed', nn, data);
-                addTestLines1(data);
-            }
-        }
-    }
-    drawLines();
 }
 /*
 function dumpStat22() {
@@ -1506,13 +1333,77 @@ function anotherStat() {
     }
     console.log('random', sz, ln, '0-6:', sm0 / ln, sm1 / ln, sm2 / ln, sm3 / ln, sm4 / ln, sm5 / ln, sm6 / ln);
 }
+function testAbsDiff() {
+    testDumpAbsDiff(1);
+    testDumpAbsDiff(1001);
+    testDumpAbsDiff(2001);
+    testDumpAbsDiff(3001);
+    testDumpAbsDiff(4001);
+    /*testDumpAbsDiff(1, 2);
+    testDumpAbsDiff(1, 3);
+    testDumpAbsDiff(1, 4);
+    let frstcnt: number[] = [];
+    for (let ff = 1; ff < 5000; ff++) {
+        let bl = datarows[ff].balls[0];
+        frstcnt[bl] = frstcnt[bl] ? frstcnt[bl] : 0;
+        frstcnt[bl]++;
+    }
+    console.log(frstcnt);*/
+}
+function testDumpAbsDiff(strt) {
+    var count1 = 0;
+    var preDiffX = [];
+    var preDiffNo = [];
+    for (var ff = strt; ff < strt + 1000; ff++) {
+        //if (datarows[ff + 1].balls[0] >= maxpre) {
+        var sz = 6;
+        var smm = 0;
+        for (var ii = ff + 1; ii < ff + 1 + sz; ii++) {
+            smm = smm + Math.abs(datarows[ii].balls[0] - datarows[ii + 1].balls[0]);
+        }
+        var avg = Math.round(1 * smm / sz);
+        //avg = datarows[ff].balls[0];
+        preDiffX[avg] = preDiffX[avg] ? preDiffX[avg] : 0;
+        preDiffNo[avg] = preDiffNo[avg] ? preDiffNo[avg] : 0;
+        //if (datarows[ff].balls[0] >= mincur) {
+        if (datarows[ff].balls[0] > 4) {
+            count1++;
+            preDiffX[avg]++;
+        }
+        else {
+            preDiffNo[avg]++;
+        }
+        //}
+        /*let frst = datarows[ff].balls[0];
+        let sz = 9;
+        let smm = 0;
+        for (let ii = ff + 1; ii < ff + 1 + sz; ii++) {
+            smm = smm + Math.abs(datarows[ii].balls[0] - datarows[ii + 1].balls[0]);
+        }
+        let avg = smm / sz;
+        if (Math.round(avg) == 3) {
+            let line = '';
+            for (let ii = 0; ii < frst; ii++) {
+                line = line + '◼';
+            }
+            console.log(line, frst, ff,avg);
+        } else {
+            //console.log(frst);
+        }*/
+    }
+    console.log(count1, preDiffX, preDiffNo);
+    var end = Math.max(preDiffX.length, preDiffNo.length);
+    for (var ii = 0; ii < end; ii++) {
+        console.log(ii, preDiffX[ii] / preDiffNo[ii], '' + preDiffX[ii] + '+' + preDiffNo[ii] + '=' + (preDiffX[ii] + preDiffNo[ii]));
+    }
+}
 init();
 addTails();
 //dumpPairsCounts();
 //let chk=randBalls(20);
 //anotherStat();
 //yetAnotherStat();
-console.log(datarows);
+//testAbsDiff();
 //test4();
 /*
 checkAllRows(rowLen * 1 / 4);
