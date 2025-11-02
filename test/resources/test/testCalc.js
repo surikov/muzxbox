@@ -781,17 +781,19 @@ function dumpTriads(svg, rows) {
     var blueLeftDiffSumm = 0;
     var blueRighDiffSumm = 0;
     //console.log('blueLeftRight', blueLeftRight);
-    var szDiff = 12;
+    var szDiff = 9;
     for (var ii = 1; ii < szDiff; ii++) {
-        blueLeftDiffSumm = blueLeftDiffSumm + Math.abs(blueLeftRight[ii].left - blueLeftRight[ii + 1].left);
-        blueRighDiffSumm = blueRighDiffSumm + Math.abs(blueLeftRight[ii].right - blueLeftRight[ii + 1].right);
+        blueLeftDiffSumm = blueLeftDiffSumm + Math.pow(Math.abs(blueLeftRight[ii].left - blueLeftRight[ii + 1].left), 2);
+        blueRighDiffSumm = blueRighDiffSumm + Math.pow(Math.abs(blueLeftRight[ii].right - blueLeftRight[ii + 1].right), 2);
     }
-    blueLeftDiffSumm = Math.round(100 * blueLeftDiffSumm / szDiff) / 100;
-    blueRighDiffSumm = Math.round(100 * blueRighDiffSumm / szDiff) / 100;
+    blueLeftDiffSumm = blueLeftDiffSumm / szDiff;
+    //blueLeftDiffSumm = Math.round(blueLeftDiffSumm * blueLeftDiffSumm);
+    blueRighDiffSumm = blueRighDiffSumm / szDiff;
+    //blueRighDiffSumm = Math.round(blueRighDiffSumm * blueRighDiffSumm);
     //console.log(blueLeftDiffSumm, blueRighDiffSumm);
     //addBigText(svg, 22, 55, "" + blueLeftDiffSumm + ' | ' + blueRighDiffSumm);
     var span = document.getElementById('statdump');
-    span.innerText = '' + szDiff + ": blue diff: " + blueLeftDiffSumm + ' | ' + blueRighDiffSumm;
+    span.innerText = '' + szDiff + ": blue diff: " + Math.round(blueLeftDiffSumm) + ' | ' + Math.round(blueRighDiffSumm);
 }
 function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
     for (var ii = 0; ii < rowLen; ii++) {
