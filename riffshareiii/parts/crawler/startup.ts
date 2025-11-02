@@ -19,7 +19,7 @@ function toArrayBuffer(buffer) {
 	return arrayBuffer;
 }
 function sstr(txt: string): string {
-	return '"' + txt.replace('"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ') + '"';
+	return '"' + txt.replace('\\', '/').replace('"', '\'').replace('\"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ').trim() + '"';
 }
 
 function readOneFile(num: number, path: string, name: string) {
@@ -109,6 +109,18 @@ CREATE TABLE "tempid" (
 		insert into parsedinstruments (fileid,inscat,inscount) select lastfileid as fileid, 1321 as inscat, 33344 as inscount from tempid;
 
 		*/
+		sqlLine = 'delete from tempid;';
+		console.log(sqlLine);
+		sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
+		console.log(sqlLine);
+		for (let mm = 0; mm < mifi.project.comments.length; mm++) {
+			let comeasure = mifi.project.comments[mm];
+			for (let pp = 0; pp < comeasure.points.length; pp++) {
+				let txt = comeasure.points[pp].text;
+				sqlLine = 'insert into parsecomments (fileid,txt) select lastfileid as fileid, ' + sstr(txt) + ' as txt from tempid;';
+				console.log(sqlLine);
+			}
+		}
 	} catch (xx) {
 		console.log('/*');
 		console.log(path, name);

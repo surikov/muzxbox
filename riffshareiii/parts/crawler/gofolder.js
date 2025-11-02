@@ -2325,7 +2325,7 @@ function toArrayBuffer(buffer) {
     return arrayBuffer;
 }
 function sstr(txt) {
-    return '"' + txt.replace('"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ') + '"';
+    return '"' + txt.replace('\\', '/').replace('"', '\'').replace('\"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ') + '"';
 }
 function readOneFile(num, path, name) {
     let buff = fs.readFileSync(path + '/' + name);
@@ -2347,6 +2347,18 @@ function readOneFile(num, path, name) {
         sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
         sqlLine = sqlLine + ');';
         console.log(sqlLine);
+        sqlLine = 'delete from tempid;';
+        console.log(sqlLine);
+        sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
+        console.log(sqlLine);
+        for (let mm = 0; mm < mifi.project.comments.length; mm++) {
+            let comeasure = mifi.project.comments[mm];
+            for (let pp = 0; pp < comeasure.points.length; pp++) {
+                let txt = comeasure.points[pp].text;
+                sqlLine = 'insert into parsecomments (fileid,txt) select lastfileid as fileid, ' + sstr(txt) + ' as txt from tempid;';
+                console.log(sqlLine);
+            }
+        }
     }
     catch (xx) {
         console.log('/*');
