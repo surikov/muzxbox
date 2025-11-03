@@ -800,8 +800,8 @@ function dumpTriads(svg, rows) {
         //console.log(mmm, Math.round(blueLeftDiffSumm), Math.round(blueRighDiffSumm));
         var yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount + 0.33;
         var xxx = 0 * rowLen / 2;
-        var invLeftWidth = blueLeftDiffSumm * 1;
-        var invRightWidth = blueRighDiffSumm * 1;
+        var invLeftWidth = blueLeftDiffSumm * blueLeftDiffSumm / 10;
+        var invRightWidth = blueRighDiffSumm * blueRighDiffSumm / 10;
         //console.log(mmm, invLeftWidth, invRightWidth);
         markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + invLeftWidth, toY: yyy, color: mgnt, manual: false, light: true });
         markLines.push({ fromX: xxx + rowLen / 2 - invRightWidth, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: mgnt, manual: false, light: true });
