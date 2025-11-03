@@ -44,7 +44,7 @@ let sortedBlue: number[] = [];
 let sortedGreen: number[] = [];
 let sortedGrey: number[] = [];
 
-let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
+let markLines: { fromX: number, fromY: number, toX: number, toY: number, color: string, manual: boolean, light?: boolean }[] = [];//{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 type BallsRow = {
 	key: string;
 	balls: number[];
@@ -276,6 +276,11 @@ function drawLines() {
 	clearSVGgroup(linesLevel);
 	let strokeWidth = cellSize / 0.99;
 	for (let i = 0; i < markLines.length; i++) {
+		if(markLines[i].light){
+			strokeWidth = 4;
+		}else{
+			strokeWidth = cellSize / 0.99;
+		}
 		if (!markLines[i].manual) {
 			composeLine(linesLevel
 				, markLines[i].fromX * cellSize + 0.5 * cellSize
@@ -288,6 +293,7 @@ function drawLines() {
 	}
 	strokeWidth = cellSize / 2.99;
 	for (let i = 0; i < markLines.length; i++) {
+		
 		if (markLines[i].manual) {
 			composeLine(linesLevel
 				, markLines[i].fromX * cellSize + 0.5 * cellSize
@@ -698,6 +704,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	let red2 = '#ff663366';
 	let blue2 = '#3333ff33';
 	let blue = '#3333ffff';
+	let mgnt = '#000000ff';
 
 	let blueLeftRight: { left: number, right: number }[] = [];
 
@@ -870,22 +877,26 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		}
 		//paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
 	}
-	let blueLeftDiffSumm = 0;
-	let blueRighDiffSumm = 0;
-	//console.log('blueLeftRight', blueLeftRight);
 	let szDiff = 9;
-	for (let ii = 1; ii < szDiff; ii++) {
-		blueLeftDiffSumm = blueLeftDiffSumm + Math.pow(Math.abs(blueLeftRight[ii].left - blueLeftRight[ii + 1].left), 2);
-		blueRighDiffSumm = blueRighDiffSumm + Math.pow(Math.abs(blueLeftRight[ii].right - blueLeftRight[ii + 1].right), 2);
+	for (let mmm = 0; mmm < 98 - szDiff; mmm++) {
+		let blueLeftDiffSumm = 0;
+		let blueRighDiffSumm = 0;
+		for (let ii = 1; ii < szDiff; ii++) {
+			blueLeftDiffSumm = blueLeftDiffSumm + Math.pow(Math.abs(blueLeftRight[mmm + ii].left - blueLeftRight[mmm + ii + 1].left), 2);
+			blueRighDiffSumm = blueRighDiffSumm + Math.pow(Math.abs(blueLeftRight[mmm + ii].right - blueLeftRight[mmm + ii + 1].right), 2);
+		}
+		blueLeftDiffSumm = blueLeftDiffSumm / szDiff;
+		blueRighDiffSumm = blueRighDiffSumm / szDiff;
+		//var span: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
+		//span.innerText = '' + szDiff + ": blue diff: " + Math.round(blueLeftDiffSumm) + ' | ' + Math.round(blueRighDiffSumm);
+		//console.log(mmm, Math.round(blueLeftDiffSumm), Math.round(blueRighDiffSumm));
+		let yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount+0.33;
+		let xxx = 0 * rowLen / 2
+		let invLeftWidth = Math.round(blueLeftDiffSumm) / 15;
+		let invRightWidth = Math.round(blueRighDiffSumm) / 15;
+		markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + invLeftWidth, toY: yyy, color: mgnt, manual: false, light: true });
+		markLines.push({ fromX: xxx + rowLen / 2 - invRightWidth, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: mgnt, manual: false, light: true });
 	}
-	blueLeftDiffSumm = blueLeftDiffSumm / szDiff;
-	//blueLeftDiffSumm = Math.round(blueLeftDiffSumm * blueLeftDiffSumm);
-	blueRighDiffSumm = blueRighDiffSumm / szDiff;
-	//blueRighDiffSumm = Math.round(blueRighDiffSumm * blueRighDiffSumm);
-	//console.log(blueLeftDiffSumm, blueRighDiffSumm);
-	//addBigText(svg, 22, 55, "" + blueLeftDiffSumm + ' | ' + blueRighDiffSumm);
-	var span: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
-	span.innerText = '' + szDiff + ": blue diff: " + Math.round(blueLeftDiffSumm) + ' | ' + Math.round(blueRighDiffSumm);
 }
 
 function paintCellsBlue(ratioPre: number
