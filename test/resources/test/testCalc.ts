@@ -276,9 +276,9 @@ function drawLines() {
 	clearSVGgroup(linesLevel);
 	let strokeWidth = cellSize / 0.99;
 	for (let i = 0; i < markLines.length; i++) {
-		if(markLines[i].light){
+		if (markLines[i].light) {
 			strokeWidth = 4;
-		}else{
+		} else {
 			strokeWidth = cellSize / 0.99;
 		}
 		if (!markLines[i].manual) {
@@ -293,7 +293,7 @@ function drawLines() {
 	}
 	strokeWidth = cellSize / 2.99;
 	for (let i = 0; i < markLines.length; i++) {
-		
+
 		if (markLines[i].manual) {
 			composeLine(linesLevel
 				, markLines[i].fromX * cellSize + 0.5 * cellSize
@@ -877,23 +877,24 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		}
 		//paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
 	}
-	let szDiff = 9;
+	let szDiff = 6;
 	for (let mmm = 0; mmm < 98 - szDiff; mmm++) {
 		let blueLeftDiffSumm = 0;
 		let blueRighDiffSumm = 0;
 		for (let ii = 1; ii < szDiff; ii++) {
-			blueLeftDiffSumm = blueLeftDiffSumm + Math.pow(Math.abs(blueLeftRight[mmm + ii].left - blueLeftRight[mmm + ii + 1].left), 2);
-			blueRighDiffSumm = blueRighDiffSumm + Math.pow(Math.abs(blueLeftRight[mmm + ii].right - blueLeftRight[mmm + ii + 1].right), 2);
+			blueLeftDiffSumm = blueLeftDiffSumm + Math.abs(blueLeftRight[mmm + ii].left - blueLeftRight[mmm + ii + 1].left);
+			blueRighDiffSumm = blueRighDiffSumm + Math.abs(blueLeftRight[mmm + ii].right - blueLeftRight[mmm + ii + 1].right);
 		}
 		blueLeftDiffSumm = blueLeftDiffSumm / szDiff;
 		blueRighDiffSumm = blueRighDiffSumm / szDiff;
 		//var span: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
 		//span.innerText = '' + szDiff + ": blue diff: " + Math.round(blueLeftDiffSumm) + ' | ' + Math.round(blueRighDiffSumm);
 		//console.log(mmm, Math.round(blueLeftDiffSumm), Math.round(blueRighDiffSumm));
-		let yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount+0.33;
+		let yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount + 0.33;
 		let xxx = 0 * rowLen / 2
-		let invLeftWidth = Math.round(blueLeftDiffSumm) / 15;
-		let invRightWidth = Math.round(blueRighDiffSumm) / 15;
+		let invLeftWidth = blueLeftDiffSumm*1 ;
+		let invRightWidth = blueRighDiffSumm*1 ;
+		//console.log(mmm, invLeftWidth, invRightWidth);
 		markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + invLeftWidth, toY: yyy, color: mgnt, manual: false, light: true });
 		markLines.push({ fromX: xxx + rowLen / 2 - invRightWidth, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: mgnt, manual: false, light: true });
 	}
