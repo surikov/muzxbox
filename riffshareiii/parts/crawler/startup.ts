@@ -19,7 +19,25 @@ function toArrayBuffer(buffer) {
 	return arrayBuffer;
 }
 function sstr(txt: string): string {
-	return '"' + txt.replace('\\', '/').replace('"', '\'').replace('\"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ').trim() + '"';
+	let retxt = txt;//"' + txt.replace('\\', '/').replace('"', '\'').replace('\"', '\'').replace('\n', ' ').replace('\r', ' ').replace('\]', ' ').trim() + '"';
+
+	retxt = retxt.replaceAll('\t', ' ');
+	retxt = retxt.replaceAll('\n', ' ');
+	retxt = retxt.replaceAll('\r', ' ');
+	retxt = retxt.replaceAll('\\', '/');
+	retxt = retxt.replaceAll('\"', '\'');
+
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+	retxt = retxt.replaceAll('  ', ' ');
+
+	return '"' + retxt.trim() + '"';
 }
 
 function readOneFile(num: number, path: string, name: string) {
@@ -72,6 +90,7 @@ function readOneFile(num: number, path: string, name: string) {
 		sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
 		sqlLine = sqlLine + ');';
 		console.log(sqlLine);
+
 		/*
 CREATE TABLE "parsecomments" (
 	"id"	INTEGER NOT NULL,
@@ -116,10 +135,21 @@ CREATE TABLE "tempid" (
 		for (let mm = 0; mm < mifi.project.comments.length; mm++) {
 			let comeasure = mifi.project.comments[mm];
 			for (let pp = 0; pp < comeasure.points.length; pp++) {
-				let txt = comeasure.points[pp].text;
-				sqlLine = 'insert into parsecomments (fileid,txt) select lastfileid as fileid, ' + sstr(txt) + ' as txt from tempid;';
-				console.log(sqlLine);
+				let txt = sstr(comeasure.points[pp].text);
+				if (txt == '""') {
+					//
+				} else {
+					sqlLine = 'insert into parsecomments (fileid,txt) select lastfileid as fileid, ' + txt + ' as txt from tempid;';
+					console.log(sqlLine);
+				}
 			}
+		}
+		for (let nn = 0; nn < mifi.info.proCategories.length; nn++) {
+			sqlLine = 'insert into parsedinstruments (fileid,inscat,inscount) select lastfileid as fileid'
+				+ ', ' + mifi.info.proCategories[nn].cat + ' as inscat'
+				+ ', ' + mifi.info.proCategories[nn].ratio + ' as inscount'
+				+ ' from tempid;';
+			console.log(sqlLine);
 		}
 	} catch (xx) {
 		console.log('/*');
