@@ -704,7 +704,7 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 	let red2 = '#ff663366';
 	let blue2 = '#3333ff33';
 	let blue = '#3333ffff';
-	let mgnt = '#000000ff';
+	let mgnt = '#ff00ffff';
 
 	let blueLeftRight: { left: number, right: number }[] = [];
 

@@ -628,7 +628,7 @@ function dumpTriads(svg, rows) {
     var red2 = '#ff663366';
     var blue2 = '#3333ff33';
     var blue = '#3333ffff';
-    var mgnt = '#000000ff';
+    var mgnt = '#ff00ffff';
     var blueLeftRight = [];
     for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
