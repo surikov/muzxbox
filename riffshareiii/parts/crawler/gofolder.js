@@ -2364,7 +2364,7 @@ function readOneFile(num, path, name) {
         console.log(sqlLine);
         sqlLine = 'delete from tempid;';
         console.log(sqlLine);
-        sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
+        sqlLine = 'insert into tempid (lastfileid) values (LAST_INSERT_ID());';
         console.log(sqlLine);
         for (let mm = 0; mm < mifi.project.comments.length; mm++) {
             let comeasure = mifi.project.comments[mm];

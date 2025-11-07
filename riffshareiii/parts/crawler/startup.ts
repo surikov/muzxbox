@@ -90,6 +90,49 @@ function readOneFile(num: number, path: string, name: string) {
 		sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
 		sqlLine = sqlLine + ');';
 		console.log(sqlLine);
+/*
+mysql
+
+CREATE TABLE parsecomments (
+	id	INTEGER NOT NULL AUTO_INCREMENT,
+	fileid	INTEGER,
+	txt	varchar(255),
+	PRIMARY KEY(id)
+);
+
+/*CREATE TABLE parsecomments (
+	id	INTEGER NOT NULL AUTO_INCREMENT,
+	fileid	INTEGER,
+	txt	varchar(255),
+	PRIMARY KEY(id)
+);*/
+//-- CREATE INDEX parsecomments_fileid ON parsecomments (fileid);
+//-- ALTER TABLE parsecomments drop INDEX parsecomments_fileid
+/*CREATE TABLE parsedfile (
+	id	INTEGER NOT NULL AUTO_INCREMENT,
+	filename	varchar(255),
+	filepath	varchar(255),
+	filesize	INTEGER,
+	songduration	INTEGER,
+	avgtempo	INTEGER,
+	drums	INTEGER,
+	chords	INTEGER,
+	bass	INTEGER,
+	overdrive	INTEGER,
+	fileid	INTEGER,
+	PRIMARY KEY(id)
+);*/
+/*CREATE TABLE parsedinstruments (
+	id	INTEGER NOT NULL AUTO_INCREMENT,
+	fileid	INTEGER,
+	inscat	INTEGER,
+	inscount	INTEGER,
+	PRIMARY KEY(id)
+);*/
+/*CREATE TABLE tempid (
+	lastfileid	INTEGER
+);*/
+
 
 		/*
 CREATE TABLE "parsecomments" (
@@ -130,7 +173,9 @@ CREATE TABLE "tempid" (
 		*/
 		sqlLine = 'delete from tempid;';
 		console.log(sqlLine);
-		sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
+		//sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
+		sqlLine = 'insert into tempid (lastfileid) values (LAST_INSERT_ID());';
+		
 		console.log(sqlLine);
 		for (let mm = 0; mm < mifi.project.comments.length; mm++) {
 			let comeasure = mifi.project.comments[mm];
