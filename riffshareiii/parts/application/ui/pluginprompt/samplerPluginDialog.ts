@@ -114,14 +114,14 @@ class SamplerPluginDialog {
 		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
-			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
 	sendPointToPlugin() {
 		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
 		if (pluginFrame) {
-			let message: MZXBX_MessageToPlugin = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
+			let message: MZXBX_MessageToPlugin = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
 			pluginFrame.contentWindow.postMessage(message, '*');
 			//console.log('sendPointToPlugin', message);
 		}

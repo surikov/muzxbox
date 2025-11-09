@@ -9,15 +9,49 @@ class ActionPluginDialog {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
-			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() }
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null }
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
-	sendCurrentProjectToActionPlugin() {
+	//globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas: HTMLCanvasElement) => {
+	//	globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
+	//});
+	sendDataToActionPlugin() {
+
+	}
+	sendCurrentProjectToActionPlugin(screen: boolean) {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
-			let message: MZXBX_MessageToPlugin = { hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors() };
-			pluginFrame.contentWindow.postMessage(message, '*');
+			//let screenData: string | null = null;
+			if (screen) {
+				//screenData = 'test screen';
+				globalCommandDispatcher.makeTileSVGsquareCanvas(600, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
+					//globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
+					canvas.toBlob((blobresult: Blob) => {
+						//globalCommandDispatcher.downloadBlob(blobresult, fileName);
+						let message: MZXBX_MessageToPlugin = {
+							hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors()
+							, screenData: JSON.stringify(buffer)
+						};
+						console.log('screen to plugin', message);
+						console.log(buffer);
+						console.log(JSON.stringify(buffer));
+						pluginFrame.contentWindow.postMessage(message, '*');
+						//var imageData = context.createImageData(w, h);
+						//imageData.data.set(incomingBuffer);
+					});
+
+				});
+
+			} else {
+				let message: MZXBX_MessageToPlugin = {
+					hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors()
+					, screenData: null
+				};
+				console.log('from host to plugin', message);
+				pluginFrame.contentWindow.postMessage(message, '*');
+			}
+
 		}
 	}
 	receiveMessageFromPlugin(event) {
@@ -30,12 +64,14 @@ class ActionPluginDialog {
 				if (message.dialogID == this.dialogID) {
 					let me = this;
 					console.log('waitProjectCallback');
-					globalCommandDispatcher.exe.commitProjectChanges([], () => {
-						let project: Zvoog_Project = message.pluginData;
-						globalCommandDispatcher.registerWorkProject(project);
-						globalCommandDispatcher.resetProject();
-						globalCommandDispatcher.reStartPlayIfPlay();
-					});
+					if (message.pluginData) {
+						globalCommandDispatcher.exe.commitProjectChanges([], () => {
+							let project: Zvoog_Project = message.pluginData;
+							globalCommandDispatcher.registerWorkProject(project);
+							globalCommandDispatcher.resetProject();
+							globalCommandDispatcher.reStartPlayIfPlay();
+						});
+					}
 					if (message.done) {
 						me.closeActionDialogFrame();
 					}
@@ -46,7 +82,7 @@ class ActionPluginDialog {
 				if (this.waitActionPluginInit) {
 					this.waitActionPluginInit = false;
 					this.sendNewIdToPlugin();
-					this.sendCurrentProjectToActionPlugin();
+					this.sendCurrentProjectToActionPlugin(!!(message.sceenWait));
 				} else {
 					//console.log('wrong received object');
 				}

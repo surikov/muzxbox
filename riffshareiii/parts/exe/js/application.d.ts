@@ -84,7 +84,8 @@ declare class ActionPluginDialog {
     dialogID: string;
     constructor();
     sendNewIdToPlugin(): void;
-    sendCurrentProjectToActionPlugin(): void;
+    sendDataToActionPlugin(): void;
+    sendCurrentProjectToActionPlugin(screen: boolean): void;
     receiveMessageFromPlugin(event: any): void;
     openActionPluginDialogFrame(info: MZXBX_PluginRegistrationInformation): void;
     closeActionDialogFrame(): void;
@@ -203,7 +204,7 @@ declare class CommandDispatcher {
     exportCanvasAsFile(canvas: HTMLCanvasElement, fileName: string): void;
     hideMenuByStyle(): void;
     showMenuByStyle(): void;
-    makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void;
+    makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => void): void;
     copySelectedBars(): void;
     copySelectedBars222(): void;
     moveAsideSelectedBars(): void;
@@ -1189,11 +1190,13 @@ type MZXBX_MessageToPlugin = {
         line: string;
         click: string;
     };
+    screenData: string | null;
 };
 type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
+    sceenWait: boolean;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

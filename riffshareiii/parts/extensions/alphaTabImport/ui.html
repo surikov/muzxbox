@@ -8,18 +8,19 @@
 	<link rel="stylesheet" href="../../plugins.css">
 	<script type='text/javascript' src='../../../js/mzxbx.js'></script>
 	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
-	<script type='text/javascript' src='./exportprojectlocal.js'></script>
 	
 </head>
 
 <body>
-	<h1>Save project localy</h1>
+	<h1>*.gp3, gp4, gp5, gpx, gp, mxl, musicxml, mid</h1>
+    <p><input type="file" id="file_at_input" onchange="plugin.loadMusicfile(this);" accept=".gp3, .gp4, .gp5, .gpx, .gp, .mxl, .musicxml, .mid"  /></p>
 	<p class="cntrblk">
-		<button onclick="plugin.exportLocalfile();" >Save</button>
+		<button onclick='plugin.sendImportedMusicData();'>Send</button>
 	</p>
 </body>
+<script type='text/javascript' src='aimportfile.js'></script>
 <script>
-	let plugin = new LocalExportPlugin();
+	let plugin=new AlphaTabImportMusicPlugin();
 </script>
 
 </html>

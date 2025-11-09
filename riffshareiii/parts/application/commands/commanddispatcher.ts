@@ -740,7 +740,7 @@ class CommandDispatcher {
 		this.renderer.menu.menuPanelInteraction.style.visibility = 'visible';
 		this.renderer.menu.menuPanelButtons.style.visibility = 'visible';
 	}
-	makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement) => void): void {
+	makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => void): void {
 		console.log('makeTileSVGsquareCanvas', canvasSize);
 		this.hideMenuByStyle();
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
@@ -760,15 +760,18 @@ class CommandDispatcher {
 			} else {
 				context.drawImage(svgImg, 0, -0.5 * (canvasSize / ratio - canvasSize), canvasSize, canvasSize / ratio);
 			}
-			onDoneCanvas(canvas);
+			var imageData: ImageData = context.getImageData(0, 0, canvasSize, canvasSize);
+			var buffer: ArrayBuffer = imageData.data.buffer;
+			onDoneCanvas(canvas, buffer);
+			this.showMenuByStyle();
 		};
 		svgImg.src = url;
-		this.showMenuByStyle();
+		//this.showMenuByStyle();
 	}
 	copySelectedBars() {
 		console.log('copySelectedBars');
 		//https://media.geeksforgeeks.org/wp-content/uploads/20231004184219/gfglogo0.jpg
-		globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas: HTMLCanvasElement) => {
+		globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
 			globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
 		});
 	}
@@ -832,18 +835,19 @@ class CommandDispatcher {
 	moveAsideSelectedBars() {
 		console.log('move aside');
 	}
-	readThemeColors():{
+	readThemeColors(): {
 		background: string// #101;
 		, main: string//#9cf;
 		, drag: string//#03f;
 		, line: string//#ffc;
 		, click: string// #c39;
-	}{
-		return { background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color')
-			, main:window.getComputedStyle(document.documentElement).getPropertyValue('--main-color')
+	} {
+		return {
+			background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color')
+			, main: window.getComputedStyle(document.documentElement).getPropertyValue('--main-color')
 			, drag: window.getComputedStyle(document.documentElement).getPropertyValue('--drag-color')
 			, line: window.getComputedStyle(document.documentElement).getPropertyValue('--line-color')
-			, click:window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
+			, click: window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
 		};
 	}
 	mergeSelectedBars() {

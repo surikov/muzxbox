@@ -359,9 +359,11 @@ type MZXBX_MessageToPlugin = {
 		, line: string//#ffc;
 		, click: string// #c39;
 	}
+	,screenData:string|null
 };
 type MZXBX_MessageToHost = {
 	dialogID: string
 	, pluginData: any
 	, done: boolean
+	,sceenWait:boolean
 };

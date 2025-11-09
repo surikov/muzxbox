@@ -457,14 +457,14 @@ class FilterPluginDialog {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -614,14 +614,14 @@ class SamplerPluginDialog {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -666,15 +666,37 @@ class ActionPluginDialog {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
-    sendCurrentProjectToActionPlugin() {
+    sendDataToActionPlugin() {
+    }
+    sendCurrentProjectToActionPlugin(screen) {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
-            let message = { hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors() };
-            pluginFrame.contentWindow.postMessage(message, '*');
+            if (screen) {
+                globalCommandDispatcher.makeTileSVGsquareCanvas(600, (canvas, buffer) => {
+                    canvas.toBlob((blobresult) => {
+                        let message = {
+                            hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors(),
+                            screenData: JSON.stringify(buffer)
+                        };
+                        console.log('screen to plugin', message);
+                        console.log(buffer);
+                        console.log(JSON.stringify(buffer));
+                        pluginFrame.contentWindow.postMessage(message, '*');
+                    });
+                });
+            }
+            else {
+                let message = {
+                    hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors(),
+                    screenData: null
+                };
+                console.log('from host to plugin', message);
+                pluginFrame.contentWindow.postMessage(message, '*');
+            }
         }
     }
     receiveMessageFromPlugin(event) {
@@ -686,12 +708,14 @@ class ActionPluginDialog {
                 if (message.dialogID == this.dialogID) {
                     let me = this;
                     console.log('waitProjectCallback');
-                    globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                        let project = message.pluginData;
-                        globalCommandDispatcher.registerWorkProject(project);
-                        globalCommandDispatcher.resetProject();
-                        globalCommandDispatcher.reStartPlayIfPlay();
-                    });
+                    if (message.pluginData) {
+                        globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                            let project = message.pluginData;
+                            globalCommandDispatcher.registerWorkProject(project);
+                            globalCommandDispatcher.resetProject();
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                        });
+                    }
                     if (message.done) {
                         me.closeActionDialogFrame();
                     }
@@ -703,7 +727,7 @@ class ActionPluginDialog {
                 if (this.waitActionPluginInit) {
                     this.waitActionPluginInit = false;
                     this.sendNewIdToPlugin();
-                    this.sendCurrentProjectToActionPlugin();
+                    this.sendCurrentProjectToActionPlugin(!!(message.sceenWait));
                 }
                 else {
                 }
@@ -865,14 +889,14 @@ class SequencerPluginDialog {
         let pluginFrame = document.getElementById("pluginSequencerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById('pluginSequencerFrame');
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -967,14 +991,14 @@ class PointPluginDialog {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors() };
+            let message = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -1687,14 +1711,16 @@ class CommandDispatcher {
             else {
                 context.drawImage(svgImg, 0, -0.5 * (canvasSize / ratio - canvasSize), canvasSize, canvasSize / ratio);
             }
-            onDoneCanvas(canvas);
+            var imageData = context.getImageData(0, 0, canvasSize, canvasSize);
+            var buffer = imageData.data.buffer;
+            onDoneCanvas(canvas, buffer);
+            this.showMenuByStyle();
         };
         svgImg.src = url;
-        this.showMenuByStyle();
     }
     copySelectedBars() {
         console.log('copySelectedBars');
-        globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas) => {
+        globalCommandDispatcher.makeTileSVGsquareCanvas(300, (canvas, buffer) => {
             globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
         });
     }
@@ -1733,7 +1759,8 @@ class CommandDispatcher {
         console.log('move aside');
     }
     readThemeColors() {
-        return { background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'),
+        return {
+            background: window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'),
             main: window.getComputedStyle(document.documentElement).getPropertyValue('--main-color'),
             drag: window.getComputedStyle(document.documentElement).getPropertyValue('--drag-color'),
             line: window.getComputedStyle(document.documentElement).getPropertyValue('--line-color'),
@@ -2788,7 +2815,7 @@ class UIToolbar {
     constructor() {
     }
     createToolbar() {
-        this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 1, 0, (nn) => {
+        this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 0, 1.5, (nn) => {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             if (globalCommandDispatcher.cfg().data.list) {
                 globalCommandDispatcher.hideRightMenu();
@@ -2797,13 +2824,13 @@ class UIToolbar {
                 globalCommandDispatcher.showRightMenu();
             }
         });
-        this.redoButton = new ToolBarButton([icon_redo], 1, 1, (nn) => {
+        this.redoButton = new ToolBarButton([icon_redo], 0, 0.5, (nn) => {
             globalCommandDispatcher.exe.redo(1);
         });
-        this.undoButton = new ToolBarButton([icon_undo], 1, 2, (nn) => {
+        this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn) => {
             globalCommandDispatcher.exe.undo(1);
         });
-        this.playStopButton = new ToolBarButton([icon_play, icon_pause], 1, 3, (nn) => {
+        this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1.5, (nn) => {
             globalCommandDispatcher.toggleStartStop();
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");

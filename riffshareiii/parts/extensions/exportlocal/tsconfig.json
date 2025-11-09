@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "../../../web/actions/exp2fi/exportprojectlocal.js"
+        ,"outFile": "../../exe/plugins/actions/exp2fi/exportprojectlocal.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -26,8 +26,8 @@
 		
 		
 		
-        "../../mzxbx/publictypes/musicenginetypes.ts"
-		,"../../mzxbx/publictypes/musicenginedeclarations.ts"
+        "../../mzxbxapi/musicenginetypes.ts"
+		,"../../mzxbxapi/musicenginedeclarations.ts"
         ,"export2local.ts"
 	]
 }

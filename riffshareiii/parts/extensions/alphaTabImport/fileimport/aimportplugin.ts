@@ -8,11 +8,13 @@ class AlphaTabImportMusicPlugin {
 	}
 	init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-		window.parent.postMessage({
+		let msg: MZXBX_MessageToHost = {
 			dialogID: this.callbackID
-			, pluginData: parsedProject
+			, pluginData: null//parsedProject
 			, done: false
-		}, '*');
+			, sceenWait: false
+		}
+		window.parent.postMessage(msg, '*');
 	}
 	sendImportedMusicData() {
 		console.log('sendImportedMusicData', parsedProject);
@@ -21,6 +23,7 @@ class AlphaTabImportMusicPlugin {
 				dialogID: this.callbackID
 				, pluginData: parsedProject
 				, done: true
+				, sceenWait: false
 			};
 			window.parent.postMessage(oo, '*');
 		} else {

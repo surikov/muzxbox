@@ -16335,7 +16335,7 @@ class AlphaTabImportMusicPlugin {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
         window.parent.postMessage({
             dialogID: this.callbackID,
-            pluginData: parsedProject,
+            pluginData: null,
             done: false
         }, '*');
     }

@@ -1,33 +1,48 @@
 "use strict";
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
+console.log('Export local v1.0.1');
 class LocalExportPlugin {
     constructor() {
         this.callbackID = '';
-        this.parsedProject = null;
-        console.log('LocalExportPlugin create');
+        this.hostProject = null;
+        this.init();
+    }
+    init() {
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-        window.parent.postMessage('', '*');
+        let msg = {
+            dialogID: this.callbackID,
+            pluginData: null,
+            done: false,
+            sceenWait: true
+        };
+        window.parent.postMessage(msg, '*');
     }
     receiveHostMessage(par) {
-        console.log('receiveHostMessage', par);
         let message = par.data;
         if (this.callbackID) {
-            this.parsedProject = message.hostData;
+            this.hostProject = message.hostData;
         }
         else {
             this.callbackID = message.hostData;
+            this.setupColors(message.colors);
         }
     }
+    setupColors(colors) {
+        document.documentElement.style.setProperty('--background-color', colors.background);
+        document.documentElement.style.setProperty('--main-color', colors.main);
+        document.documentElement.style.setProperty('--drag-color', colors.drag);
+        document.documentElement.style.setProperty('--line-color', colors.line);
+        document.documentElement.style.setProperty('--click-color', colors.click);
+    }
     exportLocalfile(th) {
-        console.log('exportLocalfile', th);
-        if (this.parsedProject) {
-            this.download(JSON.stringify(this.parsedProject, null, '	'), 'export', 'application/json');
+        if (this.hostProject) {
+            this.download(JSON.stringify(this.hostProject), 'export', 'application/json');
+            let msg = {
+                dialogID: this.callbackID,
+                pluginData: null,
+                done: true,
+                sceenWait: false
+            };
+            window.parent.postMessage(msg, '*');
         }
     }
     download(data, filename, type) {
