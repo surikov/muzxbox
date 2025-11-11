@@ -42,6 +42,31 @@ class LocalExportPlugin {
 			this.callbackID = message.hostData;
 			this.setupColors(message.colors);
 		}
+		if (message.screenData) {
+			let sz = 500;
+			//console.log(message.screenData);
+			//let canvas: HTMLCanvasElement = document.createElement('canvas');
+			//canvas.height = canvasSize;
+			//canvas.width = canvasSize;
+			let canvas = document.getElementById("prvw") as HTMLCanvasElement;
+			if (canvas) {
+				let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+				//var imageData: ImageData = context.createImageData(sz, sz);
+				var imageData: ImageData = context.getImageData(0,0,sz,sz);
+				imageData.data.set(message.screenData);
+				//context.putImageData(imageData, 0, 0);
+
+/*
+				context.strokeStyle = '#ff0000';
+				context.beginPath();
+				context.arc(95, 50, 40, 0, 2 * Math.PI);
+				context.stroke();
+
+				console.log(imageData);
+				console.dir(canvas);
+				*/
+			}
+		}
 	}
 	setupColors(colors: {
 		background: string// #101;

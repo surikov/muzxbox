@@ -25,6 +25,16 @@ class LocalExportPlugin {
             this.callbackID = message.hostData;
             this.setupColors(message.colors);
         }
+        if (message.screenData) {
+            let sz = 500;
+            let canvas = document.getElementById("prvw");
+            if (canvas) {
+                let context = canvas.getContext('2d');
+                var imageData = context.createImageData(sz, sz);
+                imageData.data.set(message.screenData);
+                context.putImageData(imageData, 0, 0);
+            }
+        }
     }
     setupColors(colors) {
         document.documentElement.style.setProperty('--background-color', colors.background);

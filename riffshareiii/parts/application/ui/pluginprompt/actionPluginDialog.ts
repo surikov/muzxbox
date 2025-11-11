@@ -22,30 +22,28 @@ class ActionPluginDialog {
 	sendCurrentProjectToActionPlugin(screen: boolean) {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
-			//let screenData: string | null = null;
 			if (screen) {
-				//screenData = 'test screen';
-				globalCommandDispatcher.makeTileSVGsquareCanvas(600, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
-					//globalCommandDispatcher.exportCanvasAsFile(canvas, 'testCanvasSVG.png');
-					canvas.toBlob((blobresult: Blob) => {
-						//globalCommandDispatcher.downloadBlob(blobresult, fileName);
+				globalCommandDispatcher.makeTileSVGsquareCanvas(500, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
+					//canvas.toBlob((blobresult: Blob) => {
+						let data: number[] = [];
+						var array8:Uint8Array = new Uint8Array(buffer);
+						var len = buffer.byteLength;//array8.byteLength;
+						for (var ii = 0; ii < len; ii++) {
+							//if (ii < 22) { console.log('b' + ii, array8[ii]); }
+							data.push(array8[ii]);
+						}
 						let message: MZXBX_MessageToPlugin = {
-							hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors()
-							, screenData: JSON.stringify(buffer)
+							hostData: globalCommandDispatcher.cfg().data
+							, colors: globalCommandDispatcher.readThemeColors()
+							, screenData: data
 						};
-						console.log('screen to plugin', message);
-						console.log(buffer);
-						console.log(JSON.stringify(buffer));
 						pluginFrame.contentWindow.postMessage(message, '*');
-						//var imageData = context.createImageData(w, h);
-						//imageData.data.set(incomingBuffer);
-					});
-
+					//});
 				});
-
 			} else {
 				let message: MZXBX_MessageToPlugin = {
-					hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors()
+					hostData: globalCommandDispatcher.cfg().data
+					, colors: globalCommandDispatcher.readThemeColors()
 					, screenData: null
 				};
 				console.log('from host to plugin', message);

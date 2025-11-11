@@ -1,0 +1,14 @@
+:root {
+	--background-color: #ccddee;
+	--main-color: #000;
+	--drag-color: #f63;
+	--line-color: #006;
+	--click-color: #bbdd99;
+}
+#tileLevelSVG {
+	background-image: url("bg/birch2.jpg");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: bottom;
+}
+

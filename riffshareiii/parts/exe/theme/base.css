@@ -129,7 +129,7 @@
 	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
 	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
 	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
-	
+	--plugintitle-color: var(--drag-color);
 }
 
 #file_midi_input {

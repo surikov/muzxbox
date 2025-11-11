@@ -153,7 +153,7 @@ button {
 	border-radius: 0.5cm;
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
-	color: var(--background-color);
+	color: var(--main-color);
 }
 
 input[type=file] {
@@ -167,7 +167,7 @@ input[type=file] {
 	border-width: 1px;
 	border-color: var(--line-color);
 	border-radius: 0.5cm;
-	
+	color: var(--main-color);
 }
 
 input::file-selector-button {
@@ -175,7 +175,7 @@ input::file-selector-button {
 	font-weight: 600;
 	font-style: normal;
 	font-size: 0.75cm;
-	color: var(--background-color);
+	color: var(--main-color);
 	padding-left: 0.5cm;
 	padding-right: 0.5cm;
 	border: none;

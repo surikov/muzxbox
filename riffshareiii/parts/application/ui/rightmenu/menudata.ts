@@ -149,6 +149,11 @@ let menuPointSettings: MenuInfo = {
 						globalCommandDispatcher.setThemeColor('light2');
 					}, itemKind: kindAction
 				}
+				, {
+					text: 'Bereza', onClick: () => {
+						globalCommandDispatcher.setThemeColor('light3');
+					}, itemKind: kindAction
+				}
 			], itemKind: kindClosedFolder
 		}, {
 			text: 'Language', children: [

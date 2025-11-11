@@ -485,6 +485,9 @@ class CommandDispatcher {
 		if (idx == 'blue1') {
 			cssPath = 'theme/colordarkblue.css';
 		}
+		if (idx == 'light3') {
+			cssPath = 'theme/colorbirch.css';
+		}
 
 		//console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);

@@ -676,22 +676,25 @@ class ActionPluginDialog {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
             if (screen) {
-                globalCommandDispatcher.makeTileSVGsquareCanvas(600, (canvas, buffer) => {
-                    canvas.toBlob((blobresult) => {
-                        let message = {
-                            hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors(),
-                            screenData: JSON.stringify(buffer)
-                        };
-                        console.log('screen to plugin', message);
-                        console.log(buffer);
-                        console.log(JSON.stringify(buffer));
-                        pluginFrame.contentWindow.postMessage(message, '*');
-                    });
+                globalCommandDispatcher.makeTileSVGsquareCanvas(500, (canvas, buffer) => {
+                    let data = [];
+                    var array8 = new Uint8Array(buffer);
+                    var len = buffer.byteLength;
+                    for (var ii = 0; ii < len; ii++) {
+                        data.push(array8[ii]);
+                    }
+                    let message = {
+                        hostData: globalCommandDispatcher.cfg().data,
+                        colors: globalCommandDispatcher.readThemeColors(),
+                        screenData: data
+                    };
+                    pluginFrame.contentWindow.postMessage(message, '*');
                 });
             }
             else {
                 let message = {
-                    hostData: globalCommandDispatcher.cfg().data, colors: globalCommandDispatcher.readThemeColors(),
+                    hostData: globalCommandDispatcher.cfg().data,
+                    colors: globalCommandDispatcher.readThemeColors(),
                     screenData: null
                 };
                 console.log('from host to plugin', message);
@@ -1552,6 +1555,9 @@ class CommandDispatcher {
         }
         if (idx == 'blue1') {
             cssPath = 'theme/colordarkblue.css';
+        }
+        if (idx == 'light3') {
+            cssPath = 'theme/colorbirch.css';
         }
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
@@ -3514,6 +3520,11 @@ let menuPointSettings = {
                     text: 'Vorot', onClick: () => {
                         globalCommandDispatcher.setThemeColor('light2');
                     }, itemKind: kindAction
+                },
+                {
+                    text: 'Bereza', onClick: () => {
+                        globalCommandDispatcher.setThemeColor('light3');
+                    }, itemKind: kindAction
                 }
             ], itemKind: kindClosedFolder
         }, {
@@ -4358,7 +4369,8 @@ class MixerBar {
         }
     }
     trackCellClick(barIdx, barX, yy, zz) {
-        let trMeasure = globalCommandDispatcher.cfg().data.tracks[0].measures[barIdx];
+        let upperTrackIdx = globalCommandDispatcher.calculateRealTrackFarOrder()[0];
+        let trMeasure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[barIdx];
         let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
         let cueditmark = globalCommandDispatcher.cfg().editmark;
@@ -4395,8 +4407,8 @@ class MixerBar {
                 }
             }
             let chord = null;
-            let measure = globalCommandDispatcher.cfg().data.tracks[0].measures[fromBar];
-            globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+            let measure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[fromBar];
+            globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
                 for (let ii = 0; ii < measure.chords.length; ii++) {
                     if (MMUtil().set(measure.chords[ii].skip).equals(skip)) {
                         chord = measure.chords[ii];
@@ -4441,7 +4453,7 @@ class MixerBar {
                     duration = MMUtil().set(duration).minus(cuslidemark.chord.slides[kk].duration);
                 }
                 if (duration.count > 0) {
-                    globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
                         if (cuslidemark) {
                             cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
                             console.log(cuslidemark, pitch);
@@ -4454,7 +4466,7 @@ class MixerBar {
                 let muStart = MMUtil().set(info.start);
                 let muEnd = MMUtil().set(info.end);
                 let drop = false;
-                globalCommandDispatcher.exe.commitProjectChanges(['tracks', 0, 'measures', barIdx], () => {
+                globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
                     for (let ii = 0; ii < trMeasure.chords.length; ii++) {
                         let chord = trMeasure.chords[ii];
                         if ((!muStart.more(chord.skip)) && muEnd.more(chord.skip)) {
