@@ -307,4 +307,5 @@ declare class LocalExportPlugin {
     }): void;
     exportLocalfile(th: any): void;
     download(data: string, filename: string, type: string): void;
+    exportImage(): void;
 }

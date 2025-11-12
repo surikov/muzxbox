@@ -52,19 +52,20 @@ class LocalExportPlugin {
 			if (canvas) {
 				let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
 				//var imageData: ImageData = context.createImageData(sz, sz);
-				var imageData: ImageData = context.getImageData(0,0,sz,sz);
+				var imageData: ImageData = context.getImageData(0, 0, sz, sz);
 				imageData.data.set(message.screenData);
-				//context.putImageData(imageData, 0, 0);
+				context.putImageData(imageData, 0, 0);
 
-/*
-				context.strokeStyle = '#ff0000';
-				context.beginPath();
-				context.arc(95, 50, 40, 0, 2 * Math.PI);
-				context.stroke();
-
-				console.log(imageData);
-				console.dir(canvas);
-				*/
+				/*
+								context.strokeStyle = '#ff0000';
+								context.beginPath();
+								context.arc(95, 50, 40, 0, 2 * Math.PI);
+								context.stroke();
+				
+								console.log(imageData);
+								
+								console.dir(canvas);
+								*/
 			}
 		}
 	}
@@ -104,6 +105,20 @@ class LocalExportPlugin {
 		a.download = filename;
 		document.body.appendChild(a);
 		a.click();
+
+	}
+	exportImage() {
+		console.log('exportImage');
+		let canvas = document.getElementById("prvw") as HTMLCanvasElement;
+		if (canvas) {
+			let dataURl:string=canvas.toDataURL('image/png');
+			//console.log(dataURl);
+			let a: HTMLAnchorElement = document.createElement("a");
+			a.href = dataURl;
+		a.download = "minium";
+		document.body.appendChild(a);
+		a.click();
+		}
 
 	}
 }

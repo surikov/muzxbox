@@ -30,7 +30,7 @@ class LocalExportPlugin {
             let canvas = document.getElementById("prvw");
             if (canvas) {
                 let context = canvas.getContext('2d');
-                var imageData = context.createImageData(sz, sz);
+                var imageData = context.getImageData(0, 0, sz, sz);
                 imageData.data.set(message.screenData);
                 context.putImageData(imageData, 0, 0);
             }
@@ -63,6 +63,18 @@ class LocalExportPlugin {
         a.download = filename;
         document.body.appendChild(a);
         a.click();
+    }
+    exportImage() {
+        console.log('exportImage');
+        let canvas = document.getElementById("prvw");
+        if (canvas) {
+            let dataURl = canvas.toDataURL('image/png');
+            let a = document.createElement("a");
+            a.href = dataURl;
+            a.download = "minium";
+            document.body.appendChild(a);
+            a.click();
+        }
     }
 }
 //# sourceMappingURL=exportprojectlocal.js.map
