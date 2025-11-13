@@ -924,13 +924,13 @@ class MidiParser {
                 }
                 else {
                     if (evnt.subtype == this.EVENT_META_TEXT) {
-                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                        this.midiheader.pushLyrics({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_MARKER) {
-                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                        this.midiheader.pushLyrics({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_COPYRIGHT_NOTICE) {
-                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
+                        this.midiheader.pushLyrics({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'Copyright: ' + (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_TRACK_NAME) {
                         singleParsedTrack.trackTitle = evnt.text ? evnt.text : '';
@@ -939,10 +939,10 @@ class MidiParser {
                         singleParsedTrack.instrumentName = evnt.text ? evnt.text : '';
                     }
                     if (evnt.subtype == this.EVENT_META_LYRICS) {
-                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
+                        this.midiheader.pushLyrics({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_CUE_POINT) {
-                        this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
+                        this.midiheader.pushLyrics({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: 'CUE: ' + (evnt.text ? evnt.text : "") });
                     }
                     if (evnt.subtype == this.EVENT_META_KEY_SIGNATURE) {
                         var majSharpCircleOfFifths = ['C', 'G', 'D', 'A', 'E', 'B', 'F#'];
@@ -1194,6 +1194,15 @@ class MIDIFileHeader {
         this.datas = new DataView(buffer, 0, this.HEADER_LENGTH);
         this.format = this.datas.getUint16(8);
         this.trackCount = this.datas.getUint16(10);
+    }
+    pushLyrics(newPoint) {
+        for (let tt = 0; tt < this.lyricsList.length; tt++) {
+            let it = this.lyricsList[tt];
+            if (Math.round(it.ms / 1000) == Math.round(newPoint.ms / 1000) && it.txt == newPoint.txt) {
+                return;
+            }
+        }
+        this.lyricsList.push(newPoint);
     }
     getCalculatedTickResolution(tempo) {
         this.lastNonZeroQuarter = tempo;
@@ -2315,7 +2324,9 @@ function MMUtil() {
 }
 var fs = require('fs');
 let folder = process.cwd();
-console.log('start', folder);
+let from = process.argv[2];
+let to = process.argv[3];
+console.log('start', folder, from, to);
 function toArrayBuffer(buffer) {
     const arrayBuffer = new ArrayBuffer(buffer.length);
     const view = new Uint8Array(arrayBuffer);
@@ -2397,7 +2408,9 @@ function readFiles(path) {
     fs.readdir(path, function (error, filenames) {
         console.log('error', error);
         console.log('count', filenames.length);
-        for (let ii = 0; ii < filenames.length; ii++) {
+        let fromN = 1 * from;
+        let toN = 1 * to;
+        for (let ii = fromN; ii < filenames.length && ii <= toN; ii++) {
             let filename = filenames[ii];
             if (filename.toLowerCase().trim().endsWith('mid')) {
                 readOneFile(ii, path, filename);

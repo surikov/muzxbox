@@ -279,11 +279,13 @@ declare type MZXBX_MessageToPlugin = {
         line: string;
         click: string;
     };
+    screenData: number[] | null;
 };
 declare type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
+    sceenWait: boolean;
 };
 declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
 declare function allPercussionDrumTitles(): string[];
@@ -501,6 +503,11 @@ declare class MIDIFileHeader {
     keyMajMin: number;
     lastNonZeroQuarter: number;
     constructor(buffer: ArrayBuffer);
+    pushLyrics(newPoint: {
+        track: number;
+        ms: number;
+        txt: string;
+    }): void;
     getCalculatedTickResolution(tempo: number): number;
     get0TickResolution(): number;
     getTicksPerBeat(): number;
@@ -680,6 +687,8 @@ declare function require(a: any): any;
 declare var process: any;
 declare var fs: any;
 declare let folder: any;
+declare let from: any;
+declare let to: any;
 declare function toArrayBuffer(buffer: any): ArrayBuffer;
 declare function sstr(txt: string): string;
 declare function readOneFile(num: number, path: string, name: string): void;

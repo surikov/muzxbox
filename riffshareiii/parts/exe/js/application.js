@@ -457,14 +457,14 @@ class FilterPluginDialog {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginFilterFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -614,14 +614,14 @@ class SamplerPluginDialog {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -666,7 +666,7 @@ class ActionPluginDialog {
         let pluginFrame = document.getElementById("pluginActionFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -686,7 +686,8 @@ class ActionPluginDialog {
                     let message = {
                         hostData: globalCommandDispatcher.cfg().data,
                         colors: globalCommandDispatcher.readThemeColors(),
-                        screenData: data
+                        screenData: data,
+                        langID: labelLocaleDictionary
                     };
                     pluginFrame.contentWindow.postMessage(message, '*');
                 });
@@ -695,7 +696,8 @@ class ActionPluginDialog {
                 let message = {
                     hostData: globalCommandDispatcher.cfg().data,
                     colors: globalCommandDispatcher.readThemeColors(),
-                    screenData: null
+                    screenData: null,
+                    langID: labelLocaleDictionary
                 };
                 console.log('from host to plugin', message);
                 pluginFrame.contentWindow.postMessage(message, '*');
@@ -892,14 +894,14 @@ class SequencerPluginDialog {
         let pluginFrame = document.getElementById("pluginSequencerFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById('pluginSequencerFrame');
         if (pluginFrame) {
-            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
@@ -994,14 +996,14 @@ class PointPluginDialog {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
-            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
     sendPointToPlugin() {
         let pluginFrame = document.getElementById("pluginPointFrame");
         if (pluginFrame) {
-            let message = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors(), screenData: null };
+            let message = { hostData: this.pluginPoint.stateBlob, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }

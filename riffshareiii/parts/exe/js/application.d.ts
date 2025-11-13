@@ -1191,6 +1191,7 @@ declare type MZXBX_MessageToPlugin = {
         click: string;
     };
     screenData: number[] | null;
+    langID: string;
 };
 declare type MZXBX_MessageToHost = {
     dialogID: string;

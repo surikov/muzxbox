@@ -9,7 +9,7 @@ class ActionPluginDialog {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
-			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null }
+			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary }
 			pluginFrame.contentWindow.postMessage(message, '*');
 		}
 	}
@@ -25,19 +25,20 @@ class ActionPluginDialog {
 			if (screen) {
 				globalCommandDispatcher.makeTileSVGsquareCanvas(500, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
 					//canvas.toBlob((blobresult: Blob) => {
-						let data: number[] = [];
-						var array8:Uint8Array = new Uint8Array(buffer);
-						var len = buffer.byteLength;//array8.byteLength;
-						for (var ii = 0; ii < len; ii++) {
-							//if (ii < 22) { console.log('b' + ii, array8[ii]); }
-							data.push(array8[ii]);
-						}
-						let message: MZXBX_MessageToPlugin = {
-							hostData: globalCommandDispatcher.cfg().data
-							, colors: globalCommandDispatcher.readThemeColors()
-							, screenData: data
-						};
-						pluginFrame.contentWindow.postMessage(message, '*');
+					let data: number[] = [];
+					var array8: Uint8Array = new Uint8Array(buffer);
+					var len = buffer.byteLength;//array8.byteLength;
+					for (var ii = 0; ii < len; ii++) {
+						//if (ii < 22) { console.log('b' + ii, array8[ii]); }
+						data.push(array8[ii]);
+					}
+					let message: MZXBX_MessageToPlugin = {
+						hostData: globalCommandDispatcher.cfg().data
+						, colors: globalCommandDispatcher.readThemeColors()
+						, screenData: data
+						, langID: labelLocaleDictionary
+					};
+					pluginFrame.contentWindow.postMessage(message, '*');
 					//});
 				});
 			} else {
@@ -45,6 +46,7 @@ class ActionPluginDialog {
 					hostData: globalCommandDispatcher.cfg().data
 					, colors: globalCommandDispatcher.readThemeColors()
 					, screenData: null
+					, langID: labelLocaleDictionary
 				};
 				console.log('from host to plugin', message);
 				pluginFrame.contentWindow.postMessage(message, '*');

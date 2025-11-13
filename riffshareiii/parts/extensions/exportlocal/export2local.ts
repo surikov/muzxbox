@@ -86,7 +86,7 @@ class LocalExportPlugin {
 	exportLocalfile(th) {
 		//console.log('exportLocalfile', th);
 		if (this.hostProject) {
-			this.download(JSON.stringify(this.hostProject), 'export', 'application/json');
+			this.download(JSON.stringify(this.hostProject), 'minium', 'application/json');
 			let msg: MZXBX_MessageToHost = {
 				dialogID: this.callbackID
 				, pluginData: null

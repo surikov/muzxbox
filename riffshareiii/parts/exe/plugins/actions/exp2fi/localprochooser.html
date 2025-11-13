@@ -1,28 +1,28 @@
 <html>
 
 <head>
-	<style>
-		html {
-
-			background-color: #333;
-			color: #ccc;
-		}
-	</style>
-    <script type='text/javascript' src='./localprojimp.js'></script>
-    <script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<!--<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">-->
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100..900&display=swap" rel="stylesheet">
+	
+	<link rel="stylesheet" href="../../plugins.css">
+	<script type='text/javascript' src='../../../js/mzxbx.js'></script>
+	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
 </head>
 
 <body>
-	<h1>Local import</h1>
-    <p><input type="file" id="file_midi_input" accept="application/json" 
-        onchange="plugin.loadLocalFile(this);" /></p>
-	<p>
-		<button onclick='plugin.sendLoadedData();'>Send data</button>
+	<h1 id='title'>Local project</h1>
+    <p><input type="file" id="file_at_input" onchange="plugin.loadLocalFile(this);" accept=".json"  /></p>
+	<p class="cntrblk">
+		<button onclick='plugin.sendLoadedData();'>OK</button>
 	</p>
 </body>
+<script type='text/javascript' src='./localprojimp.js'></script>
 <script>
-	
-	let plugin=new LocalProjectImport();
+	let plugin = new LocalProjectImport();
 </script>
 
 </html>

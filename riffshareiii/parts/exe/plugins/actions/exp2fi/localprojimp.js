@@ -1,11 +1,4 @@
 "use strict";
-var MZXBX_PluginPurpose;
-(function (MZXBX_PluginPurpose) {
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Action"] = 0] = "Action";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Filter"] = 1] = "Filter";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Sampler"] = 2] = "Sampler";
-    MZXBX_PluginPurpose[MZXBX_PluginPurpose["Performer"] = 3] = "Performer";
-})(MZXBX_PluginPurpose || (MZXBX_PluginPurpose = {}));
 class LocalProjectImport {
     constructor() {
         this.id = '';
@@ -13,9 +6,14 @@ class LocalProjectImport {
         this.init();
     }
     init() {
-        console.log('init MIDI import');
         window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-        window.parent.postMessage('', '*');
+        let msg = {
+            dialogID: '',
+            pluginData: null,
+            done: false,
+            sceenWait: false
+        };
+        window.parent.postMessage(msg, '*');
     }
     loadLocalFile(inputFile) {
         var file = inputFile.files[0];
@@ -31,17 +29,35 @@ class LocalProjectImport {
     }
     sendLoadedData() {
         if (this.parsedProject) {
-            var oo = { dialogID: this.id, pluginData: this.parsedProject };
+            var oo = { dialogID: this.id, pluginData: this.parsedProject, sceenWait: false, done: true };
             window.parent.postMessage(oo, '*');
         }
     }
     receiveHostMessage(par) {
-        console.log('receiveHostMessage', par);
         let message = par.data;
         if (this.id) {
         }
         else {
             this.id = message.hostData;
+            this.setupLangColors(message);
+        }
+    }
+    setupLangColors(message) {
+        document.documentElement.style.setProperty('--background-color', message.colors.background);
+        document.documentElement.style.setProperty('--main-color', message.colors.main);
+        document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+        document.documentElement.style.setProperty('--line-color', message.colors.line);
+        document.documentElement.style.setProperty('--click-color', message.colors.click);
+        if (message.langID == 'ru') {
+            document.getElementById('title').innerHTML = 'Загрузить локальный проект';
+        }
+        else {
+            if (message.langID == 'zh') {
+                document.getElementById('title').innerHTML = '从本地存储导入项目';
+            }
+            else {
+                document.getElementById('title').innerHTML = 'Import project from local storage';
+            }
         }
     }
 }

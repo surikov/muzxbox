@@ -18,14 +18,20 @@ html {
 	scrollbar-color: var(--drag-color) var(--background-color);
 }
 
-body {
+body333 {
 	font-family: "Poiret One", sans-serif;
 	font-weight: 600;
 	font-style: normal;
 	background-color: var(--bgfill3);
 	color: var(--main-color);
 }
-
+body {
+	font-family: "Noto Sans SC", sans-serif;
+	font-weight: 400;
+	font-style222: normal;
+	background-color: var(--bgfill3);
+	color: var(--main-color);
+}
 h1 {
 	text-align: center;
 	font-size: 1cm;
@@ -129,9 +135,9 @@ input[type=text] {
 	border-bottom: 1px solid var(--click-color);
 	outline: none;
 	height: 1cm;
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
+	font-family11: "Poiret One", sans-serif;
+	font-weight11: 600;
+	font-style11: normal;
 	color: var(--main-color);
 }
 
@@ -142,9 +148,9 @@ input[type=text]:focus {
 
 button {
 	height: 1cm;
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
+	font-family11: "Poiret One", sans-serif;
+	font-weight11: 600;
+	font-style11: normal;
 	font-size: 0.75cm;
 	background: var(--click-color);
 	border-style: solid;
@@ -158,9 +164,9 @@ button {
 
 input[type=file] {
 	height: 1cm;
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
+	font-family11: "Poiret One", sans-serif;
+	font-weight11: 600;
+	font-style11: normal;
 	font-size: 0.75cm;
 	background: var(--bgfill);
 	border-style: solid;
@@ -171,9 +177,9 @@ input[type=file] {
 }
 
 input::file-selector-button {
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
+	font-family11: "Poiret One", sans-serif;
+	font-weight11: 600;
+	font-style11: normal;
 	font-size: 0.75cm;
 	color: var(--main-color);
 	padding-left: 0.5cm;

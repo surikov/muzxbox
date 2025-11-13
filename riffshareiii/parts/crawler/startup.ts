@@ -8,7 +8,9 @@ var fs = require('fs');
 //let folder = 'D:\\projects\\muzxbox\\test\\music\\';
 //let folder = '/home/sss/Documents/GitHub/muzxbox/test/music/';
 let folder = process.cwd();
-console.log('start', folder);
+let from = process.argv[2];
+let to = process.argv[3];
+console.log('start', folder, from, to);
 
 function toArrayBuffer(buffer) {
 	const arrayBuffer = new ArrayBuffer(buffer.length);
@@ -90,48 +92,48 @@ function readOneFile(num: number, path: string, name: string) {
 		sqlLine = sqlLine + ',' + Math.round(100 * mifi.info.overDriveRatio01);
 		sqlLine = sqlLine + ');';
 		console.log(sqlLine);
-/*
-mysql
-
-CREATE TABLE parsecomments (
-	id	INTEGER NOT NULL AUTO_INCREMENT,
-	fileid	INTEGER,
-	txt	varchar(255),
-	PRIMARY KEY(id)
-);
-
-/*CREATE TABLE parsecomments (
-	id	INTEGER NOT NULL AUTO_INCREMENT,
-	fileid	INTEGER,
-	txt	varchar(255),
-	PRIMARY KEY(id)
-);*/
-//-- CREATE INDEX parsecomments_fileid ON parsecomments (fileid);
-//-- ALTER TABLE parsecomments drop INDEX parsecomments_fileid
-/*CREATE TABLE parsedfile (
-	id	INTEGER NOT NULL AUTO_INCREMENT,
-	filename	varchar(255),
-	filepath	varchar(255),
-	filesize	INTEGER,
-	songduration	INTEGER,
-	avgtempo	INTEGER,
-	drums	INTEGER,
-	chords	INTEGER,
-	bass	INTEGER,
-	overdrive	INTEGER,
-	fileid	INTEGER,
-	PRIMARY KEY(id)
-);*/
-/*CREATE TABLE parsedinstruments (
-	id	INTEGER NOT NULL AUTO_INCREMENT,
-	fileid	INTEGER,
-	inscat	INTEGER,
-	inscount	INTEGER,
-	PRIMARY KEY(id)
-);*/
-/*CREATE TABLE tempid (
-	lastfileid	INTEGER
-);*/
+		/*
+		mysql
+		
+		CREATE TABLE parsecomments (
+			id	INTEGER NOT NULL AUTO_INCREMENT,
+			fileid	INTEGER,
+			txt	varchar(255),
+			PRIMARY KEY(id)
+		);
+		
+		/*CREATE TABLE parsecomments (
+			id	INTEGER NOT NULL AUTO_INCREMENT,
+			fileid	INTEGER,
+			txt	varchar(255),
+			PRIMARY KEY(id)
+		);*/
+		//-- CREATE INDEX parsecomments_fileid ON parsecomments (fileid);
+		//-- ALTER TABLE parsecomments drop INDEX parsecomments_fileid
+		/*CREATE TABLE parsedfile (
+			id	INTEGER NOT NULL AUTO_INCREMENT,
+			filename	varchar(255),
+			filepath	varchar(255),
+			filesize	INTEGER,
+			songduration	INTEGER,
+			avgtempo	INTEGER,
+			drums	INTEGER,
+			chords	INTEGER,
+			bass	INTEGER,
+			overdrive	INTEGER,
+			fileid	INTEGER,
+			PRIMARY KEY(id)
+		);*/
+		/*CREATE TABLE parsedinstruments (
+			id	INTEGER NOT NULL AUTO_INCREMENT,
+			fileid	INTEGER,
+			inscat	INTEGER,
+			inscount	INTEGER,
+			PRIMARY KEY(id)
+		);*/
+		/*CREATE TABLE tempid (
+			lastfileid	INTEGER
+		);*/
 
 
 		/*
@@ -165,6 +167,11 @@ CREATE TABLE "parsedinstruments" (
 CREATE TABLE "tempid" (
 	"lastfileid"	INTEGER
 )
+delete from parsedinstruments;
+delete from parsedfile;
+delete from parsecomments;
+delete from tempid;
+
 		delete from tempid;
 		insert into tempid (lastfileid) values (last_insert_rowid());
 		insert into parsecomments (fileid,txt) select lastfileid as fileid, 'cmnt' as txt from tempid;
@@ -175,7 +182,7 @@ CREATE TABLE "tempid" (
 		console.log(sqlLine);
 		//sqlLine = 'insert into tempid (lastfileid) values (last_insert_rowid());';
 		sqlLine = 'insert into tempid (lastfileid) values (LAST_INSERT_ID());';
-		
+
 		console.log(sqlLine);
 		for (let mm = 0; mm < mifi.project.comments.length; mm++) {
 			let comeasure = mifi.project.comments[mm];
@@ -209,7 +216,9 @@ function readFiles(path) {
 		console.log('error', error);
 		console.log('count', filenames.length);
 		//filenames.sort((a, b) => b.localeCompare(a) );
-		for (let ii = 0; ii < filenames.length; ii++) {
+		let fromN = 1 * from;
+		let toN = 1 * to;
+		for (let ii = fromN; ii < filenames.length && ii <= toN; ii++) {
 			let filename = filenames[ii];
 			if (filename.toLowerCase().trim().endsWith('mid')) {
 				//console.log(ii, filename);

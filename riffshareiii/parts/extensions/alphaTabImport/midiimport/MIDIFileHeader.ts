@@ -5,7 +5,7 @@ class MIDIFileHeader {
 	trackCount: number;
 	tempoBPM: number = 120;
 	changesResolutionTempo: { track: number, ms: number, newresolution: number, bpm: number, evnt: MIDIEvent | null }[] = [];
-	metersList: { track: number, ms: number, count: number, division: number , evnt: MIDIEvent | null}[] = [];
+	metersList: { track: number, ms: number, count: number, division: number, evnt: MIDIEvent | null }[] = [];
 	lyricsList: { track: number, ms: number, txt: string }[] = [];
 	signsList: { track: number, ms: number, sign: string }[] = [];
 	meterCount: number = 4;
@@ -19,6 +19,16 @@ class MIDIFileHeader {
 		this.trackCount = this.datas.getUint16(10);
 		//console.log('MIDIFileHeader', (this.datas.getUint16(12) & 0x8000), this.datas.getUint16(12));
 	}
+	pushLyrics(newPoint: { track: number, ms: number, txt: string }) {
+		for (let tt = 0; tt < this.lyricsList.length; tt++) {
+			let it = this.lyricsList[tt];
+			if (Math.round(it.ms/1000) == Math.round(newPoint.ms/1000) && it.txt == newPoint.txt) {
+				return;
+			}
+		}
+		this.lyricsList.push(newPoint);
+	}
+	//this.midiheader.lyricsList.push({ track: t, ms: evnt.playTimeMs ? evnt.playTimeMs : 0, txt: (evnt.text ? evnt.text : "") });
 	/*
 	// Tick compute
 	getTickResolution(tempo: number) {
