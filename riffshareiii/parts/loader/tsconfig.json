@@ -2,44 +2,60 @@
 	"compilerOptions": {
 		"target": "es2020"
 		//"target": "es2015"
-        ,"outFile": "doload.js"
-        //,"outDir":"../js"
-		,"strictNullChecks": true
-		,"alwaysStrict": true
-		,"esModuleInterop": true
-		,"noResolve": false
-        ,"noImplicitAny": false
-        ,"removeComments": true
-        ,"preserveConstEnums": true
-        ,"sourceMap": true
-        ,"experimentalDecorators": true
-        ,"isolatedModules": false
-		,"module": "AMD"
+		,
+		"outFile": "js/doload.js"
+		//,"outDir":"../js"
+		,
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD"
 		//,"module": "es2020"
-        ,"lib": [
+		,
+		"lib": [
 			"ES2015",
-            "ES2016",
-            "ES2017",
-            "ES2021",
-            //"es2022.regexp",
-            //"es2022.error",
-            //"ES2024.Promise",
-            "DOM",
-            "DOM.Iterable",
-            //"ES2017.ArrayBuffer",
-            //"ES2024.ArrayBuffer"
-            //"dom"
-            //,"es2015"
-            //,"es5"
-        ]
-        ,"declaration": true
-		,"types": [ ]
-	}
-	,"files": [
-		
-		
-		
-      "loader.ts"
+			"ES2016",
+			"ES2017",
+			"ES2021",
+			//"es2022.regexp",
+			//"es2022.error",
+			//"ES2024.Promise",
+			"DOM",
+			"DOM.Iterable",
+			//"ES2017.ArrayBuffer",
+			//"ES2024.ArrayBuffer"
+			//"dom"
+			//,"es2015"
+			//,"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+		"../mzxbxapi/musicenginetypes.ts"
+		,"../mzxbxapi/musicenginedeclarations.ts"
 
+		,"../extensions/minium.percussion/list/names.ts"
+		,"../extensions/minium.pitch/list/names.ts"
+
+		,"../application/data/lzutil.ts"
+
+		,"../extensions/alphaTabImport/alphatab/AlphaTabError.ts",
+		"../extensions/alphaTabImport/midiimport/MIDIEvent.ts",
+		"../extensions/alphaTabImport/midiimport/MIDIParser.ts",
+		"../extensions/alphaTabImport/midiimport/MIDIFileTrack.ts",
+		"../extensions/alphaTabImport/midiimport/MIDIFileHeader.ts",
+		"../extensions/alphaTabImport/midiimport/DataViewStream.ts",
+		"../extensions/alphaTabImport/midiimport/midiimport.ts",
+		"../extensions/alphaTabImport/midiimport/eventsconvert.ts"
+
+		,"loader.ts"
 	]
 }
