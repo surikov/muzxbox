@@ -700,6 +700,7 @@ declare class EventsConverter {
 }
 declare let params: URLSearchParams;
 declare let fileurl: string | null;
+declare let filetitle: string | null;
 declare function startload(): void;
 declare function loadFromArray(arrayBuffer: ArrayBuffer): void;
 declare function saveProject(parsedProject: Zvoog_Project): void;

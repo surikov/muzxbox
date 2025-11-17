@@ -3,6 +3,7 @@
 //http://127.0.0.1:8081/loader.html?url=./deff_leppard-hysteria.mid
 let params: URLSearchParams = new URLSearchParams(document.location.search);
 let fileurl = params.get('url'); // is the string "Jonathan"
+let filetitle = params.get('title'); // is the string "Jonathan"
 console.log('fileurl', fileurl);
 function startload() {
 	console.log('startload', fileurl);
@@ -23,7 +24,8 @@ function startload() {
 }
 function loadFromArray(arrayBuffer: ArrayBuffer) {
 	console.log(arrayBuffer);
-	let mireader: MIDIReader = new MIDIReader('name', 123, arrayBuffer);
+	let title:string=filetitle?filetitle:'?';
+	let mireader: MIDIReader = new MIDIReader(title, 123, arrayBuffer);
 	let parsedProject: Zvoog_Project = mireader.project;
 
 	//console.log(mireader.parser);
