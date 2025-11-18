@@ -629,7 +629,7 @@ class EventsConverter {
 		for (let aa = 0; aa < this.parser.alignedMIDIevents.length; aa++) {
 			let avg = this.parser.alignedMIDIevents[aa].avg;
 			if ((timeMs < 0 || Math.abs(avg - ms) < Math.abs(timeMs - ms))
-				&& Math.abs(avg - ms) < 123
+				&& Math.abs(avg - ms) < 99//123
 			) {
 				//console.log(timeMs,avg,ms);
 				timeMs = avg;

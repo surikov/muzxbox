@@ -592,7 +592,7 @@ class MidiParser {
 
 	}
 	alignEventsTime() {
-		let maxDelta = 23;
+		let maxDelta = 22;//23;
 		let starts: MIDIEvent[] = [];
 		//let aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
