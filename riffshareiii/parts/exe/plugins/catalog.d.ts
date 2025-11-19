@@ -144,6 +144,7 @@ declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
+    farorder: number[];
     percussions: Zvoog_PercussionTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
@@ -154,13 +155,13 @@ declare type Zvoog_Project = {
         z: number;
     };
     list: boolean;
-    menuPerformers?: boolean;
-    menuSamplers?: boolean;
-    menuFilters?: boolean;
-    menuActions?: boolean;
-    menuPlugins?: boolean;
-    menuClipboard?: boolean;
-    menuSettings?: boolean;
+    menuPerformers: boolean;
+    menuSamplers: boolean;
+    menuFilters: boolean;
+    menuActions: boolean;
+    menuPlugins: boolean;
+    menuClipboard: boolean;
+    menuSettings: boolean;
 };
 declare type MZXBX_CachedWave = {
     path: string;
@@ -271,11 +272,21 @@ declare type MZXBX_PluginRegistrationInformation = {
 };
 declare type MZXBX_MessageToPlugin = {
     hostData: any;
+    colors: {
+        background: string;
+        main: string;
+        drag: string;
+        line: string;
+        click: string;
+    };
+    screenData: number[] | null;
+    langID: string;
 };
 declare type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
+    sceenWait: boolean;
 };
 declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];

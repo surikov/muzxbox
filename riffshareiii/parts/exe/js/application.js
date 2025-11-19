@@ -2742,7 +2742,6 @@ class TimeSelectBar {
             let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
             let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
                 + '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-            this.addSelectionMenuButton(icon_copybarcontent, left, 1, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.copySelectedBars);
         }
     }
     fillTimeBar() {

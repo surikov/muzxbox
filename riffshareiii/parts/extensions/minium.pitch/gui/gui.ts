@@ -130,7 +130,7 @@ class CHPUI {
 		this.sendToHost(this.util.dumpParameters(this.selectedVolume, this.selectedItemIdx, this.selectedMode));
 	}
 	sendToHost(data: string) {
-		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false, sceenWait: false };
 		console.log('sendToHost',message);
 		window.parent.postMessage(message, '*');
 	}
