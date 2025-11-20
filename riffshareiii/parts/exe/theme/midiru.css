@@ -1,0 +1,77 @@
+:root {
+	--background-color: #411;
+	--main-color: #ff9;
+	--drag-color: #c30;
+	--line-color: #fff;
+	--click-color: #264;
+}
+
+body {
+	font-family: "Verdana", sans-serif;
+	font-size: 0.25cm;
+	background-color: var(--background-color);
+	color: var(--line-color);
+	padding: 0cm;
+	margin: 0cm;
+}
+
+a {
+	text-decoration: none;
+}
+
+.navbuttons {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center
+}
+
+.nobut {
+	background-color: var(--drag-color);
+	border: 1px solid cyan;
+}
+
+.valbut {
+	background-color: var(--click-color);
+	border: 1px solid deeppink;
+}
+
+.navigationdiv {
+	text-align: center;
+}
+
+.linkbutton {
+	
+	height: 1cm;
+	color: var(--line-color);
+	font-size: 1cm;
+	background-color: var(--click-color);
+}
+
+.itemslist {
+
+	color: var(--background-color);
+	padding-left: 0.25cm;
+	padding-top: 0.25cm;
+	padding-bottom: 0.25cm;
+	padding-right: 0.25cm;
+}
+
+a .pageheader {
+	color: var(--line-color);
+	font-size: 0.5cm;
+}
+
+.singleitem {
+	color: var(--click-color);
+	font-size: 0.25cm;
+}
+
+
+
+.pageheader {
+	padding-left: 0.25cm;
+	padding-top: 0.25cm;
+	padding-bottom: 0cm;
+	padding-right: 0.25cm;
+	margin: 0cm;
+}

@@ -8,6 +8,8 @@ class UIToolbar {
 	redoButton: ToolBarButton;
 	playStopButton: ToolBarButton;
 
+	midiruButton: ToolBarButton;
+
 	constructor() {
 		//
 	}
@@ -31,6 +33,10 @@ class UIToolbar {
 			globalCommandDispatcher.toggleStartStop();
 		});
 
+		
+		this.midiruButton = new ToolBarButton([icon_home], -1, 0, (nn: number) => {
+			location.href='midiru.php';
+		});
 
 		
 		//this.playStopButton = new ToolBarButton([icon_play, icon_pause], -1, 0, (nn: number) => {
@@ -53,6 +59,7 @@ class UIToolbar {
 				, this.undoButton.iconLabelButton.anchor
 				, this.redoButton.iconLabelButton.anchor
 				, this.playStopButton.iconLabelButton.anchor
+				, this.midiruButton.iconLabelButton.anchor
 			]
 		};
 		this.toolBarLayer = {
@@ -71,5 +78,6 @@ class UIToolbar {
 		this.undoButton.resize(viewWIdth, viewHeight);
 		this.redoButton.resize(viewWIdth, viewHeight);
 		this.playStopButton.resize(viewWIdth, viewHeight);
+		this.midiruButton.resize(viewWIdth, viewHeight);
 	}
 }

@@ -332,6 +332,7 @@ declare class UIToolbar {
     undoButton: ToolBarButton;
     redoButton: ToolBarButton;
     playStopButton: ToolBarButton;
+    midiruButton: ToolBarButton;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
@@ -654,6 +655,7 @@ declare let icon_deletebars: string;
 declare let icon_shiftbarcontent: string;
 declare let icon_mergebars: string;
 declare let icon_copybarcontent: string;
+declare let icon_home: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
@@ -679,7 +681,7 @@ declare class WarningUI {
     warningSmallText: TileText;
     onCancel: null | (() => void);
     noWarning: boolean;
-    cancel(): void;
+    cancelWarning(): void;
     initDialogUI(): void;
     resetDialogView(data: Zvoog_Project): void;
     resizeDialog(ww: number, hh: number, resetWarningAnchor: () => void): void;

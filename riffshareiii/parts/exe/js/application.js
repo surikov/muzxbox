@@ -2840,6 +2840,9 @@ class UIToolbar {
         this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1.5, (nn) => {
             globalCommandDispatcher.toggleStartStop();
         });
+        this.midiruButton = new ToolBarButton([icon_home], -1, 0, (nn) => {
+            location.href = 'midiru.php';
+        });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
@@ -2849,7 +2852,8 @@ class UIToolbar {
                 this.openRightMenuButton.iconLabelButton.anchor,
                 this.undoButton.iconLabelButton.anchor,
                 this.redoButton.iconLabelButton.anchor,
-                this.playStopButton.iconLabelButton.anchor
+                this.playStopButton.iconLabelButton.anchor,
+                this.midiruButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -2868,6 +2872,7 @@ class UIToolbar {
         this.undoButton.resize(viewWIdth, viewHeight);
         this.redoButton.resize(viewWIdth, viewHeight);
         this.playStopButton.resize(viewWIdth, viewHeight);
+        this.midiruButton.resize(viewWIdth, viewHeight);
     }
 }
 class ToolBarButton {
@@ -6060,6 +6065,7 @@ let icon_deletebars = '&#xf314';
 let icon_shiftbarcontent = '&#xf302';
 let icon_mergebars = '&#xf232';
 let icon_copybarcontent = '&#xf237';
+let icon_home = '&#xf175';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -6094,7 +6100,7 @@ class WarningUI {
     constructor() {
         this.noWarning = true;
     }
-    cancel() {
+    cancelWarning() {
         if (this.onCancel) {
             this.onCancel();
         }
@@ -6117,7 +6123,8 @@ class WarningUI {
         this.warningRectangle = {
             x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
                 globalCommandDispatcher.initAudioFromUI();
-                me.cancel();
+                me.cancelWarning();
+                globalCommandDispatcher.setupAndStartPlay();
             }
         };
         this.warningAnchor = {

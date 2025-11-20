@@ -18,7 +18,7 @@ class WarningUI {
 
 	noWarning = true;
 
-	cancel() {
+	cancelWarning() {
 		//console.log('warning cancel', this.onCancel,(typeof this.onCancel));
 		
 		if(this.onCancel){
@@ -47,7 +47,8 @@ class WarningUI {
 		this.warningRectangle = {
 			x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
 				globalCommandDispatcher.initAudioFromUI();
-				me.cancel();
+				me.cancelWarning();
+				globalCommandDispatcher.setupAndStartPlay();
 			}
 
 			//this.cancel.bind(this) 

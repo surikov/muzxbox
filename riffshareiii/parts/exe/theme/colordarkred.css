@@ -1,9 +1,9 @@
 :root {
 	--background-color: #411;
 	--main-color: #ff9;
-	--drag-color: #960;
+	--drag-color: #c30;
 	--line-color: #fff;
-	--click-color: #c01;
+	--click-color: #264;
 }
 
 #tileLevelSVG {

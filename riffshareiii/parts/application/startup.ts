@@ -73,6 +73,8 @@ function startApplication() {
 
 	globalCommandDispatcher.resetProject();
 
+	
+
 }
 function squashString(data: string): string {
 	return data;
