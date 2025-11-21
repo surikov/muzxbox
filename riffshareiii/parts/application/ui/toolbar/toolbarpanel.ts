@@ -8,13 +8,13 @@ class UIToolbar {
 	redoButton: ToolBarButton;
 	playStopButton: ToolBarButton;
 
-	midiruButton: ToolBarButton;
+	backHomeButton: ToolBarButton;
 
 	constructor() {
 		//
 	}
 	createToolbar(): TileLayerDefinition[] {
-		this.openRightMenuButton = new ToolBarButton([/*icon_moveright,*/icon_ver_menu], 0, 1.5, (nn: number) => {
+		this.openRightMenuButton = new ToolBarButton([/*icon_moveright,*/icon_ver_menu], 0, 2, (nn: number) => {
 			globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
 
 			if (globalCommandDispatcher.cfg().data.list) {
@@ -23,18 +23,18 @@ class UIToolbar {
 				globalCommandDispatcher.showRightMenu();
 			}
 		});
-		this.redoButton = new ToolBarButton([icon_redo], 0, 0.5, (nn: number) => {
+		this.redoButton = new ToolBarButton([icon_redo], 0, 1, (nn: number) => {
 			globalCommandDispatcher.exe.redo(1);
 		});
-		this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn: number) => {
+		this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn: number) => {
 			globalCommandDispatcher.exe.undo(1);
 		});
-		this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1.5, (nn: number) => {
+		this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1, (nn: number) => {
 			globalCommandDispatcher.toggleStartStop();
 		});
 
 		
-		this.midiruButton = new ToolBarButton([icon_home], -1, 0, (nn: number) => {
+		this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn: number) => {
 			location.href='midiru.php';
 		});
 
@@ -59,7 +59,7 @@ class UIToolbar {
 				, this.undoButton.iconLabelButton.anchor
 				, this.redoButton.iconLabelButton.anchor
 				, this.playStopButton.iconLabelButton.anchor
-				, this.midiruButton.iconLabelButton.anchor
+				, this.backHomeButton.iconLabelButton.anchor
 			]
 		};
 		this.toolBarLayer = {
@@ -78,6 +78,6 @@ class UIToolbar {
 		this.undoButton.resize(viewWIdth, viewHeight);
 		this.redoButton.resize(viewWIdth, viewHeight);
 		this.playStopButton.resize(viewWIdth, viewHeight);
-		this.midiruButton.resize(viewWIdth, viewHeight);
+		this.backHomeButton.resize(viewWIdth, viewHeight);
 	}
 }

@@ -332,7 +332,7 @@ declare class UIToolbar {
     undoButton: ToolBarButton;
     redoButton: ToolBarButton;
     playStopButton: ToolBarButton;
-    midiruButton: ToolBarButton;
+    backHomeButton: ToolBarButton;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;

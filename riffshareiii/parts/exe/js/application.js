@@ -2822,7 +2822,7 @@ class UIToolbar {
     constructor() {
     }
     createToolbar() {
-        this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 0, 1.5, (nn) => {
+        this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 0, 2, (nn) => {
             globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
             if (globalCommandDispatcher.cfg().data.list) {
                 globalCommandDispatcher.hideRightMenu();
@@ -2831,16 +2831,16 @@ class UIToolbar {
                 globalCommandDispatcher.showRightMenu();
             }
         });
-        this.redoButton = new ToolBarButton([icon_redo], 0, 0.5, (nn) => {
+        this.redoButton = new ToolBarButton([icon_redo], 0, 1, (nn) => {
             globalCommandDispatcher.exe.redo(1);
         });
-        this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn) => {
+        this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn) => {
             globalCommandDispatcher.exe.undo(1);
         });
-        this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1.5, (nn) => {
+        this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1, (nn) => {
             globalCommandDispatcher.toggleStartStop();
         });
-        this.midiruButton = new ToolBarButton([icon_home], -1, 0, (nn) => {
+        this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn) => {
             location.href = 'midiru.php';
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
@@ -2853,7 +2853,7 @@ class UIToolbar {
                 this.undoButton.iconLabelButton.anchor,
                 this.redoButton.iconLabelButton.anchor,
                 this.playStopButton.iconLabelButton.anchor,
-                this.midiruButton.iconLabelButton.anchor
+                this.backHomeButton.iconLabelButton.anchor
             ]
         };
         this.toolBarLayer = {
@@ -2872,7 +2872,7 @@ class UIToolbar {
         this.undoButton.resize(viewWIdth, viewHeight);
         this.redoButton.resize(viewWIdth, viewHeight);
         this.playStopButton.resize(viewWIdth, viewHeight);
-        this.midiruButton.resize(viewWIdth, viewHeight);
+        this.backHomeButton.resize(viewWIdth, viewHeight);
     }
 }
 class ToolBarButton {

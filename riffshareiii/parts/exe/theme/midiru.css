@@ -4,13 +4,20 @@
 	--drag-color: #c30;
 	--line-color: #fff;
 	--click-color: #264;
+
+	--page-bg-color: #eee;
+	--page-text-color: #000;
+	--page-link-color: #c30;
+	--header-bg-color: #411;
+	--header-text-color: #eee;
+	--header-link-color: #c30;
 }
 
 body {
 	font-family: "Verdana", sans-serif;
 	font-size: 0.25cm;
-	background-color: var(--background-color);
-	color: var(--line-color);
+	background-color: var(--header-bg-color);
+	color: var(--header-text-color);
 	padding: 0cm;
 	margin: 0cm;
 }
@@ -19,59 +26,103 @@ a {
 	text-decoration: none;
 }
 
-.navbuttons {
+h1 {
+	font-size: 0.5cm;
+	padding: 0cm;
+	margin: 0cm;
+}
+
+.pageheader {
+	padding-left: 0.25cm;
+	padding-top: 0;
+	padding-bottom: 0cm;
+	padding-right: 0.25cm;
+	margin: 0cm;
+	color: var(--header-text-color);
+	font-size: 0.5cm;
+	height: 1cm;
 	display: flex;
 	flex-wrap: nowrap;
-	justify-content: center
+	justify-content: flex-start;
+	align-items: center;
 }
 
-.nobut {
-	background-color: var(--drag-color);
-	border: 1px solid cyan;
+.itemslist {
+	background-color: var(--page-bg-color);
+	color: var(--page-text-color);
+	padding-left: 0.25cm;
+	padding-top: 0.25cm;
+	padding-bottom: 0;
+	padding-right: 0.25cm;
+	text-align: center;
 }
 
-.valbut {
-	background-color: var(--click-color);
-	border: 1px solid deeppink;
+.itemscolumn {
+	text-align: left;
+	display: inline-block;
+}
+
+.singleitem {
+	color: var(--page-link-color);
+	font-size: 0.33cm;
+	padding-bottom: 0.25cm;
+}
+
+.itemsmallinfo {
+	font-size: 0.25cm;
 }
 
 .navigationdiv {
 	text-align: center;
 }
 
-.linkbutton {
-	
-	height: 1cm;
-	color: var(--line-color);
+.pagenum {
+	display: flex;
+	justify-content: center;
+
+}
+
+.homelink {
 	font-size: 1cm;
-	background-color: var(--click-color);
+	color: var(--header-link-color);
 }
 
-.itemslist {
-
-	color: var(--background-color);
-	padding-left: 0.25cm;
-	padding-top: 0.25cm;
-	padding-bottom: 0.25cm;
-	padding-right: 0.25cm;
+.gopage {
+	font-size: 1cm;
+	color: var(--header-link-color);
+}
+.gopage > a{
+	font-size: 1cm;
+	color: var(--header-link-color);
+}
+.nogopage {
+	font-size: 1cm;
+	color: var(--header-text-color);
 }
 
-a .pageheader {
-	color: var(--line-color);
-	font-size: 0.5cm;
+.curpage {
+	display: flex;
+	align-items: center;
 }
 
-.singleitem {
-	color: var(--click-color);
-	font-size: 0.25cm;
+.naviline {
+	display: flex;
+	height: 1cm;
 }
 
+.posisegment {
+	background-color: var(--page-bg-color);
+	opacity: 0.33;
+	flex-grow: 1;
+}
 
+.navsegment {
+	background-color: var(--page-link-color);
+	opacity: 0.33;
+	flex-grow: 1;
+}
 
-.pageheader {
-	padding-left: 0.25cm;
-	padding-top: 0.25cm;
-	padding-bottom: 0cm;
-	padding-right: 0.25cm;
-	margin: 0cm;
+.naviline>a {
+	flex-grow: 1;
+	display: flex;
 }
