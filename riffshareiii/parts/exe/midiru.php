@@ -8,6 +8,7 @@
 </head>
 
 <body>
+	
 	<?php
 	try {
 		include('connect.php');
@@ -15,12 +16,94 @@
 		echo '<p>Caught exception: ',  $e, '</p>';
 	}
 	?>
+	<script language="javascript">
+		function findprompt() {
+			let what = prompt("Поиск","<?php echo($find);?>");
+			if (what != null) {
+				console.log('what', what);
+				let url = 'midiru.php?find=' + what;
+				window.location = url;
+			}
+		}
+	</script>
 	<div class="pagediv>">
-		<a href="zdbgfsgfbsbgf">
-			<div class="pageheader"><span class="homelink">🠜</span> Архив MIDI𝄞ru</div>
-		</a>
+		<div class="headerbox">
+			<a href="zdbgfsgfbsbgf">
+				<div class="pageheader">
+					<div> Архив MIDI𝄞ru</div>
+				</div>
+			</a>
+			<a href="javascript:findprompt();">
+				<div class="zoomicon">🔍</div>
+			</a>
+		</div>
+		<div class="navigationdiv">
+			<div class="naviline">
+				<?php
+				$where = "";
+				if (!empty($find)) {
+					$where = " where music.title like '%" . $find . "%'";
+				}
+				$sql = "select count(*) as cnt from parsedfile left join music on music.id=parsedfile.filename"
+					. $where . ";";
+				//echo $find;
+				$countresult = $dbconnection->query($sql);
+				$countrow = $countresult->fetch_assoc();
+				$pagecount = ceil(intval($countrow["cnt"]) / $limit);
+				$stepsize = $pagecount / $steps;
+				for ($ii = 0; $ii < $steps; $ii++) {
+					$linkoffset = floor($ii * $stepsize);
+					if ($ii == ceil($offset / $stepsize)) {
+				?>
+						<div class="posisegment"></div>
+					<?php
+					} else {
+						$pageurl = "midiru.php?page=" . $linkoffset . "&find=" . $find;
+					?>
+						<a href="<?php echo ($pageurl) ?>">
+							<div class="navsegment"></div>
+						</a>
+				<?php
+					}
+				}
+				?>
+			</div>
+			<div class="pagenum">
+				<?php
+				if ($offset > 0) {
+					$preoffset = "midiru.php?page=" . ($offset - 1) . "&find=" . $find;
+				?>
+					<a href="<?php echo ($preoffset) ?>">
+						<div class="gopage">&nbsp;&nbsp;&nbsp;🠜</div>
+					</a>
+				<?php
+				} else {
+				?>
+					<div class="gopage">&nbsp;&nbsp;&nbsp;🠜</div>
+				<?php
+				}
+				?>
+				<div class="curpage">
+					<nobr>&nbsp;&nbsp;&nbsp;<?php echo ('' . ($offset + 1)); ?>&nbsp;&nbsp;&nbsp;</nobr>
+				</div>
+
+				<?php
+				if ($offset < $pagecount) {
+					$nextoffset = "midiru.php?page=" . ($offset + 1) . "&find=" . $find;
+				?>
+					<a href="<?php echo ($nextoffset) ?>">
+						<div class="gopage">🠞&nbsp;&nbsp;&nbsp;</div>
+					</a>
+				<?php
+				} else {
+				?>
+					<div class="gopage">🠞&nbsp;&nbsp;&nbsp;</div>
+				<?php
+				}
+				?>
+			</div>
+		</div>
 		<div class="itemslist">
-			<h1>Музыка</h1>
 			<div class="itemscolumn">
 				<?php
 				try {
@@ -37,6 +120,7 @@
 						. '		left join music on music.id=parsedfile.filename'
 						. '		left join artists on music.artist=artists.id'
 						. '		left join authors on music.author=authors.id';
+					$sql = $sql . $where;
 					$sql = $sql . '	order by music.date,music.title';
 					$sql = $sql . ' limit ' . $limit . ' offset ' . ($limit * $offset) . ';';
 					$result = $dbconnection->query($sql);
@@ -62,78 +146,12 @@
 				?>
 			</div>
 		</div>
-		<div class="navigationdiv">
-			<div class="naviline">
-				<?php
-				$countresult = $dbconnection->query("select count(*) as cnt from parsedfile;");
-				$countrow = $countresult->fetch_assoc();
-				$pagecount = ceil(intval($countrow["cnt"]) / $limit);
-				for ($ii = 0; $ii < 100; $ii++) {
-					$linkoffset = floor($ii * $pagecount / 100);
-					$startsegment = $offset;
-					$endsegment = $offset + $pagecount / 100;
-					if ($linkoffset >= $startsegment && $linkoffset <= $endsegment) {
-				?>
-						<a href="<?php echo ($pageurl) ?>">
-							<div class="posisegment"></div>
-						</a>
-					<?php
-					} else {
-						$pageurl = "midiru.php?page=" . $linkoffset;
-					?>
-						<a href="<?php echo ($pageurl) ?>">
-							<div class="navsegment"></div>
-						</a>
-				<?php
-					}
-				}
-				?>
-				<!--
-				<a href="find.php">
-					<div class="navsegment"></div>
-				</a>
-				<a href="find.php">
-					<div class="navsegment"></div>
-				</a>
-				<a href="find.php">
-					<div class="posisegment"></div>
-				</a>
-				<a href="find.php">
-					<div class="posisegment"></div>
-				</a>
-				<a href="find.php">
-					<div class="navsegment"></div>
-				</a>
-				-->
-			</div>
-			<div class="pagenum">
-				<?php
-				if ($offset > 0) {
-					$preoffset = "midiru.php?page=" . ($offset - 1);
-				?>
-					<div class="gopage"><a href="<?php echo ($preoffset) ?>">🠜</a></div>
-				<?php
-				} else {
-				?>
-					<div class="gopage">🠜</div>
-				<?php
-				}
-				?>
-				<div class="curpage"><?php echo ($offset); ?></div>
-
-				<?php
-				if ($offset < $pagecount) {
-					$nextoffset = "midiru.php?page=" . ($offset + 1);
-				?>
-					<div class="gopage"><a href="<?php echo ($nextoffset) ?>">🠞</a></div>
-				<?php
-				} else {
-				?>
-					<div class="gopage">🠞</div>
-				<?php
-				}
-				?>
-			</div>
+		<div>
+			<a href="zdbgfsgfbsbgf">
+				<div class="pageheader">
+					<div> Архив MIDI𝄞ru</div>
+				</div>
+			</a>
 		</div>
 	</div>
 </body>

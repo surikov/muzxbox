@@ -47,6 +47,22 @@ h1 {
 	align-items: center;
 }
 
+.headerbox {
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.zoomicon {
+	font-size: 1cm;
+}
+
+.homelink {
+	font-size: 1cm;
+	color: var(--header-link-color);
+}
+
 .itemslist {
 	background-color: var(--page-bg-color);
 	color: var(--page-text-color);
@@ -64,7 +80,7 @@ h1 {
 
 .singleitem {
 	color: var(--page-link-color);
-	font-size: 0.33cm;
+	font-size: 0.44cm;
 	padding-bottom: 0.25cm;
 }
 
@@ -79,30 +95,27 @@ h1 {
 .pagenum {
 	display: flex;
 	justify-content: center;
-
+	align-items: flex-start;
 }
 
-.homelink {
-	font-size: 1cm;
-	color: var(--header-link-color);
-}
+
 
 .gopage {
-	font-size: 1cm;
+	font-size: 0.75cm;
+	color: var(--header-link-color);
+	align-items: center;
+}
+
+.gopage>a {
+	font-sizeuf: 1cm;
 	color: var(--header-link-color);
 }
-.gopage > a{
-	font-size: 1cm;
-	color: var(--header-link-color);
-}
-.nogopage {
-	font-size: 1cm;
-	color: var(--header-text-color);
-}
+
 
 .curpage {
 	display: flex;
 	align-items: center;
+	font-size: 0.5cm;
 }
 
 .naviline {

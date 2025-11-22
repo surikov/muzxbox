@@ -8,8 +8,11 @@ function shutDownFunction()
 	}
 }
 register_shutdown_function('shutDownFunction');
-$limit = 10;
+$limit = 15;
+$steps = 100;
 $offset = intval($_GET["page"]);
+$find = $_GET["find"];
+$find = trim(str_replace(array("'", "\"", "%", "&", "<", ">"), "", $find));
 $dbconnection = new mysqli($servername, $username, $password, $db);
 if ($dbconnection->connect_errno) {
 	echo "<p>Failed to connect to MySQL: " . $mysqli->connect_error . '</p>';
