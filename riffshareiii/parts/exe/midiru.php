@@ -8,7 +8,7 @@
 </head>
 
 <body>
-	
+
 	<?php
 	try {
 		include('connect.php');
@@ -18,7 +18,7 @@
 	?>
 	<script language="javascript">
 		function findprompt() {
-			let what = prompt("Поиск","<?php echo($find);?>");
+			let what = prompt("Поиск", "<?php echo ($find); ?>");
 			if (what != null) {
 				console.log('what', what);
 				let url = 'midiru.php?find=' + what;
@@ -44,8 +44,7 @@
 				if (!empty($find)) {
 					$where = " where music.title like '%" . $find . "%'";
 				}
-				$sql = "select count(*) as cnt from parsedfile left join music on music.id=parsedfile.filename"
-					. $where . ";";
+				$sql = "select count(*) as cnt from parsedfile left join music on music.id=parsedfile.filename"	. $where . ";";
 				//echo $find;
 				$countresult = $dbconnection->query($sql);
 				$countrow = $countresult->fetch_assoc();
@@ -53,7 +52,7 @@
 				$stepsize = $pagecount / $steps;
 				for ($ii = 0; $ii < $steps; $ii++) {
 					$linkoffset = floor($ii * $stepsize);
-					if ($ii == ceil($offset / $stepsize)) {
+					if ($linkoffset >= $offset && $linkoffset < $offset+$stepsize) {
 				?>
 						<div class="posisegment"></div>
 					<?php
