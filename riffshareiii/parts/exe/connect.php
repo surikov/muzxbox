@@ -17,3 +17,20 @@ $dbconnection = new mysqli($servername, $username, $password, $db);
 if ($dbconnection->connect_errno) {
 	echo "<p>Failed to connect to MySQL: " . $mysqli->connect_error . '</p>';
 }
+function markWhat($txt, $find)
+{
+	if (empty($find)) {
+		return $txt;
+	} else {
+		$start = strpos(mb_strtolower($txt), mb_strtolower($find));
+		if ($start === false) {
+			return $txt;
+		} else {
+			$begin = substr($txt, 0, $start);
+			$found = substr($txt, $start, strlen($find));
+			$end = substr($txt, strlen($begin) + strlen($find));
+			$res = $begin . '<b>' . $found . '</b>' . $end;
+			return $res;
+		}
+	}
+}

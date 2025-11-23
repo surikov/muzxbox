@@ -18,7 +18,7 @@
 	?>
 	<script language="javascript">
 		function findprompt() {
-			let what = prompt("Поиск", "<?php echo ($find); ?>");
+			let what = prompt("Поиск по тексту", "<?php echo ($find); ?>");
 			if (what != null) {
 				console.log('what', what);
 				let url = 'midiru.php?find=' + what;
@@ -30,9 +30,10 @@
 		<div class="headerbox">
 			<a href="zdbgfsgfbsbgf">
 				<div class="pageheader">
-					<div> Архив MIDI𝄞ru</div>
+					<div><?php echo ($find); ?>&nbsp;</div>
 				</div>
 			</a>
+			<div></div>
 			<a href="javascript:findprompt();">
 				<div class="zoomicon">🔍</div>
 			</a>
@@ -42,9 +43,17 @@
 				<?php
 				$where = "";
 				if (!empty($find)) {
-					$where = " where music.title like '%" . $find . "%'";
+					$where = " where music.title like '%" . $find
+						. "%' or artists.artist like '%" . $find
+						. "%' or authors.name like '%" . $find
+						. "%' or authors.city like '%" . $find . "%'";
 				}
-				$sql = "select count(*) as cnt from parsedfile left join music on music.id=parsedfile.filename"	. $where . ";";
+				$sql = "select count(*) as cnt"
+					. " from parsedfile"
+					. "		left join music on music.id=parsedfile.filename"
+					. "		left join artists on music.artist=artists.id"
+					. "		left join authors on music.author=authors.id"
+					. $where . ";";
 				//echo $find;
 				$countresult = $dbconnection->query($sql);
 				$countrow = $countresult->fetch_assoc();
@@ -52,7 +61,7 @@
 				$stepsize = $pagecount / $steps;
 				for ($ii = 0; $ii < $steps; $ii++) {
 					$linkoffset = floor($ii * $stepsize);
-					if ($linkoffset >= $offset && $linkoffset < $offset+$stepsize) {
+					if ($linkoffset >= $offset && $linkoffset < ceil($offset + $stepsize)) {
 				?>
 						<div class="posisegment"></div>
 					<?php
@@ -73,30 +82,28 @@
 					$preoffset = "midiru.php?page=" . ($offset - 1) . "&find=" . $find;
 				?>
 					<a href="<?php echo ($preoffset) ?>">
-						<div class="gopage">&nbsp;&nbsp;&nbsp;🠜</div>
+						<div class="gopage">&nbsp;&nbsp;&nbsp;&lt;&lt;</div>
 					</a>
 				<?php
 				} else {
 				?>
-					<div class="gopage">&nbsp;&nbsp;&nbsp;🠜</div>
+					<div class="gopage">&nbsp;&nbsp;&nbsp;&lt;&lt;</div>
 				<?php
 				}
 				?>
-				<div class="curpage">
-					<nobr>&nbsp;&nbsp;&nbsp;<?php echo ('' . ($offset + 1)); ?>&nbsp;&nbsp;&nbsp;</nobr>
-				</div>
+				<div class="curpage"> &nbsp;&nbsp;&nbsp;<?php echo ('' . ($offset + 1)); ?>&nbsp;&nbsp;&nbsp; </div>
 
 				<?php
 				if ($offset < $pagecount) {
 					$nextoffset = "midiru.php?page=" . ($offset + 1) . "&find=" . $find;
 				?>
 					<a href="<?php echo ($nextoffset) ?>">
-						<div class="gopage">🠞&nbsp;&nbsp;&nbsp;</div>
+						<div class="gopage">&gt;&gt;&nbsp;&nbsp;&nbsp;</div>
 					</a>
 				<?php
 				} else {
 				?>
-					<div class="gopage">🠞&nbsp;&nbsp;&nbsp;</div>
+					<div class="gopage">&gt;&gt;&nbsp;&nbsp;&nbsp;</div>
 				<?php
 				}
 				?>
@@ -131,8 +138,8 @@
 								. str_replace('\'', '"', $row["title"]);
 				?>
 							<a href="<?php echo ($songurl) ?>" class="itemrow">
-								<div class="singleitem"><?php echo ($row["title"]); ?>
-									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo ($row["author"]); ?> / <?php echo ($row["acity"]); ?>, <?php echo ($row["artist"]); ?></span>
+								<div class="singleitem"><?php echo (markWhat($row["title"], $find)); ?>
+									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
 									<br /><span class="itemsmallinfo">короткая, гитары, много ударных</span>
 								</div>
 							</a>
