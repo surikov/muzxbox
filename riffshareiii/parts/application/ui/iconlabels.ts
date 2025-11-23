@@ -61,6 +61,7 @@ let icon_mergebars = '&#xf232';
 let icon_copybarcontent = '&#xf237';
 
 let icon_home = '&#xf175';
+let icon_time = '&#xf337';
 
 
 

@@ -61,19 +61,26 @@ function startApplication() {
 		globalCommandDispatcher.setThemeColor(themei);
 	}
 	let uilocale = readRawTextFromlocalStorage('uilocale');
+
+	let navilang = getNavigatorLanguage();
+	console.log(uilocale, navilang);
 	if (uilocale) {
-		let uiratio = readRawTextFromlocalStorage('uiratio');
-		if (uiratio) {
-			let nratio = parseInt(uiratio);
-			if (nratio >= 0.1) {
-				globalCommandDispatcher.setThemeLocale(uilocale, nratio);
-			}
+		//
+	} else {
+		uilocale = navilang;
+	}
+	let uiratio = readRawTextFromlocalStorage('uiratio');
+	if (uiratio) {
+		let nratio = parseInt(uiratio);
+		if (nratio >= 0.1) {
+			globalCommandDispatcher.setThemeLocale(uilocale, nratio);
 		}
 	}
 
+
 	globalCommandDispatcher.resetProject();
 
-	
+
 
 }
 function squashString(data: string): string {
@@ -81,6 +88,28 @@ function squashString(data: string): string {
 }
 function resolveString(data: string): string | null {
 	return data;
+}
+function getNavigatorLanguage(): string {
+	console.log('navigator.languages', navigator.languages);
+	console.log('navigator.language', navigator.language);
+	let rr = '';
+	if (navigator.languages && navigator.languages.length) {
+		rr = navigator.languages[0];
+	} else {
+		if (navigator.language) {
+			rr = navigator.language;
+		}
+	}
+	if (rr.toLowerCase().startsWith('ru')) {
+		rr = 'ru';
+	} else {
+		if (rr.toLowerCase().startsWith('zh')) {
+			rr = 'zh';
+		} else {
+			rr = 'en';
+		}
+	}
+	return rr;
 }
 function saveProjectState() {
 	//console.log('saveProjectState');

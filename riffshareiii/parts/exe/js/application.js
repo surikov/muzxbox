@@ -276,13 +276,18 @@ function startApplication() {
         globalCommandDispatcher.setThemeColor(themei);
     }
     let uilocale = readRawTextFromlocalStorage('uilocale');
+    let navilang = getNavigatorLanguage();
+    console.log(uilocale, navilang);
     if (uilocale) {
-        let uiratio = readRawTextFromlocalStorage('uiratio');
-        if (uiratio) {
-            let nratio = parseInt(uiratio);
-            if (nratio >= 0.1) {
-                globalCommandDispatcher.setThemeLocale(uilocale, nratio);
-            }
+    }
+    else {
+        uilocale = navilang;
+    }
+    let uiratio = readRawTextFromlocalStorage('uiratio');
+    if (uiratio) {
+        let nratio = parseInt(uiratio);
+        if (nratio >= 0.1) {
+            globalCommandDispatcher.setThemeLocale(uilocale, nratio);
         }
     }
     globalCommandDispatcher.resetProject();
@@ -292,6 +297,31 @@ function squashString(data) {
 }
 function resolveString(data) {
     return data;
+}
+function getNavigatorLanguage() {
+    console.log('navigator.languages', navigator.languages);
+    console.log('navigator.language', navigator.language);
+    let rr = '';
+    if (navigator.languages && navigator.languages.length) {
+        rr = navigator.languages[0];
+    }
+    else {
+        if (navigator.language) {
+            rr = navigator.language;
+        }
+    }
+    if (rr.toLowerCase().startsWith('ru')) {
+        rr = 'ru';
+    }
+    else {
+        if (rr.toLowerCase().startsWith('zh')) {
+            rr = 'zh';
+        }
+        else {
+            rr = 'en';
+        }
+    }
+    return rr;
 }
 function saveProjectState() {
     globalCommandDispatcher.exe.cutLongUndo();
@@ -6066,6 +6096,7 @@ let icon_shiftbarcontent = '&#xf302';
 let icon_mergebars = '&#xf232';
 let icon_copybarcontent = '&#xf237';
 let icon_home = '&#xf175';
+let icon_time = '&#xf337';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -6168,7 +6199,12 @@ class WarningUI {
     allLayers() {
         return [this.warningLayer];
     }
+    setIcon(icon) {
+        this.warningIcon.text = icon;
+    }
     showWarning(title, msg, smallMsg, onCancel) {
+        console.log('WarningUI show', title, msg);
+        this.setIcon(icon_time);
         this.onCancel = onCancel;
         this.warningTitle.text = title;
         this.warningDescription.text = msg;

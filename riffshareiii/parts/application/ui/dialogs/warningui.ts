@@ -100,8 +100,12 @@ class WarningUI {
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
 	}
+	setIcon(icon:string){
+		this.warningIcon.text=icon;
+	}
 	showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)) {
-		//console.log('WarningUI show', title, msg);
+		console.log('WarningUI show', title, msg);
+		this.setIcon(icon_time);
 		this.onCancel = onCancel;
 		this.warningTitle.text = title;
 		this.warningDescription.text = msg;

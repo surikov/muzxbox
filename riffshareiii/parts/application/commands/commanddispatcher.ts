@@ -395,6 +395,7 @@ class CommandDispatcher {
 		if (result != null) {
 			//this.onAir = false;
 			//this.neeToStart = false;
+			//this.renderer.warning.setIcon('S');
 			this.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
 		} else {
 			//this.renderer.menu.rerenderMenuContent()
@@ -423,7 +424,7 @@ class CommandDispatcher {
 				}, 1000);
 				console.log('setTimeout',id);
 			}*/
-
+			//this.renderer.warning.setIcon('S');
 			this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg//,null);
 				, () => {
 					console.log('cancel wait start loop');
