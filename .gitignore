@@ -31,3 +31,4 @@
 *.out
 *.app
 riffshareiii/parts/exe/dbcfg/dbcfgdata.php
+/riffshareiii/parts/vk/mini-app/node_modules
