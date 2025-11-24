@@ -3,15 +3,26 @@ include('dbcfg/dbcfgdata.php');
 function shutDownFunction()
 {
 	$error = error_get_last();
-	if ($error['type'] === E_ERROR) {
-		echo '<p>ops ', error_get_last()['message'], '</p>';
+	if (!empty($error)) {
+		if ($error['type'] === E_ERROR) {
+			echo '<p>on shutdown: ', error_get_last()['message'], '</p>';
+		}
+	}
+}
+function getVarOrSpace($name)
+{
+	if (empty($_GET[$name])) {
+		return '';
+	} else {
+		return $_GET[$name];
 	}
 }
 register_shutdown_function('shutDownFunction');
 $limit = 15;
 $steps = 100;
-$offset = intval($_GET["page"]);
-$find = $_GET["find"];
+
+$offset = intval(getVarOrSpace("page"));
+$find = getVarOrSpace("find");
 $find = trim(str_replace(array("'", "\"", "%", "&", "<", ">"), "", $find));
 $dbconnection = new mysqli($servername, $username, $password, $db);
 if ($dbconnection->connect_errno) {
@@ -31,6 +42,54 @@ function markWhat($txt, $find)
 			$end = substr($txt, strlen($begin) + strlen($find));
 			$res = $begin . '<b>' . $found . '</b>' . $end;
 			return $res;
+		}
+	}
+}
+function songduration04label($txt)
+{
+	if ('' . $txt == '0') {
+		return 'фрагмент';
+	} else {
+		if ('' . $txt == '1') {
+			return 'короткая';
+		} else {
+			if ('' . $txt == '2') {
+				return 'не длинная';
+			} else {
+				if ('' . $txt == '3') {
+					return 'длинная';
+				} else {
+					if ('' . $txt == '4') {
+						return 'продолжительная';
+					} else {
+						return $txt;
+					}
+				}
+			}
+		}
+	}
+}
+function avgtempo02label($txt)
+{
+	if ('' . $txt == '0') {
+		return 'очень медленная';
+	} else {
+		if ('' . $txt == '1') {
+			return 'медленная';
+		} else {
+			if ('' . $txt == '2') {
+				return 'ритмичная';
+			} else {
+				if ('' . $txt == '3') {
+					return 'быстрая';
+				} else {
+					if ('' . $txt == '4') {
+						return 'очень быстрая';
+					} else {
+						return $txt;
+					}
+				}
+			}
 		}
 	}
 }

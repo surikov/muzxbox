@@ -30,13 +30,14 @@
 		<div class="headerbox">
 			<a href="zdbgfsgfbsbgf">
 				<div class="pageheader">
-					<div><?php echo ($find); ?>&nbsp;</div>
+					<div> Архив MIDI𝄞ru</div>
 				</div>
 			</a>
-			<div></div>
-			<a href="javascript:findprompt();">
-				<div class="zoomicon">🔍</div>
-			</a>
+			<div>
+				<a href="javascript:findprompt();">
+					<nobr><span class='findwhat'><?php echo ($find); ?>&nbsp;</span><span class="zoomicon">🔍</span></nobr>
+				</a>
+			</div>
 		</div>
 		<div class="navigationdiv">
 			<div class="naviline">
@@ -115,6 +116,11 @@
 				try {
 					$sql = 'select'
 						. '		parsedfile.filename as filename'
+						. '		,parsedfile.avgtempo as avgtempo'
+						. '		,parsedfile.songduration as songduration'
+						. '		,parsedfile.bass as bass'
+						. '		,parsedfile.chords as chords'
+						. '		,parsedfile.drums as drums'
 						. '		,music.title as title'
 						. '		,music.date as date'
 						. '		,artists.artist as artist'
@@ -140,7 +146,7 @@
 							<a href="<?php echo ($songurl) ?>" class="itemrow">
 								<div class="singleitem"><?php echo (markWhat($row["title"], $find)); ?>
 									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
-									<br /><span class="itemsmallinfo">короткая, гитары, много ударных</span>
+									<br /><span class="itemsmallinfo"><?php echo (songduration04label($row["songduration"])); ?>, <?php echo (avgtempo02label($row["avgtempo"])); ?>, бас <?php echo (10 * intval($row["bass"])); ?>%, аккорды <?php echo (30 * intval($row["chords"])); ?>%, ударных <?php echo (30 * intval($row["drums"])); ?>%</span>
 								</div>
 							</a>
 				<?php

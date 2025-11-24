@@ -1,0 +1,3 @@
+<br />
+<b>Warning</b>:  PHP Startup: Unable to load dynamic library 'mysqli' (tried: C:\php\ext\mysqli (Не найден указанный модуль.), C:\php\ext\php_mysqli.dll (Не найден указанный модуль.)) in <b>Unknown</b> on line <b>0</b><br />
+php -S localhost:8000 -c d:\php\php.ini

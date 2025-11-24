@@ -25,9 +25,11 @@ body {
 a {
 	text-decoration: none;
 }
-b{
+
+b {
 	color: var(--page-text-color);
 }
+
 h1 {
 	font-size: 0.5cm;
 	padding: 0cm;
@@ -47,6 +49,11 @@ h1 {
 	flex-wrap: nowrap;
 	justify-content: flex-start;
 	align-items: center;
+}
+
+.findwhat {
+	font-size: 0.25cm;
+	color: var(--header-text-color);
 }
 
 .headerbox {
