@@ -138,7 +138,9 @@
 					$result = $dbconnection->query($sql);
 					if ($result) {
 						while ($row = $result->fetch_assoc()) {
-							$songurl = "loader.html?url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
+							//$songurl = "loader.html?url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
+							$songurl = "loader.php?file=" . $row["filename"]
+								. "&url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
 								. $row["filename"]
 								. ".mid&title="
 								. str_replace('\'', '"', $row["title"]);

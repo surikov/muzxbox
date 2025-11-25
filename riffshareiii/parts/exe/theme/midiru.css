@@ -36,6 +36,29 @@ h1 {
 	margin: 0cm;
 }
 
+.buttonplay {
+	width: 1cm;
+	height: 1cm;
+	padding-right: 0.25cm;
+}
+.fileplay{
+	display: flex;
+	justify-content2: flex-start;
+	align-items:start;
+}
+
+.fileinfo {
+	display11: inline-block;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+.fileinforows {
+	display: inline-block;
+	text-align: left;
+}
+
 .pageheader {
 	padding-left: 0.25cm;
 	padding-top: 0;

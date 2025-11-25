@@ -22,6 +22,7 @@ $limit = 15;
 $steps = 100;
 
 $offset = intval(getVarOrSpace("page"));
+$file = intval(getVarOrSpace("file"));
 $find = getVarOrSpace("find");
 $find = trim(str_replace(array("'", "\"", "%", "&", "<", ">"), "", $find));
 $dbconnection = new mysqli($servername, $username, $password, $db);
