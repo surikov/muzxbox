@@ -636,6 +636,7 @@ class FileLoaderAlpha {
 	}
 	takeChord(start: Zvoog_Metre, measure: Zvoog_TrackMeasure): Zvoog_Chord {
 		let startBeat = MMUtil().set(start).strip(32);
+		//let startBeat = MMUtil().set(start).strip(128);
 		for (let cc = 0; cc < measure.chords.length; cc++) {
 			if (startBeat.equals(measure.chords[cc].skip)) {
 				return measure.chords[cc];

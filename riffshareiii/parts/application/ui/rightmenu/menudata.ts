@@ -36,6 +36,7 @@ let menuPointActions: MenuInfo = {
 	}
 	, itemKind: kindClosedFolder
 };
+/*
 let menuPointStore: MenuInfo = {
 	text: 'snippets'
 	, onFolderCloseOpen: () => {
@@ -49,6 +50,7 @@ let menuPointStore: MenuInfo = {
 	}
 	, itemKind: kindClosedFolder
 };
+*/
 /*
 let menuPointPerformers: MenuInfo = {
 	text: localMenuPerformersFolder
@@ -244,7 +246,7 @@ function fillPluginsLists() {
 	//menuPointSamplers.children = [];
 	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
-	menuPointStore.children = [];
+	/*menuPointStore.children = [];
 	menuPointStore.children.push({
 		text: 'fragment 1'
 		, noLocalization: true
@@ -256,7 +258,7 @@ function fillPluginsLists() {
 		}
 		, url: 'url main 1'
 		, itemKind: kindPreview
-	});
+	});*/
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
@@ -463,7 +465,7 @@ function composeBaseMenu(): MenuInfo[] {
 			//, 
 			menuPointActions
 			, menuPointAddPlugin
-			, menuPointStore
+			//, menuPointStore
 			, menuPointSettings
 			/*, {
 				text: localMenuNewPlugin, children: [

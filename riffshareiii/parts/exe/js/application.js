@@ -3068,12 +3068,6 @@ class RightMenuPanel {
             else {
                 menuPointAddPlugin.itemKind = kindClosedFolder;
             }
-            if (globalCommandDispatcher.cfg().data.menuClipboard) {
-                menuPointStore.itemKind = kindOpenedFolder;
-            }
-            else {
-                menuPointStore.itemKind = kindClosedFolder;
-            }
             if (globalCommandDispatcher.cfg().data.menuActions) {
                 menuPointActions.itemKind = kindOpenedFolder;
             }
@@ -3464,20 +3458,6 @@ let menuPointActions = {
     },
     itemKind: kindClosedFolder
 };
-let menuPointStore = {
-    text: 'snippets',
-    onFolderCloseOpen: () => {
-        if (globalCommandDispatcher.cfg()) {
-            if (menuPointStore.itemKind == kindClosedFolder) {
-                globalCommandDispatcher.cfg().data.menuClipboard = true;
-            }
-            else {
-                globalCommandDispatcher.cfg().data.menuClipboard = false;
-            }
-        }
-    },
-    itemKind: kindClosedFolder
-};
 let menuPointAddPlugin = {
     text: localMenuNewPlugin,
     onFolderCloseOpen: () => {
@@ -3598,19 +3578,6 @@ let menuPointSettings = {
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
     menuPointActions.children = [];
-    menuPointStore.children = [];
-    menuPointStore.children.push({
-        text: 'fragment 1',
-        noLocalization: true,
-        onClick: () => {
-            console.log('click');
-        },
-        onSubClick: () => {
-            console.log('subclick');
-        },
-        url: 'url main 1',
-        itemKind: kindPreview
-    });
     for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
         let label = MZXBX_currentPlugins()[ii].label;
         let purpose = MZXBX_currentPlugins()[ii].purpose;
@@ -3797,7 +3764,6 @@ function composeBaseMenu() {
         menuItemsData = [
             menuPointActions,
             menuPointAddPlugin,
-            menuPointStore,
             menuPointSettings
         ];
         return menuItemsData;

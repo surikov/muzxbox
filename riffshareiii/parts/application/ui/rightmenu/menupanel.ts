@@ -266,11 +266,11 @@ class RightMenuPanel {
 			} else {
 				menuPointAddPlugin.itemKind = kindClosedFolder;
 			}
-			if (globalCommandDispatcher.cfg().data.menuClipboard) {
+			/*if (globalCommandDispatcher.cfg().data.menuClipboard) {
 				menuPointStore.itemKind = kindOpenedFolder;
 			} else {
 				menuPointStore.itemKind = kindClosedFolder;
-			}
+			}*/
 			if (globalCommandDispatcher.cfg().data.menuActions) {
 				menuPointActions.itemKind = kindOpenedFolder;
 			} else {

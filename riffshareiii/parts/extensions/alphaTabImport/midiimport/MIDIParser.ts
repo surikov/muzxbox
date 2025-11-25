@@ -8,6 +8,8 @@ type PP = {
 };
 let pluckDiff = 23;
 type TicksAverageTime = { avgstartms: number, items: number[] };
+let maxAlignedDelta = 43;//22;//23;
+let maxDeltaNearestPoint=121;//99;
 class MidiParser {
 	alignedMIDIevents: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 	midiheader: MIDIFileHeader;
@@ -592,7 +594,7 @@ class MidiParser {
 
 	}
 	alignEventsTime() {
-		let maxDelta = 22;//23;
+		
 		let starts: MIDIEvent[] = [];
 		//let aligned: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
 		for (let tt = 0; tt < this.parsedTracks.length; tt++) {
@@ -615,7 +617,7 @@ class MidiParser {
 				let evnt = starts[ee];
 				let last = this.alignedMIDIevents[this.alignedMIDIevents.length - 1];
 				let pretime = last.events[last.events.length - 1].playTimeMs;
-				if (evnt.playTimeMs < pretime + maxDelta) {
+				if (evnt.playTimeMs < pretime + maxAlignedDelta) {
 					last.events.push(evnt);
 				} else {
 					this.alignedMIDIevents.push({ startMs: evnt.playTimeMs, avg: 0, events: [evnt] });

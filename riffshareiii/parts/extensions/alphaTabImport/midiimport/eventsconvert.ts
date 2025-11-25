@@ -629,7 +629,7 @@ class EventsConverter {
 		for (let aa = 0; aa < this.parser.alignedMIDIevents.length; aa++) {
 			let avg = this.parser.alignedMIDIevents[aa].avg;
 			if ((timeMs < 0 || Math.abs(avg - ms) < Math.abs(timeMs - ms))
-				&& Math.abs(avg - ms) < 99//123
+				&& Math.abs(avg - ms) < maxDeltaNearestPoint//99//123
 			) {
 				//console.log(timeMs,avg,ms);
 				timeMs = avg;
@@ -1106,7 +1106,8 @@ class EventsConverter {
 				let zvootraidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
 				let zvooginstrack = tracks[zvootraidx];
 				let noteStartMs = note.startMs - barStart;
-				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
+				//let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
+				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
 				//console.log(tracks, insidx, instrack);
 				//instrack.measures[ii]..skips.push(when);
 				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx,zvootraidx);
@@ -1159,7 +1160,8 @@ class EventsConverter {
 				let peridx = this.takeProSamplerNo(allPercussions, note.trackidx, note.basePitch, null);
 				let pertrack = percussions[peridx];
 				let noteStartMs = note.startMs - barStart;
-				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
+				//let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
+				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
 				//console.log(peridx,pertrack);
 				pertrack.measures[ii].skips.push(when);
 				return;

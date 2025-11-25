@@ -2452,6 +2452,8 @@ declare type TicksAverageTime = {
     avgstartms: number;
     items: number[];
 };
+declare let maxAlignedDelta: number;
+declare let maxDeltaNearestPoint: number;
 declare class MidiParser {
     alignedMIDIevents: {
         startMs: number;
