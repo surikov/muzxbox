@@ -1418,29 +1418,35 @@ function test9() {
         counts[nn] = counts[nn] ? counts[nn] : 0;
         counts[nn]++;
     }
-    var last = 8;
-    var limit = 3;
-    var first = 4;
+    var last = 1;
+    var limit = 5;
+    var first = 6;
     var freq = [];
+    var antifreq = [];
     var found = 0;
     for (var ii = 1; ii < datarows.length; ii++) {
-        if (datarows[ii].balls[0] > last) {
-            var lenCount = 0;
-            for (var kk = 1; ii + kk < datarows.length; kk++) {
-                var ball = datarows[ii + kk].balls[0];
-                if (ball > limit) {
-                    if (ball > first) {
-                        freq[lenCount] = freq[lenCount] ? freq[lenCount] : 0;
-                        freq[lenCount]++;
-                        found++;
-                    }
-                    break;
-                }
-                lenCount++;
-            }
+        var lastBall = datarows[ii].balls[0];
+        var cuarr = antifreq;
+        if (lastBall == last) {
+            cuarr = freq;
         }
+        var lenCount = 0;
+        for (var kk = 1; ii + kk < datarows.length; kk++) {
+            var cuball = datarows[ii + kk].balls[0];
+            if (cuball > limit) {
+                if (cuball > first) {
+                    cuarr[lenCount] = cuarr[lenCount] ? cuarr[lenCount] : 0;
+                    cuarr[lenCount]++;
+                    found++;
+                }
+                break;
+            }
+            lenCount++;
+        }
+        //}
     }
-    console.log(datarows, counts, last, limit, first, freq, found);
+    console.log(freq);
+    console.log(antifreq);
 }
 init();
 addTails();

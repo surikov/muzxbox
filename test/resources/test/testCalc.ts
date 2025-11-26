@@ -1553,31 +1553,37 @@ function test9() {
 		counts[nn] = counts[nn] ? counts[nn] : 0;
 		counts[nn]++;
 	}
-	let last = 8;
-	let limit = 3;
-	let first = 4;
+	let last = 1;
+	let limit = 5;
+	let first = 6;
 
 	let freq: number[] = [];
-	let found=0;
+	let antifreq: number[] = [];
+	let found = 0;
 	for (let ii = 1; ii < datarows.length; ii++) {
-		if (datarows[ii].balls[0] > last) {
+		let lastBall = datarows[ii].balls[0];
+		let cuarr=antifreq;
+		if (lastBall == last) {
+			 cuarr=freq;
+		}
 			let lenCount = 0;
 			for (let kk = 1; ii + kk < datarows.length; kk++) {
-				let ball = datarows[ii + kk].balls[0];
-				if (ball > limit) {
-					if (ball > first) {
-						freq[lenCount] = freq[lenCount] ? freq[lenCount] : 0;
-						freq[lenCount]++;
+				let cuball = datarows[ii + kk].balls[0];
+				if (cuball > limit) {
+					if (cuball > first) {
+						cuarr[lenCount] = cuarr[lenCount] ? cuarr[lenCount] : 0;
+						cuarr[lenCount]++;
 						found++;
 					}
 					break;
 				}
 				lenCount++;
 			}
-		}
+		//}
 	}
 
-	console.log(datarows,counts, last, limit, first, freq,found);
+	console.log(freq);
+	console.log(antifreq);
 }
 init();
 addTails();
