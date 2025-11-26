@@ -92,12 +92,15 @@ class ActionPluginDialog {
 	openActionPluginDialogFrame(info: MZXBX_PluginRegistrationInformation) {
 		this.pluginInfo = info;
 		this.resetActionTitle();
-		let pluginFrame = document.getElementById("pluginActionFrame") as any;
+		let pluginFrame = document.getElementById("pluginActionFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginActionDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitActionPluginInit = true;
-				pluginFrame.src = this.pluginInfo.ui;
+				//pluginFrame.src = this.pluginInfo.ui;
+				//pluginFrame.location.replace(this.pluginInfo.ui);
+				//console.dir(pluginFrame);
+				pluginFrame.contentWindow.window.location.replace(this.pluginInfo.ui);
 				pluginDiv.style.visibility = "visible";
 			}
 		}
@@ -107,9 +110,10 @@ class ActionPluginDialog {
 		if (pluginDiv) {
 			pluginDiv.style.visibility = "hidden";
 		}
-		let pluginFrame = document.getElementById("pluginActionFrame") as any;
-		if (pluginFrame) {
-			pluginFrame.src = "plugins/pluginplaceholder.html";
+		let pluginFrame = document.getElementById("pluginActionFrame") as HTMLIFrameElement;
+		if (pluginFrame.contentWindow) {
+			//pluginFrame.src = "plugins/pluginplaceholder.html";
+			pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
 		}
 	}
 	resetActionTitle() {

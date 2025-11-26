@@ -240,7 +240,7 @@ function clearNonManual() {
 
 
 }
-function clickFog(vnt) {
+function clickFog(vnt: any) {
 	let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
 	let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
 	if (markX < 0) {
@@ -892,8 +892,8 @@ function dumpTriads(svg: SVGElement, rows: BallsRow[]) {
 		//console.log(mmm, Math.round(blueLeftDiffSumm), Math.round(blueRighDiffSumm));
 		let yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount + 0.33;
 		let xxx = 0 * rowLen / 2
-		let invLeftWidth = blueLeftDiffSumm*blueLeftDiffSumm /10;
-		let invRightWidth = blueRighDiffSumm*blueRighDiffSumm /10;
+		let invLeftWidth = blueLeftDiffSumm * blueLeftDiffSumm / 10;
+		let invRightWidth = blueRighDiffSumm * blueRighDiffSumm / 10;
 		//console.log(mmm, invLeftWidth, invRightWidth);
 		markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + invLeftWidth, toY: yyy, color: mgnt, manual: false, light: true });
 		markLines.push({ fromX: xxx + rowLen / 2 - invRightWidth, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: mgnt, manual: false, light: true });
@@ -1546,7 +1546,39 @@ function testDumpAbsDiff(strt: number) {//}, maxpre: number) {//, mincur: number
 		console.log(ii, preDiffX[ii] / preDiffNo[ii], '' + preDiffX[ii] + '+' + preDiffNo[ii] + '=' + (preDiffX[ii] + preDiffNo[ii]));
 	}
 }
+function test9() {
+	let counts: number[] = [];
+	for (let ii = 1; ii < datarows.length; ii++) {
+		let nn = datarows[ii].balls[0];
+		counts[nn] = counts[nn] ? counts[nn] : 0;
+		counts[nn]++;
+	}
+	let last = 8;
+	let limit = 3;
+	let first = 4;
 
+	let freq: number[] = [];
+	let found=0;
+	for (let ii = 1; ii < datarows.length; ii++) {
+		if (datarows[ii].balls[0] > last) {
+			let lenCount = 0;
+			for (let kk = 1; ii + kk < datarows.length; kk++) {
+				let ball = datarows[ii + kk].balls[0];
+				if (ball > limit) {
+					if (ball > first) {
+						freq[lenCount] = freq[lenCount] ? freq[lenCount] : 0;
+						freq[lenCount]++;
+						found++;
+					}
+					break;
+				}
+				lenCount++;
+			}
+		}
+	}
+
+	console.log(datarows,counts, last, limit, first, freq,found);
+}
 init();
 addTails();
 
@@ -1568,7 +1600,7 @@ for (let ii = 0; ii < 10; ii++) {
 	console.log(chackRow(randBalls(33), row));
 }
 */
-
+test9();
 console.log('start');
 
 

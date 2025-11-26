@@ -75,12 +75,13 @@ class FilterPluginDialog {
 		this.order = order;
 		this.pluginRawData = filter.data;
 		this.resetFilterTitle();
-		let pluginFrame = document.getElementById("pluginFilterFrame") as any;
+		let pluginFrame = document.getElementById("pluginFilterFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginFilterDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitFilterPluginInit = true;
-				pluginFrame.src = 'pluginplaceholder.html';
+				//pluginFrame.src = 'pluginplaceholder.html';
+				pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
 			}
@@ -92,13 +93,14 @@ class FilterPluginDialog {
 		this.order = order;
 		this.pluginRawData = filter.data;
 		this.resetFilterTitle();
-		let pluginFrame = document.getElementById("pluginFilterFrame") as any;
+		let pluginFrame = document.getElementById("pluginFilterFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginFilterDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitFilterPluginInit = true;
 				if (filterPlugin) {
-					pluginFrame.src = filterPlugin.ui;
+					//pluginFrame.src = filterPlugin.ui;
+					pluginFrame.contentWindow.window.location.replace(filterPlugin.ui);
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();

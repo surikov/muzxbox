@@ -76,5 +76,6 @@ function saveRawText2localStorage(name: string, text: string) {
 	//console.log('saveRawText2localStorage', name);
 }
 function goedit() {
-	window.location.replace('minium.studio.html');
+	//window.location.replace('minium.studio.html');
+	window.open('minium.studio.html',"_self")
 }

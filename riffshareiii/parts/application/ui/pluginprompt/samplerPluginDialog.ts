@@ -75,9 +75,12 @@ class SamplerPluginDialog {
 		this.drum = drum;
 		this.order = order;
 		this.resetDrumTitle();
-		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
+		let pluginFrame = document.getElementById("pluginSamplerFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginSamplerDiv") as any;
-		pluginFrame.src = 'pluginplaceholder.html';
+		//pluginFrame.src = 'pluginplaceholder.html';
+		if (pluginFrame.contentWindow) {
+			pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
+		}
 		pluginDiv.style.visibility = "visible";
 		this.resetStateButtons();
 	}
@@ -87,13 +90,14 @@ class SamplerPluginDialog {
 		this.order = order;
 		this.pluginRawData = drum.sampler.data;
 		this.resetDrumTitle();
-		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
+		let pluginFrame = document.getElementById("pluginSamplerFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginSamplerDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitSamplerPluginInit = true;
 				if (fplugin) {
-					pluginFrame.src = fplugin.ui;
+					//pluginFrame.src = fplugin.ui;
+					pluginFrame.contentWindow.window.location.replace(fplugin.ui);
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();

@@ -78,11 +78,12 @@ class SequencerPluginDialog {
 		this.order = order;
 
 		this.resetSequencerTitle();
-		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
+		let pluginFrame = document.getElementById("pluginSequencerFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginSequencerDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
-				pluginFrame.src = 'pluginplaceholder.html';
+				//pluginFrame.src = 'pluginplaceholder.html';
+				pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
 			}
@@ -107,13 +108,14 @@ class SequencerPluginDialog {
 		this.order = trackNo;
 		this.pluginRawData = track.performer.data;
 		this.resetSequencerTitle();
-		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
+		let pluginFrame = document.getElementById("pluginSequencerFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginSequencerDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitSequencerPluginInit = true;
 				if (trackPlugin) {
-					pluginFrame.src = trackPlugin.ui;
+					//pluginFrame.src = trackPlugin.ui;
+					pluginFrame.contentWindow.window.location.replace(trackPlugin.ui);
 				}
 				pluginDiv.style.visibility = "visible";
 				this.resetStateButtons();
@@ -125,9 +127,10 @@ class SequencerPluginDialog {
 		if (pluginDiv) {
 			pluginDiv.style.visibility = "hidden";
 		}
-		let pluginFrame = document.getElementById("pluginSequencerFrame") as any;
-		if (pluginFrame) {
-			pluginFrame.src = "plugins/pluginplaceholder.html";
+		let pluginFrame = document.getElementById("pluginSequencerFrame") as HTMLIFrameElement;
+		if (pluginFrame.contentWindow) {
+			//pluginFrame.src = "plugins/pluginplaceholder.html";
+			pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
 		}
 	}
 	sendNewIdToPlugin() {

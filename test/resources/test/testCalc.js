@@ -1411,6 +1411,37 @@ function testDumpAbsDiff(strt) {
         console.log(ii, preDiffX[ii] / preDiffNo[ii], '' + preDiffX[ii] + '+' + preDiffNo[ii] + '=' + (preDiffX[ii] + preDiffNo[ii]));
     }
 }
+function test9() {
+    var counts = [];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var nn = datarows[ii].balls[0];
+        counts[nn] = counts[nn] ? counts[nn] : 0;
+        counts[nn]++;
+    }
+    var last = 8;
+    var limit = 3;
+    var first = 4;
+    var freq = [];
+    var found = 0;
+    for (var ii = 1; ii < datarows.length; ii++) {
+        if (datarows[ii].balls[0] > last) {
+            var lenCount = 0;
+            for (var kk = 1; ii + kk < datarows.length; kk++) {
+                var ball = datarows[ii + kk].balls[0];
+                if (ball > limit) {
+                    if (ball > first) {
+                        freq[lenCount] = freq[lenCount] ? freq[lenCount] : 0;
+                        freq[lenCount]++;
+                        found++;
+                    }
+                    break;
+                }
+                lenCount++;
+            }
+        }
+    }
+    console.log(datarows, counts, last, limit, first, freq, found);
+}
 init();
 addTails();
 //dumpPairsCounts();
@@ -1431,4 +1462,5 @@ for (let ii = 0; ii < 10; ii++) {
     console.log(chackRow(randBalls(33), row));
 }
 */
+test9();
 console.log('start');

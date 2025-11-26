@@ -42,12 +42,13 @@ class PointPluginDialog {
 		this.pointIdx = pointIdx;
 		this.pluginPoint = pointChange;
 		this.resetPointTitle();
-		let pluginFrame = document.getElementById("pluginPointFrame") as any;
+		let pluginFrame = document.getElementById("pluginPointFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginPointDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
 				this.waitPointPluginInit = true;
-				pluginFrame.src = filterPlugin.ui;
+				//pluginFrame.src = filterPlugin.ui;
+				pluginFrame.contentWindow.window.location.replace(filterPlugin.ui);
 				pluginDiv.style.visibility = "visible";
 			}
 		}
@@ -57,9 +58,9 @@ class PointPluginDialog {
 		if (pluginDiv) {
 			pluginDiv.style.visibility = "hidden";
 		}
-		let pluginFrame = document.getElementById("pluginPointFrame") as any;
-		if (pluginFrame) {
-			pluginFrame.src = "plugins/pluginplaceholder.html";
+		let pluginFrame = document.getElementById("pluginPointFrame") as HTMLIFrameElement;
+		if (pluginFrame.contentWindow) {
+			pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
 		}
 	}
 	sendNewIdToPlugin() {

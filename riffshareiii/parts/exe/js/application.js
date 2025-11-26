@@ -449,7 +449,7 @@ class FilterPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitFilterPluginInit = true;
-                pluginFrame.src = 'pluginplaceholder.html';
+                pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
             }
@@ -466,7 +466,7 @@ class FilterPluginDialog {
             if (pluginFrame.contentWindow) {
                 this.waitFilterPluginInit = true;
                 if (filterPlugin) {
-                    pluginFrame.src = filterPlugin.ui;
+                    pluginFrame.contentWindow.window.location.replace(filterPlugin.ui);
                 }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
@@ -608,7 +608,9 @@ class SamplerPluginDialog {
         this.resetDrumTitle();
         let pluginFrame = document.getElementById("pluginSamplerFrame");
         let pluginDiv = document.getElementById("pluginSamplerDiv");
-        pluginFrame.src = 'pluginplaceholder.html';
+        if (pluginFrame.contentWindow) {
+            pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
+        }
         pluginDiv.style.visibility = "visible";
         this.resetStateButtons();
     }
@@ -623,7 +625,7 @@ class SamplerPluginDialog {
             if (pluginFrame.contentWindow) {
                 this.waitSamplerPluginInit = true;
                 if (fplugin) {
-                    pluginFrame.src = fplugin.ui;
+                    pluginFrame.contentWindow.window.location.replace(fplugin.ui);
                 }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
@@ -777,7 +779,7 @@ class ActionPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitActionPluginInit = true;
-                pluginFrame.src = this.pluginInfo.ui;
+                pluginFrame.contentWindow.window.location.replace(this.pluginInfo.ui);
                 pluginDiv.style.visibility = "visible";
             }
         }
@@ -788,8 +790,8 @@ class ActionPluginDialog {
             pluginDiv.style.visibility = "hidden";
         }
         let pluginFrame = document.getElementById("pluginActionFrame");
-        if (pluginFrame) {
-            pluginFrame.src = "plugins/pluginplaceholder.html";
+        if (pluginFrame.contentWindow) {
+            pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
         }
     }
     resetActionTitle() {
@@ -878,7 +880,7 @@ class SequencerPluginDialog {
         let pluginDiv = document.getElementById("pluginSequencerDiv");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
-                pluginFrame.src = 'pluginplaceholder.html';
+                pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
             }
@@ -903,7 +905,7 @@ class SequencerPluginDialog {
             if (pluginFrame.contentWindow) {
                 this.waitSequencerPluginInit = true;
                 if (trackPlugin) {
-                    pluginFrame.src = trackPlugin.ui;
+                    pluginFrame.contentWindow.window.location.replace(trackPlugin.ui);
                 }
                 pluginDiv.style.visibility = "visible";
                 this.resetStateButtons();
@@ -916,8 +918,8 @@ class SequencerPluginDialog {
             pluginDiv.style.visibility = "hidden";
         }
         let pluginFrame = document.getElementById("pluginSequencerFrame");
-        if (pluginFrame) {
-            pluginFrame.src = "plugins/pluginplaceholder.html";
+        if (pluginFrame.contentWindow) {
+            pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
         }
     }
     sendNewIdToPlugin() {
@@ -1007,7 +1009,7 @@ class PointPluginDialog {
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
                 this.waitPointPluginInit = true;
-                pluginFrame.src = filterPlugin.ui;
+                pluginFrame.contentWindow.window.location.replace(filterPlugin.ui);
                 pluginDiv.style.visibility = "visible";
             }
         }
@@ -1018,8 +1020,8 @@ class PointPluginDialog {
             pluginDiv.style.visibility = "hidden";
         }
         let pluginFrame = document.getElementById("pluginPointFrame");
-        if (pluginFrame) {
-            pluginFrame.src = "plugins/pluginplaceholder.html";
+        if (pluginFrame.contentWindow) {
+            pluginFrame.contentWindow.window.location.replace("plugins/pluginplaceholder.html");
         }
     }
     sendNewIdToPlugin() {
