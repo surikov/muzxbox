@@ -15,7 +15,7 @@
 
 body {
 	font-family: "Verdana", sans-serif;
-	font-size: 0.25cm;
+	font-size: 0.3cm;
 	background-color: var(--header-bg-color);
 	color: var(--header-text-color);
 	padding: 0cm;
@@ -36,15 +36,23 @@ h1 {
 	margin: 0cm;
 }
 
+h2 {
+	font-size: 0.5cm;
+	padding: 0cm;
+	margin: 0cm;
+	font-weight: normal;
+}
+
 .buttonplay {
 	width: 1cm;
 	height: 1cm;
 	padding-right: 0.25cm;
 }
-.fileplay{
+
+.fileplay {
 	display: flex;
 	justify-content2: flex-start;
-	align-items:start;
+	align-items: start;
 }
 
 .fileinfo {
@@ -117,7 +125,14 @@ h1 {
 }
 
 .itemsmallinfo {
-	font-size: 0.25cm;
+	font-size: 0.3cm;
+	
+}
+
+.itemsmallline {
+	font-size: 0.3cm;
+	border-bottom: 1px solid var(--line-color);
+	padding-bottom: 0.2cm;
 }
 
 .navigationdiv {
@@ -170,4 +185,8 @@ h1 {
 .naviline>a {
 	flex-grow: 1;
 	display: flex;
+}
+
+.linkinfo {
+	color: var(--page-link-color);
 }

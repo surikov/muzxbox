@@ -21,9 +21,9 @@
 
 	<div class="pagediv>">
 		<div class="headerbox">
-			<a href="zdbgfsgfbsbgf">
+			<a href="javascript:history.back()">
 				<div class="pageheader">
-					<div> Архив MIDI𝄞ru11</div>
+					<div> &lt;&lt; назад</div>
 				</div>
 			</a>
 			<div>
@@ -34,7 +34,7 @@
 		<div class="itemslist">
 			<div class="fileinfo">
 				<div class='fileplay'>
-					<img class='buttonplay' src="theme/img/buttonplay.png" onclick='startload();' />
+					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/buttonplay.png" /></a>
 				</div>
 				<div class="fileinforows">
 					<?php
@@ -47,43 +47,68 @@
 							. '		,parsedfile.chords as chords'
 							. '		,parsedfile.drums as drums'
 							. '		,music.title as title'
+							. '		,music.note as note'
+							//. '		,music.average_rate as rate'
 							. '		,music.date as date'
+							. '		,music.desc as mudesc'
+							. '		,left(music.lyrics,40) as lyrics'
 							. '		,artists.artist as artist'
 							. '		,artists.id as artistid'
 							. '		,authors.name as author'
 							. '		,authors.id as authorsid'
 							. '		,authors.city as acity'
 							. '		,authors.url as aurl'
-							. '		,authors.desc as adesc'
+
 							. '		,authors.hw as ahw'
 							. '		,statuses.status as astatus'
+							. '		,types.type as mutype'
+							. '		,standards.standard as mustandard'
 							. ' from parsedfile'
 							. '		left join music on music.id=parsedfile.filename'
 							. '		left join artists on music.artist=artists.id'
 							. '		left join authors on music.author=authors.id'
 							. '		left join statuses on authors.status=statuses.id'
+							. '		left join types on music.type=types.id'
+							. '		left join standards on music.standard=standards.id'
 							. '		where parsedfile.filename="' . $file . '";';
 						$result = $dbconnection->query($sql);
+
 						if ($result) {
 							$row = $result->fetch_assoc();
+							//$murate = intval($row["rate"]);
 					?>
-							<p><b><?php echo ($row["title"]); ?></b></p>
-							<p>раздел: <?php echo ($row["artist"]); ?></p>
-							<p><?php echo ($row["author"]); ?>
-								<br /><?php echo ($row["aurl"]); ?>
-								<br /><?php echo ($row["adesc"]); ?>
-								<br />hardware: <?php echo ($row["ahw"]); ?>
-								<br />статус: <?php echo ($row["astatus"]); ?>
+							<p>
+								<?php
+								echo ($row["date"]);
+								/*echo " ".$murate;
+								for ($ii = 0; $ii < $murate; $ii++) {
+									echo "+";
+								}
+								for ($ii = $murate; $ii < 6; $ii++) {
+									echo "-";
+								}*/
+								?>
 							</p>
-							<p>город: <?php echo ($row["acity"]); ?></p>
-							<p><?php echo ($row["date"]); ?></p>
+							<h2><?php echo ($row["title"]); ?></h2>
+							<p>тип: <?php echo ($row["mutype"]); ?></p>
+							<p>инструмент: <?php echo ($row["mustandard"]); ?></p>
 							<p><?php echo (songduration04label($row["songduration"])); ?>,
-							<?php echo (avgtempo02label($row["avgtempo"])); ?>,
-							бас <?php echo (10 * intval($row["bass"])); ?>%,
-							аккорды <?php echo (30 * intval($row["chords"])); ?>%,
-							ударных <?php echo (30 * intval($row["drums"])); ?>%
+								<?php echo (avgtempo02label($row["avgtempo"])); ?>,
+								бас <?php echo (10 * intval($row["bass"])); ?>%,
+								аккорды <?php echo (30 * intval($row["chords"])); ?>%,
+								ударных <?php echo (30 * intval($row["drums"])); ?>%
+							</p>
+							<p><?php echo ($row["note"]); ?></p>
+							<p><?php echo ($row["mudesc"]); ?></p>
+							<p><a class='linkinfo' href="lyrics?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
+							<p><a class='linkinfo' href="artist?file=<?php echo $file; ?>">раздел: <?php echo ($row["artist"]); ?></a></p>
+							<p><a class='linkinfo' href="author?file=<?php echo $file; ?>">автор: <?php echo ($row["astatus"]); ?> <?php echo ($row["author"]); ?></a></p>
+							<p><a class='linkinfo' href="city?file=<?php echo $file; ?>">город: <?php echo ($row["acity"]); ?></a></p>
+
+
 
 					<?php
+							$result->close();
 						}
 					} catch (Exception $e) {
 						echo '<p>Caught exception: ',  $e, '</p>';
@@ -91,9 +116,40 @@
 					?>
 				</div>
 			</div>
+			<div class="itemslist">
+				<div class="itemscolumn">
+					<?php
+					$sql = 'select'
+						. ' 	comments.date as date'
+						. ' 	,comments.comment as comment'
+						. ' 	,comments.reply as reply'
+						. ' 	,comments.id_author as name'
+						. ' 	,authors.name'
+						. ' from comments '
+						. ' 	join authors on authors.id=comments.id_author '
+						. ' where id_music=' . $file
+						. ' order by date,comments.id';
+					$result = $dbconnection->query($sql);
+
+					if ($result) {
+						while ($row = $result->fetch_assoc()) {
+					?>
+							<div class="itemsmallline"><?php echo ($row["date"]); ?><a class='linkinfo' href="dzfb">: <?php echo ($row["name"]); ?></a>
+							<br/><?php echo ($row["comment"]); ?>
+							<br/>- <i><?php echo ($row["reply"]); ?></i>
+						</div>
+					<?php
+						}
+						$result->close();
+					}
+					$dbconnection->close();
+					?>
+				</div>
+			</div>
 		</div>
+
 		<div>
-			<a href="zdbgfsgfbsbgf">
+			<a href="midiru.php">
 				<div class="pageheader">
 					<div> Архив MIDI𝄞ru</div>
 				</div>

@@ -28,7 +28,7 @@
 	</script>
 	<div class="pagediv>">
 		<div class="headerbox">
-			<a href="zdbgfsgfbsbgf">
+			<a href="midiru.php">
 				<div class="pageheader">
 					<div> Архив MIDI𝄞ru</div>
 				</div>
@@ -54,6 +54,7 @@
 					. "		left join music on music.id=parsedfile.filename"
 					. "		left join artists on music.artist=artists.id"
 					. "		left join authors on music.author=authors.id"
+					. '		left join statuses on authors.status=statuses.id'
 					. $where . ";";
 				//echo $find;
 				$countresult = $dbconnection->query($sql);
@@ -128,10 +129,12 @@
 						. '		,authors.name as author'
 						. '		,authors.id as authorsid'
 						. '		,authors.city as acity'
+						. '		,statuses.status as astatus'
 						. ' from parsedfile'
 						. '		left join music on music.id=parsedfile.filename'
 						. '		left join artists on music.artist=artists.id'
-						. '		left join authors on music.author=authors.id';
+						. '		left join authors on music.author=authors.id'
+						. '		left join statuses on authors.status=statuses.id';
 					$sql = $sql . $where;
 					$sql = $sql . '	order by music.date,music.title';
 					$sql = $sql . ' limit ' . $limit . ' offset ' . ($limit * $offset) . ';';
@@ -139,7 +142,10 @@
 					if ($result) {
 						while ($row = $result->fetch_assoc()) {
 							//$songurl = "loader.html?url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
-							$songurl = "loader.php?file=" . $row["filename"]
+							$songurl =
+								"loader.php?file="
+								//"https://mzxbox.ru/minium/midiru.php/loader.php?file="
+								. $row["filename"]
 								. "&url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
 								. $row["filename"]
 								. ".mid&title="
@@ -147,13 +153,15 @@
 				?>
 							<a href="<?php echo ($songurl) ?>" class="itemrow">
 								<div class="singleitem"><?php echo (markWhat($row["title"], $find)); ?>
-									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
+									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo ($row["astatus"]); ?> <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
 									<br /><span class="itemsmallinfo"><?php echo (songduration04label($row["songduration"])); ?>, <?php echo (avgtempo02label($row["avgtempo"])); ?>, бас <?php echo (10 * intval($row["bass"])); ?>%, аккорды <?php echo (30 * intval($row["chords"])); ?>%, ударных <?php echo (30 * intval($row["drums"])); ?>%</span>
 								</div>
 							</a>
 				<?php
 						}
+						$result->close();
 					}
+					$dbconnection->close();
 				} catch (Exception $e) {
 					echo '<p>Caught exception: ',  $e, '</p>';
 				}
@@ -161,7 +169,7 @@
 			</div>
 		</div>
 		<div>
-			<a href="zdbgfsgfbsbgf">
+			<a href="midiru.php">
 				<div class="pageheader">
 					<div> Архив MIDI𝄞ru</div>
 				</div>
