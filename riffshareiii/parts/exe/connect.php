@@ -17,10 +17,19 @@ function getVarOrSpace($name)
 		return $_GET[$name];
 	}
 }
+function getIntOrNegative($name)
+{
+	if (array_key_exists($name, $_GET)) {
+		if (strlen($_GET[$name]) > 0) {
+			return intval($_GET[$name]);
+		}
+	}
+	return -1;
+}
 register_shutdown_function('shutDownFunction');
 $limit = 15;
 $steps = 100;
-
+$author=getIntOrNegative('author');
 $offset = intval(getVarOrSpace("page"));
 $file = intval(getVarOrSpace("file"));
 $find = getVarOrSpace("find");

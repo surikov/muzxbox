@@ -124,6 +124,7 @@
 						. '		,parsedfile.drums as drums'
 						. '		,music.title as title'
 						. '		,music.date as date'
+						. '		,music.comments_count as ccnt'
 						. '		,artists.artist as artist'
 						. '		,artists.id as artistid'
 						. '		,authors.name as author'
@@ -150,9 +151,20 @@
 								. $row["filename"]
 								. ".mid&title="
 								. str_replace('\'', '"', $row["title"]);
+							$ccnt=intval($row["ccnt"]);
+							$star='';
+							if($ccnt>0){
+								$star='☆';
+							}
+							if($ccnt>5){
+								$star='☆☆';
+							}
+							if($ccnt>22){
+								$star='☆☆☆';
+							}
 				?>
 							<a href="<?php echo ($songurl) ?>" class="itemrow">
-								<div class="singleitem"><?php echo (markWhat($row["title"], $find)); ?>
+								<div class="singleitem"><?php echo ($star.' '.markWhat($row["title"], $find)); ?>
 									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo ($row["astatus"]); ?> <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
 									<br /><span class="itemsmallinfo"><?php echo (songduration04label($row["songduration"])); ?>, <?php echo (avgtempo02label($row["avgtempo"])); ?>, бас <?php echo (10 * intval($row["bass"])); ?>%, аккорды <?php echo (30 * intval($row["chords"])); ?>%, ударных <?php echo (30 * intval($row["drums"])); ?>%</span>
 								</div>

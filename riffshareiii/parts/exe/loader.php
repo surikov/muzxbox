@@ -100,9 +100,9 @@
 							</p>
 							<p><?php echo ($row["note"]); ?></p>
 							<p><?php echo ($row["mudesc"]); ?></p>
-							<p><a class='linkinfo' href="lyrics?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
+							<p><a class='linkinfo' href="lyrics.php?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
 							<p><a class='linkinfo' href="artist?file=<?php echo $file; ?>">раздел: <?php echo ($row["artist"]); ?></a></p>
-							<p><a class='linkinfo' href="author?file=<?php echo $file; ?>">автор: <?php echo ($row["astatus"]); ?> <?php echo ($row["author"]); ?></a></p>
+							<p><a class='linkinfo' href="author.php?author=<?php echo ($row["authorsid"]); ?>">автор: <?php echo ($row["astatus"]); ?> <?php echo ($row["author"]); ?></a></p>
 							<p><a class='linkinfo' href="city?file=<?php echo $file; ?>">город: <?php echo ($row["acity"]); ?></a></p>
 
 
@@ -124,6 +124,7 @@
 						. ' 	,comments.comment as comment'
 						. ' 	,comments.reply as reply'
 						. ' 	,comments.id_author as name'
+						. '		,authors.id as authorsid'
 						. ' 	,authors.name'
 						. ' from comments '
 						. ' 	join authors on authors.id=comments.id_author '
@@ -134,10 +135,12 @@
 					if ($result) {
 						while ($row = $result->fetch_assoc()) {
 					?>
-							<div class="itemsmallline"><?php echo ($row["date"]); ?><a class='linkinfo' href="dzfb">: <?php echo ($row["name"]); ?></a>
-							<br/><?php echo ($row["comment"]); ?>
-							<br/>- <i><?php echo ($row["reply"]); ?></i>
-						</div>
+							<div class="itemsmallline">
+								<?php echo ($row["date"]); ?><a class='linkinfo' href="author.php?author=<?php echo ($row["authorsid"]); ?>">: <?php echo ($row["name"]); ?>
+									<br /><?php echo ($row["comment"]); ?>
+								</a>
+								<br />- <i><?php echo ($row["reply"]); ?></i>
+							</div>
 					<?php
 						}
 						$result->close();
