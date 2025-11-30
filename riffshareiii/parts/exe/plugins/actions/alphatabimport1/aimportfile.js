@@ -283,7 +283,7 @@ class ChordPitchPerformerUtil {
             "0010_GeneralUserGS_sf2_file", "0010_Aspirin_sf2_file", "0010_Chaos_sf2_file", "0010_FluidR3_GM_sf2_file", "0010_JCLive_sf2_file", "0010_SBLive_sf2", "0010_SoundBlasterOld_sf2", "0011_Aspirin_sf2_file", "0011_FluidR3_GM_sf2_file", "0011_GeneralUserGS_sf2_file", "0012_GeneralUserGS_sf2_file",
             "0020_GeneralUserGS_sf2_file", "0020_Aspirin_sf2_file", "0020_Chaos_sf2_file", "0020_FluidR3_GM_sf2_file", "0020_JCLive_sf2_file", "0020_SBLive_sf2", "0020_SoundBlasterOld_sf2", "0021_Aspirin_sf2_file", "0021_GeneralUserGS_sf2_file", "0022_Aspirin_sf2_file",
             "0030_Chaos_sf2_file", "0030_Aspirin_sf2_file", "0030_FluidR3_GM_sf2_file", "0030_GeneralUserGS_sf2_file", "0030_JCLive_sf2_file", "0030_SBLive_sf2", "0030_SoundBlasterOld_sf2", "0031_Aspirin_sf2_file", "0031_FluidR3_GM_sf2_file", "0031_GeneralUserGS_sf2_file", "0031_SoundBlasterOld_sf2",
-            "0040_GeneralUserGS_sf2_file", "0040_Aspirin_sf2_file", "0040_Chaos_sf2_file", "0040_FluidR3_GM_sf2_file", "0040_JCLive_sf2_file", "0040_SBLive_sf2", "0040_SoundBlasterOld_sf2", "0041_FluidR3_GM_sf2_file", "0041_GeneralUserGS_sf2_file", "0041_SoundBlasterOld_sf2", "0042_GeneralUserGS_sf2_file", "0043_GeneralUserGS_sf2_file", "0044_GeneralUserGS_sf2_file", "0045_GeneralUserGS_sf2_file", "0046_GeneralUserGS_sf2_file",
+            "0040_Aspirin_sf2_file", "0040_GeneralUserGS_sf2_file", "0040_Chaos_sf2_file", "0040_FluidR3_GM_sf2_file", "0040_JCLive_sf2_file", "0040_SBLive_sf2", "0040_SoundBlasterOld_sf2", "0041_FluidR3_GM_sf2_file", "0041_GeneralUserGS_sf2_file", "0041_SoundBlasterOld_sf2", "0042_GeneralUserGS_sf2_file", "0043_GeneralUserGS_sf2_file", "0044_GeneralUserGS_sf2_file", "0045_GeneralUserGS_sf2_file", "0046_GeneralUserGS_sf2_file",
             "0050_Aspirin_sf2_file", "0050_GeneralUserGS_sf2_file", "0050_Chaos_sf2_file", "0050_FluidR3_GM_sf2_file", "0050_JCLive_sf2_file", "0050_SBLive_sf2", "0050_SoundBlasterOld_sf2", "0051_FluidR3_GM_sf2_file", "0051_GeneralUserGS_sf2_file", "0052_GeneralUserGS_sf2_file", "0053_GeneralUserGS_sf2_file", "0054_GeneralUserGS_sf2_file",
             "0060_GeneralUserGS_sf2_file", "0060_Aspirin_sf2_file", "0060_Chaos_sf2_file", "0060_FluidR3_GM_sf2_file", "0060_JCLive_sf2_file", "0060_SBLive_sf2", "0060_SoundBlasterOld_sf2", "0061_Aspirin_sf2_file", "0061_GeneralUserGS_sf2_file", "0061_SoundBlasterOld_sf2", "0062_GeneralUserGS_sf2_file",
             "0070_FluidR3_GM_sf2_file", "0070_GeneralUserGS_sf2_file", "0070_Aspirin_sf2_file", "0070_Chaos_sf2_file", "0070_JCLive_sf2_file", "0070_SBLive_sf2", "0070_SoundBlasterOld_sf2", "0071_GeneralUserGS_sf2_file",
@@ -328,7 +328,7 @@ class ChordPitchPerformerUtil {
             "0460_GeneralUserGS_sf2_file", "0460_Aspirin_sf2_file", "0460_Chaos_sf2_file", "0460_FluidR3_GM_sf2_file", "0460_JCLive_sf2_file", "0460_SBLive_sf2", "0460_SoundBlasterOld_sf2", "0461_FluidR3_GM_sf2_file",
             "0470_GeneralUserGS_sf2_file", "0470_Aspirin_sf2_file", "0470_Chaos_sf2_file", "0470_FluidR3_GM_sf2_file", "0470_JCLive_sf2_file", "0470_SBLive_sf2", "0470_SoundBlasterOld_sf2", "0471_FluidR3_GM_sf2_file", "0471_GeneralUserGS_sf2_file",
             "0480_GeneralUserGS_sf2_file", "0480_Aspirin_sf2_file", "0480_Chaos_sf2_file", "0480_FluidR3_GM_sf2_file", "0480_JCLive_sf2_file", "0480_SBLive_sf2", "0480_SoundBlasterOld_sf2", "04810_GeneralUserGS_sf2_file", "04811_GeneralUserGS_sf2_file", "04812_GeneralUserGS_sf2_file", "04813_GeneralUserGS_sf2_file", "04814_GeneralUserGS_sf2_file", "04815_GeneralUserGS_sf2_file", "04816_GeneralUserGS_sf2_file", "04817_GeneralUserGS_sf2_file", "0481_Aspirin_sf2_file", "0481_FluidR3_GM_sf2_file", "0481_GeneralUserGS_sf2_file", "0482_Aspirin_sf2_file", "0482_GeneralUserGS_sf2_file", "0483_GeneralUserGS_sf2_file", "0484_GeneralUserGS_sf2_file", "0485_GeneralUserGS_sf2_file", "0486_GeneralUserGS_sf2_file", "0487_GeneralUserGS_sf2_file", "0488_GeneralUserGS_sf2_file", "0489_GeneralUserGS_sf2_file",
-            "0490_Chaos_sf2_file", "0490_GeneralUserGS_sf2_file", "0490_Aspirin_sf2_file", "0490_FluidR3_GM_sf2_file", "0490_JCLive_sf2_file", "0490_SBLive_sf2", "0490_SoundBlasterOld_sf2", "0491_GeneralUserGS_sf2_file", "0492_GeneralUserGS_sf2_file",
+            "0490_GeneralUserGS_sf2_file", "0490_Chaos_sf2_file", "0490_Aspirin_sf2_file", "0490_FluidR3_GM_sf2_file", "0490_JCLive_sf2_file", "0490_SBLive_sf2", "0490_SoundBlasterOld_sf2", "0491_GeneralUserGS_sf2_file", "0492_GeneralUserGS_sf2_file",
             "0501_FluidR3_GM_sf2_file", "0500_Aspirin_sf2_file", "0500_Chaos_sf2_file", "0500_FluidR3_GM_sf2_file", "0500_GeneralUserGS_sf2_file", "0500_JCLive_sf2_file", "0500_SBLive_sf2", "0500_SoundBlasterOld_sf2", "0501_GeneralUserGS_sf2_file", "0502_FluidR3_GM_sf2_file", "0502_GeneralUserGS_sf2_file", "0503_FluidR3_GM_sf2_file", "0504_FluidR3_GM_sf2_file", "0505_FluidR3_GM_sf2_file",
             "0510_Aspirin_sf2_file", "0510_SBLive_sf2", "0510_GeneralUserGS_sf2_file", "0510_Chaos_sf2_file", "0510_FluidR3_GM_sf2_file", "0510_JCLive_sf2_file", "0510_SoundBlasterOld_sf2", "0511_GeneralUserGS_sf2_file", "0511_SoundBlasterOld_sf2",
             "0520_JCLive_sf2_file", "0520_GeneralUserGS_sf2_file", "0520_Aspirin_sf2_file", "0520_Chaos_sf2_file", "0520_FluidR3_GM_sf2_file", "0520_SBLive_sf2", "0520_Soul_Ahhs_sf2_file", "0520_SoundBlasterOld_sf2", "0521_FluidR3_GM_sf2_file", "0521_Soul_Ahhs_sf2_file", "0521_SoundBlasterOld_sf2", "0522_Soul_Ahhs_sf2_file",
@@ -374,7 +374,7 @@ class ChordPitchPerformerUtil {
             "0920_GeneralUserGS_sf2_file", "0920_Aspirin_sf2_file", "0920_Chaos_sf2_file", "0920_FluidR3_GM_sf2_file", "0920_JCLive_sf2_file", "0920_SBLive_sf2", "0920_SoundBlasterOld_sf2", "0921_Aspirin_sf2_file", "0921_GeneralUserGS_sf2_file", "0921_SoundBlasterOld_sf2",
             "0930_GeneralUserGS_sf2_file", "0930_Aspirin_sf2_file", "0930_Chaos_sf2_file", "0930_FluidR3_GM_sf2_file", "0930_JCLive_sf2_file", "0930_SBLive_sf2", "0930_SoundBlasterOld_sf2", "0931_Aspirin_sf2_file", "0931_FluidR3_GM_sf2_file", "0931_GeneralUserGS_sf2_file", "0931_SoundBlasterOld_sf2",
             "0941_Aspirin_sf2_file", "0940_GeneralUserGS_sf2_file", "0940_Aspirin_sf2_file", "0940_Chaos_sf2_file", "0940_FluidR3_GM_sf2_file", "0940_JCLive_sf2_file", "0940_SBLive_sf2", "0940_SoundBlasterOld_sf2", "0941_FluidR3_GM_sf2_file", "0941_GeneralUserGS_sf2_file", "0941_JCLive_sf2_file",
-            "0950_GeneralUserGS_sf2_file", "0950_Aspirin_sf2_file", "0950_Chaos_sf2_file", "0950_FluidR3_GM_sf2_file", "0950_JCLive_sf2_file", "0950_SBLive_sf2", "0950_SoundBlasterOld_sf2", "0951_FluidR3_GM_sf2_file", "0951_GeneralUserGS_sf2_file",
+            "0950_Aspirin_sf2_file", "0950_GeneralUserGS_sf2_file", "0950_Chaos_sf2_file", "0950_FluidR3_GM_sf2_file", "0950_JCLive_sf2_file", "0950_SBLive_sf2", "0950_SoundBlasterOld_sf2", "0951_FluidR3_GM_sf2_file", "0951_GeneralUserGS_sf2_file",
             "0960_GeneralUserGS_sf2_file", "0960_Aspirin_sf2_file", "0960_Chaos_sf2_file", "0960_FluidR3_GM_sf2_file", "0960_JCLive_sf2_file", "0960_SBLive_sf2", "0960_SoundBlasterOld_sf2", "0961_Aspirin_sf2_file", "0961_FluidR3_GM_sf2_file", "0961_GeneralUserGS_sf2_file", "0961_SoundBlasterOld_sf2", "0962_GeneralUserGS_sf2_file",
             "0970_GeneralUserGS_sf2_file", "0970_Aspirin_sf2_file", "0970_Chaos_sf2_file", "0970_FluidR3_GM_sf2_file", "0970_JCLive_sf2_file", "0970_SBLive_sf2", "0970_SoundBlasterOld_sf2", "0971_FluidR3_GM_sf2_file", "0971_GeneralUserGS_sf2_file", "0971_SoundBlasterOld_sf2",
             "0980_Aspirin_sf2_file", "0980_GeneralUserGS_sf2_file", "0980_Chaos_sf2_file", "0980_FluidR3_GM_sf2_file", "0980_JCLive_sf2_file", "0980_SBLive_sf2", "0980_SoundBlasterOld_sf2", "0981_Aspirin_sf2_file", "0981_FluidR3_GM_sf2_file", "0981_GeneralUserGS_sf2_file", "0981_SoundBlasterOld_sf2", "0982_GeneralUserGS_sf2_file", "0983_GeneralUserGS_sf2_file", "0984_GeneralUserGS_sf2_file",
@@ -388,7 +388,7 @@ class ChordPitchPerformerUtil {
             "1060_GeneralUserGS_sf2_file", "1060_Aspirin_sf2_file", "1060_Chaos_sf2_file", "1060_FluidR3_GM_sf2_file", "1060_JCLive_sf2_file", "1060_SBLive_sf2", "1060_SoundBlasterOld_sf2", "1061_FluidR3_GM_sf2_file", "1061_GeneralUserGS_sf2_file", "1061_SoundBlasterOld_sf2",
             "1070_GeneralUserGS_sf2_file", "1070_Aspirin_sf2_file", "1070_Chaos_sf2_file", "1070_FluidR3_GM_sf2_file", "1070_JCLive_sf2_file", "1070_SBLive_sf2", "1070_SoundBlasterOld_sf2", "1071_FluidR3_GM_sf2_file", "1071_GeneralUserGS_sf2_file", "1072_GeneralUserGS_sf2_file", "1073_GeneralUserGS_sf2_file",
             "1080_GeneralUserGS_sf2_file", "1080_Aspirin_sf2_file", "1080_Chaos_sf2_file", "1080_FluidR3_GM_sf2_file", "1080_JCLive_sf2_file", "1080_SBLive_sf2", "1080_SoundBlasterOld_sf2", "1081_SoundBlasterOld_sf2",
-            "1090_GeneralUserGS_sf2_file", "1090_Aspirin_sf2_file", "1090_Chaos_sf2_file", "1090_FluidR3_GM_sf2_file", "1090_JCLive_sf2_file", "1090_SBLive_sf2", "1090_SoundBlasterOld_sf2", "1091_SoundBlasterOld_sf2",
+            "1090_FluidR3_GM_sf2_file", "1090_GeneralUserGS_sf2_file", "1090_Aspirin_sf2_file", "1090_Chaos_sf2_file", "1090_JCLive_sf2_file", "1090_SBLive_sf2", "1090_SoundBlasterOld_sf2", "1091_SoundBlasterOld_sf2",
             "1100_GeneralUserGS_sf2_file", "1100_Aspirin_sf2_file", "1100_Chaos_sf2_file", "1100_FluidR3_GM_sf2_file", "1100_JCLive_sf2_file", "1100_SBLive_sf2", "1100_SoundBlasterOld_sf2", "1101_Aspirin_sf2_file", "1101_FluidR3_GM_sf2_file", "1101_GeneralUserGS_sf2_file", "1102_GeneralUserGS_sf2_file",
             "1110_GeneralUserGS_sf2_file", "1110_Aspirin_sf2_file", "1110_Chaos_sf2_file", "1110_FluidR3_GM_sf2_file", "1110_JCLive_sf2_file", "1110_SBLive_sf2", "1110_SoundBlasterOld_sf2",
             "1120_GeneralUserGS_sf2_file", "1120_Aspirin_sf2_file", "1120_Chaos_sf2_file", "1120_FluidR3_GM_sf2_file", "1120_JCLive_sf2_file", "1120_SBLive_sf2", "1120_SoundBlasterOld_sf2", "1121_SoundBlasterOld_sf2",
@@ -440,6 +440,14 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
+    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -454,14 +462,6 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
-    }
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
     }
 }
 var LogLevel;
@@ -3538,11 +3538,6 @@ class Chord {
     }
 }
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3643,6 +3638,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,10 +8893,6 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8912,6 +8908,10 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
+    get inputCrc() {
+        return this._engine.inputCrc.value;
+    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
-    }
-    get inputCrc() {
-        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,16 +9591,6 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
-    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9629,6 +9619,16 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+    }
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,6 +9951,13 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
+    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9969,13 +9976,6 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
-    }
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
+    get isFlushed() {
+        return this._end === 0;
+    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
-    }
-    get isFlushed() {
-        return this._end === 0;
     }
     reset() {
         this._start = 0;

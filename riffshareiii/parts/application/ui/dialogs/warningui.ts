@@ -40,9 +40,12 @@ class WarningUI {
 		this.warningInfo4 = { x: 0, y: 0, w: 1, h: 1, href: 'theme/img/trackpad.png', css: 'warningInfoIcon' };
 
 
-		this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
-		this.warningDescription = { x: 0, y: 0, text: 'Controls:', css: 'warningDescription' };
-		this.warningSmallText = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningSmallText' };
+		//this.warningTitle = { x: 0, y: 0, text: 'Play', css: 'warningTitle' };
+		this.warningTitle = { x: 0, y: 0, text: '', css: 'warningTitle' };
+		//this.warningDescription = { x: 0, y: 0, text: 'Controls:', css: 'warningDescription' };
+		this.warningDescription = { x: 0, y: 0, text: '', css: 'warningDescription' };
+		//this.warningSmallText = { x: 0, y: 0, text: 'Use mouse or touchpad to move and zoom piano roll', css: 'warningSmallText' };
+		this.warningSmallText = { x: 0, y: 0, text: '', css: 'warningSmallText' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
 		this.warningRectangle = {
 			x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
@@ -102,6 +105,10 @@ class WarningUI {
 	}
 	setIcon(icon:string){
 		this.warningIcon.text=icon;
+		this.warningInfo1.href='';
+		this.warningInfo2.href='';
+		this.warningInfo3.href='';
+		this.warningInfo4.href='';
 	}
 	showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)) {
 		console.log('WarningUI show', title, msg);
