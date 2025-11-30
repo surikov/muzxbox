@@ -30,6 +30,7 @@ register_shutdown_function('shutDownFunction');
 $limit = 15;
 $steps = 100;
 $author=getIntOrNegative('author');
+$artist=getIntOrNegative('artist');
 $offset = intval(getVarOrSpace("page"));
 $file = intval(getVarOrSpace("file"));
 $find = getVarOrSpace("find");

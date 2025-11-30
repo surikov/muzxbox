@@ -35,19 +35,55 @@
 			</a>
 			<div>
 				<a href="javascript:findprompt();">
-					<nobr><span class='findwhat'><?php echo ($find); ?>&nbsp;</span><span class="zoomicon">🔍</span></nobr>
+					<nobr><span class="zoomicon">🔍</span></nobr>
 				</a>
 			</div>
 		</div>
 		<div class="navigationdiv">
 			<div class="naviline">
 				<?php
+				$listtitle = '';
 				$where = "";
+				$selection = '';
 				if (!empty($find)) {
+					$listtitle = 'поиск: '.$find;
+					$selection = "&find=" . $find;
 					$where = " where music.title like '%" . $find
 						. "%' or artists.artist like '%" . $find
 						. "%' or authors.name like '%" . $find
 						. "%' or authors.city like '%" . $find . "%'";
+				}
+				if ($author >= 0) {
+					$listtitle = 'автор: ' . $author;
+					$selection = "&author=" . $author;
+					$where = " where authors.id=" . $author;
+					try {
+						$sql = "select name as name from authors where id=" . $author;
+						$result = $dbconnection->query($sql);
+						if ($result) {
+							$row = $result->fetch_assoc();
+							$listtitle = 'автор: ' . $row["name"];
+							$result->close();
+						}
+					} catch (Exception $e) {
+						echo '<p>Caught exception: ',  $e, '</p>';
+					}
+				}
+				if ($artist >= 0) {
+					$listtitle = 'раздел: ' . $artist;
+					$selection = "&artist=" . $artist;
+					$where = " where artists.id=" . $artist;
+					try {
+						$sql = "select artist as name from artists where id=" . $artist;
+						$result = $dbconnection->query($sql);
+						if ($result) {
+							$row = $result->fetch_assoc();
+							$listtitle = 'раздел: ' . $row["name"];
+							$result->close();
+						}
+					} catch (Exception $e) {
+						echo '<p>Caught exception: ',  $e, '</p>';
+					}
 				}
 				$sql = "select count(*) as cnt"
 					. " from parsedfile"
@@ -68,7 +104,7 @@
 						<div class="posisegment"></div>
 					<?php
 					} else {
-						$pageurl = "midiru.php?page=" . $linkoffset . "&find=" . $find;
+						$pageurl = "midiru.php?page=" . $linkoffset . $selection;
 					?>
 						<a href="<?php echo ($pageurl) ?>">
 							<div class="navsegment"></div>
@@ -81,7 +117,7 @@
 			<div class="pagenum">
 				<?php
 				if ($offset > 0) {
-					$preoffset = "midiru.php?page=" . ($offset - 1) . "&find=" . $find;
+					$preoffset = "midiru.php?page=" . ($offset - 1) . $selection;
 				?>
 					<a href="<?php echo ($preoffset) ?>">
 						<div class="gopage">&nbsp;&nbsp;&nbsp;&lt;&lt;</div>
@@ -97,7 +133,7 @@
 
 				<?php
 				if ($offset < $pagecount) {
-					$nextoffset = "midiru.php?page=" . ($offset + 1) . "&find=" . $find;
+					$nextoffset = "midiru.php?page=" . ($offset + 1) . $selection;
 				?>
 					<a href="<?php echo ($nextoffset) ?>">
 						<div class="gopage">&gt;&gt;&nbsp;&nbsp;&nbsp;</div>
@@ -114,6 +150,11 @@
 		<div class="itemslist">
 			<div class="itemscolumn">
 				<?php
+				if (! empty($listtitle)) {
+				?>
+					<div class='listtitle'><a href='midiru.php'>[x] <?php echo ($listtitle); ?></a></div>
+					<?php
+				}
 				try {
 					$sql = 'select'
 						. '		parsedfile.filename as filename'
@@ -142,29 +183,31 @@
 					$result = $dbconnection->query($sql);
 					if ($result) {
 						while ($row = $result->fetch_assoc()) {
-							//$songurl = "loader.html?url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
+							$safetitle = $row["title"];
+							$safetitle = str_replace('"', "", $safetitle);
+							$safetitle = str_replace('"', "", $safetitle);
+
 							$songurl =
 								"loader.php?file="
-								//"https://mzxbox.ru/minium/midiru.php/loader.php?file="
 								. $row["filename"]
 								. "&url=https://mzxbox.ru/midi/midiru-archive-2022-02-25/music_files/"
 								. $row["filename"]
 								. ".mid&title="
-								. str_replace('\'', '"', $row["title"]);
-							$ccnt=intval($row["ccnt"]);
-							$star='';
-							if($ccnt>0){
-								$star='☆';
+								. $safetitle;
+							$ccnt = intval($row["ccnt"]);
+							$star = '';
+							if ($ccnt > 0) {
+								$star = '☆';
 							}
-							if($ccnt>5){
-								$star='☆☆';
+							if ($ccnt > 5) {
+								$star = '☆☆';
 							}
-							if($ccnt>22){
-								$star='☆☆☆';
+							if ($ccnt > 22) {
+								$star = '☆☆☆';
 							}
-				?>
+					?>
 							<a href="<?php echo ($songurl) ?>" class="itemrow">
-								<div class="singleitem"><?php echo ($star.' '.markWhat($row["title"], $find)); ?>
+								<div class="singleitem"><?php echo ($star . ' ' . markWhat($row["title"], $find)); ?>
 									<br /><span class="itemsmallinfo"><?php echo ($row["date"]); ?>, <?php echo ($row["astatus"]); ?> <?php echo (markWhat($row["author"], $find)); ?> / <?php echo (markWhat($row["acity"], $find)); ?>, <?php echo (markWhat($row["artist"], $find)); ?></span>
 									<br /><span class="itemsmallinfo"><?php echo (songduration04label($row["songduration"])); ?>, <?php echo (avgtempo02label($row["avgtempo"])); ?>, бас <?php echo (10 * intval($row["bass"])); ?>%, аккорды <?php echo (30 * intval($row["chords"])); ?>%, ударных <?php echo (30 * intval($row["drums"])); ?>%</span>
 								</div>

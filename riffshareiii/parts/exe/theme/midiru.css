@@ -44,9 +44,19 @@ h2 {
 }
 pre{
 	max-width:100%;
-	white-space: wrap;
+	white-space77: wrap-line;
+	overflow-wrap: break-word;
 }
+.listtitle{
+	font-size: 0.5cm;
+	text-align: center;
+	margin-top: 0.5cm;
+	margin-bottom: 0.5cm;
+}
+.listtitle > a{
 
+	color: var(--page-link-color);
+}
 .buttonplay {
 	width: 1cm;
 	height: 1cm;
@@ -99,7 +109,7 @@ pre{
 }
 
 .zoomicon {
-	font-size: 1cm;
+	font-size: 0.75cm;
 }
 
 .homelink {

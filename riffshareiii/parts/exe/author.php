@@ -53,18 +53,32 @@
 
                         if ($result) {
                             $row = $result->fetch_assoc();
+                            $info = $row["aesc"];
+                            $info = str_replace("\n", "<br/>", $info);
+                            $info = str_replace("\r", "<br/>", $info);
+                            $info = str_replace("<br/><br/>", "<br/>", $info);
                     ?>
                             <p>статус: <?php echo ($row["astatus"]); ?></p>
                             <h2><?php echo ($row["author"]); ?></h2>
                             <p>город: <?php echo ($row["acity"]); ?></p>
                             <p>URL: <?php echo ($row["aurl"]); ?></p>
                             <p>оборудование: <?php echo ($row["hw"]); ?></p>
-                            <p><a class='linkinfo' href='midiru.php?author=<?php echo ($author); ?>'>всего файлов: <?php echo ($row["acnt"]); ?></a></p>
+                            <?php
+                            if (intval($row["acnt"]) > 0) {
+                            ?>
+                                <p><a class='linkinfo' href='midiru.php?author=<?php echo ($author); ?>'>всего файлов: <?php echo ($row["acnt"]); ?></a></p>
+                            <?php
+                            } else {
+                            ?>
+                                <p>нет файлов</p>
+                            <?php
+                            }
+                            ?>
                 </div>
             </div>
             <div class="itemslist">
                 <div class="itemscolumn">
-                    <div class="itemsmallinfo"><pre><?php echo ($row["aesc"]); ?></pre><br/>&nbsp;</div>
+                    <div class="itemsmallinfo"><?php echo ($info); ?><br />&nbsp;</div>
                 </div>
             </div>
     <?php

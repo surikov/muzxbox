@@ -75,21 +75,19 @@
 
 						if ($result) {
 							$row = $result->fetch_assoc();
-							//$murate = intval($row["rate"]);
+							$info = $row["mudesc"];
+                            $info = str_replace("\n", "<br/>", $info);
+                            $info = str_replace("\r", "<br/>", $info);
+                            $info = str_replace("<br/><br/>", "<br/>", $info);
+							$munote = $row["note"];
+                            $munote = str_replace("\n", "<br/>", $munote);
+                            $munote = str_replace("\r", "<br/>", $munote);
+                            $munote = str_replace("<br/><br/>", "<br/>", $munote);
 					?>
-							<p>
-								<?php
-								echo ($row["date"]);
-								/*echo " ".$murate;
-								for ($ii = 0; $ii < $murate; $ii++) {
-									echo "+";
-								}
-								for ($ii = $murate; $ii < 6; $ii++) {
-									echo "-";
-								}*/
-								?>
-							</p>
+							
+							<p><?php echo ($row["date"]); ?></p>
 							<h2><?php echo ($row["title"]); ?></h2>
+							<p><a class='linkinfo' href="midiru.php?artist=<?php echo ($row["artistid"]); ?>"><?php echo ($row["artist"]); ?></a></p>
 							<p>тип: <?php echo ($row["mutype"]); ?></p>
 							<p>инструмент: <?php echo ($row["mustandard"]); ?></p>
 							<p><?php echo (songduration04label($row["songduration"])); ?>,
@@ -98,13 +96,14 @@
 								аккорды <?php echo (30 * intval($row["chords"])); ?>%,
 								ударных <?php echo (30 * intval($row["drums"])); ?>%
 							</p>
-							<p><?php echo ($row["note"]); ?></p>
-							<p><?php echo ($row["mudesc"]); ?></p>
-							<p><a class='linkinfo' href="lyrics.php?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
-							<p><a class='linkinfo' href="artist?file=<?php echo $file; ?>">раздел: <?php echo ($row["artist"]); ?></a></p>
-							<p><a class='linkinfo' href="author.php?author=<?php echo ($row["authorsid"]); ?>">автор: <?php echo ($row["astatus"]); ?> <?php echo ($row["author"]); ?></a></p>
-							<p><a class='linkinfo' href="city?file=<?php echo $file; ?>">город: <?php echo ($row["acity"]); ?></a></p>
+							<p><?php echo ($munote); ?></p>
+							<p><?php echo ($info); ?></p>
 
+
+							<p><a class='linkinfo' href="author.php?author=<?php echo ($row["authorsid"]); ?>">автор: <?php echo ($row["astatus"]); ?> <?php echo ($row["author"]); ?></a></p>
+							<p>город: <?php echo ($row["acity"]); ?></p>
+
+							<p><a class='linkinfo' href="lyrics.php?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
 
 
 					<?php
