@@ -1063,7 +1063,7 @@ class EventsConverter {
 		if (program == 38) re.ratio = 0.95;
 		if (program == 39) re.ratio = 0.95;
 
-		if (program == 48) re.ratio = 0.4;
+		if (program == 48) re.ratio = 0.6;
 		if (program == 49) re.ratio = 0.4;
 		if (program == 50) re.ratio = 0.5;
 		if (program == 51) re.ratio = 0.4;

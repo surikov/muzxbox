@@ -76,26 +76,25 @@
 						if ($result) {
 							$row = $result->fetch_assoc();
 							$info = $row["mudesc"];
-                            $info = str_replace("\n", "<br/>", $info);
-                            $info = str_replace("\r", "<br/>", $info);
-                            $info = str_replace("<br/><br/>", "<br/>", $info);
+							$info = str_replace("\n", "<br/>", $info);
+							$info = str_replace("\r", "<br/>", $info);
+							$info = str_replace("<br/><br/>", "<br/>", $info);
 							$munote = $row["note"];
-                            $munote = str_replace("\n", "<br/>", $munote);
-                            $munote = str_replace("\r", "<br/>", $munote);
-                            $munote = str_replace("<br/><br/>", "<br/>", $munote);
+							$munote = str_replace("\n", "<br/>", $munote);
+							$munote = str_replace("\r", "<br/>", $munote);
+							$munote = str_replace("<br/><br/>", "<br/>", $munote);
 					?>
-							
+
 							<p><?php echo ($row["date"]); ?></p>
 							<h2><?php echo ($row["title"]); ?></h2>
 							<p><a class='linkinfo' href="midiru.php?artist=<?php echo ($row["artistid"]); ?>"><?php echo ($row["artist"]); ?></a></p>
 							<p>тип: <?php echo ($row["mutype"]); ?></p>
 							<p>инструмент: <?php echo ($row["mustandard"]); ?></p>
-							<p><?php echo (songduration04label($row["songduration"])); ?>,
-								<?php echo (avgtempo02label($row["avgtempo"])); ?>,
-								бас <?php echo (10 * intval($row["bass"])); ?>%,
-								аккорды <?php echo (30 * intval($row["chords"])); ?>%,
-								ударных <?php echo (30 * intval($row["drums"])); ?>%
-							</p>
+							<p><a class='linkinfo' href="midiru.php?duration=<?php echo ($row["songduration"]); ?>">размер: <?php echo (songduration04label($row["songduration"])); ?></a></p>
+							<p><a class='linkinfo' href="midiru.php?tempo=<?php echo ($row["avgtempo"]); ?>">темп: <?php echo (avgtempo02label($row["avgtempo"])); ?></a></p>
+							<p><a class='linkinfo' href="midiru.php?bass=<?php echo ($row["bass"]); ?>">бас: <?php echo (10 * intval($row["bass"])); ?>%</a></p>
+							<p><a class='linkinfo' href="midiru.php?chords=<?php echo ($row["chords"]); ?>">аккорды: <?php echo (30 * intval($row["chords"])); ?>%</a></p>
+							<p><a class='linkinfo' href="midiru.php?drums=<?php echo ($row["drums"]); ?>">ударные: <?php echo (30 * intval($row["drums"])); ?>%</a></p>
 							<p><?php echo ($munote); ?></p>
 							<p><?php echo ($info); ?></p>
 

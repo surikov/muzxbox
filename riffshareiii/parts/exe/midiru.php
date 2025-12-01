@@ -45,19 +45,45 @@
 				$listtitle = '';
 				$where = "";
 				$selection = '';
-				if (!empty($find)) {
-					$listtitle = 'поиск: '.$find;
-					$selection = "&find=" . $find;
-					$where = " where music.title like '%" . $find
-						. "%' or artists.artist like '%" . $find
-						. "%' or authors.name like '%" . $find
-						. "%' or authors.city like '%" . $find . "%'";
-				}
-				if ($author >= 0) {
-					$listtitle = 'автор: ' . $author;
-					$selection = "&author=" . $author;
-					$where = " where authors.id=" . $author;
-					try {
+				try {
+					if (!empty($find)) {
+						$listtitle = 'поиск: ' . $find;
+						$selection = "&find=" . $find;
+						$where = " where music.title like '%" . $find
+							. "%' or artists.artist like '%" . $find
+							. "%' or authors.name like '%" . $find
+							. "%' or authors.city like '%" . $find . "%'";
+					}
+					if ($tempo >= 0) {
+						$listtitle = 'темп: ' . avgtempo02label('' . $tempo);
+						$selection = "&tempo=" . $tempo;
+						$where = " where parsedfile.avgtempo=" . $tempo;
+					}
+					if ($duration >= 0) {
+						$listtitle = 'размер: ' . songduration04label('' . $duration);
+						$selection = "&duration=" . $duration;
+						$where = " where parsedfile.songduration=" . $duration;
+					}
+					if ($bass >= 0) {
+						$listtitle = 'бас: ' .  (10 * $bass) . '%';
+						$selection = "&bass=" . $bass;
+						$where = " where parsedfile.bass=" . $bass;
+					}
+					if ($chords >= 0) {
+						$listtitle = 'бас: ' .  (30 * $chords) . '%';
+						$selection = "&chords=" . $chords;
+						$where = " where parsedfile.chords=" . $chords;
+					}
+					if ($drums >= 0) {
+						$listtitle = 'ударные: ' .  (30 * $drums) . '%';
+						$selection = "&drums=" . $drums;
+						$where = " where parsedfile.drums=" . $drums;
+					}
+					if ($author >= 0) {
+						$listtitle = 'автор: ' . $author;
+						$selection = "&author=" . $author;
+						$where = " where authors.id=" . $author;
+
 						$sql = "select name as name from authors where id=" . $author;
 						$result = $dbconnection->query($sql);
 						if ($result) {
@@ -65,15 +91,12 @@
 							$listtitle = 'автор: ' . $row["name"];
 							$result->close();
 						}
-					} catch (Exception $e) {
-						echo '<p>Caught exception: ',  $e, '</p>';
 					}
-				}
-				if ($artist >= 0) {
-					$listtitle = 'раздел: ' . $artist;
-					$selection = "&artist=" . $artist;
-					$where = " where artists.id=" . $artist;
-					try {
+					if ($artist >= 0) {
+						$listtitle = 'раздел: ' . $artist;
+						$selection = "&artist=" . $artist;
+						$where = " where artists.id=" . $artist;
+
 						$sql = "select artist as name from artists where id=" . $artist;
 						$result = $dbconnection->query($sql);
 						if ($result) {
@@ -81,9 +104,9 @@
 							$listtitle = 'раздел: ' . $row["name"];
 							$result->close();
 						}
-					} catch (Exception $e) {
-						echo '<p>Caught exception: ',  $e, '</p>';
 					}
+				} catch (Exception $e) {
+					echo '<p>Caught exception: ',  $e, '</p>';
 				}
 				$sql = "select count(*) as cnt"
 					. " from parsedfile"
