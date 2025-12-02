@@ -1112,7 +1112,7 @@ class EventsConverter {
 				//instrack.measures[ii]..skips.push(when);
 				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx,zvootraidx);
 				let chord = this.takeChord(zvooginstrack.measures[ii], when);
-				chord.pitches.push(note.basePitch);
+				if(chord.pitches.indexOf(note.basePitch)<0)chord.pitches.push(note.basePitch);
 
 				if (chord.slides.length == 0 || chord.slides.length == 1) {
 					if (note.bendPoints.length) {

@@ -211,7 +211,6 @@ class SchedulePlayer {
         };
     }
     connectAllPlugins() {
-        console.log('connectAllPlugins');
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
             if (msg) {

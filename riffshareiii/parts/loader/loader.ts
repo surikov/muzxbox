@@ -77,5 +77,10 @@ function saveRawText2localStorage(name: string, text: string) {
 }
 function goedit() {
 	//window.location.replace('minium.studio.html');
-	window.open('minium.studio.html',"_self")
+	//let backURL=encodeURIComponent('file:///D:/projects/muzxbox/riffshareiii/parts/exe/loader.html?home=test&from=qqq');
+	//let fullurl='minium.studio.html?a&=b&home='+backURL+'&test=123';
+	let backURL=encodeURIComponent(''+window.location);
+	let fullurl='minium.studio.html?home='+backURL;
+	console.log('fullurl',fullurl);
+	window.open(fullurl,"_self")
 }

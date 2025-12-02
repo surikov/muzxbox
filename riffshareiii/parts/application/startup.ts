@@ -1,9 +1,12 @@
 //console.log('startup v1.02');
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
+let goHomeBackURL: string = '';
 function startApplication() {
 	console.log('startApplication v1.6.11');
 	//let commands = new CommandDispatcher();
+	setupHomeBackURL();
+
 	globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
 	let ui = new UIRenderer();
 	ui.createUI();
@@ -82,6 +85,20 @@ function startApplication() {
 
 
 
+}
+function setupHomeBackURL() {
+	let urlParams = new URLSearchParams(window.location.search);
+	let home = urlParams.get('home');
+	if (home) {
+		goHomeBackURL = home;
+		console.log('goHomeBackURL', goHomeBackURL);
+	} else {
+		let saved = readRawTextFromlocalStorage('goHomeBackURL');
+		if (saved) {
+			goHomeBackURL = saved;
+		}
+	}
+	saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
 }
 function squashString(data: string): string {
 	return data;

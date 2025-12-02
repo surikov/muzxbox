@@ -548,24 +548,24 @@ class FileLoaderAlpha {
 									if (note.isPalmMute) {
 										let pmChord: Zvoog_Chord = this.takeChord(start, pmMeasure);
 										pmChord.slides = slides;
-										pmChord.pitches.push(pitch);
+										if (pmChord.pitches.indexOf(pitch) < 0) pmChord.pitches.push(pitch);
 										pmFlag = true;
 									} else {
 										if (beat.brushType == 1) {
 											let upchord: Zvoog_Chord = this.takeChord(start, upMeasure);
 											upchord.slides = slides;
-											upchord.pitches.push(pitch);
+											if (upchord.pitches.indexOf(pitch) < 0) upchord.pitches.push(pitch);
 											upFlag = true;
 										} else {
 											if (beat.brushType == 2) {
 												let downchord: Zvoog_Chord = this.takeChord(start, downMeasure);
 												downchord.slides = slides;
-												downchord.pitches.push(pitch);
+												if (downchord.pitches.indexOf(pitch) < 0) downchord.pitches.push(pitch);
 												downFlag = true;
 											} else {
 												let chord: Zvoog_Chord = this.takeChord(start, mzxbxMeasure);
 												chord.slides = slides;
-												chord.pitches.push(pitch);
+												if (chord.pitches.indexOf(pitch) < 0) chord.pitches.push(pitch);
 											}
 										}
 									}

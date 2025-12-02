@@ -144,6 +144,7 @@ declare type Zvoog_Project = {
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];
+    farorder: number[];
     percussions: Zvoog_PercussionTrack[];
     comments: Zvoog_CommentMeasure[];
     filters: Zvoog_FilterTarget[];
@@ -271,11 +272,21 @@ declare type MZXBX_PluginRegistrationInformation = {
 };
 declare type MZXBX_MessageToPlugin = {
     hostData: any;
+    colors: {
+        background: string;
+        main: string;
+        drag: string;
+        line: string;
+        click: string;
+    };
+    screenData: number[] | null;
+    langID: string;
 };
 declare type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
+    sceenWait: boolean;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

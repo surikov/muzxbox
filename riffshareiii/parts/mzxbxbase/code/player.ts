@@ -139,7 +139,7 @@ class SchedulePlayer implements MZXBX_Player {
 		};
 	}
 	connectAllPlugins(): string | null {
-		console.log('connectAllPlugins');
+		//console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
 			//console.log('launchCollectedPlugins', msg);

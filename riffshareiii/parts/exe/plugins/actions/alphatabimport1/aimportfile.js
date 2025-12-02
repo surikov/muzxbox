@@ -16249,7 +16249,8 @@ class EventsConverter {
                 let noteStartMs = note.startMs - barStart;
                 let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
                 let chord = this.takeChord(zvooginstrack.measures[ii], when);
-                chord.pitches.push(note.basePitch);
+                if (chord.pitches.indexOf(note.basePitch) < 0)
+                    chord.pitches.push(note.basePitch);
                 if (chord.slides.length == 0 || chord.slides.length == 1) {
                     if (note.bendPoints.length) {
                         chord.slides = [];
@@ -16908,27 +16909,31 @@ class FileLoaderAlpha {
                                     if (note.isPalmMute) {
                                         let pmChord = this.takeChord(start, pmMeasure);
                                         pmChord.slides = slides;
-                                        pmChord.pitches.push(pitch);
+                                        if (pmChord.pitches.indexOf(pitch) < 0)
+                                            pmChord.pitches.push(pitch);
                                         pmFlag = true;
                                     }
                                     else {
                                         if (beat.brushType == 1) {
                                             let upchord = this.takeChord(start, upMeasure);
                                             upchord.slides = slides;
-                                            upchord.pitches.push(pitch);
+                                            if (upchord.pitches.indexOf(pitch) < 0)
+                                                upchord.pitches.push(pitch);
                                             upFlag = true;
                                         }
                                         else {
                                             if (beat.brushType == 2) {
                                                 let downchord = this.takeChord(start, downMeasure);
                                                 downchord.slides = slides;
-                                                downchord.pitches.push(pitch);
+                                                if (downchord.pitches.indexOf(pitch) < 0)
+                                                    downchord.pitches.push(pitch);
                                                 downFlag = true;
                                             }
                                             else {
                                                 let chord = this.takeChord(start, mzxbxMeasure);
                                                 chord.slides = slides;
-                                                chord.pitches.push(pitch);
+                                                if (chord.pitches.indexOf(pitch) < 0)
+                                                    chord.pitches.push(pitch);
                                             }
                                         }
                                     }

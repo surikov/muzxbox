@@ -231,8 +231,10 @@ class StateDiff {
         }
     }
 }
+let goHomeBackURL = '';
 function startApplication() {
     console.log('startApplication v1.6.11');
+    setupHomeBackURL();
     globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
     let ui = new UIRenderer();
     ui.createUI();
@@ -291,6 +293,21 @@ function startApplication() {
         }
     }
     globalCommandDispatcher.resetProject();
+}
+function setupHomeBackURL() {
+    let urlParams = new URLSearchParams(window.location.search);
+    let home = urlParams.get('home');
+    if (home) {
+        goHomeBackURL = home;
+        console.log('goHomeBackURL', goHomeBackURL);
+    }
+    else {
+        let saved = readRawTextFromlocalStorage('goHomeBackURL');
+        if (saved) {
+            goHomeBackURL = saved;
+        }
+    }
+    saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
 }
 function squashString(data) {
     return data;
@@ -2873,7 +2890,9 @@ class UIToolbar {
             globalCommandDispatcher.toggleStartStop();
         });
         this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn) => {
-            location.href = 'midiru.php';
+            if (goHomeBackURL) {
+                window.location.replace(goHomeBackURL);
+            }
         });
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
@@ -6175,7 +6194,6 @@ class WarningUI {
         this.warningInfo4.href = '';
     }
     showWarning(title, msg, smallMsg, onCancel) {
-        console.log('WarningUI show', title, msg);
         this.setIcon(icon_time);
         this.onCancel = onCancel;
         this.warningTitle.text = title;

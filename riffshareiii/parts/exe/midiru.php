@@ -70,7 +70,7 @@
 						$where = " where parsedfile.bass=" . $bass;
 					}
 					if ($chords >= 0) {
-						$listtitle = 'бас: ' .  (30 * $chords) . '%';
+						$listtitle = 'аккорды: ' .  (30 * $chords) . '%';
 						$selection = "&chords=" . $chords;
 						$where = " where parsedfile.chords=" . $chords;
 					}

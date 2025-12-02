@@ -328,7 +328,7 @@ class ChordPitchPerformerUtil {
             "0460_GeneralUserGS_sf2_file", "0460_Aspirin_sf2_file", "0460_Chaos_sf2_file", "0460_FluidR3_GM_sf2_file", "0460_JCLive_sf2_file", "0460_SBLive_sf2", "0460_SoundBlasterOld_sf2", "0461_FluidR3_GM_sf2_file",
             "0470_GeneralUserGS_sf2_file", "0470_Aspirin_sf2_file", "0470_Chaos_sf2_file", "0470_FluidR3_GM_sf2_file", "0470_JCLive_sf2_file", "0470_SBLive_sf2", "0470_SoundBlasterOld_sf2", "0471_FluidR3_GM_sf2_file", "0471_GeneralUserGS_sf2_file",
             "0480_GeneralUserGS_sf2_file", "0480_Aspirin_sf2_file", "0480_Chaos_sf2_file", "0480_FluidR3_GM_sf2_file", "0480_JCLive_sf2_file", "0480_SBLive_sf2", "0480_SoundBlasterOld_sf2", "04810_GeneralUserGS_sf2_file", "04811_GeneralUserGS_sf2_file", "04812_GeneralUserGS_sf2_file", "04813_GeneralUserGS_sf2_file", "04814_GeneralUserGS_sf2_file", "04815_GeneralUserGS_sf2_file", "04816_GeneralUserGS_sf2_file", "04817_GeneralUserGS_sf2_file", "0481_Aspirin_sf2_file", "0481_FluidR3_GM_sf2_file", "0481_GeneralUserGS_sf2_file", "0482_Aspirin_sf2_file", "0482_GeneralUserGS_sf2_file", "0483_GeneralUserGS_sf2_file", "0484_GeneralUserGS_sf2_file", "0485_GeneralUserGS_sf2_file", "0486_GeneralUserGS_sf2_file", "0487_GeneralUserGS_sf2_file", "0488_GeneralUserGS_sf2_file", "0489_GeneralUserGS_sf2_file",
-            "0490_Chaos_sf2_file", "0490_GeneralUserGS_sf2_file", "0490_Aspirin_sf2_file", "0490_FluidR3_GM_sf2_file", "0490_JCLive_sf2_file", "0490_SBLive_sf2", "0490_SoundBlasterOld_sf2", "0491_GeneralUserGS_sf2_file", "0492_GeneralUserGS_sf2_file",
+            "0490_GeneralUserGS_sf2_file", "0490_Chaos_sf2_file", "0490_Aspirin_sf2_file", "0490_FluidR3_GM_sf2_file", "0490_JCLive_sf2_file", "0490_SBLive_sf2", "0490_SoundBlasterOld_sf2", "0491_GeneralUserGS_sf2_file", "0492_GeneralUserGS_sf2_file",
             "0501_FluidR3_GM_sf2_file", "0500_Aspirin_sf2_file", "0500_Chaos_sf2_file", "0500_FluidR3_GM_sf2_file", "0500_GeneralUserGS_sf2_file", "0500_JCLive_sf2_file", "0500_SBLive_sf2", "0500_SoundBlasterOld_sf2", "0501_GeneralUserGS_sf2_file", "0502_FluidR3_GM_sf2_file", "0502_GeneralUserGS_sf2_file", "0503_FluidR3_GM_sf2_file", "0504_FluidR3_GM_sf2_file", "0505_FluidR3_GM_sf2_file",
             "0510_Aspirin_sf2_file", "0510_SBLive_sf2", "0510_GeneralUserGS_sf2_file", "0510_Chaos_sf2_file", "0510_FluidR3_GM_sf2_file", "0510_JCLive_sf2_file", "0510_SoundBlasterOld_sf2", "0511_GeneralUserGS_sf2_file", "0511_SoundBlasterOld_sf2",
             "0520_JCLive_sf2_file", "0520_GeneralUserGS_sf2_file", "0520_Aspirin_sf2_file", "0520_Chaos_sf2_file", "0520_FluidR3_GM_sf2_file", "0520_SBLive_sf2", "0520_Soul_Ahhs_sf2_file", "0520_SoundBlasterOld_sf2", "0521_FluidR3_GM_sf2_file", "0521_Soul_Ahhs_sf2_file", "0521_SoundBlasterOld_sf2", "0522_Soul_Ahhs_sf2_file",
@@ -370,7 +370,7 @@ class ChordPitchPerformerUtil {
             "0880_SoundBlasterOld_sf2", "0880_GeneralUserGS_sf2_file", "0880_Aspirin_sf2_file", "0880_Chaos_sf2_file", "0880_FluidR3_GM_sf2_file", "0880_JCLive_sf2_file", "0880_SBLive_sf2", "0881_Aspirin_sf2_file", "0881_FluidR3_GM_sf2_file", "0881_GeneralUserGS_sf2_file", "0881_SoundBlasterOld_sf2", "0882_Aspirin_sf2_file", "0882_FluidR3_GM_sf2_file", "0882_GeneralUserGS_sf2_file", "0883_GeneralUserGS_sf2_file", "0884_GeneralUserGS_sf2_file", "0885_GeneralUserGS_sf2_file", "0886_GeneralUserGS_sf2_file", "0887_GeneralUserGS_sf2_file", "0888_GeneralUserGS_sf2_file", "0889_GeneralUserGS_sf2_file",
             "0890_Aspirin_sf2_file", "0890_GeneralUserGS_sf2_file", "0890_Chaos_sf2_file", "0890_FluidR3_GM_sf2_file", "0890_JCLive_sf2_file", "0890_SBLive_sf2", "0890_SoundBlasterOld_sf2", "0891_Aspirin_sf2_file", "0891_FluidR3_GM_sf2_file", "0891_GeneralUserGS_sf2_file",
             "0900_GeneralUserGS_sf2_file", "0900_Aspirin_sf2_file", "0900_Chaos_sf2_file", "0900_FluidR3_GM_sf2_file", "0900_JCLive_sf2_file", "0900_SBLive_sf2", "0900_SoundBlasterOld_sf2", "0901_Aspirin_sf2_file", "0901_FluidR3_GM_sf2_file", "0901_GeneralUserGS_sf2_file", "0901_SoundBlasterOld_sf2",
-            "0910_GeneralUserGS_sf2_file", "0910_Aspirin_sf2_file", "0910_Chaos_sf2_file", "0910_FluidR3_GM_sf2_file", "0910_JCLive_sf2_file", "0910_SBLive_sf2", "0910_SoundBlasterOld_sf2", "0911_Aspirin_sf2_file", "0911_GeneralUserGS_sf2_file", "0911_JCLive_sf2_file", "0911_SoundBlasterOld_sf2",
+            "0910_FluidR3_GM_sf2_file", "0910_GeneralUserGS_sf2_file", "0910_Aspirin_sf2_file", "0910_Chaos_sf2_file", "0910_JCLive_sf2_file", "0910_SBLive_sf2", "0910_SoundBlasterOld_sf2", "0911_Aspirin_sf2_file", "0911_GeneralUserGS_sf2_file", "0911_JCLive_sf2_file", "0911_SoundBlasterOld_sf2",
             "0920_GeneralUserGS_sf2_file", "0920_Aspirin_sf2_file", "0920_Chaos_sf2_file", "0920_FluidR3_GM_sf2_file", "0920_JCLive_sf2_file", "0920_SBLive_sf2", "0920_SoundBlasterOld_sf2", "0921_Aspirin_sf2_file", "0921_GeneralUserGS_sf2_file", "0921_SoundBlasterOld_sf2",
             "0930_GeneralUserGS_sf2_file", "0930_Aspirin_sf2_file", "0930_Chaos_sf2_file", "0930_FluidR3_GM_sf2_file", "0930_JCLive_sf2_file", "0930_SBLive_sf2", "0930_SoundBlasterOld_sf2", "0931_Aspirin_sf2_file", "0931_FluidR3_GM_sf2_file", "0931_GeneralUserGS_sf2_file", "0931_SoundBlasterOld_sf2",
             "0941_Aspirin_sf2_file", "0940_GeneralUserGS_sf2_file", "0940_Aspirin_sf2_file", "0940_Chaos_sf2_file", "0940_FluidR3_GM_sf2_file", "0940_JCLive_sf2_file", "0940_SBLive_sf2", "0940_SoundBlasterOld_sf2", "0941_FluidR3_GM_sf2_file", "0941_GeneralUserGS_sf2_file", "0941_JCLive_sf2_file",
@@ -388,7 +388,7 @@ class ChordPitchPerformerUtil {
             "1060_GeneralUserGS_sf2_file", "1060_Aspirin_sf2_file", "1060_Chaos_sf2_file", "1060_FluidR3_GM_sf2_file", "1060_JCLive_sf2_file", "1060_SBLive_sf2", "1060_SoundBlasterOld_sf2", "1061_FluidR3_GM_sf2_file", "1061_GeneralUserGS_sf2_file", "1061_SoundBlasterOld_sf2",
             "1070_GeneralUserGS_sf2_file", "1070_Aspirin_sf2_file", "1070_Chaos_sf2_file", "1070_FluidR3_GM_sf2_file", "1070_JCLive_sf2_file", "1070_SBLive_sf2", "1070_SoundBlasterOld_sf2", "1071_FluidR3_GM_sf2_file", "1071_GeneralUserGS_sf2_file", "1072_GeneralUserGS_sf2_file", "1073_GeneralUserGS_sf2_file",
             "1080_GeneralUserGS_sf2_file", "1080_Aspirin_sf2_file", "1080_Chaos_sf2_file", "1080_FluidR3_GM_sf2_file", "1080_JCLive_sf2_file", "1080_SBLive_sf2", "1080_SoundBlasterOld_sf2", "1081_SoundBlasterOld_sf2",
-            "1090_GeneralUserGS_sf2_file", "1090_Aspirin_sf2_file", "1090_Chaos_sf2_file", "1090_FluidR3_GM_sf2_file", "1090_JCLive_sf2_file", "1090_SBLive_sf2", "1090_SoundBlasterOld_sf2", "1091_SoundBlasterOld_sf2",
+            "1090_FluidR3_GM_sf2_file", "1090_GeneralUserGS_sf2_file", "1090_Aspirin_sf2_file", "1090_Chaos_sf2_file", "1090_JCLive_sf2_file", "1090_SBLive_sf2", "1090_SoundBlasterOld_sf2", "1091_SoundBlasterOld_sf2",
             "1100_GeneralUserGS_sf2_file", "1100_Aspirin_sf2_file", "1100_Chaos_sf2_file", "1100_FluidR3_GM_sf2_file", "1100_JCLive_sf2_file", "1100_SBLive_sf2", "1100_SoundBlasterOld_sf2", "1101_Aspirin_sf2_file", "1101_FluidR3_GM_sf2_file", "1101_GeneralUserGS_sf2_file", "1102_GeneralUserGS_sf2_file",
             "1110_GeneralUserGS_sf2_file", "1110_Aspirin_sf2_file", "1110_Chaos_sf2_file", "1110_FluidR3_GM_sf2_file", "1110_JCLive_sf2_file", "1110_SBLive_sf2", "1110_SoundBlasterOld_sf2",
             "1120_GeneralUserGS_sf2_file", "1120_Aspirin_sf2_file", "1120_Chaos_sf2_file", "1120_FluidR3_GM_sf2_file", "1120_JCLive_sf2_file", "1120_SBLive_sf2", "1120_SoundBlasterOld_sf2", "1121_SoundBlasterOld_sf2",
@@ -2518,7 +2518,7 @@ class EventsConverter {
         if (program == 39)
             re.ratio = 0.95;
         if (program == 48)
-            re.ratio = 0.4;
+            re.ratio = 0.6;
         if (program == 49)
             re.ratio = 0.4;
         if (program == 50)
@@ -2560,7 +2560,8 @@ class EventsConverter {
                 let noteStartMs = note.startMs - barStart;
                 let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
                 let chord = this.takeChord(zvooginstrack.measures[ii], when);
-                chord.pitches.push(note.basePitch);
+                if (chord.pitches.indexOf(note.basePitch) < 0)
+                    chord.pitches.push(note.basePitch);
                 if (chord.slides.length == 0 || chord.slides.length == 1) {
                     if (note.bendPoints.length) {
                         chord.slides = [];
@@ -2708,6 +2709,9 @@ function saveRawText2localStorage(name, text) {
     localStorage.setItem(name, text);
 }
 function goedit() {
-    window.open('minium.studio.html', "_self");
+    let backURL = encodeURIComponent('' + window.location);
+    let fullurl = 'minium.studio.html?home=' + backURL;
+    console.log('fullurl', fullurl);
+    window.open(fullurl, "_self");
 }
 //# sourceMappingURL=doload.js.map

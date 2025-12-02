@@ -33,12 +33,15 @@ class UIToolbar {
 			globalCommandDispatcher.toggleStartStop();
 		});
 
-		
+
 		this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn: number) => {
-			location.href='midiru.php';
+			//location.href='midiru.php';
+			if (goHomeBackURL) {
+				window.location.replace(goHomeBackURL);
+			}
 		});
 
-		
+
 		//this.playStopButton = new ToolBarButton([icon_play, icon_pause], -1, 0, (nn: number) => {
 		//	globalCommandDispatcher.toggleStartStop();
 		//});

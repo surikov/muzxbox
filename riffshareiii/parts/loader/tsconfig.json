@@ -3,7 +3,7 @@
 		"target": "es2020"
 		//"target": "es2015"
 		,
-		"outFile": "js/doload.js"
+		"outFile": "../exe/js/doload.js"
 		//,"outDir":"../js"
 		,
 		"strictNullChecks": true,

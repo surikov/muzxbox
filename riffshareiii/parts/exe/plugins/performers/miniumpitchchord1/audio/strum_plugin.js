@@ -504,7 +504,7 @@ class MM_WebAudioFontPlayer {
         }
         when = when + Math.random() * 2 / tempo;
         var envelopes = [];
-        let strumStep = 1.1 / tempo;
+        let strumStep = 0.7 / tempo;
         for (var i = 0; i < pitches.length; i++) {
             var envlp = this.queueWaveTable(audioContext, target, preset, when + i * strumStep, pitches[i], duration, volume - Math.random() * 0.01, slides);
             if (envlp)

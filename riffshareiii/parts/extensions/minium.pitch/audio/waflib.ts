@@ -231,7 +231,9 @@ class MM_WebAudioFontPlayer {
 		when = when + Math.random() * 2 / tempo;
 		//console.log('~',when);
 		var envelopes: MMWaveEnvelope[] = [];
-		let strumStep = 1.1 / tempo;
+		//let strumStep = 1.1 / tempo;
+		let strumStep = 0.7 / tempo;
+		//console.log(strumStep);
 		for (var i = 0; i < pitches.length; i++) {
 			/*var singleSlide: undefined | ZPWaveSlide[] = undefined;
 			if (slides) {
