@@ -14521,7 +14521,7 @@ MusicXmlImporter.allDurations = [
 ];
 MusicXmlImporter.allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiUtils.toTicks(d));
 let pluckDiff = 23;
-let maxAlignedDelta = 43;
+let maxAlignedDelta = 17;
 let maxDeltaNearestPoint = 121;
 class MidiParser {
     constructor(arrayBuffer) {

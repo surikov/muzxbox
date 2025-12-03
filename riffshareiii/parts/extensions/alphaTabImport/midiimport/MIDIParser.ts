@@ -8,7 +8,7 @@ type PP = {
 };
 let pluckDiff = 23;
 type TicksAverageTime = { avgstartms: number, items: number[] };
-let maxAlignedDelta = 43;//22;//23;
+let maxAlignedDelta = 17;//43;//22;//23;
 let maxDeltaNearestPoint=121;//99;
 class MidiParser {
 	alignedMIDIevents: { startMs: number, avg: number, events: MIDIEvent[] }[] = [];
