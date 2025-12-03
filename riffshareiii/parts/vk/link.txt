@@ -1,1 +1,8 @@
+https://github.com/VKCOM/create-vk-mini-app
+https://dev.vk.com/ru/mini-apps/getting-started
+
 https://vk.com/app54348455
+vk.com: https://stage-app54348455-84b41aa683df.pages.vk-apps.com/index.html
+iOS & Android:  https://stage-app54348455-84b41aa683df.pages.vk-apps.com/index.html
+m.vk.com:       https://stage-app54348455-84b41aa683df.pages.vk-apps.com/index.html
+
