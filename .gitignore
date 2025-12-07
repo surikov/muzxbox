@@ -33,3 +33,5 @@
 riffshareiii/parts/exe/dbcfg/dbcfgdata.php
 /riffshareiii/parts/vk/mini-app/node_modules
 /riffshareiii/parts/vk/mini-app/build
+/riffshareiii/parts/vk/deploy/node_modules
+/riffshareiii/parts/vk/bridge/node_modules
