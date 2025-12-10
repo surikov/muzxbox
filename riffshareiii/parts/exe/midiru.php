@@ -4,6 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 	<link rel="stylesheet" type="text/css" href="theme/midiru.css">
+	<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
 	<title>MIDI.ru Archive</title>
 </head>
 
@@ -17,6 +18,8 @@
 	}
 	?>
 	<script language="javascript">
+		var vk_access_token = '';
+
 		function findprompt() {
 			let what = prompt("Поиск по тексту", "<?php echo ($find); ?>");
 			if (what != null) {
@@ -25,6 +28,30 @@
 				window.location = url;
 			}
 		}
+
+		function vkinit() {
+			console.log('vkBridge', vkBridge);
+			vkBridge.send('VKWebAppInit')
+				.then(data => {
+					console.log('vkBridge data', data);
+				})
+				.catch(error => {
+					console.log('vkBridge error', error);
+				});
+			vkBridge.subscribe(e => {
+				if (e.detail.type === 'VKWebAppViewHide') {
+					console.log('VKWebAppViewHide', e);
+				} else {
+					if (e.detail.type === 'VKWebAppAccessTokenReceived') {
+						console.log('token', e.detail.data);
+						vk_access_token = e.detail.data.access_token;
+					} else {
+						console.log('vk', e);
+					}
+				}
+			});
+		}
+		vkinit();
 	</script>
 	<div class="pagediv>">
 		<div class="headerbox">
