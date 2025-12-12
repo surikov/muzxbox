@@ -2,8 +2,13 @@
 
 <head>
 	<script type='text/javascript' src='bigexport.js'></script>
-	<script type='text/javascript' src='testapp.js'></script>
+
 	<script nonce="csp_nonce" src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+	<!--<script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>-->
+	<!--<script src='https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-latest.js'></script>-->
+	<script src='yandexsdk.js'></script>
+	<script type='text/javascript' src='testapp.js'></script>
+
 	<script nonce="csp_nonce" type="text/javascript">
 		//if ('VKIDSDK' in window) {
 		const VKID = window.VKIDSDK;
@@ -70,13 +75,38 @@
 		function vkidOnError(error) {
 			console.log('vkidOnError', error);
 		}
+
+		function showYa() {
+			console.log('YaAuthSuggest', YaAuthSuggest);
+			let info = {
+				client_id: 'ad8bb18784e44c64a2098ad6a342e576',
+				response_type: 'token',
+				redirect_uri: 'https://mzxbox.ru/minium/vkread.html'
+			};
+			YaAuthSuggest.init(info, 'https://mzxbox.ru')
+				.then((yalib) => {
+					//.then(({
+					//	handler
+					//}) => {
+					console.log('YaAuthSuggest.then1 yalib', yalib);
+					yalib.handler();
+				})
+				.then((data) => {
+					console.log('YaAuthSuggest.then2', data);
+
+				})
+				.catch((error) => {
+					console.log('YaAuthSuggest.catch', error);
+				});
+		}
 		//}
 	</script>
 </head>
 
 <body>
 	<h1>test</h1>
-	<p><button onclick="showVK();">start</button></p>
+	<p><button onclick="showYa();">ya start</button></p>
+	<p><button onclick="showVK();">vk start</button></p>
 	<div id="vkbutton"></div>
 	<p>VK</p>
 </body>
