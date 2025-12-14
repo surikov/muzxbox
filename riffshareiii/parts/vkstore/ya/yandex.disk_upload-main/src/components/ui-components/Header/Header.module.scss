@@ -1,0 +1,13 @@
+.header {
+  padding: 30px 15px;
+  margin: 0 auto;
+  max-width: 900px;
+  border-bottom: 3px solid var(--blue-color);
+
+  & > h1 {
+    margin: 0;
+    text-align: center;
+    color: var(--blue-color);
+    line-height: 24px;
+  }
+}

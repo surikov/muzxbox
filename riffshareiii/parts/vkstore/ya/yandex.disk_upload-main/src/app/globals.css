@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Grenze:wght@200;300;400;600&display=swap');
+
+
+:root {
+  --white: #FFFFFF;
+  --red-light: rgb(255 59 59);
+  --red-accept: rgba(194, 0, 0, 0.764);
+  --turquoise: rgb(194 202 255);
+  --text-color: #333333;
+  --blue-color: #4f59a6;
+  --blue-light: #b3bcff;
+  --yellow-color: #c0991e;
+  --yellow-light-color: rgb(224, 185, 69);
+  --gray: #959595;
+  --body-bg: #dcdcdc82;
+  --error-text-color: rgb(165, 0, 0);
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  min-width: 320px;
+  font-family: 'Grenze', serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 16px;
+  background-color: var(--body-bg);
+}
+
+* {
+  font-family: 'Grenze', serif;
+  color: var(--text-color);
+  box-sizing: border-box;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+}
+
+button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
