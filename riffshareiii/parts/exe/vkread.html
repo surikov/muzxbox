@@ -1,0 +1,137 @@
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<script type='text/javascript' src='bigexport.js'></script>
+
+	<script nonce="csp_nonce" src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+	<script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+
+	<script type='text/javascript' src='testapp.js'></script>
+
+	<script nonce="csp_nonce" type="text/javascript">
+		//if ('VKIDSDK' in window) {
+		const VKID = window.VKIDSDK;
+		let access_info = null;
+
+		function showVK() {
+
+
+			VKID.Config.init({
+				app: 54394770,
+				redirectUrl: 'https://mzxbox.ru/minium/minium.studio.html',
+				responseMode: VKID.ConfigResponseMode.Callback,
+				source: VKID.ConfigSource.LOWCODE,
+				scope: 'docs', // Заполните нужными доступами по необходимости
+			});
+
+			const oneTap = new VKID.OneTap();
+
+			oneTap.render({
+					container: document.getElementById("vkbutton"),
+					//container: document.currentScript.parentElement,
+					showAlternativeLogin: true
+				})
+				.on(VKID.WidgetEvents.ERROR, vkidRenderError)
+				.on(VKID.OneTapInternalEvents.LOGIN_SUCCESS, vkExchange);
+		}
+
+		function vkExchange(payload) {
+			console.log('vkExchange', payload);
+			const code = payload.code;
+			const deviceId = payload.device_id;
+			VKID.Auth.exchangeCode(code, deviceId)
+				.then(vkidOnSuccess)
+				.catch(vkidOnError);
+		}
+
+		function vkidOnSuccess(data) {
+			console.log('vkidOnSuccess', data);
+			access_info = data;
+			sendFile(access_info.access_token);
+			/*
+					{
+    "refresh_token": "vk2.a.Pj8FlOXhKiG_PsdDvTIJqGJqTCZ_73kim6tX5F5Zr-5MOnOlzO7qylNBB2mshJggEsxaKr0xBZNe8PjmeAECTdKfTqPdKnyuqX_H_MwjtkxsqaKyv3r-W2Muv7qPPKdj9zPT4m40H5HScVawaa7Ze8FgX1xJg5t98due0bm8lQCWF4N7W-AzyWzdPOtN6O38Q4YCdz2nZY5nJa4szSooNKGmtXO9Drb-MmuVuJV7npA",
+    "access_token": "vk2.a.hya5KvOQIUlh98bwLyPfrga469uzDIMU1y7URiv3v7RThWrhnHuTEhSFIPqSQ5_rqGuO6jEXykPlntOul54jLDPh6W9rH1UrShz0j8c4cxUGHMjAtGQRfdF_BZgnknheNaPzPNAFp_lhSNMDHn6lq9vge2kpq2goOxjU7_pBj1DPNkpsxlbCkt1R37bzNW5QnAAjHlblaTsM-gtPPs1Y0lfOrmrADs655ZgRRpwOiAYYH755cv6CtSrHJ4_quR_b",
+    "id_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpaXMiOiJWSyIsInN1YiI6OTU5OTQ1NDIsImFwcCI6NTQzOTQ3NzAsImV4cCI6MTc5NjU1Mzc4OSwiaWF0IjoxNzY1NDQ5Nzg5LCJqdGkiOjIxfQ.Z18zN4IFPRynm3VlkHJd-jNK5JJ9fFumMnaedNFXqIDeBiNssxUYPDjNP5qtaa6ftg8p0hXMEFoaJkY8BKROI3vr4imlmgvJar2_P4RUHRASXq_tiE6wmVfl3hJOKwD5rcLPdkIn2p4zIKZaKM30E-GkSaVfR-nbGgrKYZFuHpLbzygNZUhLxbVL8J65EFdylOoBdsSGlWUdhOyBTsCZnuh6t8K1zJ7zarSlKKeQc26RsqL2QV7qCcqCVXyWC9w-tmvscdkt0W5YAzBS4UZZAwWx_MURlTYpXON2iMq0I3TIXOfRNv4afiV_h8msg_RXbaNZliLRrDqHotMXHUOZUWkwAx4IclQpZBQiQR2PKv55udnFaxwOCG0Ud926A9wa7UzGtWkFpS_GtY8Ww68Q0rzh3jOBW4HuJxhH_thTigIXWIiWKIxQQJfm8Gi263p2A7-78uEJlCAw4cjhugU4yEsUF4YudTICGENt5kCIF435SJb6jqYCN5Kk_mcXDIOohZynctIwFBCH7Ra23uc88Oyigc9cDJP8E9VUH328uYK82HhV5PY-HqahKZ5MTxXO6fnZhLtHSWBq2X2qRuhFISiati7cJjIsWwlLjPJns9KUmKniES_n4ALr0gGhVxk-GAo0HSzkJ0hqyiKiBuipYmZA49EvrZxtgYYsND4BGzY",
+    "token_type": "Bearer",
+    "expires_in": 3600,
+    "user_id": 95994542,
+    "state": "5wwJ-IBKAi785PQw2KjmiRH_W9vfc33_X0EqzWNieI7kfJtw",
+    "scope": "vkid.personal_info"
+}
+					*/
+
+		}
+
+		function sendFile(token) {
+			let url = "";
+		}
+
+		function vkidRenderError(error) {
+			console.log('vkidRenderError', error);
+		}
+
+		function vkidOnError(error) {
+			console.log('vkidOnError', error);
+		}
+
+		function showYa() {
+			//https://passport.yandex.ru/pwl-yandex?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D23460948-2142-4f55-adbf-f08e1e2bd1b7%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth
+/*
+			https://passport.yandex.ru/pwl-yandex
+?retpath=https://oauth.yandex.ru/authorize
+?client_id=ad8bb18784e44c64a2098ad6a342e576
+&response_type=token
+&redirect_uri=https://mzxbox.ru/minium/vkread.html
+&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
+&widget_kind=default
+&suggest_hostname=mzxbox.ru
+&et=1765731001482
+&noreturn=1
+&origin=oauth
+&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
+&cause=auth
+*/
+
+/*
+request
+https://passport.yandex.ru/pwl-yandex?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D0%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=0&cause=auth
+response
+https://mzxbox.ru/minium/vkread.html#access_token=y0__xDT3NeEAhjgozwg66f90BUw-K7t2AcOjOqls2zHm1-7Bn4CnoZvSL0tQA&token_type=bearer&expires_in=31342952&cid=tm7pp01u5pfdu3whrh034bchtm
+*/
+			let info = {
+				client_id: 'ad8bb18784e44c64a2098ad6a342e576',
+				response_type: 'token',
+				redirect_uri: 'https://mzxbox.ru/minium/vkread.html'
+			};
+			YaAuthSuggest.init(info, 'https://mzxbox.ru')
+				.then((yalib) => {
+					//.then(({
+					//	handler
+					//}) => {
+					console.log('YaAuthSuggest.then1 yalib', yalib);
+					yalib.handler();
+				})
+				.then((data) => {
+					console.log('YaAuthSuggest.then2', data);
+
+				})
+				.catch((error) => {
+					console.log('YaAuthSuggest.catch', error);
+				});
+		}
+		//}
+	</script>
+</head>
+
+<body>
+	<h1>test</h1>
+	<p><button onclick="showYa();">ya start</button></p>
+	<p><a href='https://passport.yandex.ru/pwl-yandex/auth/add?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D0%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth'>ya upload</a></p>
+	<p><button onclick="showVK();">vk start</button></p>
+	<div id="vkbutton"></div>
+	<p>VK</p>
+</body>
+
+</html>
