@@ -2,17 +2,50 @@
 
 <head>
 	<meta charset="UTF-8">
-	<script type='text/javascript' src='bigexport.js'></script>
 
+
+
+	<!--
+	<script type='text/javascript' src='bigexport.js'></script>
+	<script type='text/javascript' src='testapp.js'></script>
 	<script nonce="csp_nonce" src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
 	<script src="https://yastatic.net/s3/passport-sdk/autofill/v1/sdk-suggest-with-polyfills-latest.js"></script>
+-->
+	<script type="text/javascript">
+		//https://oauth.yandex.ru/
+		//Export MIDIru
 
-	<script type='text/javascript' src='testapp.js'></script>
-
-	<script nonce="csp_nonce" type="text/javascript">
 		//if ('VKIDSDK' in window) {
-		const VKID = window.VKIDSDK;
+		//const VKID = window.VKIDSDK;
 		let access_info = null;
+
+		let ya_access_token = '';
+		let ya_upload_method = '';
+		let ya_upload_url = '';
+		let ya_operation_id = '';
+		let ya_file_name = '';
+
+		function check_ya_token() {
+			if (window.location.hash) {
+				let hash = window.location.hash.substring(1);
+				if (hash) {
+					let pars = hash.split('&');
+					for (let ii = 0; ii < pars.length; ii++) {
+						let namval = pars[ii].split('=');
+						if (namval[0]) {
+							if (namval[1]) {
+								console.log(ii, namval[0], namval[1]);
+								if (namval[0] == 'access_token') {
+									ya_access_token = namval[1];
+								}
+							}
+						}
+
+					}
+				}
+			}
+			document.getElementById("ya_token_text").innerHTML = ya_access_token;
+		}
 
 		function showVK() {
 
@@ -77,28 +110,41 @@
 		}
 
 		function showYa() {
-			//https://passport.yandex.ru/pwl-yandex?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D23460948-2142-4f55-adbf-f08e1e2bd1b7%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth
-/*
+			/*
+			request
+			https://passport.yandex.ru/pwl-yandex?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D23460948-2142-4f55-adbf-f08e1e2bd1b7%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth
+			
 			https://passport.yandex.ru/pwl-yandex
-?retpath=https://oauth.yandex.ru/authorize
-?client_id=ad8bb18784e44c64a2098ad6a342e576
-&response_type=token
-&redirect_uri=https://mzxbox.ru/minium/vkread.html
-&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
-&widget_kind=default
-&suggest_hostname=mzxbox.ru
-&et=1765731001482
-&noreturn=1
-&origin=oauth
-&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
-&cause=auth
-*/
+			?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D23460948-2142-4f55-adbf-f08e1e2bd1b7%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482
+			&noreturn=1
+			&origin=oauth
+			&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
+			&cause=auth
 
-/*
-request
-https://passport.yandex.ru/pwl-yandex?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D0%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=0&cause=auth
-response
-https://mzxbox.ru/minium/vkread.html#access_token=y0__xDT3NeEAhjgozwg66f90BUw-K7t2AcOjOqls2zHm1-7Bn4CnoZvSL0tQA&token_type=bearer&expires_in=31342952&cid=tm7pp01u5pfdu3whrh034bchtm
+			retpath
+			https://oauth.yandex.ru/authorize?client_id=ad8bb18784e44c64a2098ad6a342e576&response_type=token&redirect_uri=https%3A%2F%2Fmzxbox.ru%2Fminium%2Fvkread.html&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&widget_kind=default&suggest_hostname=mzxbox.ru&et=1765731001482
+			https://oauth.yandex.ru/authorize
+			?client_id=ad8bb18784e44c64a2098ad6a342e576
+			&response_type=token
+			&redirect_uri=https%3A%2F%2Fmzxbox.ru%2Fminium%2Fvkread.html
+			&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7
+			&widget_kind=default
+			&suggest_hostname=mzxbox.ru
+			&et=1765731001482
+
+			redirect_uri
+			https://mzxbox.ru/minium/vkread.html
+
+			---------------------------------result
+			https://mzxbox.ru/minium/vkread.html#access_token=y0__xDT3NeEAhjgozwgt6yF0RXJbDXR2I6xS21ekkri_kmKq3LRTg&token_type=bearer&expires_in=31296690&cid=tm7pp01u5pfdu3whrh034bchtm
+
+			https://mzxbox.ru/minium/vkread.html
+			#access_token=y0__xDT3NeEAhjgozwgt6yF0RXJbDXR2I6xS21ekkri_kmKq3LRTg
+			&token_type=bearer
+			&expires_in=31296690
+			&cid=tm7pp01u5pfdu3whrh034bchtm
+
+
 */
 			let info = {
 				client_id: 'ad8bb18784e44c64a2098ad6a342e576',
@@ -122,16 +168,172 @@ https://mzxbox.ru/minium/vkread.html#access_token=y0__xDT3NeEAhjgozwg66f90BUw-K7
 				});
 		}
 		//}
+		function readYaToken() {
+			//https://oauth.yandex.ru/client/ad8bb18784e44c64a2098ad6a342e576/info
+			let redirect_uri = 'https://mzxbox.ru/minium/vkread.html';
+			let client_id = 'ad8bb18784e44c64a2098ad6a342e576';
+			let suggest_hostname = 'mzxbox.ru';
+			//let process_uuid = '0';
+			//let et = '0';
+			//let scope = 'cloud_api:disk.app_folder';
+			let retpath = 'https://oauth.yandex.ru/authorize' +
+				'?client_id=' + client_id +
+				'&response_type=token' +
+				'&redirect_uri=' + encodeURI(redirect_uri) +
+				//'&process_uuid=' + process_uuid +
+				//'&widget_kind=default' +
+				'&suggest_hostname=' + suggest_hostname;
+			//'&scope=' + scope + ''; //'&et=' + et; //1765731001482';
+			/*
+			let yapass = 'https://passport.yandex.ru/pwl-yandex' +
+				'?retpath=' + encodeURI(retpath) +
+				'&noreturn=1' +
+				'&origin=oauth' +
+				//'&process_uuid=' + process_uuid +
+				'&cause=auth';
+*/
+			//let yaurl = 'https://passport.yandex.ru/pwl-yandex/auth/add?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D0%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth';
+			//window.location.href = yapass;
+			console.log('retpath', retpath);
+			window.location.href = retpath;
+		}
+
+		function textcell2(num) {
+			if (num < 10) {
+				return '0' + num;
+			} else {
+				return '' + num;
+			}
+		}
+
+		function datekey() {
+			let dd = new Date();
+			return dd.getFullYear() + '.' + textcell2(dd.getMonth()) + '.' + textcell2(dd.getDay()) +
+				'_' + textcell2(dd.getHours()) + '-' + textcell2(dd.getMinutes()) + '-' + textcell2(dd.getSeconds())
+		}
+
+		function readYaUploadURL() {
+			console.log('readYaUploadURL');
+			/*curl -X GET --header 'Accept: application/json' --header 'Authorization: OAuth y0__xDT3NeEAhjblgMg_5Cs1hUZYMHs-T4tALNxcO2AE0kXEOtccg' 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=test123'
+			{
+			"method": "PUT",
+			"href": "https://uploader26vla.disk.yandex.net:443/upload-target/20251215T123146.169.utd.bsybedkz7rv0qdfge0a2vu6oc-k26vla.1812291",
+			"templated": false,
+			"operation_id": "355e8d841fc61f21b0ed376d58555a92fdf0b906e85dec21443980fab16b6453"
+			}
+  */
+
+			ya_file_name = 'test123-' + datekey() + '.txt';
+			const xmlHttpRequest = new XMLHttpRequest();
+			let url = 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/' + ya_file_name;
+			//let url = "https://cloud-api.yandex.net/v1/disk/resources/files";
+			xmlHttpRequest.open("GET", url, false);
+			xmlHttpRequest.onload = function (vProgressEvent) {
+				console.log('onload', vProgressEvent);
+				try {
+					let json = JSON.parse(xmlHttpRequest.responseText);
+
+					ya_upload_method = json['method'];
+					ya_upload_url = json['href'];
+					ya_operation_id = json['operation_id'];
+					console.log('result', ya_upload_method, ya_upload_url, json);
+					document.getElementById("ya_upload_url").innerHTML = ya_upload_url;
+				} catch (xx) {
+					console.log('parse', xx)
+				}
+			};
+			xmlHttpRequest.onerror = function (vProgressEvent) {
+				console.log('onerror', vProgressEvent);
+			};
+			xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + ya_access_token);
+			xmlHttpRequest.send();
+			console.log('done', xmlHttpRequest);
+		}
+
+		function uploadYaFileData() {
+			console.log('uploadYaFileData');
+			const xmlHttpRequest = new XMLHttpRequest();
+			xmlHttpRequest.open("PUT", ya_upload_url, false);
+			xmlHttpRequest.onload = function (vProgressEvent) {
+				console.log('onload', vProgressEvent);
+				try {
+					//let json = JSON.parse(xmlHttpRequest.responseText);
+					document.getElementById("ya_upload_result").innerHTML = xmlHttpRequest.response;
+					//dumpYaOperationState();
+
+				} catch (xx) {
+					console.log('parse', xx)
+				}
+			};
+			xmlHttpRequest.onerror = function (vProgressEvent) {
+				console.log('onerror', vProgressEvent);
+			};
+			let senddata = '{"test":' + Math.random() + ',"when":"' + new Date() + '"}';
+			xmlHttpRequest.send(senddata);
+			console.log('done', xmlHttpRequest);
+		}
+
+		function dumpYaOperationState() {
+			console.log('dumpYaOperationState');
+			//https://cloud-api.yandex.net/v1/disk/operations/4e0fad9321fe04fdc2a8627e5a2a9ae8ed3dd8d5dbc62aba7350ee93f603b8d0
+			const xmlHttpRequest = new XMLHttpRequest();
+			let url = 'https://cloud-api.yandex.net/v1/disk/operations/' + ya_operation_id;
+			xmlHttpRequest.open("GET", url, false);
+			xmlHttpRequest.onload = function (vProgressEvent) {
+				console.log('onload', vProgressEvent);
+				document.getElementById("ya_upload_state").innerHTML = xmlHttpRequest.responseText;
+			};
+			xmlHttpRequest.onerror = function (vProgressEvent) {
+				console.log('onerror', vProgressEvent);
+			};
+			xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + ya_access_token);
+			xmlHttpRequest.send();
+			console.log('done', xmlHttpRequest);
+		}
+
+		function getYaLink() {
+			console.log('getYaLink');
+			const xmlHttpRequest = new XMLHttpRequest();
+			let url = 'https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/' + ya_file_name;
+			xmlHttpRequest.open("GET", url, false);
+			xmlHttpRequest.onload = function (vProgressEvent) {
+				console.log('onload', vProgressEvent);
+				try {
+					let json = JSON.parse(xmlHttpRequest.responseText);
+					console.log('json', json);
+					let downurl = json['href'];
+					document.getElementById("ya_link_uploaded").href = downurl;
+					document.getElementById("ya_uploaded_link").innerHTML = downurl;
+				} catch (xx) {
+					console.log('parse', xx)
+				}
+
+			};
+			xmlHttpRequest.onerror = function (vProgressEvent) {
+				console.log('onerror', vProgressEvent);
+			};
+			xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + ya_access_token);
+			xmlHttpRequest.send();
+			console.log('done', xmlHttpRequest);
+		}
 	</script>
 </head>
 
 <body>
 	<h1>test</h1>
-	<p><button onclick="showYa();">ya start</button></p>
+	<!--<p><button onclick="showYa();">ya start</button></p>
 	<p><a href='https://passport.yandex.ru/pwl-yandex/auth/add?retpath=https%3A%2F%2Foauth.yandex.ru%2Fauthorize%3Fclient_id%3Dad8bb18784e44c64a2098ad6a342e576%26response_type%3Dtoken%26redirect_uri%3Dhttps%253A%252F%252Fmzxbox.ru%252Fminium%252Fvkread.html%26process_uuid%3D0%26widget_kind%3Ddefault%26suggest_hostname%3Dmzxbox.ru%26et%3D1765731001482&noreturn=1&origin=oauth&process_uuid=23460948-2142-4f55-adbf-f08e1e2bd1b7&cause=auth'>ya upload</a></p>
 	<p><button onclick="showVK();">vk start</button></p>
 	<div id="vkbutton"></div>
-	<p>VK</p>
+-->
+	<p><button onclick="readYaToken();">readYaToken</button> <span id='ya_token_text'></span></p>
+	<p><button onclick="readYaUploadURL();">readYaUploadURL</button> <span id='ya_upload_url'></span></p>
+	<p><button onclick="uploadYaFileData();">uploadYaFileData</button> <span id='ya_upload_result'></span></p>
+	<p><button onclick="dumpYaOperationState();">dumpYaOperationState</button> <span id='ya_upload_state'></span></p>
+	<p><button onclick="getYaLink();">getYaLink</button> <a id='ya_link_uploaded' href="#"><span id='ya_uploaded_link'></a></p>
+	<script type="text/javascript">
+		check_ya_token();
+	</script>
 </body>
 
 </html>
