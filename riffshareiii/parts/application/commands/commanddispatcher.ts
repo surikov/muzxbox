@@ -750,7 +750,40 @@ class CommandDispatcher {
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
 		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
+		//xml = xml.replace(replaceText, wholeCSSstring);
+
+		let csscolors = colordarkred;
+		let idx = readRawTextFromlocalStorage('uicolortheme');
+		if (idx == 'green1') {
+			csscolors = colordarkgreen;
+		}
+		if (idx == 'red1') {
+			csscolors = colordarkred;
+		}
+		if (idx == 'neon1') {
+			csscolors = colorneon;
+		}
+		if (idx == 'light1') {
+			csscolors = colorlight;
+		}
+		if (idx == 'light2') {
+			csscolors = colorwhite;
+		}
+		if (idx == 'blue1') {
+			csscolors = colordarkblue;
+		}
+		if (idx == 'light3') {
+			csscolors = colorbirch;
+		}
+
+		let wholeCSSstring = encodeURIComponent('<style>')
+			+ encodeURIComponent(styleText)
+			+ encodeURIComponent(' ' + csscolors)
+			+ encodeURIComponent('</style>')
+			;
+		console.log(wholeCSSstring);
 		xml = xml.replace(replaceText, wholeCSSstring);
+
 		var url: string = 'data:image/svg+xml;utf8,' + xml;
 		let ratio = window.innerWidth / window.innerHeight;
 		let canvas: HTMLCanvasElement = document.createElement('canvas');
@@ -786,7 +819,7 @@ class CommandDispatcher {
 
 		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
 		//xml=xml.replace(replaceText,'%3C!--%20donestyle%20--%3E');
-		xml = xml.replace(replaceText, wholeCSSstring);
+		//xml = xml.replace(replaceText, wholeCSSstring);
 		var url: string = 'data:image/svg+xml;utf8,' + xml;
 		//console.log(url);
 		let ww = window.innerWidth;

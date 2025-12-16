@@ -1,0 +1,2462 @@
+#topbox {
+    width:100%;
+    height2:1cm;
+    background-color: #330099;
+    flex-basis: auto;
+    flex-shrink: 0;
+    flex-grow: 0;
+    
+}
+#innerframe {
+    width:100%;
+    height:1cm;
+    background-color: #999900;
+    border:0;
+}:root {
+    --tapSize: 1cm;
+}
+/* cyrillic 
+@font-face {
+    font-family: 'Poiret One';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(poiretone/poiretonecyrillic.woff2) format('woff2');
+    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+*/
+/* latin-ext 
+@font-face {
+    font-family: 'Poiret One';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(poiretone/poiretonelatinext.woff2) format('woff2');
+    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+*/
+/* latin 
+@font-face {
+    font-family: 'Poiret One';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(poiretone/poiretonelatin.woff2) format('woff2');
+    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+*/
+/*
+@font-face {
+    font-family: 'Roboto';
+    src: url(roboto/Roboto-Regular.ttf);
+}
+*/
+
+/*
+@font-face {
+	font-family: 'MontserratAlternates-Regular';
+	src: url(MontserratAlternates/MontserratAlternates-Regular.ttf);
+}*/
+/*
+@font-face {
+	font-family: 'Brahms';
+	src: url('ofont.ru_Brahms Gotisch.ttf');
+}*/
+@font-face {
+	font-family: 'MontserratAlternates';
+	src: url('MontserratAlternates/MontserratAlternates-Regular.ttf');
+}
+
+
+::-webkit-scrollbar2 {
+	display: none;
+}
+
+:root {
+	--font-ratio2: 1;
+	--font-ratio: 1.0;
+}
+
+:root {
+	--tapSize: 1cm;
+}
+
+:root {
+	--label-4cm: calc(4.0*var(--font-ratio)*var(--tapSize));
+	--label-3cm: calc(3.0*var(--font-ratio)*var(--tapSize));
+	--label-2cm: calc(2.0*var(--font-ratio)*var(--tapSize));
+	--label-1cm: calc(1.0*var(--font-ratio)*var(--tapSize));
+	--label-075cm: calc(0.75*var(--font-ratio)*var(--tapSize));
+	--label-05cm: calc(0.5*var(--font-ratio)*var(--tapSize));
+	--label-04cm: calc(0.4*var(--font-ratio)*var(--tapSize));
+	--label-025cm: calc(0.25*var(--font-ratio)*var(--tapSize));
+	--label-0125cm: calc(0.125*var(--font-ratio)*var(--tapSize));
+
+	--icon-4cm: calc(4.0*var(--tapSize));
+	--icon-2cm: calc(2.0*var(--tapSize));
+	--icon-1cm: calc(1.0*var(--tapSize));
+	--icon-075cm: calc(0.75*var(--tapSize));
+	--icon-05cm: calc(0.5*var(--tapSize));
+	--icon-04cm: calc(0.4*var(--tapSize));
+	--icon-033cm: calc(0.33*var(--tapSize));
+}
+
+:root {
+
+
+	--color-debug: #c00;
+	/*
+	--color-shadow: #00000066;
+	--color-background: #000000ff;
+	--color-panel: #114466ff;
+	--color-focus: #009933ff;
+	--color-interactive: #cc6633ff;
+	--color-panel: #44ccffff;
+	--color-subtext: #99ccccff;
+	(((--main-color))): #ddeeffff;
+*/
+	--background-color: #030900;
+	--main-color: #fff;
+	--drag-color: #066;
+	--line-color: #cff;
+	--click-color: #360;
+
+	--click-color50: color-mix(in lab, transparent 50%, var(--click-color));
+
+	--line-color90: color-mix(in lab, transparent 90%, var(--line-color));
+	--line-color75: color-mix(in lab, transparent 75%, var(--line-color));
+	--line-color50: color-mix(in lab, transparent 50%, var(--line-color));
+	--line-color30: color-mix(in lab, transparent 30%, var(--line-color));
+	--line-color15: color-mix(in lab, transparent 15%, var(--line-color));
+	--line-color6: color-mix(in lab, transparent 6%, var(--line-color));
+
+	--background-color10: color-mix(in lab, transparent 10%, var(--background-color));
+
+	--selectedtime-color22: color-mix(in lab, transparent 85%, var(--line-color));
+	--selectedtime-color: color-mix(in lab, transparent 66%, var(--drag-color));
+	--selectedbgground-color: color-mix(in lab, transparent 0%, var(--background-color));
+	--unselectedbg-color: color-mix(in lab, transparent 0%, var(--background-color));
+
+	--disable-drag-color: color-mix(in lab, transparent 75%, var(--drag-color));
+	--disable-click-color: color-mix(in lab, transparent 75%, var(--click-color));
+
+}
+
+:root {
+	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
+	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
+	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
+	--plugintitle-color: var(--drag-color);
+}
+
+#file_midi_input {
+	display: none;
+}
+
+#file_gp35_input {
+	display: none;
+}
+
+@keyframes focusFlashFill {
+	0% {
+		fill: var(--main-color)
+	}
+
+	40% {
+		fill: var(--main-color)
+	}
+
+	60% {
+		fill: var(--drag-color)
+	}
+
+	80% {
+		fill: var(--click-color)
+	}
+
+	100% {
+		fill: var(--main-color)
+	}
+}
+
+html {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	font-family2: 'Poiret One';
+	font-family2: 'Fontquan-XinYiJiXiangSong-Regular';
+	background-color2: #ff0000;
+	user-select: none;
+background-color2: var(--main-color);
+}
+
+body {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	touch-action: manipulation;
+	background-color2: #ff00ff;
+	cursor: grab;
+	background-color2: var(--main-color);
+	overflow: hidden;
+}
+
+#pagediv {
+	width: 100%;
+	height: 100%;
+	margin: 0px;
+	padding: 0px;
+	min-height: 100%;
+	background-image2: url("bg/burevestnik.jpg");
+	background-repeat2: no-repeat;
+	background-size2: cover;
+	background-position2: center;
+	display: flex;
+	flex-direction: column;
+	background: var(--background-color);
+}
+
+#tileLevelSVG {
+	width: 100%;
+	user-select: none;
+	touch-action: manipulation;
+	background-size: cover;
+	stroke-linecap: round;
+	margin: 0px;
+	padding: 0px;
+	background2: var(--unselectedbg-color);
+	flex-basis: 0;
+	flex-shrink: 1;
+	flex-grow: 1;
+
+	background-image22: url("bg/blue.png");
+	background-size: cover;
+	background-position-x: center;
+	background-position-y: center;
+	background: var(--background-color);
+}
+
+
+
+
+.debug {
+	fill: var(--color-debug);
+	fill-opacity: 30%;
+	stroke: var(--color-debug);
+	stroke-opacity: 90%;
+	stroke-width: 0.3%;
+}
+
+.fillShadow {
+	fill: var(--shadow-color);
+}
+
+.warningAnchor22 {
+	cursor: default;
+}
+
+.warningBG {
+	fill: var(--fog-color);
+	cursor: default;
+}
+
+.warningIcon {
+	font-size222: calc(4*var(--tapSize));
+	font-size: var(--icon-4cm);
+	fill: var(--line-color);
+	text-anchor: middle;
+	font-family: 'Material-Design-Iconic-Font';
+	pointer-events: none;
+}
+
+.warningTitle {
+	font-size222: calc(0.75*var(--tapSize));
+	font-size: var(--label-075cm);
+	fill: var(--main-color);
+	text-anchor: middle;
+	pointer-events: none;
+}
+
+.warningDescription {
+	font-size222: calc(0.33*var(--tapSize));
+	font-size: var(--label-04cm);
+	fill: var(--line-color);
+	text-anchor: middle;
+	pointer-events: none;
+	width2:50%;
+}
+.warningSmallText {
+	font-size222: calc(0.33*var(--tapSize));
+	font-size: var(--label-025cm);
+	fill: var(--line-color);
+	text-anchor: middle;
+	pointer-events: none;
+	width2:50%;
+}
+
+.warningInfoIcon {
+	fill: #ff993300;
+}
+
+
+.mixTextFill {
+	fill: var(--main-color);
+	stroke: none;
+}
+
+.mixSubtextFill {
+	fill: var(--drag-color);
+	stroke: none;
+}
+
+.mixFocusFill {
+	fill: var(--color-focus);
+	stroke: none;
+}
+
+.leftPanelBG {
+	fill: color-mix(in lab, transparent 15%, var(--color-panel))
+}
+.gridRollTracks {
+	fill: #ffffff01
+}.samplerRowBorder{
+	fill: var(--line-color);
+	fill-opacity:25%;
+    stroke: none;
+}
+.samplerDrumDotFocused{
+	fill: var(--main-color);
+	fill-opacity:99%;
+    stroke: none;
+}
+.samplerDrumDotBg{
+	fill: var(--main-color);
+	fill-opacity2:75%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumMuteBg{
+	fill: var(--main-color);
+	fill-opacity:10%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumDotActive23542354{
+	fill: var(--click-color);
+	fill-opacity2:75%;
+    stroke: none;
+}
+.samplerDrumDotLine{
+	fill: var(--main-color);
+	fill-opacity33:95%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumMuteLine{
+	fill: var(--main-color);
+	fill-opacity:10%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumDeleteIcon{
+	fill: var(--click-color);
+    stroke: none;
+	font-family: 'Material-Design-Iconic-Font';
+	pointer-events: none;
+	
+}
+.samplerDrumDeleteSize2{
+	font-size: var(--icon-075cm);
+}
+.samplerDrumDeleteSize1{
+	font-size: var(--icon-05cm);
+}
+.samplerDrumDeleteSize0{
+	font-size: var(--icon-033cm);
+}
+.samplerDrumDragSpot{
+	fill: var(--drag-color);
+    stroke: none;
+	cursor: ew-resize;
+	stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.samplerDrumDragIcon{
+	font-size: var(--icon-05cm);
+	font-family: 'Material-Design-Iconic-Font';
+	fill: var(--main-color);
+	stroke: none;
+	pointer-events: none;
+}.rightMenuPanel {
+    fill: var(--background-color);
+}
+
+.rectangleDragItem {
+    fill: var(--drag-color);
+	stroke: var(--main-color);
+    stroke-width: 0.01cm;
+}
+
+.dragDropMixerItem {
+    visibility: visible;
+}
+.noDragDropMixerItem {
+    visibility: hidden;
+}
+
+.rightMenuDelimiterLine {
+    fill: var(--shadow-color);
+    pointer-events: none;
+}
+
+.rightMenuFocusedDelimiter {
+    fill: var(--main-color);
+    pointer-events: none;
+    animation: focusFlashFill 4s linear infinite;
+}
+
+.rightMenuLabel {
+    fill: var(--main-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+.rightMenuLightLabel {
+    fill: var(--shadow-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+
+.rightMenuSubLabel {
+    fill: var(--drag-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+
+.rightMenuItemDragBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: var(--drag-color);
+    cursor: move;
+}
+
+.rightMenuItemActionBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: var(--click-color);
+}
+
+.rightMenuItemDisabledBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: none;
+}
+
+.rightMenuItemSubActionBG {
+    fill: none;
+    stroke: var(--click-color);
+    stroke-width: 0.05cm;
+}
+
+.rightMenuButtonLabel {
+    fill: var(--click-color);
+    text-anchor: middle;
+
+    font-size: var(--label-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+
+.rightMenuIconLabel {
+    fill: var(--main-color);
+    text-anchor: middle;
+
+    font-size: var(--icon-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+
+
+.menuButtonCircle {
+    fill: var(--click-color);
+    stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+
+.menuButtonLabel {
+    fill: var(--main-color);
+    text-anchor: middle;
+    font-size: var(--icon-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+
+.currentTitleLabel {
+    fill: var(--line-color);
+    font-size: var(--label-05cm);
+    pointer-events: none;
+    opacity: 50%;
+    transform: rotate(90deg);
+    transform-origin: 0cm 0cm;
+}.leftBlackKey {
+	fill: var(--drag-color);
+}
+
+.leftKeyWhite {
+	fill: var(--main-color);
+}
+
+
+.octaveLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*0.25*var(--tapSize));
+
+}
+
+.octaveLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*0.5*var(--tapSize));
+}
+
+.octaveLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*var(--tapSize));
+}
+
+.octaveLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*2*var(--tapSize));
+}
+
+.octaveLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*4*var(--tapSize));
+}
+
+.octaveLabel8 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*8*var(--tapSize));
+}
+
+.octaveLabel16 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*16*var(--tapSize));
+}
+
+.octaveLabel32 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*32*var(--tapSize));
+}
+
+.octaveLabel64 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*64*var(--tapSize));
+}
+
+.octaveLabel128 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*128*var(--tapSize));
+}
+
+
+.octaveSubLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*0.25*var(--tapSize));
+	text-anchor22: start;
+	pointer-events: none;
+}
+
+.octaveSubLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*2*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*4*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel8 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*8*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel16 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*16*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel32 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*32*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel64 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*64*var(--tapSize));
+	pointer-events: none;
+}
+
+.octaveSubLabel128 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*128*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+.curTrackTitleLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*0.25*var(--tapSize));
+	text-anchor22: start;
+	pointer-events: none;
+}
+
+.curTrackTitleLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*2*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*4*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel8 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*8*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel16 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*16*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel32 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*32*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel64 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*64*var(--tapSize));
+	pointer-events: none;
+}
+
+.curTrackTitleLabel128 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(0.5*128*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+.samplerRowLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(0.75*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerRowLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(1.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(0.75*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+
+.samplerMuteLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(1.5*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+.autoRowLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoRowLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoRowLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoRowLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(8*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoRowLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(12*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(8*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.autoMuteLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(12*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+.firstTrackLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(2*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(4*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(6*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(8*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 75%;
+	font-size: calc(12*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+
+.firstTrackMute05 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(4*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute1 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(6*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute2 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(8*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.firstTrackMute4 {
+	fill: var(--line-color);
+	fill-opacity: 15%;
+	font-size: calc(12*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.otherTrackLabel025 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(1*0.15*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(2*0.175*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackLabel1 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(3*0.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackLabel2 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(4*0.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackLabel4 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	font-size: calc(6*0.2*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+.otherTrackMute025 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(1*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute05 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(2*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute1 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(3*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute2 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(4*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+.otherTrackMute4 {
+	fill: var(--line-color);
+	fill-opacity: 20%;
+	font-size: calc(6*0.125*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+.octaveMark {
+	fill: var(--line-color);
+	fill-opacity: 25%;
+}
+.toolBarPanel {
+    fill: var(--line-color);
+    pointer-events: none;
+}
+
+.transparentSpot {
+    fill: #0f0;
+    fill-opacity: 0.050%;
+    cursor: pointer;
+}
+.transparentDragger {
+    fill: #0f0;
+    fill-opacity: 0.050%;
+    cursor: move;
+}
+
+.transparentScroll {
+    fill: #999;
+    fill-opacity: 0.05%;
+    cursor: ns-resize;
+}
+
+.toolBarButtonCircle {
+    fill: var(--click-color);
+	stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+
+.toolBarButtonLabel {
+    fill: var(--main-color);
+    text-anchor: middle;
+    alignment-baseline222: middle;
+    font-size: var(--icon-05cm);
+    pointer-events2: none;
+	
+	font-family: "Material-Design-Iconic-Font";
+}
+
+
+.projectTitle222222 {
+    fill: var(--drag-color);
+	font-size: var(--label-4cm);
+}
+.trackTitle {
+    fill: var(--drag-color);
+	font-size: var(--label-1cm);
+}
+.mixNoteLine{
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 90%;
+    pointer-events: none;
+}
+.mixMuteLine{
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 8%;
+    pointer-events: none;
+}
+.mixDropClick{
+    fill: red;/* var(--click-color); */
+	fill-opacity: 0.001%;
+cursor:col-resize;
+}
+.mixDropNote{
+    fill: var(--click-color);
+	fill-opacity: 90%;
+    pointer-events: none;
+}
+.mixNoteSub{
+    stroke: var(--line-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 33%;
+    pointer-events: none;
+}
+.mixMuteSub{
+    stroke: var(--line-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 8%;
+    pointer-events: none;
+}
+
+.mixTimeMeasureMark{
+    fill: var(--line-color);
+	fill-opacity: 25%;
+}
+
+.interactiveTimeMeasureMark{
+    fill: var(--click-color);
+	fill-opacity: 95%;
+    pointer-events: none;
+}
+
+.mixFiller1{
+    fill: var(--line-color);
+	fill-opacity: 5%;
+}
+.mixFiller2{
+    fill: var(--line-color);
+	fill-opacity: 10%;
+}
+.mixFiller3{
+    fill: var(--line-color);
+	fill-opacity: 15%;
+}
+.mixFiller4{
+    fill: var(--line-color);
+	fill-opacity: 20%;
+}
+.mixFiller5{
+    fill: var(--line-color);
+	fill-opacity: 25%;
+}
+.mixFiller6{
+    fill: var(--line-color);
+	fill-opacity: 30%;
+}
+.mixFiller7{
+    fill: var(--line-color);
+	fill-opacity: 35%;
+}
+.mixFiller8{
+    fill: var(--line-color);
+	fill-opacity: 40%;
+}
+
+
+.titleLabel025 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(0.25*var(--tapSize));
+    text-anchor22: start;
+	pointer-events: none;
+}
+.titleLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel1 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel2 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel4 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel8 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(8*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel16 {
+	fill: var(--line-color);
+	fill-opacity:50%;
+    font-size: calc(16*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel32 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(32*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel64 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(64*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel128 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(128*var(--tapSize));
+	pointer-events: none;
+}
+
+
+.markPointFill22222 {
+    fill: var(--drag-color);
+	fill-opacity: 90%;
+    stroke-dasharray: 5px;
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-linecap: butt;
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 90%;
+	pointer-events: none;
+}
+.slidePointFill {
+    fill: none;
+    stroke-dasharray2: 5px;
+    stroke: var(--drag-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
+	pointer-events: none;
+}
+.markPointFill {
+    fill: none;
+    stroke-dasharray2: 5px;
+    stroke: var(--main-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
+	pointer-events: none;
+}
+.markPointNone {
+    fill: none;
+    stroke: none;
+	pointer-events: none;
+}
+
+.octaveBottomBorder{
+	fill: var(--line-color);
+	fill-opacity:75%;
+    stroke: none;
+	pointer-events: none;
+}
+.octaveBottomBorder123{
+	fill: url(#horizontalBorderLine);;
+    stroke: none;
+	pointer-events: none;
+}
+
+.stepPartDelimiter{
+	fill2: var(--line-color);
+
+	fill-opacity:9%;
+    stroke2: none;
+
+	fill22: url(#verticalBorderLine);;
+	fill: var(--line-color);
+    stroke: none;
+	pointer-events: none;
+}
+.verLineFrom {
+    stop-color: var(--line-color);
+    stop-opacity: 50%;
+  }
+  .verLineMiddle{
+    stop-color: var(--line-color);
+    stop-opacity: 20%;
+  }
+  .verLineTo {
+    stop-color: var(--line-color);
+    stop-opacity: 0;
+  }
+.barRightBorder{
+	fill: url(#verticalBorderLine);
+    stroke: none;
+	pointer-events: none;
+}
+
+
+.barRightBorder2{
+	fill: var(--line-color);
+	fill-opacity:50%;
+    stroke: none;
+	pointer-events: none;
+}
+.interActiveGridLine{
+	fill: var(--click-color);
+	fill-opacity:95%;
+    stroke: none;
+    pointer-events: none;
+}
+
+
+.commentLineText025 {
+    fill: var(--main-color);
+    font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText05 {
+    fill: var(--main-color);
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText1 {
+    fill: var(--main-color);
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText2 {
+    fill: var(--main-color);
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText4 {
+    fill: var(--main-color);
+    font-size: calc(3*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText8 {
+    fill: var(--main-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText16 {
+    fill: var(--main-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+
+
+.commentPaneForClick {
+    fill: #00000000;
+	cursor: pointer;
+}
+
+.commentReadText025 {
+    fill: var(--line-color);
+    font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText05 {
+    fill: var(--line-color);
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText1 {
+    fill: var(--line-color);
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText2 {
+    fill: var(--line-color);
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText4 {
+    fill: var(--line-color);
+    font-size: calc(3*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText8 {
+    fill: var(--line-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText16 {
+    fill: var(--line-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+
+.automationBgDot{
+	fill: var(--main-color);
+	fill-opacity:95%;
+    stroke: none;
+	pointer-events: none;
+}
+.automationMuteDot{
+	fill: var(--main-color);
+	fill-opacity:8%;
+    stroke: none;
+	pointer-events: none;
+}
+.automationFocusedDot{
+	fill: var(--click-color);
+	fill-opacity:90%;
+    stroke: none;
+}
+.timeMeasureMark22222 {
+	fill: var(--line-color);
+	fill-opacity: 25%;
+}
+
+.positionMark1 {
+	stop-color: var(--drag-color);
+	stop-opacity: 0%;
+}
+
+.positionMark2 {
+	stop-color: var(--drag-color);
+	stop-opacity: 50%;
+}
+
+.positionMark3 {
+	stop-color: var(--drag-color);
+	stop-opacity: 100%;
+}
+
+.positionTimeMarkShow {
+	fill2: var(--drag-color);
+	fill: url(#positionTimeMarkFill);
+	visibility:visible;
+}
+.positionTimeMarkHide {
+	fill2: var(--drag-color);
+	fill: url(#positionTimeMarkFill);
+	visibility:hidden;
+}
+
+
+
+.timeSelection {
+	fill-opacity2: 20%;
+	fill: var(--selectedtime-color);
+	pointer-events: none;
+	animation2: focusFlashFill 4s linear infinite;
+
+}
+
+.timeSubMark {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+	pointer-events: none;
+}
+
+.timeMarkButtonCircle025 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.005cm;
+}
+.timeMarkButtonCircle05 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.01cm;
+}
+.timeMarkButtonCircle1 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.02cm;
+}
+.timeMarkButtonCircle2 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.04cm;
+}
+.timeMarkButtonCircle4 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.08cm;
+}
+.timeMarkButtonCircle8 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.16cm;
+}
+.timeMarkButtonCircle16 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.32cm;
+}
+.timeMarkButtonCircle32 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 0.64cm;
+}
+.timeMarkButtonCircle64 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 1.28cm;
+}
+.timeMarkButtonCircle128 {
+	fill: var(--click-color);
+	cursor: pointer;
+	stroke: var(--main-color);
+    stroke-width: 2.56cm;
+}
+
+.timeMarkButtonBorder {
+	fill: var(--main-color);
+
+}
+
+.timeBarNum025 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.2*var(--tapSize));
+	text-anchor22: start;
+	pointer-events: none;
+}
+
+.timeBarNum05 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum1 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum2 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(1.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum4 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(3.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum8 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(6.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum16 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(12.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum32 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(25.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum64 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(51.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.timeBarNum128 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(102.4*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+.selectedBarNum025 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.2*var(--tapSize));
+	text-anchor22: start;
+	pointer-events: none;
+}
+
+.selectedBarNum05 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum1 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*0.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum2 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*1.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum4 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*3.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum8 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*6.4*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum16 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*12.8*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum32 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*25.6*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum64 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*51.2*var(--tapSize));
+	pointer-events: none;
+}
+
+.selectedBarNum128 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.75*102.4*var(--tapSize));
+	pointer-events: none;
+}
+
+
+
+
+
+
+
+
+.selectedBarIcon025 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon05 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon1 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(0.8*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon2 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(1.6*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon4 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(3.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon8 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(6.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon16 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(12.8*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon32 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(25.6*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon64 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(51.2*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.selectedBarIcon128 {
+	fill: var(--main-color);
+	fill-opacity: 90%;
+	font-size: calc(102.4*var(--tapSize));
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.timeBarInfo025 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.1*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo05 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.2*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo1 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.4*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo2 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(0.8*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo4 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(1.6*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo8 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(3.2*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo16 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(6.4*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo32 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(12.8*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo64 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(25.6*var(--tapSize));
+	text-anchor2: end;
+}
+
+.timeBarInfo128 {
+	fill: var(--line-color);
+	fill-opacity: 90%;
+	font-size: calc(51.2*var(--tapSize));
+	text-anchor2: end;
+}#pluginFilterDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
+#pluginSamplerDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
+#pluginSequencerDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
+#pluginActionDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
+
+#pluginPointDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
+
+.pluginFrame {
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 1.0cm;
+	bottom: 0.0cm;
+	border: none;
+	background-color222: #66666633;
+	flex-basis: 0;
+	flex-shrink: 1;
+	flex-grow: 1;
+	border-radius2: 0.0cm 0.0cm 0.125cm 0.125cm;
+	overflow: scroll;
+	scrollbar-color: red orange;
+	scrollbar-width: thin;
+}
+
+#pluginActionHeader {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--plugintitle-color);
+	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
+	flex-basis: auto;
+	flex-shrink: 0;
+	flex-grow: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-top: 0.1cm;
+}
+#pluginPointHeader {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--background-color);
+	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
+	flex-basis: auto;
+	flex-shrink: 0;
+	flex-grow: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-top: 0.1cm;
+}
+.pluginOtherHeader {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--background-color);
+	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
+	flex-basis: auto;
+	flex-shrink: 0;
+	flex-grow: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	padding-top: 0.1cm;
+}
+/*
+#pluginEditTitleButton {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	font-family: "Material-Design-Iconic-Font";
+	cursor: pointer;
+	margin-left: 0.2cm;
+	margin-right: 0.2cm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+}
+*/
+#pluginActionTitle {
+	color: var(--line-color);
+	font-size: var(--label-04cm);
+	padding-left: 0.0cm;
+	padding-top: 0.25cm;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: center;
+	cursor:default;
+}
+#pluginPointTitle {
+	color: var(--line-color);
+	font-size: var(--label-04cm);
+	padding-left: 0.0cm;
+	padding-top: 0.25cm;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: center;
+	cursor:default;
+}
+.pluginPromptTitle {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: left;
+	cursor: pointer;
+	margin-left: 0.2cm;
+	margin-right: 0.2cm;
+	display: flex;
+	align-items: center;
+	justify-content: start;
+	min-width: 0.8cm;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.pluginCancel {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	text-shadow2: 0.25px 0px var(--main-color), -0.25px 0px var(--main-color), 0px 0.25px var(--main-color), 0px -0.25px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	padding-top2: 0.05cm;
+	background-color2: green;
+	border-color2: var(--main-color);
+	border-style2: solid;
+	border-width2: 1px;
+	border-radius2: 1cm;
+	margin2: 0.05cm;
+	font-family: "Material-Design-Iconic-Font";
+	vertical-align22: middle;
+	alignment-baseline22: middle;
+	cursor: pointer;
+	margin-left: 0.2cm;
+	margin-right: 0.2cm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+}
+/*
+#pluginRefresh {
+	border-radius2: 0.4cm;
+	background-color: var(--click-color);
+	color: var(--main-color);
+	text-shadow2: 0.25px 0px var(--main-color), -0.25px 0px var(--main-color), 0px 0.25px var(--main-color), 0px -0.25px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	margin-to2p: 0.1cm;
+	font-family: "Material-Design-Iconic-Font";
+	background-color2: brown;
+	cursor: pointer;
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+
+}
+*/
+
+
+.pluginBottom {
+	width: 100%;
+	height: 1.0cm;
+	background-color: var(--background-color10);
+	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
+	flex-basis: auto;
+	flex-shrink: 0;
+	flex-grow: 0;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	padding-top: 0.1cm;
+}
+/*
+#pluginDeleteLabel {
+	color: var(--main-color);
+	font-size: var(--label-04cm);
+	padding-left: 0.5cm;
+	padding-top: 0.15cm;
+	flex-grow: 1;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: right;
+}
+*/
+.pluginDoButton {
+	border-radius: 0.4cm;
+	background-color: var(--click-color);
+	background-color2: var(--background-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	font-family: "Material-Design-Iconic-Font";
+	cursor: pointer;
+	margin-left: 0.07cm;
+	margin-right: 0.07cm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+}
+.pluginNoneButton {
+	border-radius: 0.4cm;
+	background-color2: var(--click-color);
+	background-color: var(--background-color);
+	color: var(--main-color);
+	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
+	font-size: var(--label-05cm);
+	width: 0.8cm;
+	height: 0.8cm;
+	text-align: center;
+	font-family: "Material-Design-Iconic-Font";
+	cursor: pointer;
+	margin-left: 0.07cm;
+	margin-right: 0.07cm;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 0.8cm;
+}
+.fanIconLabel {
+	fill: var(--line-color);
+	font-size: var(--label-2cm);
+	pointer-events: none;
+	dominant-baseline22: middle;
+	text-anchor2: middle;
+}
+.fanDisabledLabel {
+	fill: var(--line-color75);
+	font-size: var(--label-2cm);
+	pointer-events: none;
+	dominant-baseline22: middle;
+	text-anchor2: middle;
+}
+.fanIconLabelSize0 {
+	font-size: var(--label-025cm);
+}
+.fanIconLabelSize1 {
+	font-size: var(--label-04cm);
+}
+.fanIconLabelSize2 {
+	font-size: var(--label-075cm);
+}
+.fanIconLabelSize3 {
+	font-size: var(--label-1cm);
+}
+.fanIconLabelSize4{
+	font-size: var(--label-2cm);
+}
+.fanIconLabelSize5 {
+	font-size: var(--label-3cm);
+}
+
+
+.fanSamplerMoveIconBase {
+	fill: var(--drag-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: move;
+	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerMoveIconDisabled {
+	fill: var(--disable-drag-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: move;
+	stroke: var(--line-color75);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerMoveIcon0 {stroke-width: calc(0.02*var(--tapSize));}
+.fanSamplerMoveIcon1 {stroke-width: calc(0.04*var(--tapSize));}
+.fanSamplerMoveIcon2 {stroke-width: calc(0.08*var(--tapSize));}
+.fanSamplerMoveIcon3 {stroke-width: calc(0.16*var(--tapSize));}
+.fanSamplerMoveIcon4 {stroke-width: calc(0.32*var(--tapSize));}
+.fanSamplerMoveIcon5 {stroke-width: calc(0.64*var(--tapSize));}
+.fanSamplerMoveIcon6 {stroke-width: calc(1.28*var(--tapSize));}
+.fanSamplerMoveIcon7 {stroke-width: calc(2.56*var(--tapSize));}
+.fanSamplerMoveIcon8 {stroke-width: calc(5.12*var(--tapSize));}
+.fanSamplerMoveIcon9 {stroke-width: calc(10.24*var(--tapSize));}
+/*
+.fanSamplerUpIcon0 {stroke-width: calc(0.08*var(--tapSize));}
+.fanSamplerUpIcon1 {stroke-width: calc(0.16*var(--tapSize));}
+.fanSamplerUpIcon2 {stroke-width: calc(0.32*var(--tapSize));}
+.fanSamplerUpIcon3 {stroke-width: calc(0.64*var(--tapSize));}
+.fanSamplerUpIcon4 {stroke-width: calc(1.28*var(--tapSize));}
+.fanSamplerUpIcon5 {stroke-width: calc(2.56*var(--tapSize));}
+.fanSamplerUpIcon6 {stroke-width: calc(5.12*var(--tapSize));}
+.fanSamplerUpIcon7 {stroke-width: calc(7.68*var(--tapSize));}
+.fanSamplerUpIcon8 {stroke-width: calc(10.24*var(--tapSize));}
+.fanSamplerUpIcon9 {stroke-width: calc(20.48*var(--tapSize));}
+*/
+.fanSamplerInteractionIcon {
+	fill: var(--click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: pointer;
+	stroke: var(--line-color);
+	stroke-width2: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanSamplerInterDisabledIcon {
+	fill: var(--disable-click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: pointer;
+	stroke: var(--line-color90);
+	stroke-width2: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+.fanButton0 {stroke-width: calc(0.02*var(--tapSize));}
+.fanButton1 {stroke-width: calc(0.04*var(--tapSize));}
+.fanButton2 {stroke-width: calc(0.08*var(--tapSize));}
+.fanButton3 {stroke-width: calc(0.16*var(--tapSize));}
+.fanButton4 {stroke-width: calc(0.32*var(--tapSize));}
+
+.fanSamplerActionIconLabel {
+	fill: var(--main-color);
+	font-size: var(--label-075cm);
+	pointer-events: none;
+	text-anchor: middle;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+.fanPointLinker {
+	fill: var(--drag-color);
+	cursor: move;
+	stroke: var(--line-color);
+	stroke-width: calc(0.125*var(--tapSize));
+	stroke-linejoin: round;
+	paint-order: stroke fill;
+}
+
+.fanSamplerClickIcon {
+	fill: var(--click-color);
+	font-size: calc(0.25*var(--tapSize));
+	cursor: pointer;
+}
+
+.fanPerformerIcon {
+
+	fill: var(--line-color);
+	stroke-dasharray: 15, 15;
+	pointer-events: none;
+
+}
+
+.fanFilterIcon {
+
+	fill: var(--line-color);
+	stroke-dasharray: 45, 45;
+	pointer-events: none;
+
+}
+.fanConnectionButton {
+	cursor: ns-resize;
+	stroke: var(--main-color);
+	fill: var(--drag-color);
+	stroke-width: calc(0.0256*var(--tapSize));
+}
+.fanSampleDrragger {
+	cursor: ns-resize;
+	stroke: var(--line-color);
+	fill: var(--drag-color);
+	stroke-width: calc(0.1024*var(--tapSize));
+}
+.fanFilterDrragger {
+	cursor: ns-resize;
+	stroke: var(--line-color);
+	fill: var(--drag-color);
+	stroke-width: calc(0.1024*var(--tapSize));
+}
+
+.fanConnectionBase {
+	pointer-events: none;
+	stroke: var(--line-color50);
+	stroke-width2: 0.5cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+	fill:none;
+}
+.fanConnectionSecondary{
+	stroke: var(--line-color90);
+}
+.fanConnection0 {stroke-width: 0.02cm;}
+.fanConnection1 {stroke-width: 0.04cm;}
+.fanConnection2 {stroke-width: 0.08cm;}
+.fanConnection3 {stroke-width: 0.16cm;}
+.fanConnection4 {stroke-width: 0.32cm;}
+.fanConnection5 {stroke-width: 0.5cm;}
+.fanConnection6 {stroke-width: 0.75cm;}
+.fanConnection7 {stroke-width: 1cm;}
+.fanConnection8 {stroke-width: 2cm;}
+
+.fanStream {
+	pointer-events: none;
+	stroke: var(--main-color);
+	stroke-width: 2cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+}
+
+.fanDropConnection {
+	cursor: pointer;
+	stroke: var(--line-color);
+	stroke-width: 0.5cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+	fill: var(--click-color);
+}
+.fanDropConnection0 {stroke-width: 0.02cm;}
+.fanDropConnection1 {stroke-width: 0.04cm;}
+.fanDropConnection2 {stroke-width: 0.08cm;}
+.fanDropConnection3 {stroke-width: 0.16cm;}
+.fanDropConnection4 {stroke-width: 0.32cm;}
+
+
+.fanDeleteIcon {
+	fill: var(--main-color);
+	text-anchor: middle;
+	font-size: var(--icon-2cm);
+	pointer-events: none;
+	font-family: "Material-Design-Iconic-Font";
+}
+
+
+.fanSpeakerIcon {
+	fill: var(--line-color);
+	font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+	border-color: var(--main-color);
+	stroke: var(--main-color);
+	stroke-width: 0.1cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+}
+
+.fanSpeakerLabel {
+	fill: var(--line-color);
+	font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+	border-color: var(--main-color);
+	stroke: var(--main-color);
+	stroke-width: 0.1cm;
+	stroke-linejoin: round;
+	paint-order: stroke;
+}
+
+.fanSpeakerIconLabel {
+	font-size: calc(24*var(--tapSize));
+	pointer-events: none;
+	fill: var(--line-color);
+	font-family: 'Material-Design-Iconic-Font';
+	text-align2: center;
+}
+
+.controlConnection {
+	fill: var(--main-color);
+	fill-opacity: 25%;
+}
+
+.fanSplitIconLabel {
+	fill: var(--main-color);
+	font-size: var(--label-025cm);
+	pointer-events: none;
+	text-anchor: middle;
+	font-family: "Material-Design-Iconic-Font";
+}:root {
+	--background-color: #411;
+	--main-color: #ff9;
+	--drag-color: #c30;
+	--line-color: #fff;
+	--click-color: #264;
+}
+
+#tileLevelSVG {
+	background-image: url("bg/logo.png");
+	background-size2: cover;
+	background-position-x: left;
+	background-position-y: bottom;
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+}
+
+:root {
+    --font-ratio: 0.85;
+}
+/* latin-ext */
+@font-face {
+	font-family: 'Bruno Ace';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(BrunoAce/WwkcxPa2E06x4trkOj_UOaANaNM.woff2) format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  }
+  /* latin */
+  @font-face {
+	font-family: 'Bruno Ace';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(BrunoAce/WwkcxPa2E06x4trkOj_UN6AN.woff2) format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  }
+html {
+    font-family2: 'MontserratAlternates-Regular';
+	font-family3: 'Brahms';
+	font-family4: 'MontserratAlternates';
+	font-family: 'Bruno Ace';
+	
+	
+}

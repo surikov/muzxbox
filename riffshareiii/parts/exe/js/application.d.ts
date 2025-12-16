@@ -800,7 +800,14 @@ declare class LZUtil {
     compressToUTF16(input: string | null | undefined): string;
     decompressFromUTF16(compressed: string | null | undefined): string | null | undefined;
 }
-declare let wholeCSSstring: string;
+declare let styleText: string;
+declare let colorbirch: string;
+declare let colordarkblue: string;
+declare let colordarkgreen: string;
+declare let colordarkred: string;
+declare let colorlight: string;
+declare let colorneon: string;
+declare let colorwhite: string;
 declare type TileZoom = {
     x: number;
     y: number;
