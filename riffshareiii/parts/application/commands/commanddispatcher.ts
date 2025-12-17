@@ -781,7 +781,7 @@ class CommandDispatcher {
 			+ encodeURIComponent(' ' + csscolors)
 			+ encodeURIComponent('</style>')
 			;
-		console.log(wholeCSSstring);
+		//console.log(wholeCSSstring);
 		xml = xml.replace(replaceText, wholeCSSstring);
 
 		var url: string = 'data:image/svg+xml;utf8,' + xml;

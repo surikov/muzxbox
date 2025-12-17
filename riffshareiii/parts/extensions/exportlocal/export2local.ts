@@ -111,13 +111,25 @@ class LocalExportPlugin {
 		console.log('exportImage');
 		let canvas = document.getElementById("prvw") as HTMLCanvasElement;
 		if (canvas) {
-			let dataURl:string=canvas.toDataURL('image/png');
-			//console.log(dataURl);
+			let dataURl: string = canvas.toDataURL('image/png');
+			canvas.toBlob((blob: Blob | null) => {
+				console.log('blob', blob);
+				if (blob) {
+					let pro: Promise<ArrayBuffer> = blob.arrayBuffer();
+					pro.catch((reason: any) => {
+						console.log('reason', reason);
+					});
+					pro.then((arrayBuffer: ArrayBuffer) => {
+						console.log('arrayBuffer', arrayBuffer);
+					});
+				}
+			}, 'image/png');
+
 			let a: HTMLAnchorElement = document.createElement("a");
 			a.href = dataURl;
-		a.download = "minium";
-		document.body.appendChild(a);
-		a.click();
+			a.download = "minium";
+			document.body.appendChild(a);
+			a.click();
 		}
 
 	}

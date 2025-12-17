@@ -44,9 +44,9 @@
 				'_' + textcell2(dd.getHours()) + '-' + textcell2(dd.getMinutes()) + '-' + textcell2(dd.getSeconds())
 		}
 
-		function sendRequest(token, url, method, json, onError, onDone) {
+		function sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
+			let xmlHttpRequest = new XMLHttpRequest();
 			try {
-				let xmlHttpRequest = new XMLHttpRequest();
 				xmlHttpRequest.open(method, url, false);
 				xmlHttpRequest.onload = function (vProgressEvent) {
 					onDone(xmlHttpRequest, vProgressEvent);
@@ -58,8 +58,8 @@
 				if (token) {
 					xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + token);
 				}
-				if (json) {
-					xmlHttpRequest.send(json);
+				if (jsonOrArrayBuffer) {
+					xmlHttpRequest.send(jsonOrArrayBuffer);
 				} else {
 					xmlHttpRequest.send();
 				}
@@ -85,9 +85,9 @@
 			});
 		}
 
-		function uploadYaFileData(ya_upload_url, senddata, onError, onDone) {
+		function uploadYaFileData(ya_upload_url, jsonOrArrayBuffer, onError, onDone) {
 			console.log('uploadYaFileData', ya_upload_url);
-			sendRequest('', ya_upload_url, 'PUT', senddata, onError, (xmlHttpRequest, vProgressEvent) => {
+			sendRequest('', ya_upload_url, 'PUT', jsonOrArrayBuffer, onError, (xmlHttpRequest, vProgressEvent) => {
 				onDone();
 			});
 		}
@@ -123,24 +123,11 @@
 			});
 		}
 
-		function startUpload() {
-			let ya_file_name = 'MiniumStudio-' + datekey() + '.json';
-			let data = JSON.stringify(miprodata);
-			let ya_access_token = check_ya_token();
-			console.log('startUpload', ya_access_token);
-			if (ya_access_token) {
-				getLinkUpload(ya_file_name, data, ya_access_token, dumpResultMessage, (link) => {
-					//https://downloader.disk.yandex.ru/disk/877e949099119b4ab9c9535142a3f6be6d27236e77ab9c90e6ad8cd83b163311/69416437/z6kOkzFFFj_drbTBxZCz9V7hwGqG9RQATzvkKYbRTu6tVS-0yyL9hrIr1d7z0ZGrMgs98bObFM6-MRlY0J8zrw%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-52-54.json&disposition=attachment&hash=&limit=0&content_type=application%2Fjson&owner_uid=546696787&fsize=71126&hid=621da899d24a2fd894d46456b154865d&media_type=unknown&tknv=v3&etag=6e762437786380fc0824065824606f26
-					console.log('download link', link);
-				});
-			} else {
-				dumpResultMessage('empty token');
-			}
-		}
 
-		function getLinkUpload(ya_file_name, filejson, ya_access_token, onError, onDone) {
+
+		function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError, onDone) {
 			readYaUploadURL(ya_access_token, ya_file_name, onError, (href, operation_id) => {
-				uploadYaFileData(href, filejson, onError, () => {
+				uploadYaFileData(href, jsonOrArrayBuffer, onError, () => {
 					dumpYaOperationState(operation_id, ya_access_token, onError, () => {
 						getYaLink(ya_file_name, ya_access_token, onError, (linkDownload) => {
 							onDone(linkDownload);
@@ -148,6 +135,34 @@
 					});
 				});
 			});
+		}
+
+		function startUpload() {
+
+			let arrayBuffer = new ArrayBuffer(3);
+			var bufView = new Uint8Array(arrayBuffer);
+			bufView[0] = 1;
+			bufView[1] = 2;
+			bufView[2] = 3;
+			console.log('arrayBuffer', arrayBuffer);
+
+			let dt = datekey();
+			let ya_file_name = 'MiniumStudio-' + dt + '.json';
+			let ya_picture_name = 'MiniumStudio-' + dt + '.png';
+			let textdata = JSON.stringify(miprodata);
+			let ya_access_token = check_ya_token();
+			console.log('startUpload', ya_access_token);
+			if (ya_access_token) {
+				getLinkUpload(ya_file_name, textdata, ya_access_token, dumpResultMessage, (link) => {
+					//https://downloader.disk.yandex.ru/disk/877e949099119b4ab9c9535142a3f6be6d27236e77ab9c90e6ad8cd83b163311/69416437/z6kOkzFFFj_drbTBxZCz9V7hwGqG9RQATzvkKYbRTu6tVS-0yyL9hrIr1d7z0ZGrMgs98bObFM6-MRlY0J8zrw%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-52-54.json&disposition=attachment&hash=&limit=0&content_type=application%2Fjson&owner_uid=546696787&fsize=71126&hid=621da899d24a2fd894d46456b154865d&media_type=unknown&tknv=v3&etag=6e762437786380fc0824065824606f26
+					console.log('project download link', link);
+					getLinkUpload(ya_picture_name, arrayBuffer, ya_access_token, dumpResultMessage, (link) => {
+						console.log('image download link', link);
+					});
+				});
+			} else {
+				dumpResultMessage('empty token');
+			}
 		}
 	</script>
 </head>

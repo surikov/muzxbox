@@ -1780,7 +1780,6 @@ class CommandDispatcher {
             + encodeURIComponent(styleText)
             + encodeURIComponent(' ' + csscolors)
             + encodeURIComponent('</style>');
-        console.log(wholeCSSstring);
         xml = xml.replace(replaceText, wholeCSSstring);
         var url = 'data:image/svg+xml;utf8,' + xml;
         let ratio = window.innerWidth / window.innerHeight;

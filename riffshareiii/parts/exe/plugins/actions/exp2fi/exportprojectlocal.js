@@ -45,7 +45,7 @@ class LocalExportPlugin {
     }
     exportLocalfile(th) {
         if (this.hostProject) {
-            this.download(JSON.stringify(this.hostProject), 'export', 'application/json');
+            this.download(JSON.stringify(this.hostProject), 'minium', 'application/json');
             let msg = {
                 dialogID: this.callbackID,
                 pluginData: null,
@@ -69,6 +69,18 @@ class LocalExportPlugin {
         let canvas = document.getElementById("prvw");
         if (canvas) {
             let dataURl = canvas.toDataURL('image/png');
+            canvas.toBlob((blob) => {
+                console.log('blob', blob);
+                if (blob) {
+                    let pro = blob.arrayBuffer();
+                    pro.catch((reason) => {
+                        console.log('reason', reason);
+                    });
+                    pro.then((arrayBuffer) => {
+                        console.log('reason', arrayBuffer);
+                    });
+                }
+            }, 'image/png');
             let a = document.createElement("a");
             a.href = dataURl;
             a.download = "minium";
