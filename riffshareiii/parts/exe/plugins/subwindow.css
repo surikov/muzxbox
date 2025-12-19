@@ -18,14 +18,13 @@ html {
 	scrollbar-color: var(--drag-color) var(--background-color);
 }
 
-body333 {
-	font-family: "Poiret One", sans-serif;
-	font-weight: 600;
-	font-style: normal;
+body {
+	font-family: "WDXL Lubrifont SC", sans-serif;
+	font-weight44: 400;
 	background-color: var(--bgfill3);
 	color: var(--main-color);
 }
-body {
+body222 {
 	font-family: "Noto Sans SC", sans-serif;
 	font-weight: 400;
 	font-style222: normal;
@@ -73,7 +72,12 @@ ul {
 	font-size: 0.75cm;
 }
 li {
-	color: var(--click-color);
+	color: var(--main-color);
+	
+}
+
+ul li::marker {
+  color: var(--click-color);;
 }
 
 .form_radio_group {
@@ -99,7 +103,7 @@ li {
 	border-right: none;
 	user-select: none;
 	background: var(--click-color);
-	color: var(--background-color);
+	color: var(--main-color);
 }
 
 .form_radio_group .form_radio_group-item:first-child label {
@@ -120,7 +124,8 @@ li {
 
 /* Hover */
 .form_radio_group label:hover {
-	color: var(--drag-color);
+	color: var(--main-color);
+	background: var(--background-color);
 }
 
 /* Disabled */
@@ -135,9 +140,8 @@ input[type=text] {
 	border-bottom: 1px solid var(--click-color);
 	outline: none;
 	height: 1cm;
-	font-family11: "Poiret One", sans-serif;
-	font-weight11: 600;
-	font-style11: normal;
+	font-family: "WDXL Lubrifont SC", sans-serif;
+	font-weight44: 400;
 	color: var(--main-color);
 }
 
@@ -148,9 +152,8 @@ input[type=text]:focus {
 
 button {
 	height: 1cm;
-	font-family11: "Poiret One", sans-serif;
-	font-weight11: 600;
-	font-style11: normal;
+	font-family: "WDXL Lubrifont SC", sans-serif;
+	font-weight44: 400;
 	font-size: 0.75cm;
 	background: var(--click-color);
 	border-style: solid;
@@ -164,9 +167,8 @@ button {
 
 input[type=file] {
 	height: 1cm;
-	font-family11: "Poiret One", sans-serif;
-	font-weight11: 600;
-	font-style11: normal;
+	font-family: "WDXL Lubrifont SC", sans-serif;
+	font-weight44: 400;
 	font-size: 0.75cm;
 	background: var(--bgfill);
 	border-style: solid;
@@ -177,9 +179,8 @@ input[type=file] {
 }
 
 input::file-selector-button {
-	font-family11: "Poiret One", sans-serif;
-	font-weight11: 600;
-	font-style11: normal;
+	font-family: "WDXL Lubrifont SC", sans-serif;
+	font-weight44: 400;
 	font-size: 0.75cm;
 	color: var(--main-color);
 	padding-left: 0.5cm;
@@ -210,5 +211,5 @@ a:active {
 #prvw{
 	border-style: solid;
   border-width: 1px;
-  border-color: var(--line-color90);;
+  border-color: var(--line-color80);;
 }

@@ -12,7 +12,7 @@ class AlphaTabImportMusicPlugin {
 			dialogID: this.callbackID
 			, pluginData: null//parsedProject
 			, done: false
-			, sceenWait: false
+			, screenWait: false
 		}
 		window.parent.postMessage(msg, '*');
 	}
@@ -23,7 +23,7 @@ class AlphaTabImportMusicPlugin {
 				dialogID: this.callbackID
 				, pluginData: parsedProject
 				, done: true
-				, sceenWait: false
+				, screenWait: false
 			};
 			window.parent.postMessage(oo, '*');
 		} else {

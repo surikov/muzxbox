@@ -1210,7 +1210,7 @@ declare type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
-    sceenWait: boolean;
+    screenWait: boolean;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;

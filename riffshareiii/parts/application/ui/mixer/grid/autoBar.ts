@@ -31,12 +31,22 @@ class AutomationBarContent {
 				for (let ii = 0; ii < measure.changes.length; ii++) {
 					let change = measure.changes[ii];
 					let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-					let aubtn: TilePolygon = {
+					/*let aubtn: TilePolygon = {
 						dots: [xx, top + globalCommandDispatcher.cfg().autoPointHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
 							, xx + globalCommandDispatcher.cfg().autoPointHeight, top + globalCommandDispatcher.cfg().autoPointHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
 							, xx, top + globalCommandDispatcher.cfg().autoPointHeight * (aa + 1)//globalCommandDispatcher.cfg().notePathHeight * (ff + 1)
 						]
 						, css: css
+					};
+					*/
+					let aubtn: TileRectangle = {
+						x: xx
+						, y: top + globalCommandDispatcher.cfg().autoPointHeight * aa
+						, w: globalCommandDispatcher.cfg().autoPointHeight * 0.95
+						, h: globalCommandDispatcher.cfg().autoPointHeight * 0.95
+						//, rx: globalCommandDispatcher.cfg().autoPointHeight/2
+						//, ry: globalCommandDispatcher.cfg().autoPointHeight/2
+						,css:css
 					};
 					barOctaveAnchor.content.push(aubtn);
 					if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {

@@ -148,7 +148,7 @@ class CHPUI {
         this.sendToHost(this.util.dumpParameters(this.selectedVolume, this.selectedItemIdx, this.selectedMode));
     }
     sendToHost(data) {
-        var message = { dialogID: this.id, pluginData: data, done: false, sceenWait: false };
+        var message = { dialogID: this.id, pluginData: data, done: false, screenWait: false };
         console.log('sendToHost', message);
         window.parent.postMessage(message, '*');
     }
@@ -159,6 +159,7 @@ class CHPUI {
         }
         else {
             this.setMessagingId(message.hostData);
+            this.setupLangColors(message);
         }
     }
     setMessagingId(newId) {
@@ -193,6 +194,24 @@ class CHPUI {
         this.selectedItemIdx = idx;
         this.sendDataToHost();
         this.refreshTitle();
+    }
+    setupLangColors(message) {
+        document.documentElement.style.setProperty('--background-color', message.colors.background);
+        document.documentElement.style.setProperty('--main-color', message.colors.main);
+        document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+        document.documentElement.style.setProperty('--line-color', message.colors.line);
+        document.documentElement.style.setProperty('--click-color', message.colors.click);
+        if (message.langID == 'ru') {
+            document.getElementById('title').innerHTML = 'Аккорд/Тон';
+        }
+        else {
+            if (message.langID == 'zh') {
+                document.getElementById('title').innerHTML = '?';
+            }
+            else {
+                document.getElementById('title').innerHTML = 'Chord/Pitch';
+            }
+        }
     }
 }
 function initCHPUI() {

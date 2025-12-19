@@ -286,7 +286,7 @@ declare type MZXBX_MessageToHost = {
     dialogID: string;
     pluginData: any;
     done: boolean;
-    sceenWait: boolean;
+    screenWait: boolean;
 };
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
 declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
@@ -320,6 +320,7 @@ declare class CHPUI {
     tapCategory(idx: number): void;
     tapSub(idx: number): void;
     tapItem(idx: number): void;
+    setupLangColors(message: MZXBX_MessageToPlugin): void;
 }
 declare function initCHPUI(): void;
 declare class ChordPitchPerformerUtil {

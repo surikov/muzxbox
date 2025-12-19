@@ -12,7 +12,7 @@ class LocalExportPlugin {
             dialogID: this.callbackID,
             pluginData: null,
             done: false,
-            sceenWait: true
+            screenWait: true
         };
         window.parent.postMessage(msg, '*');
     }
@@ -50,7 +50,7 @@ class LocalExportPlugin {
                 dialogID: this.callbackID,
                 pluginData: null,
                 done: true,
-                sceenWait: false
+                screenWait: false
             };
             window.parent.postMessage(msg, '*');
         }
@@ -77,7 +77,7 @@ class LocalExportPlugin {
                         console.log('reason', reason);
                     });
                     pro.then((arrayBuffer) => {
-                        console.log('reason', arrayBuffer);
+                        console.log('arrayBuffer', arrayBuffer);
                     });
                 }
             }, 'image/png');

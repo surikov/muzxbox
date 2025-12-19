@@ -321,10 +321,18 @@ cursor:col-resize;
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
-
+.xAutoStart {
+    stop-color: var(--main-color);
+    stop-opacity: 100%;
+  }
+  .xAutoEnd {
+    stop-color: var(--main-color);
+    stop-opacity: 0%;
+  }
 .automationBgDot{
-	fill: var(--main-color);
-	fill-opacity:95%;
+	fill999: var(--main-color);
+	fill-opacity9999:95%;
+	fill: url(#autoDotGradient);
     stroke: none;
 	pointer-events: none;
 }

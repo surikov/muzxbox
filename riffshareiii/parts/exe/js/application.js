@@ -781,7 +781,7 @@ class ActionPluginDialog {
                 if (this.waitActionPluginInit) {
                     this.waitActionPluginInit = false;
                     this.sendNewIdToPlugin();
-                    this.sendCurrentProjectToActionPlugin(!!(message.sceenWait));
+                    this.sendCurrentProjectToActionPlugin(!!(message.screenWait));
                 }
                 else {
                 }
@@ -4666,10 +4666,10 @@ class AutomationBarContent {
                     let change = measure.changes[ii];
                     let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                     let aubtn = {
-                        dots: [xx, top + globalCommandDispatcher.cfg().autoPointHeight * aa,
-                            xx + globalCommandDispatcher.cfg().autoPointHeight, top + globalCommandDispatcher.cfg().autoPointHeight * aa,
-                            xx, top + globalCommandDispatcher.cfg().autoPointHeight * (aa + 1)
-                        ],
+                        x: xx,
+                        y: top + globalCommandDispatcher.cfg().autoPointHeight * aa,
+                        w: globalCommandDispatcher.cfg().autoPointHeight * 0.95,
+                        h: globalCommandDispatcher.cfg().autoPointHeight * 0.95,
                         css: css
                     };
                     barOctaveAnchor.content.push(aubtn);

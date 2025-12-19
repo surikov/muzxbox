@@ -82,7 +82,7 @@ class ActionPluginDialog {
 				if (this.waitActionPluginInit) {
 					this.waitActionPluginInit = false;
 					this.sendNewIdToPlugin();
-					this.sendCurrentProjectToActionPlugin(!!(message.sceenWait));
+					this.sendCurrentProjectToActionPlugin(!!(message.screenWait));
 				} else {
 					//console.log('wrong received object');
 				}

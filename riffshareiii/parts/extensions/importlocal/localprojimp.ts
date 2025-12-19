@@ -10,7 +10,7 @@ class LocalProjectImport {
 			dialogID: ''
 			, pluginData: null
 			, done: false
-			, sceenWait: false
+			, screenWait: false
 		}
 		window.parent.postMessage(msg, '*');
 	}
@@ -28,7 +28,7 @@ class LocalProjectImport {
 	}
 	sendLoadedData() {
 		if (this.parsedProject) {
-			var oo: MZXBX_MessageToHost = { dialogID: this.id, pluginData: this.parsedProject, sceenWait: false, done: true };
+			var oo: MZXBX_MessageToHost = { dialogID: this.id, pluginData: this.parsedProject, screenWait: false, done: true };
 			window.parent.postMessage(oo, '*');
 		}
 	}

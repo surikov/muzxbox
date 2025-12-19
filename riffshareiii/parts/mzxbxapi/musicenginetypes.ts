@@ -366,5 +366,5 @@ type MZXBX_MessageToHost = {
 	dialogID: string
 	, pluginData: any
 	, done: boolean
-	, sceenWait: boolean
+	, screenWait: boolean
 };
