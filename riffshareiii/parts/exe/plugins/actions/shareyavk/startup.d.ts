@@ -288,5 +288,25 @@ type MZXBX_MessageToHost = {
     done: boolean;
     screenWait: boolean;
 };
-declare let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[];
+declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_appendScriptURL(url: string): boolean;
+declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class YAVKSharePlugin {
+    callbackID: string;
+    hostProject: Zvoog_Project | null;
+    constructor();
+    setupMessaging(): void;
+    receiveHostMessage(par: any): void;
+    selupLanguage(langID: string): void;
+    setupColors(colors: {
+        background: string;
+        main: string;
+        drag: string;
+        line: string;
+        click: string;
+    }): void;
+    requestYaToken(): void;
+    startYAVKshare(): void;
+}

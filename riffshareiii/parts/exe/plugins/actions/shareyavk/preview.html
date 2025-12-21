@@ -1,0 +1,32 @@
+<html>
+
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta charset="UTF-8">
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poiret+One&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../../subwindow.css">
+
+	<script type='text/javascript' src='../../../js/mzxbx.js'></script>
+	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+	<script type='text/javascript' src='./startup.js'></script>
+
+</head>
+
+<body>
+
+	
+	<p class="cntrblk">
+		<canvas id="prvw" width=500 height=500 onclick="plugin.startYAVKshare();" />
+	</p>
+	<p class="cntrblk">
+		<button onclick="plugin.startYAVKshare();" id='butonStart'>go</button>
+	</p>
+</body>
+<script>
+	let plugin = new YAVKSharePlugin();
+</script>
+
+</html>
