@@ -311,20 +311,21 @@ declare class LZUtil {
     compressToUTF16(input: string | null | undefined): string;
     decompressFromUTF16(compressed: string | null | undefined): string | null | undefined;
 }
-declare class YAVKSharePlugin {
-    callbackID: string;
-    hostProject: Zvoog_Project | null;
-    constructor();
-    setupMessaging(): void;
-    receiveHostMessage(par: any): void;
-    selupLanguage(langID: string): void;
-    setupColors(colors: {
-        background: string;
-        main: string;
-        drag: string;
-        line: string;
-        click: string;
-    }): void;
-    requestYaToken(): void;
-    startYAVKshare(): void;
-}
+declare let dt: string;
+declare let ya_file_name: string;
+declare let ya_picture_name: string;
+declare let ya_access_token: string;
+declare let projecttextdata: string;
+declare let previewArrayBuffer: ArrayBuffer;
+declare function dumpResultMessage(txt: string): void;
+declare function check_ya_token(): string;
+declare function textcell2(num: number): string;
+declare function datekey(): string;
+declare function sendRequest(token: any, url: any, method: any, jsonOrArrayBuffer: any, onError: any, onDone: any): void;
+declare function readYaUploadURL(ya_access_token: any, filename: any, onError: any, onDone: any): void;
+declare function uploadYaFileData(ya_upload_url: any, jsonOrArrayBuffer: any, onError: any, onDone: any): void;
+declare function dumpYaOperationState(ya_operation_id: any, ya_access_token: any, onError: any, onDone: any): void;
+declare function getYaLink(ya_file_name: any, ya_access_token: any, onError: any, onDone: any): void;
+declare function getLinkUpload(ya_file_name: any, jsonOrArrayBuffer: any, ya_access_token: any, onError: any, onDone: any): void;
+declare function startUpload(): void;
+declare function startYAVKipload(): void;

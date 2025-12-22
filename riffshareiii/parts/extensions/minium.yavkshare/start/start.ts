@@ -26,7 +26,7 @@ class YAVKSharePlugin {
 			this.callbackID = message.hostData;
 			this.setupColors(message.colors);
 			this.selupLanguage(message.langID);
-			localStorage.setItem('yavkmsgid', this.callbackID);
+			//localStorage.setItem('yavkmsgid', this.callbackID);
 		}
 		if (message.screenData) {
 			let sz = 500;
@@ -36,17 +36,21 @@ class YAVKSharePlugin {
 				var imageData: ImageData = context.getImageData(0, 0, sz, sz);
 				imageData.data.set(message.screenData);
 				context.putImageData(imageData, 0, 0);
+				let lz = new LZUtil();
+				let json = JSON.stringify(message.screenData);
+				let data = lz.compressToUTF16(json);
+				localStorage.setItem('yavkpreview', data);
 			}
 		}
 	}
 	selupLanguage(langID: string) {
 		if (langID == 'ru') {
-			(document.getElementById("butonStart") as any).textContent='Отправить';
+			(document.getElementById("butonStart") as any).textContent = 'Отправить';
 		} else {
 			if (langID == 'zh') {
-				(document.getElementById("butonStart") as any).textContent='分享';
+				(document.getElementById("butonStart") as any).textContent = '分享';
 			} else {
-				(document.getElementById("butonStart") as any).textContent='Share';
+				(document.getElementById("butonStart") as any).textContent = 'Share';
 			}
 		}
 	}
@@ -63,7 +67,7 @@ class YAVKSharePlugin {
 		document.documentElement.style.setProperty('--line-color', colors.line);
 		document.documentElement.style.setProperty('--click-color', colors.click);
 	}
-	 requestYaToken() {
+	requestYaToken() {
 		let redirect_uri = 'https://mzxbox.ru/minium/vkread.html';
 		let client_id = 'ad8bb18784e44c64a2098ad6a342e576';
 		let suggest_hostname = 'mzxbox.ru';

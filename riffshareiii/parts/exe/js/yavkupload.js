@@ -406,84 +406,187 @@ class LZUtil {
             return null;
     }
 }
-console.log('Share YAVK start v1.0.1');
-class YAVKSharePlugin {
-    constructor() {
-        this.callbackID = '';
-        this.hostProject = null;
-        this.setupMessaging();
+console.log('upload');
+let dt = datekey();
+let ya_file_name = 'MiniumStudio-' + dt + '.json';
+let ya_picture_name = 'MiniumStudio-' + dt + '.png';
+let ya_access_token = check_ya_token();
+let projecttextdata = '';
+let previewArrayBuffer;
+function dumpResultMessage(txt) {
+    console.log('error', txt);
+}
+function check_ya_token() {
+    if (window.location.hash) {
+        let hash = window.location.hash.substring(1);
+        if (hash) {
+            let pars = hash.split('&');
+            for (let ii = 0; ii < pars.length; ii++) {
+                let namval = pars[ii].split('=');
+                if (namval[0]) {
+                    if (namval[1]) {
+                        if (namval[0] == 'access_token') {
+                            let ya_access_token = namval[1];
+                            return ya_access_token;
+                        }
+                    }
+                }
+            }
+        }
     }
-    setupMessaging() {
-        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-        let msg = {
-            dialogID: this.callbackID,
-            pluginData: null,
-            done: false,
-            screenWait: true
+    return '';
+}
+function textcell2(num) {
+    if (num < 10) {
+        return '0' + num;
+    }
+    else {
+        return '' + num;
+    }
+}
+function datekey() {
+    let dd = new Date();
+    return dd.getFullYear() + '.' + textcell2(dd.getMonth()) + '.' + textcell2(dd.getDay()) +
+        '_' + textcell2(dd.getHours()) + '-' + textcell2(dd.getMinutes()) + '-' + textcell2(dd.getSeconds());
+}
+function sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
+    let xmlHttpRequest = new XMLHttpRequest();
+    try {
+        xmlHttpRequest.open(method, url, false);
+        xmlHttpRequest.onload = function (vProgressEvent) {
+            onDone(xmlHttpRequest, vProgressEvent);
         };
-        window.parent.postMessage(msg, '*');
-    }
-    receiveHostMessage(par) {
-        let message = par.data;
-        if (this.callbackID) {
+        xmlHttpRequest.onerror = function (vProgressEvent) {
+            console.log('onerror', vProgressEvent);
+            onError('request error');
+        };
+        if (token) {
+            xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + token);
+        }
+        if (jsonOrArrayBuffer) {
+            xmlHttpRequest.send(jsonOrArrayBuffer);
         }
         else {
-            this.callbackID = message.hostData;
-            this.setupColors(message.colors);
-            this.selupLanguage(message.langID);
-            localStorage.setItem('yavkmsgid', this.callbackID);
+            xmlHttpRequest.send();
         }
-        if (message.screenData) {
+    }
+    catch (xx) {
+        console.log('sendRequest', xx, xmlHttpRequest);
+        onError('Can\'t send request');
+    }
+}
+function readYaUploadURL(ya_access_token, filename, onError, onDone) {
+    console.log('readYaUploadURL', ya_access_token, filename);
+    sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/' + filename, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+        try {
+            let json = JSON.parse(xmlHttpRequest.responseText);
+            let ya_upload_url = json['href'];
+            let ya_operation_id = json['operation_id'];
+            onDone(ya_upload_url, ya_operation_id);
+        }
+        catch (xx) {
+            console.log('parse', xx);
+            onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+        }
+    });
+}
+function uploadYaFileData(ya_upload_url, jsonOrArrayBuffer, onError, onDone) {
+    console.log('uploadYaFileData', ya_upload_url);
+    sendRequest('', ya_upload_url, 'PUT', jsonOrArrayBuffer, onError, (xmlHttpRequest, vProgressEvent) => {
+        onDone();
+    });
+}
+function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone) {
+    console.log('dumpYaOperationState', ya_operation_id);
+    sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/operations/' + ya_operation_id, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+        try {
+            let json = JSON.parse(xmlHttpRequest.responseText);
+            let status = json['status'];
+            if (status == 'success') {
+                onDone();
+            }
+            else {
+                onError(xmlHttpRequest.responseText);
+            }
+        }
+        catch (xx) {
+            console.log('parse', xx);
+            onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+        }
+    });
+}
+function getYaLink(ya_file_name, ya_access_token, onError, onDone) {
+    console.log('getYaLink', ya_file_name);
+    sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/' + ya_file_name, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+        try {
+            let json = JSON.parse(xmlHttpRequest.responseText);
+            let downurl = json['href'];
+            onDone(downurl);
+        }
+        catch (xx) {
+            onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+        }
+    });
+}
+function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError, onDone) {
+    readYaUploadURL(ya_access_token, ya_file_name, onError, (href, operation_id) => {
+        uploadYaFileData(href, jsonOrArrayBuffer, onError, () => {
+            dumpYaOperationState(operation_id, ya_access_token, onError, () => {
+                getYaLink(ya_file_name, ya_access_token, onError, (linkDownload) => {
+                    onDone(linkDownload);
+                });
+            });
+        });
+    });
+}
+function startUpload() {
+    if (ya_access_token) {
+        getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
+            console.log('project download link', link);
+            getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
+                console.log('image download link', link);
+            });
+        });
+    }
+    else {
+        dumpResultMessage('empty token');
+    }
+}
+function startYAVKipload() {
+    console.log(startYAVKipload);
+    let lz = new LZUtil();
+    let txt = localStorage.getItem('yavkpreview');
+    if (txt) {
+        let json = lz.decompressFromUTF16(txt);
+        if (json) {
+            let screenData = JSON.parse(json);
             let sz = 500;
             let canvas = document.getElementById("prvw");
             if (canvas) {
                 let context = canvas.getContext('2d');
                 var imageData = context.getImageData(0, 0, sz, sz);
-                imageData.data.set(message.screenData);
+                imageData.data.set(screenData);
                 context.putImageData(imageData, 0, 0);
-                let lz = new LZUtil();
-                let cmpr = lz.compressToUTF16(JSON.stringify(message.screenData));
-                localStorage.setItem('yavkpreview', cmpr);
+                canvas.toBlob((blob) => {
+                    console.log('blob', blob);
+                    if (blob) {
+                        let pro = blob.arrayBuffer();
+                        pro.catch((reason) => {
+                            console.log('reason', reason);
+                        });
+                        pro.then((arrayBuffer) => {
+                            console.log('arrayBuffer', arrayBuffer);
+                            previewArrayBuffer = arrayBuffer;
+                            let txt = localStorage.getItem('lastprojectdata');
+                            let json = lz.decompressFromUTF16(txt);
+                            if (json) {
+                                projecttextdata = json;
+                            }
+                        });
+                    }
+                }, 'image/png');
             }
         }
-    }
-    selupLanguage(langID) {
-        if (langID == 'ru') {
-            document.getElementById("butonStart").textContent = 'Отправить';
-        }
-        else {
-            if (langID == 'zh') {
-                document.getElementById("butonStart").textContent = '分享';
-            }
-            else {
-                document.getElementById("butonStart").textContent = 'Share';
-            }
-        }
-    }
-    setupColors(colors) {
-        document.documentElement.style.setProperty('--background-color', colors.background);
-        document.documentElement.style.setProperty('--main-color', colors.main);
-        document.documentElement.style.setProperty('--drag-color', colors.drag);
-        document.documentElement.style.setProperty('--line-color', colors.line);
-        document.documentElement.style.setProperty('--click-color', colors.click);
-    }
-    requestYaToken() {
-        let redirect_uri = 'https://mzxbox.ru/minium/vkread.html';
-        let client_id = 'ad8bb18784e44c64a2098ad6a342e576';
-        let suggest_hostname = 'mzxbox.ru';
-        let retpath = 'https://oauth.yandex.ru/authorize' +
-            '?client_id=' + client_id +
-            '&response_type=token' +
-            '&redirect_uri=' + encodeURI(redirect_uri) +
-            '&suggest_hostname=' + suggest_hostname;
-        let wp = window.open(retpath, '_blank');
-        if (wp) {
-            wp.focus();
-        }
-    }
-    startYAVKshare() {
-        console.log('startYAVKshare');
-        this.requestYaToken();
     }
 }
-//# sourceMappingURL=startup.js.map
+//# sourceMappingURL=yavkupload.js.map

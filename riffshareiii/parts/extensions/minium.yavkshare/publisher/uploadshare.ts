@@ -1,136 +1,206 @@
+console.log('upload');
+let dt = datekey();
+let ya_file_name = 'MiniumStudio-' + dt + '.json';
+let ya_picture_name = 'MiniumStudio-' + dt + '.png';
+let ya_access_token = check_ya_token();
+let projecttextdata = '';
+let previewArrayBuffer: ArrayBuffer;
+function dumpResultMessage(txt: string) {
+	console.log('error', txt);
 
-console.log('Export local v1.0.1');
-//let parsedProject: Zvoog_Project | null = null;
-class LocalExportPlugin {
-	callbackID = '';
-	hostProject: Zvoog_Project | null = null;
-	/*constructor() {
-		//console.log('LocalExportPlugin create');
-		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-		window.parent.postMessage('', '*');
-	}*/
-	constructor() {
-		this.init();
-	}
-	init() {
-		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
-		let msg: MZXBX_MessageToHost = {
-			dialogID: this.callbackID
-			, pluginData: null
-			, done: false
-			, screenWait: true
-		};
-		window.parent.postMessage(msg, '*');
-	}
+}
 
-	receiveHostMessage(par) {
-		//console.log('receiveHostMessage', par);
-		//callbackID = par.data;
-		/*try {
-			//console.log('parse', par.data.data);
-			this.parsedProject = JSON.parse(par.data.data);
-			//console.log('result', oo);
-			this.callbackID = par.data.dialogID;
-			//console.log('dialogID', this.callbackID);
-		} catch (xx) {
-			console.log(xx);
-		}*/
-		let message: MZXBX_MessageToPlugin = par.data;
-		if (this.callbackID) {
-			this.hostProject = message.hostData;
-		} else {
-			this.callbackID = message.hostData;
-			this.setupColors(message.colors);
-		}
-		if (message.screenData) {
-			let sz = 500;
-			//console.log(message.screenData);
-			//let canvas: HTMLCanvasElement = document.createElement('canvas');
-			//canvas.height = canvasSize;
-			//canvas.width = canvasSize;
-			let canvas = document.getElementById("prvw") as HTMLCanvasElement;
-			if (canvas) {
-				let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
-				//var imageData: ImageData = context.createImageData(sz, sz);
-				var imageData: ImageData = context.getImageData(0, 0, sz, sz);
-				imageData.data.set(message.screenData);
-				context.putImageData(imageData, 0, 0);
+function check_ya_token() {
+	if (window.location.hash) {
+		let hash = window.location.hash.substring(1);
+		if (hash) {
+			let pars = hash.split('&');
+			for (let ii = 0; ii < pars.length; ii++) {
+				let namval = pars[ii].split('=');
+				if (namval[0]) {
+					if (namval[1]) {
+						if (namval[0] == 'access_token') {
+							let ya_access_token = namval[1];
+							return ya_access_token;
+						}
+					}
+				}
 
-				/*
-								context.strokeStyle = '#ff0000';
-								context.beginPath();
-								context.arc(95, 50, 40, 0, 2 * Math.PI);
-								context.stroke();
-				
-								console.log(imageData);
-								
-								console.dir(canvas);
-								*/
 			}
 		}
 	}
-	setupColors(colors: {
-		background: string// #101;
-		, main: string//#9cf;
-		, drag: string//#03f;
-		, line: string//#ffc;
-		, click: string// #c39;
-	}) {
-		//console.log('setipColors', colors.background, window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'));
-		document.documentElement.style.setProperty('--background-color', colors.background);
-		document.documentElement.style.setProperty('--main-color', colors.main);
-		document.documentElement.style.setProperty('--drag-color', colors.drag);
-		document.documentElement.style.setProperty('--line-color', colors.line);
-		document.documentElement.style.setProperty('--click-color', colors.click);
+	return '';
+}
+
+function textcell2(num: number) {
+	if (num < 10) {
+		return '0' + num;
+	} else {
+		return '' + num;
 	}
-	exportLocalfile(th) {
-		//console.log('exportLocalfile', th);
-		if (this.hostProject) {
-			this.download(JSON.stringify(this.hostProject), 'minium', 'application/json');
-			let msg: MZXBX_MessageToHost = {
-				dialogID: this.callbackID
-				, pluginData: null
-				, done: true
-				, screenWait: false
-			};
-			window.parent.postMessage(msg, '*');
+}
+
+function datekey() {
+	let dd = new Date();
+	return dd.getFullYear() + '.' + textcell2(dd.getMonth()) + '.' + textcell2(dd.getDay()) +
+		'_' + textcell2(dd.getHours()) + '-' + textcell2(dd.getMinutes()) + '-' + textcell2(dd.getSeconds())
+}
+
+function sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
+	let xmlHttpRequest = new XMLHttpRequest();
+	try {
+		xmlHttpRequest.open(method, url, false);
+		xmlHttpRequest.onload = function (vProgressEvent) {
+			onDone(xmlHttpRequest, vProgressEvent);
+		};
+		xmlHttpRequest.onerror = function (vProgressEvent) {
+			console.log('onerror', vProgressEvent);
+			onError('request error');
+		};
+		if (token) {
+			xmlHttpRequest.setRequestHeader("Authorization", 'OAuth ' + token);
 		}
-	}
-	download(data: string, filename: string, type: string) {
-
-		let file = new Blob([data], { type: type });
-		let a: HTMLAnchorElement = document.createElement("a");
-		let url = URL.createObjectURL(file);
-		a.href = url;
-		a.download = filename;
-		document.body.appendChild(a);
-		a.click();
-
-	}
-	exportImage() {
-		console.log('exportImage');
-		let canvas = document.getElementById("prvw") as HTMLCanvasElement;
-		if (canvas) {
-			let dataURl: string = canvas.toDataURL('image/png');
-			canvas.toBlob((blob: Blob | null) => {
-				console.log('blob', blob);
-				if (blob) {
-					let pro: Promise<ArrayBuffer> = blob.arrayBuffer();
-					pro.catch((reason: any) => {
-						console.log('reason', reason);
-					});
-					pro.then((arrayBuffer: ArrayBuffer) => {
-						console.log('arrayBuffer', arrayBuffer);
-					});
-				}
-			}, 'image/png');
-
-			let a: HTMLAnchorElement = document.createElement("a");
-			a.href = dataURl;
-			a.download = "minium";
-			document.body.appendChild(a);
-			a.click();
+		if (jsonOrArrayBuffer) {
+			xmlHttpRequest.send(jsonOrArrayBuffer);
+		} else {
+			xmlHttpRequest.send();
 		}
 
+	} catch (xx) {
+		console.log('sendRequest', xx, xmlHttpRequest)
+		onError('Can\'t send request');
 	}
+}
+
+function readYaUploadURL(ya_access_token, filename, onError, onDone) {
+	console.log('readYaUploadURL', ya_access_token, filename);
+	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/' + filename, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+		try {
+			let json = JSON.parse(xmlHttpRequest.responseText);
+			let ya_upload_url = json['href'];
+			let ya_operation_id = json['operation_id'];
+			onDone(ya_upload_url, ya_operation_id);
+		} catch (xx) {
+			console.log('parse', xx)
+			onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+		}
+	});
+}
+
+function uploadYaFileData(ya_upload_url, jsonOrArrayBuffer, onError, onDone) {
+	console.log('uploadYaFileData', ya_upload_url);
+	sendRequest('', ya_upload_url, 'PUT', jsonOrArrayBuffer, onError, (xmlHttpRequest, vProgressEvent) => {
+		onDone();
+	});
+}
+
+function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone) {
+	console.log('dumpYaOperationState', ya_operation_id);
+	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/operations/' + ya_operation_id, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+		try {
+			let json = JSON.parse(xmlHttpRequest.responseText);
+			let status = json['status'];
+			if (status == 'success') {
+				onDone();
+			} else {
+				onError(xmlHttpRequest.responseText);
+			}
+		} catch (xx) {
+			console.log('parse', xx)
+			onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+		}
+	});
+}
+
+function getYaLink(ya_file_name, ya_access_token, onError, onDone) {
+	console.log('getYaLink', ya_file_name);
+	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/' + ya_file_name, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
+		try {
+			let json = JSON.parse(xmlHttpRequest.responseText);
+			let downurl = json['href'];
+			onDone(downurl);
+		} catch (xx) {
+			onError('Can\'t parse response ' + xmlHttpRequest.responseText);
+		}
+	});
+}
+
+
+
+function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError, onDone) {
+	readYaUploadURL(ya_access_token, ya_file_name, onError, (href, operation_id) => {
+		uploadYaFileData(href, jsonOrArrayBuffer, onError, () => {
+			dumpYaOperationState(operation_id, ya_access_token, onError, () => {
+				getYaLink(ya_file_name, ya_access_token, onError, (linkDownload) => {
+					onDone(linkDownload);
+				});
+			});
+		});
+	});
+}
+
+function startUpload() {
+	/*
+				let arrayBuffer = new ArrayBuffer(3);
+				var bufView = new Uint8Array(arrayBuffer);
+				bufView[0] = 1;
+				bufView[1] = 2;
+				bufView[2] = 3;
+				console.log('arrayBuffer', arrayBuffer);
+	
+				let dt = datekey();
+				let ya_file_name = 'MiniumStudio-' + dt + '.json';
+				let ya_picture_name = 'MiniumStudio-' + dt + '.png';
+				let textdata = JSON.stringify(miprodata);
+				let ya_access_token = check_ya_token();
+				console.log('startUpload', ya_access_token);
+				*/
+	if (ya_access_token) {
+		getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
+			console.log('project download link', link);
+			getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
+				console.log('image download link', link);
+			});
+		});
+	} else {
+		dumpResultMessage('empty token');
+	}
+}
+function startYAVKipload() {
+	console.log(startYAVKipload);
+	let lz = new LZUtil();
+	let txt: string | null = localStorage.getItem('yavkpreview');
+	if (txt) {
+		let json = lz.decompressFromUTF16(txt);
+		if (json) {
+			let screenData: number[] = JSON.parse(json) as number[];
+			let sz = 500;
+			let canvas = document.getElementById("prvw") as HTMLCanvasElement;
+			if (canvas) {
+				let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+				var imageData: ImageData = context.getImageData(0, 0, sz, sz);
+				imageData.data.set(screenData);
+				context.putImageData(imageData, 0, 0);
+				canvas.toBlob((blob) => {
+					console.log('blob', blob);
+					if (blob) {
+						let pro = blob.arrayBuffer();
+						pro.catch((reason) => {
+							console.log('reason', reason);
+						});
+						pro.then((arrayBuffer) => {
+							console.log('arrayBuffer', arrayBuffer);
+							previewArrayBuffer = arrayBuffer;
+							let txt: string | null = localStorage.getItem('lastprojectdata');
+							let json = lz.decompressFromUTF16(txt);
+							if (json) {
+								projecttextdata = json;
+							}
+						});
+					}
+				}, 'image/png');
+			}
+		}
+	}
+
 }

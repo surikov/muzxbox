@@ -28,6 +28,7 @@
 		
         "../../../mzxbxapi/musicenginetypes.ts"
 		,"../../../mzxbxapi/musicenginedeclarations.ts"
+		,"../../../application/data/lzutil.ts"
         ,"start.ts"
 	]
 }

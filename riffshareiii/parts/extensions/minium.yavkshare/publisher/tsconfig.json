@@ -1,8 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "../../../exe/plugins/actions/yavk/upload.js"
-        //,"outDir":"../js"
+        ,"outFile": "../../../exe/js/yavkupload.js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
 		,"esModuleInterop": true
@@ -28,6 +27,7 @@
 		
         "../../../mzxbxapi/musicenginetypes.ts"
 		,"../../../mzxbxapi/musicenginedeclarations.ts"
+		,"../../../application/data/lzutil.ts"
         ,"uploadshare.ts"
 	]
 }
