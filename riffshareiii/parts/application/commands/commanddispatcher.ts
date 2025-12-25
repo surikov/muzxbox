@@ -1319,45 +1319,62 @@ class CommandDispatcher {
 		});
 		this.adjustTimeLineLength();
 	}
+	slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean {
+		if (a1.length == a2.length) {
+			for (let ii = 0; ii < a1.length; ii++) {
+				if (a1[ii].delta == a2[ii].delta
+					//&& MMUtil().set(a1[ii].duration).equals(a2[ii].duration)
+				) {
+					//
+				} else {
+					return false;
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 	adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure) {
-		let merged: Zvoog_Chord[] = [];
+		//if(this.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
+		let mergedChords: Zvoog_Chord[] = [];
 		for (let kk = 0; kk < trackBar.chords.length; kk++) {
 			let checkChord: Zvoog_Chord = trackBar.chords[kk];
 			let xsts = false;
-			for (let mm = 0; mm < merged.length; mm++) {
-				let existedChord: Zvoog_Chord = merged[mm];
-				if (MMUtil().set(existedChord.skip).equals(checkChord.skip)) {
+			for (let mm = 0; mm < mergedChords.length; mm++) {
+				let existedChord: Zvoog_Chord = mergedChords[mm];
+				if (MMUtil().set(existedChord.skip).equals(checkChord.skip) && this.slidesEquals(existedChord.slides, checkChord.slides)) {
 					xsts = true;
 					//console.log(kk, mm, checkChord.skip, checkChord.pitches.length, '->', existedChord.skip, existedChord.pitches.length);
 					let pitchcount = checkChord.pitches.length;
 					for (let pp = 0; pp < pitchcount; pp++) {
 						let pitch = checkChord.pitches[pp];
-						existedChord.pitches.push(pitch);
+						if (existedChord.pitches.indexOf(pitch) == -1) {
+							existedChord.pitches.push(pitch);
+							checkChord.pitches.splice(pp, 1);
+							pp--;
+							pitchcount--;
+						}
 					}
 					break;
 				}
 			}
 			if (!xsts) {
-				merged.push(checkChord);
+				mergedChords.push(checkChord);
 			}
 		}
-		//trackBar.chords = merged;
+		//if(this.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 	}
 	adjustTracksChords() {
-		//console.log('adjustTracksChords');
+		//if(this.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-			//console.log('track',nn,this.cfg().data.tracks[nn]);
 			for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
 				let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
 				let trackBar = this.cfg().data.tracks[nn].measures[ii];
-				//console.log('--metre',ii,barMetre);
 				for (let kk = 0; kk < trackBar.chords.length; kk++) {
 					let chord = trackBar.chords[kk];
-					//console.log('----chord',kk,chord);
 					if (barMetre.less(chord.skip)) {
-						//console.log('------less');
 						if (ii >= this.cfg().data.timeline.length) {
-							//this.appendBar();
+							//
 						}
 						chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy().metre();
 						this.cfg().data.tracks[nn].measures[ii + 1].chords.push(chord);
@@ -1377,12 +1394,14 @@ class CommandDispatcher {
 				}
 			}
 		}
+		//if (this.cfg().data.tracks[0].measures.length > 33) console.log('2', JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
 			for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
 				let trackBar = this.cfg().data.tracks[nn].measures[ii];
 				this.adjustMergeChordByTime(trackBar);
 			}
 		}
+		//if (this.cfg().data.tracks[0].measures.length > 33) console.log('3', JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 	}
 	adjustSamplerSkips() {
 		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
@@ -1476,14 +1495,20 @@ class CommandDispatcher {
 		}
 	}
 	adjustTimelineContent() {
-		//console.log('adjustTimelineContent');
+		console.log('adjustTimelineContent');
+		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 		this.adjustTimeLineLength();
-		this.adjustRemoveEmptyChords();
+		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
+		
+		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('3',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 		this.adjustTracksChords();
+		this.adjustRemoveEmptyChords();
+		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('4',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 		this.adjustSamplerSkips();
 		this.adjustAutoPoints();
 		this.adjustLyricsPoints();
 		this.adjustTimeLineLength();
+		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('=',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();

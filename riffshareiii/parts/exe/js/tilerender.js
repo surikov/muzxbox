@@ -897,21 +897,21 @@ class TileInteraction {
     constructor(parenttiler) {
         this.tiler = parenttiler;
     }
-    rakeMouseWheel(e) {
+    rakeMouseWheel(wheelEvent) {
         this.tiler.slidingLockTo = -1;
-        e.preventDefault();
-        let wheelVal = e.deltaY;
+        wheelEvent.preventDefault();
+        let wheelVal = wheelEvent.deltaY;
         let min = Math.min(1, wheelVal);
         let delta = Math.max(-1, min);
-        let zoom = this.tiler.translateZ + delta * (this.tiler.translateZ) * 0.05;
+        let zoom = this.tiler.translateZ + delta * (this.tiler.translateZ) * 0.1;
         if (zoom < this.tiler.minZoom()) {
             zoom = this.tiler.minZoom();
         }
         if (zoom > this.tiler.maxZoom()) {
             zoom = this.tiler.maxZoom();
         }
-        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * e.offsetX;
-        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * e.offsetY;
+        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * wheelEvent.offsetX;
+        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * wheelEvent.offsetY;
         this.tiler.translateZ = zoom;
         this.tiler.applyZoomPosition();
         this.tiler.adjustContentPosition();

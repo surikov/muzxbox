@@ -313,7 +313,6 @@ declare class LZUtil {
 }
 declare class YAVKSharePlugin {
     callbackID: string;
-    hostProject: Zvoog_Project | null;
     constructor();
     setupMessaging(): void;
     receiveHostMessage(par: any): void;

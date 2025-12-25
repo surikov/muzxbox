@@ -327,5 +327,5 @@ declare function uploadYaFileData(ya_upload_url: any, jsonOrArrayBuffer: any, on
 declare function dumpYaOperationState(ya_operation_id: any, ya_access_token: any, onError: any, onDone: any): void;
 declare function getYaLink(ya_file_name: any, ya_access_token: any, onError: any, onDone: any): void;
 declare function getLinkUpload(ya_file_name: any, jsonOrArrayBuffer: any, ya_access_token: any, onError: any, onDone: any): void;
-declare function startUpload(): void;
+declare function yavkInit(): void;
 declare function startYAVKipload(): void;

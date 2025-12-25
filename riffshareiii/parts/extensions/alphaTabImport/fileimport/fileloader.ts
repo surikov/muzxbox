@@ -69,8 +69,9 @@ class FileLoaderAlpha {
 
 									let mireader: MIDIReader = new MIDIReader(file.name, file.size, arrayBuffer);
 									parsedProject = mireader.project;
-									console.log(mireader.parser);
-									console.log(mireader.info);
+									console.log('parser',mireader.parser);
+									console.log('info',mireader.info);
+									console.log('project',mireader.project);
 								} else {
 									console.log('wrong path', path);
 								}

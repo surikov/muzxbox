@@ -3,15 +3,15 @@ class TileInteraction {
     constructor(parenttiler: TileLevelRealTime) {
         this.tiler = parenttiler;
     }
-    rakeMouseWheel(e: WheelEvent) {
+    rakeMouseWheel(wheelEvent: WheelEvent) {
         //console.log('rakeMouseWheel');
         this.tiler.slidingLockTo = -1;
-        e.preventDefault();
-        let wheelVal: number = e.deltaY;
+        wheelEvent.preventDefault();
+        let wheelVal: number = wheelEvent.deltaY;
         let min: number = Math.min(1, wheelVal);
         let delta: number = Math.max(-1, min);
         //let zoom: number = this.translateZ - delta * (this.translateZ) * 0.077;
-        let zoom: number = this.tiler.translateZ + delta * (this.tiler.translateZ) * 0.05;
+        let zoom: number = this.tiler.translateZ + delta * (this.tiler.translateZ) * 0.1;//0.05;
         //console.log('rakeMouseWheel',zoom);
         if (zoom < this.tiler.minZoom()) {
             zoom = this.tiler.minZoom();
@@ -19,8 +19,8 @@ class TileInteraction {
         if (zoom > this.tiler.maxZoom()) {
             zoom = this.tiler.maxZoom();
         }
-        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * e.offsetX;
-        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * e.offsetY;
+        this.tiler.translateX = this.tiler.translateX - (this.tiler.translateZ - zoom) * wheelEvent.offsetX;
+        this.tiler.translateY = this.tiler.translateY - (this.tiler.translateZ - zoom) * wheelEvent.offsetY;
         this.tiler.translateZ = zoom;
         this.tiler.applyZoomPosition();
         this.tiler.adjustContentPosition();

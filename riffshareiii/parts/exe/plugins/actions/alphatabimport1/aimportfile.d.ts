@@ -2759,7 +2759,7 @@ declare class EventsConverter {
         idx: number;
         ratio: number;
     };
-    takeChord(bar: Zvoog_TrackMeasure, when: Zvoog_Metre): Zvoog_Chord;
+    takeChord(bar: Zvoog_TrackMeasure, when: Zvoog_Metre, create: boolean): Zvoog_Chord;
     addTrackNote(tracks: Zvoog_MusicTrack[], timeline: Zvoog_SongMeasure[], allTracks: MIDITrackInfo[], note: TrackNote): void;
     addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: MIDIDrumInfo[], note: TrackNote): void;
     takeProTrackNo(allTracks: MIDITrackInfo[], midiTrack: number, midiChannel: number, trackVolumePoints: null | {

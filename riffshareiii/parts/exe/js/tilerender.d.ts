@@ -128,7 +128,7 @@ declare function vectorNormSquared(xy: TilePoint): number;
 declare class TileInteraction {
     tiler: TileLevelRealTime;
     constructor(parenttiler: TileLevelRealTime);
-    rakeMouseWheel(e: WheelEvent): boolean;
+    rakeMouseWheel(wheelEvent: WheelEvent): boolean;
     rakeMouseDown(mouseEvent: MouseEvent): void;
     rakeMouseMove(mouseEvent: MouseEvent): void;
     rakeMouseUp(mouseEvent: MouseEvent): void;

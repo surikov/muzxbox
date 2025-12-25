@@ -67,7 +67,8 @@ let zoomPrefixLevelsCSS: {
 		, { prefix: '32', minZoom: 32, gridLines: [], iconRatio: 2.75 }//7
 		, { prefix: '64', minZoom: 64, gridLines: [], iconRatio: 3 }//8
 		, { prefix: '128', minZoom: 128, gridLines: [], iconRatio: 3.25 }//9
-		//, { prefix: '256', zoom: 256,svg:'tracksLayerZoom025' }//10
+		, { prefix: '128', minZoom: 256, gridLines: [], iconRatio: 3.25 }//10
+		, { prefix: '128', minZoom: 512, gridLines: [], iconRatio: 3.25 }//11
 	];
 class UIRenderer {//} implements RenderedPart {
 	toolbar: UIToolbar;

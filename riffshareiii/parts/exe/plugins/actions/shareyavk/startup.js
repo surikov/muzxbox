@@ -410,7 +410,6 @@ console.log('Share YAVK start v1.0.1');
 class YAVKSharePlugin {
     constructor() {
         this.callbackID = '';
-        this.hostProject = null;
         this.setupMessaging();
     }
     setupMessaging() {
@@ -426,12 +425,15 @@ class YAVKSharePlugin {
     receiveHostMessage(par) {
         let message = par.data;
         if (this.callbackID) {
+            let lz = new LZUtil();
+            let json = JSON.stringify(message.hostData);
+            let data = lz.compressToUTF16(json);
+            localStorage.setItem('yavkdata', JSON.stringify(data));
         }
         else {
             this.callbackID = message.hostData;
             this.setupColors(message.colors);
             this.selupLanguage(message.langID);
-            localStorage.setItem('yavkmsgid', this.callbackID);
         }
         if (message.screenData) {
             let sz = 500;
@@ -442,8 +444,9 @@ class YAVKSharePlugin {
                 imageData.data.set(message.screenData);
                 context.putImageData(imageData, 0, 0);
                 let lz = new LZUtil();
-                let cmpr = lz.compressToUTF16(JSON.stringify(message.screenData));
-                localStorage.setItem('yavkpreview', cmpr);
+                let json = JSON.stringify(message.screenData);
+                let data = lz.compressToUTF16(json);
+                localStorage.setItem('yavkpreview', data);
             }
         }
     }
@@ -471,14 +474,14 @@ class YAVKSharePlugin {
         let redirect_uri = 'https://mzxbox.ru/minium/vkread.html';
         let client_id = 'ad8bb18784e44c64a2098ad6a342e576';
         let suggest_hostname = 'mzxbox.ru';
-        let retpath = 'https://oauth.yandex.ru/authorize' +
-            '?client_id=' + client_id +
-            '&response_type=token' +
-            '&redirect_uri=' + encodeURI(redirect_uri) +
-            '&suggest_hostname=' + suggest_hostname;
-        let wp = window.open(retpath, '_blank');
-        if (wp) {
-            wp.focus();
+        let retpath = 'https://oauth.yandex.ru/authorize'
+            + '?client_id=' + client_id
+            + '&response_type=token'
+            + '&redirect_uri=' + encodeURI(redirect_uri)
+            + '&suggest_hostname=' + suggest_hostname;
+        let winpro = window.open(retpath, '_blank');
+        if (winpro) {
+            winpro.focus();
         }
     }
     startYAVKshare() {

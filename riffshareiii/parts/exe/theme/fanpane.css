@@ -60,6 +60,7 @@
 .fanSamplerMoveIcon7 {stroke-width: calc(2.56*var(--tapSize));}
 .fanSamplerMoveIcon8 {stroke-width: calc(5.12*var(--tapSize));}
 .fanSamplerMoveIcon9 {stroke-width: calc(10.24*var(--tapSize));}
+.fanSamplerMoveIcon10 {stroke-width: calc(10.24*var(--tapSize));}
 /*
 .fanSamplerUpIcon0 {stroke-width: calc(0.08*var(--tapSize));}
 .fanSamplerUpIcon1 {stroke-width: calc(0.16*var(--tapSize));}
@@ -173,6 +174,8 @@
 .fanConnection6 {stroke-width: 0.75cm;}
 .fanConnection7 {stroke-width: 1cm;}
 .fanConnection8 {stroke-width: 2cm;}
+.fanConnection9 {stroke-width: 2cm;}
+.fanConnection10 {stroke-width: 2cm;}
 
 .fanStream {
 	pointer-events: none;

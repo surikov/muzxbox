@@ -16223,11 +16223,13 @@ class EventsConverter {
         return re;
     }
     ;
-    takeChord(bar, when) {
-        for (let cc = 0; cc < bar.chords.length; cc++) {
-            let chord = bar.chords[cc];
-            if (MMUtil().set(chord.skip).equals(when)) {
-                return chord;
+    takeChord(bar, when, create) {
+        if (!create) {
+            for (let cc = 0; cc < bar.chords.length; cc++) {
+                let chord = bar.chords[cc];
+                if (chord.slides.length < 2 && MMUtil().set(chord.skip).equals(when)) {
+                    return chord;
+                }
             }
         }
         let chord = {
@@ -16248,9 +16250,10 @@ class EventsConverter {
                 let zvooginstrack = tracks[zvootraidx];
                 let noteStartMs = note.startMs - barStart;
                 let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
-                let chord = this.takeChord(zvooginstrack.measures[ii], when);
-                if (chord.pitches.indexOf(note.basePitch) < 0)
+                let chord = this.takeChord(zvooginstrack.measures[ii], when, true);
+                if (chord.pitches.indexOf(note.basePitch) < 0) {
                     chord.pitches.push(note.basePitch);
+                }
                 if (chord.slides.length == 0 || chord.slides.length == 1) {
                     if (note.bendPoints.length) {
                         chord.slides = [];
@@ -16458,8 +16461,9 @@ class FileLoaderAlpha {
                                 if (path.endsWith('.mid')) {
                                     let mireader = new MIDIReader(file.name, file.size, arrayBuffer);
                                     parsedProject = mireader.project;
-                                    console.log(mireader.parser);
-                                    console.log(mireader.info);
+                                    console.log('parser', mireader.parser);
+                                    console.log('info', mireader.info);
+                                    console.log('project', mireader.project);
                                 }
                                 else {
                                     console.log('wrong path', path);

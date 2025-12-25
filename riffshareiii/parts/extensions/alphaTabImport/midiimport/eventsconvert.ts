@@ -174,6 +174,7 @@ class EventsConverter {
 				this.addTrackNote(project.tracks, project.timeline, allTracks, it);
 			}
 		}
+		
 
 		this.addMIDIComments(project);
 		this.arrangeIcons(project);
@@ -542,17 +543,17 @@ class EventsConverter {
 		else this.midiFileInfo.avgTempoCategory04 = 4;
 
 		for (let ii = 0; ii < project.timeline.length; ii++) {
-			let bar= project.timeline[ii];
-			let label=''+bar.metre.count+'/'+bar.metre.part;
-			let xsts=this.midiFileInfo.meters.find((it)=>it.label==label);
-			if(xsts){
+			let bar = project.timeline[ii];
+			let label = '' + bar.metre.count + '/' + bar.metre.part;
+			let xsts = this.midiFileInfo.meters.find((it) => it.label == label);
+			if (xsts) {
 				xsts.count++;
-			}else{
-				this.midiFileInfo.meters.push({label:label,count:1});
+			} else {
+				this.midiFileInfo.meters.push({ label: label, count: 1 });
 			}
 		}
-		this.midiFileInfo.meters.map((it)=>it.count=Math.round(100*it.count/project.timeline.length));
-		this.midiFileInfo.meters.sort((a,b)=>b.count-a.count);
+		this.midiFileInfo.meters.map((it) => it.count = Math.round(100 * it.count / project.timeline.length));
+		this.midiFileInfo.meters.sort((a, b) => b.count - a.count);
 
 
 		let maxTrackChordDuration = 0;
@@ -1078,12 +1079,15 @@ class EventsConverter {
 		//console.log('program', program, 'not found set 0');
 		return re;
 	};
-	takeChord(bar: Zvoog_TrackMeasure, when: Zvoog_Metre): Zvoog_Chord {
-		for (let cc = 0; cc < bar.chords.length; cc++) {
-			let chord = bar.chords[cc];
-			if (MMUtil().set(chord.skip).equals(when)) {
-				//console.log(chord);
-				return chord;
+	takeChord(bar: Zvoog_TrackMeasure, when: Zvoog_Metre, create: boolean): Zvoog_Chord {
+		if (!create) {
+			for (let cc = 0; cc < bar.chords.length; cc++) {
+				let chord = bar.chords[cc];
+				//if (MMUtil().set(chord.skip).equals(when)) {
+				if (chord.slides.length < 2 && MMUtil().set(chord.skip).equals(when)) {
+					//console.log(chord);
+					return chord;
+				}
 			}
 		}
 		let chord: Zvoog_Chord = {
@@ -1096,27 +1100,24 @@ class EventsConverter {
 	}
 	addTrackNote(tracks: Zvoog_MusicTrack[], timeline: Zvoog_SongMeasure[], allTracks: MIDITrackInfo[], note: TrackNote) {
 		let barStart = 0;
-
 		for (let ii = 0; ii < timeline.length; ii++) {
 			let measure = timeline[ii];
 			let durationMs = 1000 * MMUtil().set(measure.metre).duration(measure.tempo);
-			//if(note.trackidx==3 && note.channelidx==5)console.log('check',note.trackidx, note.channelidx,note.startMs,ii,barStart,durationMs);
 			if (note.startMs >= barStart && note.startMs < barStart + durationMs) {
-				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx);
 				let zvootraidx = this.takeProTrackNo(allTracks, note.trackidx, note.channelidx, null);
 				let zvooginstrack = tracks[zvootraidx];
 				let noteStartMs = note.startMs - barStart;
-				//let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(32).metre();
 				let when = MMUtil().set(measure.metre).calculate(noteStartMs / 1000, measure.tempo).strip(128).metre();
-				//console.log(tracks, insidx, instrack);
-				//instrack.measures[ii]..skips.push(when);
-				//if(note.trackidx==3)console.log('addTrackNote',note.trackidx, note.channelidx,zvootraidx);
-				let chord = this.takeChord(zvooginstrack.measures[ii], when);
-				if(chord.pitches.indexOf(note.basePitch)<0)chord.pitches.push(note.basePitch);
-
+				let chord = this.takeChord(zvooginstrack.measures[ii], when, true);//note.bendPoints.length > 0);
+				if (chord.pitches.indexOf(note.basePitch) < 0) {
+					chord.pitches.push(note.basePitch);
+				}
+				/*if (ii == 33 && zvootraidx == 0) {
+					console.log(ii, when, 'pitch', note.basePitch, 'pitches', JSON.stringify(chord.pitches), chord.pitches,zvooginstrack);
+				}*/
 				if (chord.slides.length == 0 || chord.slides.length == 1) {
 					if (note.bendPoints.length) {
-						//console.log(note.bendPoints);
+
 						chord.slides = [];
 						let bendDurationMs = 0;
 						for (var v = 0; v < note.bendPoints.length; v++) {
@@ -1148,7 +1149,6 @@ class EventsConverter {
 			}
 			barStart = barStart + durationMs;
 		}
-		//if(note.trackidx==3)console.log('skip addTrackNote',note.trackidx, note.channelidx);
 	}
 	addDrumkNote(percussions: Zvoog_PercussionTrack[], timeline: Zvoog_SongMeasure[], allPercussions: MIDIDrumInfo[]
 		, note: TrackNote) {
@@ -1180,8 +1180,11 @@ class EventsConverter {
 		}
 		return -1;
 	}*/
-	takeProTrackNo(allTracks: MIDITrackInfo[], midiTrack: number, midiChannel: number
-		, trackVolumePoints: null | { ms: number, value: number, channel: number }[]): number {
+	takeProTrackNo(allTracks: MIDITrackInfo[]
+		, midiTrack: number
+		, midiChannel: number
+		, trackVolumePoints: null | { ms: number, value: number, channel: number }[]
+	): number {
 		let midiProgram = this.findProgramForChannel(midiChannel);
 		for (let ii = 0; ii < allTracks.length; ii++) {
 			let it = allTracks[ii];

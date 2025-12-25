@@ -539,21 +539,8 @@ function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError
         });
     });
 }
-function startUpload() {
-    if (ya_access_token) {
-        getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
-            console.log('project download link', link);
-            getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
-                console.log('image download link', link);
-            });
-        });
-    }
-    else {
-        dumpResultMessage('empty token');
-    }
-}
-function startYAVKipload() {
-    console.log(startYAVKipload);
+function yavkInit() {
+    console.log('yavkInit');
     let lz = new LZUtil();
     let txt = localStorage.getItem('yavkpreview');
     if (txt) {
@@ -577,7 +564,7 @@ function startYAVKipload() {
                         pro.then((arrayBuffer) => {
                             console.log('arrayBuffer', arrayBuffer);
                             previewArrayBuffer = arrayBuffer;
-                            let txt = localStorage.getItem('lastprojectdata');
+                            let txt = localStorage.getItem('yavkdata');
                             let json = lz.decompressFromUTF16(txt);
                             if (json) {
                                 projecttextdata = json;
@@ -588,5 +575,13 @@ function startYAVKipload() {
             }
         }
     }
+}
+function startYAVKipload() {
+    getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
+        console.log('project download link', link);
+        getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
+            console.log('image download link', link);
+        });
+    });
 }
 //# sourceMappingURL=yavkupload.js.map

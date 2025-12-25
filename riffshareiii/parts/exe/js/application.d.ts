@@ -229,6 +229,7 @@ declare class CommandDispatcher {
     adjustTimeLineLength(): void;
     adjustRemoveEmptyChords(): void;
     appendBar(): void;
+    slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean;
     adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
     adjustTracksChords(): void;
     adjustSamplerSkips(): void;

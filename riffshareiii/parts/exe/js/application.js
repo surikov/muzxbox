@@ -2209,25 +2209,43 @@ class CommandDispatcher {
         });
         this.adjustTimeLineLength();
     }
+    slidesEquals(a1, a2) {
+        if (a1.length == a2.length) {
+            for (let ii = 0; ii < a1.length; ii++) {
+                if (a1[ii].delta == a2[ii].delta) {
+                }
+                else {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
     adjustMergeChordByTime(trackBar) {
-        let merged = [];
+        let mergedChords = [];
         for (let kk = 0; kk < trackBar.chords.length; kk++) {
             let checkChord = trackBar.chords[kk];
             let xsts = false;
-            for (let mm = 0; mm < merged.length; mm++) {
-                let existedChord = merged[mm];
-                if (MMUtil().set(existedChord.skip).equals(checkChord.skip)) {
+            for (let mm = 0; mm < mergedChords.length; mm++) {
+                let existedChord = mergedChords[mm];
+                if (MMUtil().set(existedChord.skip).equals(checkChord.skip) && this.slidesEquals(existedChord.slides, checkChord.slides)) {
                     xsts = true;
                     let pitchcount = checkChord.pitches.length;
                     for (let pp = 0; pp < pitchcount; pp++) {
                         let pitch = checkChord.pitches[pp];
-                        existedChord.pitches.push(pitch);
+                        if (existedChord.pitches.indexOf(pitch) == -1) {
+                            existedChord.pitches.push(pitch);
+                            checkChord.pitches.splice(pp, 1);
+                            pp--;
+                            pitchcount--;
+                        }
                     }
                     break;
                 }
             }
             if (!xsts) {
-                merged.push(checkChord);
+                mergedChords.push(checkChord);
             }
         }
     }
@@ -2359,9 +2377,10 @@ class CommandDispatcher {
         }
     }
     adjustTimelineContent() {
+        console.log('adjustTimelineContent');
         this.adjustTimeLineLength();
-        this.adjustRemoveEmptyChords();
         this.adjustTracksChords();
+        this.adjustRemoveEmptyChords();
         this.adjustSamplerSkips();
         this.adjustAutoPoints();
         this.adjustLyricsPoints();
@@ -2416,7 +2435,9 @@ let zoomPrefixLevelsCSS = [
     { prefix: '16', minZoom: 16, gridLines: [], iconRatio: 2.5 },
     { prefix: '32', minZoom: 32, gridLines: [], iconRatio: 2.75 },
     { prefix: '64', minZoom: 64, gridLines: [], iconRatio: 3 },
-    { prefix: '128', minZoom: 128, gridLines: [], iconRatio: 3.25 }
+    { prefix: '128', minZoom: 128, gridLines: [], iconRatio: 3.25 },
+    { prefix: '128', minZoom: 256, gridLines: [], iconRatio: 3.25 },
+    { prefix: '128', minZoom: 512, gridLines: [], iconRatio: 3.25 }
 ];
 class UIRenderer {
     constructor() {
