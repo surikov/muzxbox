@@ -1322,7 +1322,7 @@ class CommandDispatcher {
 	slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean {
 		if (a1.length == a2.length) {
 			for (let ii = 0; ii < a1.length; ii++) {
-				if (a1[ii].delta == a2[ii].delta
+				if (Math.abs(a1[ii].delta - a2[ii].delta)<0.005
 					//&& MMUtil().set(a1[ii].duration).equals(a2[ii].duration)
 				) {
 					//
