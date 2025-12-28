@@ -65,3 +65,4 @@ let icon_time = '&#xf337';
 
 
 
+let icon_hourglass= '&#xf179';

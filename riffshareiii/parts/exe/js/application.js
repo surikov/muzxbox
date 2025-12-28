@@ -6131,6 +6131,7 @@ let icon_mergebars = '&#xf232';
 let icon_copybarcontent = '&#xf237';
 let icon_home = '&#xf175';
 let icon_time = '&#xf337';
+let icon_hourglass = '&#xf179';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -6241,7 +6242,7 @@ class WarningUI {
         this.warningInfo4.href = '';
     }
     showWarning(title, msg, smallMsg, onCancel) {
-        this.setIcon(icon_time);
+        this.setIcon(icon_hourglass);
         this.onCancel = onCancel;
         this.warningTitle.text = title;
         this.warningDescription.text = msg;

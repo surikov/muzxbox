@@ -112,7 +112,8 @@ class WarningUI {
 	}
 	showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)) {
 		//console.log('WarningUI show', title, msg);
-		this.setIcon(icon_time);
+		//this.setIcon(icon_time);
+		this.setIcon(icon_hourglass);
 		this.onCancel = onCancel;
 		this.warningTitle.text = title;
 		this.warningDescription.text = msg;
