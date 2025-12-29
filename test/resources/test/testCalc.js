@@ -1469,4 +1469,4 @@ for (let ii = 0; ii < 10; ii++) {
 }
 */
 test9();
-console.log('start');
+console.log('start', datarows);
