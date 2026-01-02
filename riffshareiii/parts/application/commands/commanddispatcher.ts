@@ -343,19 +343,20 @@ class CommandDispatcher {
 			this.setupAndStartPlay();
 		}
 	}
-	toggleStartStop() {
+	/*toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
 		if (this.player.playState().play) {
 			this.stopPlay();
 		} else {
 			this.setupAndStartPlay();
 		}
-	}
+	}*/
 	stopPlay() {
 		/*if (this.onAir) {
 			this.onAir = false;
 			this.player.cancel();
 		}*/
+		
 		this.player.cancel();
 		this.renderer.menu.rerenderMenuContent(null);
 		this.setHiddenTimeMark();

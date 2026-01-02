@@ -1503,14 +1503,6 @@ class CommandDispatcher {
             this.setupAndStartPlay();
         }
     }
-    toggleStartStop() {
-        if (this.player.playState().play) {
-            this.stopPlay();
-        }
-        else {
-            this.setupAndStartPlay();
-        }
-    }
     stopPlay() {
         this.player.cancel();
         this.renderer.menu.rerenderMenuContent(null);
@@ -2933,8 +2925,13 @@ class UIToolbar {
         this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn) => {
             globalCommandDispatcher.exe.undo(1);
         });
-        this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1, (nn) => {
-            globalCommandDispatcher.toggleStartStop();
+        this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, -1, (nn) => {
+            if (globalCommandDispatcher.player.playState().play) {
+                globalCommandDispatcher.stopPlay();
+            }
+            else {
+                globalCommandDispatcher.setupAndStartPlay();
+            }
         });
         this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn) => {
             if (goHomeBackURL) {

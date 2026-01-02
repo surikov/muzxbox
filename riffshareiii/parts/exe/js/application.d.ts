@@ -188,7 +188,6 @@ declare class CommandDispatcher {
     renderCurrentProjectForOutput(): MZXBX_Schedule;
     reConnectPluginsIfPlay(): void;
     reStartPlayIfPlay(): void;
-    toggleStartStop(): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
     startPlayLoop(from: number, position: number, to: number): void;

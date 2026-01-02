@@ -8,7 +8,7 @@ class EchoBridge {
         this.sendMessageToHost('');
     }
     sendMessageToHost(data) {
-        var message = { dialogID: this.id, pluginData: data, done: false };
+        var message = { dialogID: this.id, pluginData: data, done: false, screenWait: false };
         window.parent.postMessage(message, '*');
     }
     receiveHostMessage(messageEvent) {
@@ -19,10 +19,29 @@ class EchoBridge {
         }
         else {
             this.setMessagingId(message.hostData);
+            this.setupLangColors(message);
         }
     }
     setMessagingId(newId) {
         this.id = newId;
+    }
+    setupLangColors(message) {
+        document.documentElement.style.setProperty('--background-color', message.colors.background);
+        document.documentElement.style.setProperty('--main-color', message.colors.main);
+        document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+        document.documentElement.style.setProperty('--line-color', message.colors.line);
+        document.documentElement.style.setProperty('--click-color', message.colors.click);
+        if (message.langID == 'ru') {
+            document.getElementById('title').innerHTML = 'Эхо';
+        }
+        else {
+            if (message.langID == 'zh') {
+                document.getElementById('title').innerHTML = '淡入淡出';
+            }
+            else {
+                document.getElementById('title').innerHTML = 'Echo';
+            }
+        }
     }
 }
 function initEchoUI() {

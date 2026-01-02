@@ -29,8 +29,13 @@ class UIToolbar {
 		this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn: number) => {
 			globalCommandDispatcher.exe.undo(1);
 		});
-		this.playStopButton = new ToolBarButton([icon_play, icon_pause], 0, -1, (nn: number) => {
-			globalCommandDispatcher.toggleStartStop();
+		this.playStopButton = new ToolBarButton([icon_pause,icon_play], 0, -1, (nn: number) => {
+			//globalCommandDispatcher.toggleStartStop();
+			if (globalCommandDispatcher.player.playState().play) {
+				globalCommandDispatcher.stopPlay();
+			} else {
+				globalCommandDispatcher.setupAndStartPlay();
+			}
 		});
 
 
