@@ -545,8 +545,8 @@ declare class PerformerIcon {
 declare class SamplerIcon {
     samplerId: string;
     constructor(samplerId: string);
-    buildSamplerSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
-    addSamplerSpot(order: number, samplerTrack: Zvoog_PercussionTrack, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    buildSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
 }
 declare class FilterIcon {
     filterId: string;

@@ -130,7 +130,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     , "evaluate": ""
     , "script": ""
 }
-,{
+/*,{
     "label": "⇄ Yandex/VKontakte"
     , "purpose": "Action"
     , "kind": "shareyavk"
@@ -138,7 +138,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     , "evaluate": ""
     , "script": ""
 }
-
+*/
 
 
 

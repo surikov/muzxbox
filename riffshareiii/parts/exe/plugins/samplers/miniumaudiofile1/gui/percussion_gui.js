@@ -1,5 +1,5 @@
 "use strict";
-console.log('Percussion GUI v1.0.3');
+console.log('Percussion GUI v1.0.4');
 class ZDUI {
     constructor() {
         this.id = '';
@@ -72,7 +72,7 @@ class ZDUI {
         this.sendMessageToHost('');
     }
     sendMessageToHost(data) {
-        var message = { dialogID: this.id, pluginData: data, done: false };
+        var message = { dialogID: this.id, pluginData: data, done: false, screenWait: false };
         console.log('set drum', data);
         window.parent.postMessage(message, '*');
     }
@@ -84,6 +84,7 @@ class ZDUI {
         }
         else {
             this.setMessagingId(message.hostData);
+            this.setupLangColors(message);
         }
     }
     setMessagingId(newId) {
@@ -121,6 +122,25 @@ class ZDUI {
         this.selectedItemIdx = idx;
         this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
         this.refreshTitle();
+    }
+    setupLangColors(message) {
+        console.log('setupColors', message.colors.background, window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'));
+        document.documentElement.style.setProperty('--background-color', message.colors.background);
+        document.documentElement.style.setProperty('--main-color', message.colors.main);
+        document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+        document.documentElement.style.setProperty('--line-color', message.colors.line);
+        document.documentElement.style.setProperty('--click-color', message.colors.click);
+        if (message.langID == 'ru') {
+            document.getElementById('title').innerHTML = 'Аккорд/Тон';
+        }
+        else {
+            if (message.langID == 'zh') {
+                document.getElementById('title').innerHTML = '?';
+            }
+            else {
+                document.getElementById('title').innerHTML = 'Chord/Pitch';
+            }
+        }
     }
 }
 function initZDRUI() {

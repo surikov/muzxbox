@@ -64,6 +64,14 @@ let _t_all_registerd_plugins_list = [
         "ui": "./plugins/actions/alphatabimport1/ui.html",
         "evaluate": "",
         "script": ""
+    },
+    {
+        "label": "⇄ Yandex/VKontakte",
+        "purpose": "Action",
+        "kind": "shareyavk",
+        "ui": "./plugins/actions/shareyavk/preview.html",
+        "evaluate": "",
+        "script": ""
     }
 ];
 function MZXBX_currentPlugins() {

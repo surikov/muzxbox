@@ -1,4 +1,4 @@
-console.log('Percussion GUI v1.0.3');
+console.log('Percussion GUI v1.0.4');
 /*
 var drumNames: string[] = [];
 drumNames[35] = "Bass Drum 2";
@@ -127,7 +127,7 @@ class ZDUI {
 	}
 	sendMessageToHost(data: string) {
 
-		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false, screenWait: false };
 		console.log('set drum', data);
 		window.parent.postMessage(message, '*');
 	}
@@ -138,6 +138,7 @@ class ZDUI {
 			this.setState(message.hostData);
 		} else {
 			this.setMessagingId(message.hostData);
+			this.setupLangColors(message);
 		}
 	}
 	setMessagingId(newId: string) {
@@ -158,8 +159,8 @@ class ZDUI {
 			this.selectedItemIdx = 0;
 			this.selectedCategoryIdx = 35;
 		}
-		if(this.level){
-		this.level.value=''+this.selectedVolume;
+		if (this.level) {
+			this.level.value = '' + this.selectedVolume;
 		}
 		this.reFillList();
 		this.refreshTitle();
@@ -175,6 +176,31 @@ class ZDUI {
 		this.selectedItemIdx = idx;
 		this.sendMessageToHost('' + this.selectedVolume + '/' + this.selectedItemIdx);
 		this.refreshTitle();
+	}
+	setupLangColors(message: MZXBX_MessageToPlugin) {
+		/*colors: {
+		background: string// #101;
+		, main: string//#9cf;
+		, drag: string//#03f;
+		, line: string//#ffc;
+		, click: string// #c39;
+	}) {*/
+		console.log('setupColors', message.colors.background, window.getComputedStyle(document.documentElement).getPropertyValue('--background-color'));
+		document.documentElement.style.setProperty('--background-color', message.colors.background);
+		document.documentElement.style.setProperty('--main-color', message.colors.main);
+		document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+		document.documentElement.style.setProperty('--line-color', message.colors.line);
+		document.documentElement.style.setProperty('--click-color', message.colors.click);
+		/*if (message.langID == 'ru') {
+			(document.getElementById('title') as any).innerHTML = 'Аккорд/Тон';
+		} else {
+			if (message.langID == 'zh') {
+				(document.getElementById('title') as any).innerHTML = '?';
+			} else {
+				(document.getElementById('title') as any).innerHTML = 'Chord/Pitch';
+			}
+		}
+*/
 	}
 }
 function initZDRUI() {

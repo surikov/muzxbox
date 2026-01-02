@@ -83,6 +83,7 @@
 							$munote = str_replace("\n", "<br/>", $munote);
 							$munote = str_replace("\r", "<br/>", $munote);
 							$munote = str_replace("<br/><br/>", "<br/>", $munote);
+							$fileurl='../midi/midiru-archive-2022-02-25/music_files/'.$file.'.mid';
 					?>
 
 							<p><?php echo ($row["date"]); ?></p>
@@ -103,6 +104,7 @@
 							<p>город: <?php echo ($row["acity"]); ?></p>
 
 							<p><a class='linkinfo' href="lyrics.php?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
+							<p><a class='linkinfo' href="<?php echo $fileurl; ?>">скачать</a></p>
 
 
 					<?php

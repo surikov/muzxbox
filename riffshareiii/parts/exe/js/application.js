@@ -5451,20 +5451,21 @@ class SamplerIcon {
     constructor(samplerId) {
         this.samplerId = samplerId;
     }
-    buildSamplerSpot(order, fanLevelAnchor, spearsAnchor, zidx) {
+    buildSamplerSpot(percnum, fanLevelAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
             if (globalCommandDispatcher.cfg().data.percussions[ii].sampler.id == this.samplerId) {
-                this.addSamplerSpot(order, globalCommandDispatcher.cfg().data.percussions[ii], fanLevelAnchor, spearsAnchor, zidx);
+                this.addSamplerSpot(percnum, fanLevelAnchor, spearsAnchor, zidx);
                 break;
             }
         }
     }
-    addSamplerSpot(order, samplerTrack, fanLevelAnchor, spearsAnchor, zidx) {
+    addSamplerSpot(percnum, fanLevelAnchor, spearsAnchor, zidx) {
         let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
         let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
         let top = globalCommandDispatcher.cfg().gridTop();
         let xx = left;
         let yy = top;
+        let samplerTrack = globalCommandDispatcher.cfg().data.percussions[percnum];
         if (samplerTrack.sampler.iconPosition) {
             xx = left + samplerTrack.sampler.iconPosition.x;
             yy = top + samplerTrack.sampler.iconPosition.y;
@@ -5511,19 +5512,19 @@ class SamplerIcon {
                         samplerTrack.sampler.iconPosition = { x: 0, y: 0 };
                     }
                     if (toSpeaker) {
-                        globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                        globalCommandDispatcher.exe.commitProjectChanges(['percussions', percnum, 'sampler', 'outputs'], () => {
                             samplerTrack.sampler.outputs.push('');
                         });
                     }
                     else {
                         if (toFilter) {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', percnum, 'sampler', 'outputs'], () => {
                                 if (toFilter)
                                     samplerTrack.sampler.outputs.push(toFilter.id);
                             });
                         }
                         else {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler'], () => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', percnum, 'sampler'], () => {
                                 if (dragAnchor.translation) {
                                     samplerTrack.sampler.iconPosition.x = samplerTrack.sampler.iconPosition.x + dragAnchor.translation.x;
                                     samplerTrack.sampler.iconPosition.y = samplerTrack.sampler.iconPosition.y + dragAnchor.translation.y;
@@ -5616,7 +5617,7 @@ class SamplerIcon {
                 css: interSamplerCss + ' fanButton' + zidx,
                 activation: (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
-                    globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(order, samplerTrack, info);
+                    globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(percnum, samplerTrack, info);
                 }
             };
             dragAnchor.content.push(btn);
@@ -5636,14 +5637,14 @@ class SamplerIcon {
             dragAnchor.content.push(txt);
         }
         let samplerFromY = globalCommandDispatcher.cfg().samplerTop()
-            + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
+            + (percnum + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
         new ControlConnection().addAudioStreamLineFlow(false, zidx, samplerFromY, xx, yy, spearsAnchor);
         let fol = new FanOutputLine();
         for (let oo = 0; oo < samplerTrack.sampler.outputs.length; oo++) {
             let outId = samplerTrack.sampler.outputs[oo];
             if (outId) {
                 fol.connectOutput(outId, samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', percnum, 'sampler', 'outputs'], () => {
                         let nn = samplerTrack.sampler.outputs.indexOf(outId);
                         if (nn > -1) {
                             samplerTrack.sampler.outputs.splice(nn, 1);
@@ -5653,7 +5654,7 @@ class SamplerIcon {
             }
             else {
                 fol.connectSpeaker(samplerTrack.sampler.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, samplerTrack.sampler.outputs, (x, y) => {
-                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', order, 'sampler', 'outputs'], () => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions', percnum, 'sampler', 'outputs'], () => {
                         let nn = samplerTrack.sampler.outputs.indexOf('');
                         if (nn > -1) {
                             samplerTrack.sampler.outputs.splice(nn, 1);
