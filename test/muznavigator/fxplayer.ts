@@ -1,4 +1,13 @@
 declare var Tone;
+declare function setContext(
+	context,
+	disposeOld
+);
+declare function connect(
+	srcNode,
+	dstNode
+);
+declare function createShift();
 class FxPlayer {
 	mp3arrayBuffer: ArrayBuffer | null = null;
 	mp3audioBuffer: AudioBuffer | null = null;
@@ -12,7 +21,7 @@ class FxPlayer {
 	waf: WebAudioFontPlayer;
 	reverberator: WebAudioFontReverberator;
 	//fxShift: FxShift;
-	channelMaster:WebAudioFontChannel;
+	channelMaster: WebAudioFontChannel;
 	resetSource() {
 		console.log('resetSource');
 		if (this.currentContext) {
@@ -40,10 +49,13 @@ class FxPlayer {
 	}
 	startAudioBuffer(rebuff: AudioBuffer) {
 		//let duration = rebuff.duration;
-		let tt = Tone;
-		console.log(tt);
+		//let tt = Tone;
+		let tt = new Tone();
+		console.log('Tone', Tone);
+		console.log('tt', tt);
 		//Tone.context = this.currentContext;
-		tt.setContext(this.currentContext);
+		//tt.setContext(this.currentContext);
+		setContext(this.currentContext, false);
 		//console.log(tt.getContext()._context);
 		//this.currentContext = tt.getContext()._context;
 		if (this.currentContext) {
@@ -55,7 +67,7 @@ class FxPlayer {
 			this.reverberator = this.waf.createReverberator(this.currentContext);
 			this.reverberator.compressorWet.gain.setTargetAtTime(0, 0, 0.0001);
 			this.reverberator.compressorDry.gain.setTargetAtTime(1, 0, 0.0001);
-			this.channelMaster = this.waf.createChannel(this.currentContext);	
+			this.channelMaster = this.waf.createChannel(this.currentContext);
 
 
 			this.volumeNode = this.currentContext.createGain();
@@ -64,10 +76,14 @@ class FxPlayer {
 			this.mp3sourceNode.buffer = rebuff;
 
 			this.mp3sourceNode.connect(this.channelMaster.input);
-			this.shift = new Tone.PitchShift();
+			//this.shift = new Tone.PitchShift();
+			this.shift = createShift();
+			console.log('PitchShift', this.shift);
 			//tt.connect(this.mp3sourceNode, this.shift);
-			tt.connect(this.channelMaster.output, this.shift);
-			tt.connect(this.shift, this.volumeNode);
+			//tt.connect(this.channelMaster.output, this.shift);
+			//tt.connect(this.shift, this.volumeNode);
+			connect(this.channelMaster.output, this.shift);
+			connect(this.shift, this.volumeNode);
 			this.volumeNode.connect(this.reverberator.input);
 			this.reverberator.output.connect(this.currentContext.destination);
 

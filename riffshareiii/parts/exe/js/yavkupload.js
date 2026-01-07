@@ -406,13 +406,15 @@ class LZUtil {
             return null;
     }
 }
-console.log('upload');
+console.log('upload v1');
 let dt = datekey();
 let ya_file_name = 'MiniumStudio-' + dt + '.json';
 let ya_picture_name = 'MiniumStudio-' + dt + '.png';
 let ya_access_token = check_ya_token();
 let projecttextdata = '';
 let previewArrayBuffer;
+let image_download_link = '';
+let project_download_link = '';
 function dumpResultMessage(txt) {
     console.log('error', txt);
 }
@@ -476,7 +478,6 @@ function sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
     }
 }
 function readYaUploadURL(ya_access_token, filename, onError, onDone) {
-    console.log('readYaUploadURL', ya_access_token, filename);
     sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/' + filename, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
         try {
             let json = JSON.parse(xmlHttpRequest.responseText);
@@ -491,13 +492,11 @@ function readYaUploadURL(ya_access_token, filename, onError, onDone) {
     });
 }
 function uploadYaFileData(ya_upload_url, jsonOrArrayBuffer, onError, onDone) {
-    console.log('uploadYaFileData', ya_upload_url);
     sendRequest('', ya_upload_url, 'PUT', jsonOrArrayBuffer, onError, (xmlHttpRequest, vProgressEvent) => {
         onDone();
     });
 }
 function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone) {
-    console.log('dumpYaOperationState', ya_operation_id);
     sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/operations/' + ya_operation_id, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
         try {
             let json = JSON.parse(xmlHttpRequest.responseText);
@@ -516,7 +515,6 @@ function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone)
     });
 }
 function getYaLink(ya_file_name, ya_access_token, onError, onDone) {
-    console.log('getYaLink', ya_file_name);
     sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/' + ya_file_name, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
         try {
             let json = JSON.parse(xmlHttpRequest.responseText);
@@ -538,6 +536,16 @@ function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError
             });
         });
     });
+}
+function postVKarticle() {
+    let link = 'https://mzxbox.ru/minium/yaload.html?data=' + project_download_link;
+    let url = 'https://vk.com/share.php'
+        + '?noparse=true'
+        + '&url=' + encodeURIComponent(link)
+        + '&title=' + encodeURIComponent('Моя Mузыка')
+        + '&image=' + encodeURIComponent(image_download_link)
+        + '&description=' + encodeURIComponent(image_download_link);
+    console.log('postVKarticle', url);
 }
 function yavkInit() {
     console.log('yavkInit');
@@ -577,10 +585,13 @@ function yavkInit() {
     }
 }
 function startYAVKipload() {
+    console.log('startYAVKipload');
     getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
-        console.log('project download link', link);
+        project_download_link = link;
+        console.log('project_download_link', project_download_link);
         getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
-            console.log('image download link', link);
+            image_download_link = link;
+            console.log('image_download_link', image_download_link);
         });
     });
 }

@@ -28,9 +28,10 @@ class FxPlayer {
         }
     }
     startAudioBuffer(rebuff) {
-        let tt = Tone;
-        console.log(tt);
-        tt.setContext(this.currentContext);
+        let tt = new Tone();
+        console.log('Tone', Tone);
+        console.log('tt', tt);
+        setContext(this.currentContext, false);
         if (this.currentContext) {
             this.waf = new WebAudioFontPlayer();
             this.reverberator = this.waf.createReverberator(this.currentContext);
@@ -41,9 +42,10 @@ class FxPlayer {
             this.mp3sourceNode = this.currentContext.createBufferSource();
             this.mp3sourceNode.buffer = rebuff;
             this.mp3sourceNode.connect(this.channelMaster.input);
-            this.shift = new Tone.PitchShift();
-            tt.connect(this.channelMaster.output, this.shift);
-            tt.connect(this.shift, this.volumeNode);
+            this.shift = createShift();
+            console.log('PitchShift', this.shift);
+            connect(this.channelMaster.output, this.shift);
+            connect(this.shift, this.volumeNode);
             this.volumeNode.connect(this.reverberator.input);
             this.reverberator.output.connect(this.currentContext.destination);
             if (this.mp3sourceNode) {

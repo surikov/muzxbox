@@ -1,10 +1,13 @@
-console.log('upload');
+console.log('upload v1');
 let dt = datekey();
 let ya_file_name = 'MiniumStudio-' + dt + '.json';
 let ya_picture_name = 'MiniumStudio-' + dt + '.png';
 let ya_access_token = check_ya_token();
 let projecttextdata = '';
 let previewArrayBuffer: ArrayBuffer;
+
+let image_download_link: string = '';
+let project_download_link: string = '';
 
 function dumpResultMessage(txt: string) {
 	console.log('error', txt);
@@ -74,7 +77,7 @@ function sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
 }
 
 function readYaUploadURL(ya_access_token, filename, onError, onDone) {
-	console.log('readYaUploadURL', ya_access_token, filename);
+	//console.log('readYaUploadURL', ya_access_token, filename);
 	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/upload?path=app:/' + filename, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
 		try {
 			let json = JSON.parse(xmlHttpRequest.responseText);
@@ -89,14 +92,14 @@ function readYaUploadURL(ya_access_token, filename, onError, onDone) {
 }
 
 function uploadYaFileData(ya_upload_url, jsonOrArrayBuffer, onError, onDone) {
-	console.log('uploadYaFileData', ya_upload_url);
+	//console.log('uploadYaFileData', ya_upload_url);
 	sendRequest('', ya_upload_url, 'PUT', jsonOrArrayBuffer, onError, (xmlHttpRequest, vProgressEvent) => {
 		onDone();
 	});
 }
 
 function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone) {
-	console.log('dumpYaOperationState', ya_operation_id);
+	//console.log('dumpYaOperationState', ya_operation_id);
 	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/operations/' + ya_operation_id, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
 		try {
 			let json = JSON.parse(xmlHttpRequest.responseText);
@@ -114,7 +117,7 @@ function dumpYaOperationState(ya_operation_id, ya_access_token, onError, onDone)
 }
 
 function getYaLink(ya_file_name, ya_access_token, onError, onDone) {
-	console.log('getYaLink', ya_file_name);
+	//console.log('getYaLink', ya_file_name);
 	sendRequest(ya_access_token, 'https://cloud-api.yandex.net/v1/disk/resources/download?path=app:/' + ya_file_name, 'GET', '', onError, (xmlHttpRequest, vProgressEvent) => {
 		try {
 			let json = JSON.parse(xmlHttpRequest.responseText);
@@ -167,11 +170,22 @@ function getLinkUpload(ya_file_name, jsonOrArrayBuffer, ya_access_token, onError
 	dumpResultMessage('empty token');
 }*/
 //}
+
 function postVKarticle() {
-	let project_download_link: string = 'https://downloader.disk.yandex.ru/disk/722e3bbd3e0986701333bd951ca4ec70e4c69d3ce77864656090468ed826b4b5/694a94eb/Gc4tJqwF_8gTQTp0ubc_ep9XWkuZmUU6RAYtGaYFlADsV4o_yowDnvDR9nan35DfcVfdPKEY6me_iJVjhqvmbw%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-10-52.json&disposition=attachment&hash=&limit=0&content_type=text%2Fplain&owner_uid=546696787&hid=cbe7b309b4bbe3a94682616cb7e88e01&media_type=text&tknv=v3&etag=d41d8cd98f00b204e9800998ecf8427e';
-	let image_download_link: string = 'https://downloader.disk.yandex.ru/disk/280ae39e5728c25fc420fc6c8fc220301275330d17c00c43a56c650b76678046/694a94ed/z6kOkzFFFj_drbTBxZCz9T3qufQpoW8NjYb1mXiWrLMnTpZ9KO1GWJFGrS7AV0xECf1CBpG-RPLLX0MKjCgzzg%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-10-52.png&disposition=attachment&hash=&limit=0&content_type=image%2Fpng&owner_uid=546696787&fsize=102954&hid=76dea8ee2bf5a5040414e14c6e3111f6&media_type=image&tknv=v3&etag=f33a639ab0e30baccca041f90b606f6a';
-	console.log('postVKarticle');
-	//let url=https://vk.com/share.php?noparse=true&url=https://mzxbox.ru/&title=Моя музыка&image=https://downloader.disk.yandex.ru/disk/280ae39e5728c25fc420fc6c8fc220301275330d17c00c43a56c650b76678046/694a94ed/z6kOkzFFFj_drbTBxZCz9T3qufQpoW8NjYb1mXiWrLMnTpZ9KO1GWJFGrS7AV0xECf1CBpG-RPLLX0MKjCgzzg%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-10-52.png&disposition=attachment&hash=&limit=0&content_type=image%2Fpng&owner_uid=546696787&fsize=102954&hid=76dea8ee2bf5a5040414e14c6e3111f6&media_type=image&tknv=v3&etag=f33a639ab0e30baccca041f90b606f6a
+	//let project_download_link: string = 'https://disk.yandex.ru/d/gleJvu2CO4KUHg';//'https://downloader.disk.yandex.ru/disk/722e3bbd3e0986701333bd951ca4ec70e4c69d3ce77864656090468ed826b4b5/694a94eb/Gc4tJqwF_8gTQTp0ubc_ep9XWkuZmUU6RAYtGaYFlADsV4o_yowDnvDR9nan35DfcVfdPKEY6me_iJVjhqvmbw%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-10-52.json&disposition=attachment&hash=&limit=0&content_type=text%2Fplain&owner_uid=546696787&hid=cbe7b309b4bbe3a94682616cb7e88e01&media_type=text&tknv=v3&etag=d41d8cd98f00b204e9800998ecf8427e';
+	// image_download_link: string = 
+	//'https://mzxbox.ru/minium/theme/img/buttonplay.png';//
+	//'https://disk.yandex.ru/i/9k36SYMM78gOGQ';
+	// 'https://downloader.disk.yandex.ru/disk/280ae39e5728c25fc420fc6c8fc220301275330d17c00c43a56c650b76678046/694a94ed/z6kOkzFFFj_drbTBxZCz9T3qufQpoW8NjYb1mXiWrLMnTpZ9KO1GWJFGrS7AV0xECf1CBpG-RPLLX0MKjCgzzg%3D%3D?uid=546696787&filename=MiniumStudio-2025.11.02_12-10-52.png&disposition=attachment&hash=&limit=0&content_type=image%2Fpng&owner_uid=546696787&fsize=102954&hid=76dea8ee2bf5a5040414e14c6e3111f6&media_type=image&tknv=v3&etag=f33a639ab0e30baccca041f90b606f6a';
+	let link = 'https://mzxbox.ru/minium/yaload.html?data=' + project_download_link;
+	let url = 'https://vk.com/share.php'
+		+ '?noparse=true'
+		+ '&url=' + encodeURIComponent(link)
+		+ '&title=' + encodeURIComponent('Моя Mузыка')
+		+ '&image=' + encodeURIComponent(image_download_link)
+		+ '&description=' + encodeURIComponent(image_download_link)
+		;
+	console.log('postVKarticle', url);
 }
 function yavkInit() {
 	console.log('yavkInit');
@@ -212,11 +226,14 @@ function yavkInit() {
 
 }
 function startYAVKipload() {
-	postVKarticle();
-	/*getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
-		console.log('project download link', link);
+	//postVKarticle();
+	console.log('startYAVKipload');
+	getLinkUpload(ya_file_name, projecttextdata, ya_access_token, dumpResultMessage, (link) => {
+		project_download_link = link;
+		console.log('project_download_link', project_download_link);
 		getLinkUpload(ya_picture_name, previewArrayBuffer, ya_access_token, dumpResultMessage, (link) => {
-			console.log('image download link', link);
+			image_download_link = link;
+			console.log('image_download_link', image_download_link);
 		});
-	});*/
+	});
 }

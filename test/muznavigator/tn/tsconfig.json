@@ -1,0 +1,128 @@
+{
+	"compilerOptions": {
+		"target": "es2018",
+		"outFile": "purevashift.js",
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2018",
+			"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+		
+		
+		"li/NoteUnits.ts"
+
+		,"li/ContextInitialization.ts"
+		
+		
+
+		,"li/Tone.ts"
+		,"li/TimeBase.ts"
+		,"li/Time.ts"
+		,"li/Frequency.ts"
+		,"li/Emitter.ts"
+		,"li/BaseContext.ts"
+		,"li/DummyContext.ts"
+		,"li/AudioContext.ts"
+		,"li/Global.ts"
+		
+		
+		
+
+		,"li/Context.ts"
+		,"li/OfflineContext.ts"
+		,"li/ToneAudioBuffer.ts"
+		
+		,"li/Conversions.ts"
+		,"li/TypeCheck.ts"
+		
+		
+		,"li/ToneWithContext.ts"
+
+		,"li/ToneAudioNode.ts"
+		,"li/Volume.ts"
+		,"li/OneShotSource.ts"
+
+		
+
+		,"li/Param.ts"
+		,"li/Units.ts"
+		,"li/AbstractParam.ts"
+		
+		
+		
+		
+
+		
+		,"li/Destination.ts"
+
+		,"li/Effect.ts"
+		,"li/FeedbackEffect.ts"
+		
+
+		,"li/Signal.ts"
+		,"li/SignalOperator.ts"
+		,"li/Pow.ts"
+,"li/TransportEvent.ts"		
+,"li/TransportRepeatEvent.ts"
+,"li/IntervalTimeline.ts"
+		,"li/TickParam.ts"
+		,"li/TickSignal.ts"
+		,"li/TickSource.ts"
+		,"li/Timeline.ts"
+		,"li/StateTimeline.ts"
+		,"li/Clock.ts"
+		,"li/Debug.ts"
+		,"li/TransportTime.ts"
+		,"li/Ticks.ts"
+		,"li/Listener.ts"
+		,"li/Defaults.ts"
+		,"li/AdvancedTypeCheck.ts"
+		
+		
+		,"li/Ticker.ts"
+		
+		,"li/Math.ts"
+		,"li/TimelineValue.ts"
+		,"li/Transport.ts"
+		
+		,"li/ToneConstantSource.ts"
+		,"li/Interface.ts"
+		,"li/Gain.ts"
+		,"li/Draw.ts"
+		,"li/CrossFade.ts"
+
+
+,"li/Zero.ts"
+,"li/AudioToGain.ts"
+,"li/Scale.ts"
+,"li/Add.ts"
+,"li/Multiply.ts"
+
+		,"li/OscillatorInterface.ts"
+		,"li/ToneOscillatorNode.ts"
+		,"li/Source.ts"
+,"li/Oscillator.ts"
+		,"li/LFO.ts"
+		,"li/Delay.ts"
+		
+		,"li/GainToAudio.ts"
+		,"li/PitchShift.ts"
+		,"li/WaveShaper.ts"
+		,"purevashift.ts"
+	]
+}
