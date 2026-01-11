@@ -29,7 +29,7 @@ class ListenerInstance extends ToneAudioNode<ListenerOptions> {
 	/**
 	 * The listener has no inputs or outputs.
 	 */
-	output: undefined;
+	baseOutputNode: undefined;
 	input: undefined;
 
 	readonly positionX: Param = new Param({

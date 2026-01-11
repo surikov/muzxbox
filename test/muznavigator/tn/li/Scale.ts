@@ -32,7 +32,7 @@ class Scale<
 	readonly name: string = "Scale";
 
 	input: InputNode;
-	output: OutputNode;
+	baseOutputNode: OutputNode;
 
 	/**
 	 * Hold the multiple
@@ -72,7 +72,7 @@ class Scale<
 			value: options.max - options.min,
 		});
 
-		this._add = this.output = new Add({
+		this._add = this.baseOutputNode = new Add({
 			context: this.context,
 			value: options.min,
 		});
@@ -80,7 +80,7 @@ class Scale<
 		this._min = options.min;
 		this._max = options.max;
 
-		this.input.connect(this.output);
+		this.input.connect(this.baseOutputNode);
 	}
 
 	static getDefaults(): ScaleOptions {

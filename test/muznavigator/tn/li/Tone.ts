@@ -111,7 +111,7 @@ abstract class Tone {
 		return this.name;
 	}
 }
-class Tone2 extends Tone {
-	name = "Tone2";
+class Tone22 extends Tone {
+	name = "Tone22";
 };
 

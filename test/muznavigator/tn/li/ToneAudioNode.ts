@@ -26,9 +26,7 @@ type ToneAudioNodeOptions = ToneWithContextOptions;
  * @category Core
  */
 //export 
-abstract class ToneAudioNode<
-	Options extends ToneAudioNodeOptions = ToneAudioNodeOptions,
-> extends ToneWithContext<Options> {
+abstract class ToneAudioNode<Options extends ToneAudioNodeOptions = ToneAudioNodeOptions,> extends ToneWithContext<Options> {
 	/**
 	 * The name of the class
 	 */
@@ -44,7 +42,7 @@ abstract class ToneAudioNode<
 	 * The output nodes. If the object is a sink,
 	 * it does not have any output and this.output is undefined.
 	 */
-	abstract output: OutputNode | undefined;
+	abstract baseOutputNode: OutputNode | undefined;
 
 	/**
 	 * The number of inputs feeding into the AudioNode.
@@ -72,8 +70,8 @@ abstract class ToneAudioNode<
 	 * console.log(node.numberOfOutputs);
 	 */
 	get numberOfOutputs(): number {
-		if (isDefined(this.output)) {
-			return this.output.numberOfOutputs;
+		if (isDefined(this.baseOutputNode)) {
+			return this.baseOutputNode.numberOfOutputs;
 		} else {
 			return 0;
 		}
@@ -107,9 +105,9 @@ abstract class ToneAudioNode<
 		if (this._isAudioNode(this.input)) {
 			nodeList.push(this.input);
 		}
-		if (this._isAudioNode(this.output)) {
-			if (this.input !== this.output) {
-				nodeList.push(this.output);
+		if (this._isAudioNode(this.baseOutputNode)) {
+			if (this.input !== this.baseOutputNode) {
+				nodeList.push(this.baseOutputNode);
 			}
 		}
 		return nodeList;
@@ -282,11 +280,11 @@ abstract class ToneAudioNode<
 				this.input.disconnect();
 			}
 		}
-		if (isDefined(this.output)) {
-			if (this.output instanceof ToneAudioNode) {
-				this.output.dispose();
-			} else if (isAudioNode(this.output)) {
-				this.output.disconnect();
+		if (isDefined(this.baseOutputNode)) {
+			if (this.baseOutputNode instanceof ToneAudioNode) {
+				this.baseOutputNode.dispose();
+			} else if (isAudioNode(this.baseOutputNode)) {
+				this.baseOutputNode.disconnect();
 			}
 		}
 		this._internalChannels = [];
@@ -352,15 +350,21 @@ function connect(
 	}
 
 	while (srcNode instanceof ToneAudioNode) {
-		if (isDefined(srcNode.output)) {
-			srcNode = srcNode.output;
+		if (isDefined(srcNode.baseOutputNode)) {
+			srcNode = srcNode.baseOutputNode;
 		}
 	}
 
 	// make the connection
 	if (isAudioParam(dstNode)) {
+		console.log('connect node to param');
+		//console.log(srcNode);
+		//console.log(dstNode);
 		srcNode.connect(dstNode as AudioParam, outputNumber);
 	} else {
+		console.log('connect node to node');
+		//console.log(srcNode);
+		//console.log(dstNode);
 		srcNode.connect(dstNode, outputNumber, inputNumber);
 	}
 }
@@ -388,8 +392,8 @@ function disconnect(
 
 	// resolve the src node
 	while (!isAudioNode(srcNode)) {
-		if (isDefined(srcNode.output)) {
-			srcNode = srcNode.output;
+		if (isDefined(srcNode.baseOutputNode)) {
+			srcNode = srcNode.baseOutputNode;
 		}
 	}
 

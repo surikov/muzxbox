@@ -124,5 +124,6 @@
 		,"li/PitchShift.ts"
 		,"li/WaveShaper.ts"
 		,"purevashift.ts"
+		,"li/raw.ts"
 	]
 }

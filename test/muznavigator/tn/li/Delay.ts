@@ -47,7 +47,7 @@ class Delay extends ToneAudioNode<DelayOptions2> {
 	 */
 	private _delayNode: DelayNode;
 	readonly input: DelayNode;
-	readonly output: DelayNode;
+	readonly baseOutputNode: DelayNode;
 
 	/**
 	 * @param delayTime The delay applied to the incoming signal.
@@ -70,7 +70,7 @@ class Delay extends ToneAudioNode<DelayOptions2> {
 
 		this._delayNode =
 			this.input =
-			this.output =
+			this.baseOutputNode =
 				this.context.createDelay(maxDelayInSeconds);
 
 		this.delayTime = new Param({

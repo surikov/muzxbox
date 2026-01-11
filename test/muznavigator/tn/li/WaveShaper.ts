@@ -44,7 +44,7 @@ class WaveShaper extends SignalOperator<WaveShaperOptions> {
 	/**
 	 * The output from the waveshaper node
 	 */
-	output = this._shaper;
+	baseOutputNode = this._shaper;
 
 	/**
 	 * @param mapping The function used to define the values.

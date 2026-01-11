@@ -95,7 +95,7 @@ class LFO extends ToneAudioNode<LFOOptions> {
 	/**
 	 * The output of the LFO
 	 */
-	readonly output: OutputNode;
+	readonly baseOutputNode: OutputNode;
 
 	/**
 	 * There is no input node
@@ -152,7 +152,7 @@ class LFO extends ToneAudioNode<LFOOptions> {
 		});
 		this._zeros = new Zero({ context: this.context });
 		this._a2g = new AudioToGain({ context: this.context });
-		this._scaler = this.output = new Scale({
+		this._scaler = this.baseOutputNode = new Scale({
 			context: this.context,
 			max: options.max,
 			min: options.min,

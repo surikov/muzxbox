@@ -27,7 +27,7 @@ class AudioToGain extends SignalOperator<ToneAudioNodeOptions> {
 	/**
 	 * The GainRange output [0, 1]
 	 */
-	output = this._norm;
+	baseOutputNode = this._norm;
 
 	/**
 	 * clean up

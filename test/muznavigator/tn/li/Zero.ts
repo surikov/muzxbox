@@ -25,7 +25,7 @@ class Zero extends SignalOperator<ToneAudioNodeOptions> {
 	/**
 	 * Only outputs 0
 	 */
-	output = this._gain;
+	baseOutputNode = this._gain;
 
 	/**
 	 * no input node

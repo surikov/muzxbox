@@ -59,7 +59,7 @@ class Signal<TypeName extends UnitName = "number">
 	 * The constant source node which generates the signal
 	 */
 	protected _constantSource: ToneConstantSource<TypeName>;
-	readonly output: OutputNode;
+	readonly baseOutputNode: OutputNode;
 	protected _param: Param<TypeName>;
 	readonly input: InputNode;
 
@@ -76,7 +76,7 @@ class Signal<TypeName extends UnitName = "number">
 		]) as SignalOptions<TypeName>;
 		super(options);
 
-		this.output = this._constantSource = new ToneConstantSource({
+		this.baseOutputNode = this._constantSource = new ToneConstantSource({
 			context: this.context,
 			convert: options.convert,
 			offset: options.value,

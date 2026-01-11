@@ -57,7 +57,7 @@ abstract class OneShotSource<
 	/**
 	 * The public output node
 	 */
-	output: Gain = new Gain({
+	baseOutputNode: Gain = new Gain({
 		context: this.context,
 		gain: 0,
 	});
@@ -65,7 +65,7 @@ abstract class OneShotSource<
 	/**
 	 * The output gain node.
 	 */
-	protected _gainNode = this.output;
+	protected _gainNode = this.baseOutputNode;
 
 	/**
 	 * The fadeIn time of the amplitude envelope.

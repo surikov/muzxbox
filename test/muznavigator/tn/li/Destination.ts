@@ -35,7 +35,7 @@ class DestinationInstance extends ToneAudioNode<DestinationOptions> {
 	readonly name: string = "Destination";
 
 	input: Volume = new Volume({ context: this.context });
-	output: Gain = new Gain({ context: this.context });
+	baseOutputNode: Gain = new Gain({ context: this.context });
 
 	/**
 	 * The volume of the master output in decibels. -Infinity is silent, and 0 is no change.
@@ -57,7 +57,7 @@ class DestinationInstance extends ToneAudioNode<DestinationOptions> {
 
 		connectSeries(
 			this.input,
-			this.output,
+			this.baseOutputNode,
 			this.context.rawContext.destination
 		);
 
@@ -65,7 +65,7 @@ class DestinationInstance extends ToneAudioNode<DestinationOptions> {
 		this._internalChannels = [
 			this.input,
 			this.context.rawContext.destination,
-			this.output,
+			this.baseOutputNode,
 		];
 	}
 
@@ -105,7 +105,7 @@ class DestinationInstance extends ToneAudioNode<DestinationOptions> {
 	chain(...args: Array<AudioNode | ToneAudioNode>): this {
 		this.input.disconnect();
 		args.unshift(this.input);
-		args.push(this.output);
+		args.push(this.baseOutputNode);
 		connectSeries(...args);
 		return this;
 	}

@@ -19,9 +19,7 @@ interface EffectOptions extends ToneAudioNodeOptions {
  * effect which goes to the output using the wet control.
  */
 //export 
-abstract class Effect<
-	Options extends EffectOptions,
-> extends ToneAudioNode<Options> {
+abstract class Effect<Options extends EffectOptions,> extends ToneAudioNode<Options> {
 	readonly name: string = "Effect";
 
 	/**
@@ -54,7 +52,7 @@ abstract class Effect<
 	/**
 	 * The effect output
 	 */
-	output = this._dryWet;
+	baseOutputNode = this._dryWet;
 
 	constructor(options: EffectOptions) {
 		super(options);

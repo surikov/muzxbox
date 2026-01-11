@@ -149,7 +149,7 @@ class Oscillator
 			this._oscillator.type = this._type as OscillatorType;
 		}
 		// connect the control signal to the oscillator frequency & detune
-		this._oscillator.connect(this.output);
+		this._oscillator.connect(this.baseOutputNode);
 		this.frequency.connect(this._oscillator.frequency);
 		this.detune.connect(this._oscillator.detune);
 

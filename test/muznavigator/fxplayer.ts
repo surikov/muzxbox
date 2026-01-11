@@ -41,17 +41,18 @@ class FxPlayer {
 		}
 	}
 	resetPitch(nn: number) {
-		console.log('resetPitch', nn);
+		console.log('------------resetPitch', nn);
 		if (this.currentContext) {
 			//this.fxShift.setupPitch(nn);
 			this.shift.pitch = nn;
+			//this.shift.setupPitch( nn);
 		}
 	}
 	startAudioBuffer(rebuff: AudioBuffer) {
 		//let duration = rebuff.duration;
-		//let tt = Tone;
-		let tt = new Tone();
-		console.log('Tone', Tone);
+		let tt = Tone;
+		//let tt = new Tone();
+		//console.log('Tone', Tone);
 		console.log('tt', tt);
 		//Tone.context = this.currentContext;
 		//tt.setContext(this.currentContext);
@@ -77,13 +78,19 @@ class FxPlayer {
 
 			this.mp3sourceNode.connect(this.channelMaster.input);
 			//this.shift = new Tone.PitchShift();
+			//this.shift = createShift(this.currentContext);
 			this.shift = createShift();
 			console.log('PitchShift', this.shift);
 			//tt.connect(this.mp3sourceNode, this.shift);
 			//tt.connect(this.channelMaster.output, this.shift);
 			//tt.connect(this.shift, this.volumeNode);
+			console.log('connect input');
 			connect(this.channelMaster.output, this.shift);
+			console.log('connect output');
 			connect(this.shift, this.volumeNode);
+			console.log('connect done');
+			//this.shift.shiftFrom(this.channelMaster.output);
+			//this.shift.shiftTo( this.volumeNode);
 			this.volumeNode.connect(this.reverberator.input);
 			this.reverberator.output.connect(this.currentContext.destination);
 
@@ -107,7 +114,11 @@ class FxPlayer {
 				this.mp3sourceNode.loop = true;
 				this.mp3sourceNode.loopStart = 0;
 				this.mp3sourceNode.loopEnd = rebuff.duration;
-				this.mp3sourceNode.start(0, offset);
+				
+				
+				
+				/////////////////////////
+				// this.mp3sourceNode.start(0, offset);
 				//this.lastStart = this.currentContext.currentTime;
 				console.log('duration', '' + Math.floor(rebuff.duration / 60) + ':' + Math.floor(rebuff.duration % 60));
 			}

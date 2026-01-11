@@ -31,7 +31,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 	/**
 	 * The pitch signal
 	 */
-	private _frequency: Signal<"frequency">;
+	private __frequency: Signal<"frequency">;
 
 	/**
 	 * Uses two DelayNodes to cover up the jump in the sawtooth wave.
@@ -97,7 +97,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 		);
 		super(options);
 
-		this._frequency = new Signal({ context: this.context });
+		this.__frequency = new Signal({ context: this.context });
 		this._delayA = new Delay({
 			maxDelay: 1,
 			context: this.context,
@@ -141,7 +141,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 		this._delayA.connect(this._crossFade.a);
 		this._delayB.connect(this._crossFade.b);
 		// connect the frequency
-		this._frequency.fan(
+		this.__frequency.fan(
 			this._lfoA.frequency,
 			this._lfoB.frequency,
 			this._crossFadeLFO.frequency
@@ -156,6 +156,8 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 		this._crossFadeLFO.start(now);
 		// set the initial value
 		this.windowSize = this._windowSize;
+		console.log('PitchShift output', this.baseOutputNode);
+		console.log('PitchShift input', this.input);
 	}
 
 	static getDefaults(): PitchShiftOptions {
@@ -194,7 +196,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 			this._lfoB.max = 0;
 			factor = intervalToFrequencyRatio(interval) - 1;
 		}
-		this._frequency.value = factor * (1.2 / this._windowSize);
+		this.__frequency.value = factor * (1.2 / this._windowSize);
 	}
 
 	/**
@@ -213,7 +215,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 
 	dispose(): this {
 		super.dispose();
-		this._frequency.dispose();
+		this.__frequency.dispose();
 		this._delayA.dispose();
 		this._delayB.dispose();
 		this._lfoA.dispose();
@@ -226,7 +228,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 }
 //console.log('retone',window['Tone']);
 //window['Tone'].PitchShift=PitchShift;
-function createShift() {
+function createShift1234() {
 	return new PitchShift();
 }
 //console.log(window['Tone'].PitchShift);

@@ -27,7 +27,7 @@ class Pow extends SignalOperator<PowOptions> {
 
 	input: WaveShaper;
 
-	output: WaveShaper;
+	baseOutputNode: WaveShaper;
 
 	/**
 	 * @param value Constant exponent value to use
@@ -42,7 +42,7 @@ class Pow extends SignalOperator<PowOptions> {
 
 		this._exponentScaler =
 			this.input =
-			this.output =
+			this.baseOutputNode =
 				new WaveShaper({
 					context: this.context,
 					mapping: this._expFunc(options.value),

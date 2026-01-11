@@ -20,7 +20,7 @@ declare abstract class Tone {
     get disposed(): boolean;
     toString(): string;
 }
-declare class Tone2 extends Tone {
+declare class Tone22 extends Tone {
     name: string;
 }
 type TimeValue = Time | TimeBaseClass<any, any>;
@@ -496,7 +496,7 @@ type ToneAudioNodeOptions = ToneWithContextOptions;
 declare abstract class ToneAudioNode<Options extends ToneAudioNodeOptions = ToneAudioNodeOptions> extends ToneWithContext<Options> {
     abstract readonly name: string;
     abstract input: InputNode | undefined;
-    abstract output: OutputNode | undefined;
+    abstract baseOutputNode: OutputNode | undefined;
     get numberOfInputs(): number;
     get numberOfOutputs(): number;
     protected _internalChannels: OutputNode[];
@@ -528,7 +528,7 @@ interface VolumeOptions extends ToneAudioNodeOptions {
 }
 declare class Volume extends ToneAudioNode<VolumeOptions> {
     readonly name: string;
-    output: Gain<"decibels">;
+    baseOutputNode: Gain<"decibels">;
     input: Gain<"decibels">;
     private _unmutedVolume;
     volume: Param<"decibels">;
@@ -554,7 +554,7 @@ declare abstract class OneShotSource<Options extends ToneAudioNodeOptions> exten
     protected _startTime: number;
     protected _stopTime: number;
     private _timeout;
-    output: Gain;
+    baseOutputNode: Gain;
     protected _gainNode: Gain<"gain">;
     protected _fadeIn: Time;
     protected _fadeOut: Time;
@@ -718,7 +718,7 @@ interface DestinationOptions extends ToneAudioNodeOptions {
 declare class DestinationInstance extends ToneAudioNode<DestinationOptions> {
     readonly name: string;
     input: Volume;
-    output: Gain;
+    baseOutputNode: Gain;
     volume: Param<"decibels">;
     constructor(options: Partial<DestinationOptions>);
     static getDefaults(): DestinationOptions;
@@ -738,7 +738,7 @@ declare abstract class Effect<Options extends EffectOptions> extends ToneAudioNo
     protected effectSend: Gain;
     protected effectReturn: Gain;
     input: Gain;
-    output: CrossFade;
+    baseOutputNode: CrossFade;
     constructor(options: EffectOptions);
     static getDefaults(): EffectOptions;
     protected connectEffect(effect: ToneAudioNode | AudioNode): this;
@@ -766,7 +766,7 @@ declare class Signal<TypeName extends UnitName = "number"> extends ToneAudioNode
     readonly name: string;
     readonly override: boolean;
     protected _constantSource: ToneConstantSource<TypeName>;
-    readonly output: OutputNode;
+    readonly baseOutputNode: OutputNode;
     protected _param: Param<TypeName>;
     readonly input: InputNode;
     constructor(value?: UnitMap[TypeName], units?: TypeName);
@@ -821,7 +821,7 @@ declare class Pow extends SignalOperator<PowOptions> {
     private _exponent;
     private _exponentScaler;
     input: WaveShaper;
-    output: WaveShaper;
+    baseOutputNode: WaveShaper;
     constructor(value?: number);
     constructor(options?: Partial<PowOptions>);
     static getDefaults(): PowOptions;
@@ -1146,7 +1146,7 @@ interface ListenerOptions extends ToneAudioNodeOptions {
 }
 declare class ListenerInstance extends ToneAudioNode<ListenerOptions> {
     readonly name: string;
-    output: undefined;
+    baseOutputNode: undefined;
     input: undefined;
     readonly positionX: Param;
     readonly positionY: Param;
@@ -1676,7 +1676,7 @@ declare class Gain<TypeName extends "gain" | "decibels" | "normalRange" = "gain"
     readonly gain: Param<TypeName>;
     private _gainNode;
     readonly input: GainNode;
-    readonly output: GainNode;
+    readonly baseOutputNode: GainNode;
     constructor(gain?: UnitMap[TypeName], units?: TypeName);
     constructor(options?: Partial<GainOptions2<TypeName>>);
     static getDefaults(): GainOptions2<any>;
@@ -1707,7 +1707,7 @@ declare class CrossFade extends ToneAudioNode<CrossFadeOptions> {
     private _g2a;
     readonly a: Gain;
     readonly b: Gain;
-    readonly output: Gain;
+    readonly baseOutputNode: Gain;
     readonly input: undefined;
     readonly fade: Signal<"normalRange">;
     protected _internalChannels: Gain<"gain">[];
@@ -1719,7 +1719,7 @@ declare class CrossFade extends ToneAudioNode<CrossFadeOptions> {
 declare class Zero extends SignalOperator<ToneAudioNodeOptions> {
     readonly name: string;
     private _gain;
-    output: Gain<"gain">;
+    baseOutputNode: Gain<"gain">;
     input: undefined;
     constructor(options?: Partial<ToneAudioNodeOptions>);
     dispose(): this;
@@ -1728,7 +1728,7 @@ declare class AudioToGain extends SignalOperator<ToneAudioNodeOptions> {
     readonly name: string;
     private _norm;
     input: WaveShaper;
-    output: WaveShaper;
+    baseOutputNode: WaveShaper;
     dispose(): this;
 }
 interface ScaleOptions extends ToneAudioNodeOptions {
@@ -1738,7 +1738,7 @@ interface ScaleOptions extends ToneAudioNodeOptions {
 declare class Scale<Options extends ScaleOptions = ScaleOptions> extends SignalOperator<Options> {
     readonly name: string;
     input: InputNode;
-    output: OutputNode;
+    baseOutputNode: OutputNode;
     protected _mult: Multiply;
     protected _add: Add;
     private _min;
@@ -1758,7 +1758,7 @@ declare class Add extends Signal {
     readonly name: string;
     private _sum;
     readonly input: Gain<"gain">;
-    readonly output: Gain<"gain">;
+    readonly baseOutputNode: Gain<"gain">;
     readonly addend: Param<"number">;
     constructor(value?: number);
     constructor(options?: Partial<SignalOptions<"number">>);
@@ -1770,7 +1770,7 @@ declare class Multiply<TypeName extends "number" | "positive" = "number"> extend
     readonly override = false;
     private _mult;
     input: InputNode;
-    output: OutputNode;
+    baseOutputNode: OutputNode;
     factor: Param<TypeName>;
     constructor(value?: number);
     constructor(options?: Partial<SignalOptions<TypeName>>);
@@ -1971,7 +1971,7 @@ interface SourceOptions extends ToneAudioNodeOptions {
 }
 declare abstract class Source<Options extends SourceOptions> extends ToneAudioNode<Options> {
     private _volume;
-    output: OutputNode;
+    baseOutputNode: OutputNode;
     input: undefined;
     volume: Param<"decibels">;
     onstop: onStopCallback;
@@ -2052,7 +2052,7 @@ declare class LFO extends ToneAudioNode<LFOOptions> {
     private _stoppedValue;
     private _a2g;
     private _scaler;
-    readonly output: OutputNode;
+    readonly baseOutputNode: OutputNode;
     readonly input: undefined;
     private _units;
     convert: boolean;
@@ -2095,7 +2095,7 @@ declare class Delay extends ToneAudioNode<DelayOptions2> {
     readonly delayTime: Param<"time">;
     private _delayNode;
     readonly input: DelayNode;
-    readonly output: DelayNode;
+    readonly baseOutputNode: DelayNode;
     constructor(delayTime?: Time, maxDelay?: Time);
     constructor(options?: Partial<DelayOptions2>);
     static getDefaults(): DelayOptions2;
@@ -2106,7 +2106,7 @@ declare class GainToAudio extends SignalOperator<ToneAudioNodeOptions> {
     readonly name: string;
     private _norm;
     input: WaveShaper;
-    output: WaveShaper;
+    baseOutputNode: WaveShaper;
     dispose(): this;
 }
 interface PitchShiftOptions extends FeedbackEffectOptions {
@@ -2116,7 +2116,7 @@ interface PitchShiftOptions extends FeedbackEffectOptions {
 }
 declare class PitchShift extends FeedbackEffect<PitchShiftOptions> {
     readonly name: string;
-    private _frequency;
+    private __frequency;
     private _delayA;
     private _lfoA;
     private _delayB;
@@ -2136,7 +2136,7 @@ declare class PitchShift extends FeedbackEffect<PitchShiftOptions> {
     set windowSize(size: Seconds);
     dispose(): this;
 }
-declare function createShift(): PitchShift;
+declare function createShift1234(): PitchShift;
 type WaveShaperMappingFn = (value: number, index?: number) => number;
 type WaveShaperMapping = WaveShaperMappingFn | number[] | Float32Array;
 interface WaveShaperOptions extends ToneAudioNodeOptions {
@@ -2148,7 +2148,7 @@ declare class WaveShaper extends SignalOperator<WaveShaperOptions> {
     readonly name: string;
     private _shaper;
     input: WaveShaperNode;
-    output: WaveShaperNode;
+    baseOutputNode: WaveShaperNode;
     constructor(mapping?: WaveShaperMapping, length?: number);
     constructor(options?: Partial<WaveShaperOptions>);
     static getDefaults(): WaveShaperOptions;
@@ -2159,3 +2159,88 @@ declare class WaveShaper extends SignalOperator<WaveShaperOptions> {
     set oversample(oversampling: OverSampleType);
     dispose(): this;
 }
+declare class Tone2 {
+    constructor(ac: AudioContext);
+}
+declare class ToneWithContext2 extends Tone2 {
+    _audioContext: AudioContext;
+    constructor(ac: AudioContext);
+}
+declare class Param2 extends ToneWithContext2 {
+    input: GainNode;
+    _param: AudioParam;
+    constructor(ac: AudioContext);
+}
+declare class ToneAudioNode2 extends ToneWithContext2 {
+    constructor(ac: AudioContext);
+}
+declare class Oscillator2 extends ToneAudioNode2 {
+    constructor(ac: AudioContext);
+}
+declare class Source2 extends ToneAudioNode2 {
+    constructor(ac: AudioContext);
+}
+declare class LFO2 extends ToneAudioNode2 {
+    _oscillator: Oscillator2;
+    frequency: Signal2;
+    min: number;
+    max: number;
+    constructor(ac: AudioContext);
+    connectToDelay(delay: Delay2): void;
+    connectToCrossFade(crossFade: CrossFade2): void;
+    start(when: number): void;
+}
+declare class Gain2 extends ToneAudioNode2 {
+    constructor(ac: AudioContext);
+    connectToDelay(delay: Delay2): void;
+}
+declare class Signal2 extends ToneAudioNode2 {
+    value: number;
+    constructor(ac: AudioContext);
+    connectToSignal(signal: Signal2): void;
+}
+declare class Delay2 extends ToneAudioNode2 {
+    delayTime: Param2;
+    constructor(ac: AudioContext);
+    connectToCrossFade(crossFade: CrossFade2): void;
+    connectToGain(gain: Gain2): void;
+}
+declare class CrossFade2 extends ToneAudioNode2 {
+    constructor(ac: AudioContext);
+    connectToDelay(delay: Delay2): void;
+    connectToGain(gain: Gain2): void;
+}
+declare class Effect2 extends ToneAudioNode2 {
+    outputDryWet: CrossFade2;
+    inputGainNode: GainNode;
+    wet: Signal2;
+    effectSend: Gain2;
+    effectReturn: Gain2;
+    constructor(ac: AudioContext);
+}
+declare class FeedbackEffect2 extends Effect2 {
+    feedback: Param2;
+    _feedbackGain: Gain2;
+    constructor(ac: AudioContext);
+}
+declare class PitchShift2 extends FeedbackEffect2 {
+    private _frequency;
+    _delayA: Delay2;
+    private _lfoA;
+    private _delayB;
+    private _lfoB;
+    private _crossFade;
+    private _crossFadeLFO;
+    private _feedbackDelay;
+    private _windowSampleSize;
+    inputNode: GainNode;
+    outputNode: GainNode;
+    shiftFrom(node: AudioNode): void;
+    shiftTo(node: AudioNode): void;
+    connectToGain(gain: Gain2): void;
+    constructor(ac: AudioContext);
+    setupPitch(interval: number): void;
+    dispose(): this;
+}
+declare function createShift2(ac: AudioContext): PitchShift2;
+declare function createShift(): PitchShift;

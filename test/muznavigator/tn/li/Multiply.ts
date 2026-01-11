@@ -47,7 +47,7 @@ class Multiply<
 	/**
 	 * The product of the input and {@link factor}
 	 */
-	output: OutputNode;
+	baseOutputNode: OutputNode;
 
 	/**
 	 * The multiplication factor. Can be set directly or a signal can be connected to it.
@@ -69,7 +69,7 @@ class Multiply<
 
 		this._mult =
 			this.input =
-			this.output =
+			this.baseOutputNode =
 				new Gain({
 					context: this.context,
 					minValue: options.minValue,

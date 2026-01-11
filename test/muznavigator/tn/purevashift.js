@@ -40,10 +40,10 @@ class Tone {
     }
 }
 Tone.version = version;
-class Tone2 extends Tone {
+class Tone22 extends Tone {
     constructor() {
         super(...arguments);
-        this.name = "Tone2";
+        this.name = "Tone22";
     }
 }
 ;
@@ -1525,8 +1525,8 @@ class ToneAudioNode extends ToneWithContext {
         }
     }
     get numberOfOutputs() {
-        if (isDefined(this.output)) {
-            return this.output.numberOfOutputs;
+        if (isDefined(this.baseOutputNode)) {
+            return this.baseOutputNode.numberOfOutputs;
         }
         else {
             return 0;
@@ -1541,9 +1541,9 @@ class ToneAudioNode extends ToneWithContext {
         if (this._isAudioNode(this.input)) {
             nodeList.push(this.input);
         }
-        if (this._isAudioNode(this.output)) {
-            if (this.input !== this.output) {
-                nodeList.push(this.output);
+        if (this._isAudioNode(this.baseOutputNode)) {
+            if (this.input !== this.baseOutputNode) {
+                nodeList.push(this.baseOutputNode);
             }
         }
         return nodeList;
@@ -1621,12 +1621,12 @@ class ToneAudioNode extends ToneWithContext {
                 this.input.disconnect();
             }
         }
-        if (isDefined(this.output)) {
-            if (this.output instanceof ToneAudioNode) {
-                this.output.dispose();
+        if (isDefined(this.baseOutputNode)) {
+            if (this.baseOutputNode instanceof ToneAudioNode) {
+                this.baseOutputNode.dispose();
             }
-            else if (isAudioNode(this.output)) {
-                this.output.disconnect();
+            else if (isAudioNode(this.baseOutputNode)) {
+                this.baseOutputNode.disconnect();
             }
         }
         this._internalChannels = [];
@@ -1658,14 +1658,16 @@ function connect(srcNode, dstNode, outputNumber = 0, inputNumber = 0) {
         }
     }
     while (srcNode instanceof ToneAudioNode) {
-        if (isDefined(srcNode.output)) {
-            srcNode = srcNode.output;
+        if (isDefined(srcNode.baseOutputNode)) {
+            srcNode = srcNode.baseOutputNode;
         }
     }
     if (isAudioParam(dstNode)) {
+        console.log('connect node to param');
         srcNode.connect(dstNode, outputNumber);
     }
     else {
+        console.log('connect node to node');
         srcNode.connect(dstNode, outputNumber, inputNumber);
     }
 }
@@ -1676,8 +1678,8 @@ function disconnect(srcNode, dstNode, outputNumber = 0, inputNumber = 0) {
         }
     }
     while (!isAudioNode(srcNode)) {
-        if (isDefined(srcNode.output)) {
-            srcNode = srcNode.output;
+        if (isDefined(srcNode.baseOutputNode)) {
+            srcNode = srcNode.baseOutputNode;
         }
     }
     if (isAudioParam(dstNode)) {
@@ -1703,12 +1705,12 @@ class Volume extends ToneAudioNode {
         ]);
         super(options);
         this.name = "Volume";
-        this.input = this.output = new Gain({
+        this.input = this.baseOutputNode = new Gain({
             context: this.context,
             gain: options.volume,
             units: "decibels",
         });
-        this.volume = this.output.gain;
+        this.volume = this.baseOutputNode.gain;
         readOnly(this, "volume");
         this._unmutedVolume = options.volume;
         this.mute = options.mute;
@@ -1745,11 +1747,11 @@ class OneShotSource extends ToneAudioNode {
         this._startTime = -1;
         this._stopTime = -1;
         this._timeout = -1;
-        this.output = new Gain({
+        this.baseOutputNode = new Gain({
             context: this.context,
             gain: 0,
         });
-        this._gainNode = this.output;
+        this._gainNode = this.baseOutputNode;
         this.getStateAtTime = function (time) {
             const computedTime = this.toSeconds(time);
             if (this._startTime !== -1 &&
@@ -2257,14 +2259,14 @@ class DestinationInstance extends ToneAudioNode {
         super(options);
         this.name = "Destination";
         this.input = new Volume({ context: this.context });
-        this.output = new Gain({ context: this.context });
+        this.baseOutputNode = new Gain({ context: this.context });
         this.volume = this.input.volume;
-        connectSeries(this.input, this.output, this.context.rawContext.destination);
+        connectSeries(this.input, this.baseOutputNode, this.context.rawContext.destination);
         this.mute = options.mute;
         this._internalChannels = [
             this.input,
             this.context.rawContext.destination,
-            this.output,
+            this.baseOutputNode,
         ];
     }
     static getDefaults() {
@@ -2282,7 +2284,7 @@ class DestinationInstance extends ToneAudioNode {
     chain(...args) {
         this.input.disconnect();
         args.unshift(this.input);
-        args.push(this.output);
+        args.push(this.baseOutputNode);
         connectSeries(...args);
         return this;
     }
@@ -2311,7 +2313,7 @@ class Effect extends ToneAudioNode {
         this.effectSend = new Gain({ context: this.context });
         this.effectReturn = new Gain({ context: this.context });
         this.input = new Gain({ context: this.context });
-        this.output = this._dryWet;
+        this.baseOutputNode = this._dryWet;
         this.input.fan(this._dryWet.a, this.effectSend);
         this.effectReturn.connect(this._dryWet.b);
         this.wet.setValueAtTime(options.wet, 0);
@@ -2371,7 +2373,7 @@ class Signal extends ToneAudioNode {
         super(options);
         this.name = "Signal";
         this.override = true;
-        this.output = this._constantSource = new ToneConstantSource({
+        this.baseOutputNode = this._constantSource = new ToneConstantSource({
             context: this.context,
             convert: options.convert,
             offset: options.value,
@@ -2564,7 +2566,7 @@ class Pow extends SignalOperator {
         this.name = "Pow";
         this._exponentScaler =
             this.input =
-                this.output =
+                this.baseOutputNode =
                     new WaveShaper({
                         context: this.context,
                         mapping: this._expFunc(options.value),
@@ -4806,7 +4808,7 @@ class Gain extends ToneAudioNode {
         this.name = "Gain";
         this._gainNode = this.context.createGain();
         this.input = this._gainNode;
-        this.output = this._gainNode;
+        this.baseOutputNode = this._gainNode;
         this.gain = new Param({
             context: this.context,
             convert: options.convert,
@@ -4897,7 +4899,7 @@ class CrossFade extends ToneAudioNode {
             context: this.context,
             gain: 0,
         });
-        this.output = new Gain({ context: this.context });
+        this.baseOutputNode = new Gain({ context: this.context });
         this._internalChannels = [this.a, this.b];
         this.fade = new Signal({
             context: this.context,
@@ -4912,8 +4914,8 @@ class CrossFade extends ToneAudioNode {
         connect(this._split, this.a.gain, 0);
         connect(this._split, this.b.gain, 1);
         this.fade.chain(this._g2a, this._panner.pan);
-        this.a.connect(this.output);
-        this.b.connect(this.output);
+        this.a.connect(this.baseOutputNode);
+        this.b.connect(this.baseOutputNode);
     }
     static getDefaults() {
         return Object.assign(ToneAudioNode.getDefaults(), {
@@ -4924,7 +4926,7 @@ class CrossFade extends ToneAudioNode {
         super.dispose();
         this.a.dispose();
         this.b.dispose();
-        this.output.dispose();
+        this.baseOutputNode.dispose();
         this.fade.dispose();
         this._g2a.dispose();
         this._panner.disconnect();
@@ -4937,7 +4939,7 @@ class Zero extends SignalOperator {
         super(optionsFromArguments(Zero.getDefaults(), arguments));
         this.name = "Zero";
         this._gain = new Gain({ context: this.context });
-        this.output = this._gain;
+        this.baseOutputNode = this._gain;
         this.input = undefined;
         connect(this.context.getConstant(0), this._gain);
     }
@@ -4956,7 +4958,7 @@ class AudioToGain extends SignalOperator {
             mapping: (x) => (x + 1) / 2,
         });
         this.input = this._norm;
-        this.output = this._norm;
+        this.baseOutputNode = this._norm;
     }
     dispose() {
         super.dispose();
@@ -4976,13 +4978,13 @@ class Scale extends SignalOperator {
             context: this.context,
             value: options.max - options.min,
         });
-        this._add = this.output = new Add({
+        this._add = this.baseOutputNode = new Add({
             context: this.context,
             value: options.min,
         });
         this._min = options.min;
         this._max = options.max;
-        this.input.connect(this.output);
+        this.input.connect(this.baseOutputNode);
     }
     static getDefaults() {
         return Object.assign(SignalOperator.getDefaults(), {
@@ -5022,7 +5024,7 @@ class Add extends Signal {
         this.name = "Add";
         this._sum = new Gain({ context: this.context });
         this.input = this._sum;
-        this.output = this._sum;
+        this.baseOutputNode = this._sum;
         this.addend = this._param;
         connectSeries(this._constantSource, this._sum);
     }
@@ -5045,7 +5047,7 @@ class Multiply extends Signal {
         this.override = false;
         this._mult =
             this.input =
-                this.output =
+                this.baseOutputNode =
                     new Gain({
                         context: this.context,
                         minValue: options.minValue,
@@ -5150,7 +5152,7 @@ class Source extends ToneAudioNode {
         this._syncedStop = noOp;
         this._state.memory = 100;
         this._state.increasing = true;
-        this._volume = this.output = new Volume({
+        this._volume = this.baseOutputNode = new Volume({
             context: this.context,
             mute: options.mute,
             volume: options.volume,
@@ -5370,7 +5372,7 @@ class Oscillator extends Source {
         else {
             this._oscillator.type = this._type;
         }
-        this._oscillator.connect(this.output);
+        this._oscillator.connect(this.baseOutputNode);
         this.frequency.connect(this._oscillator.frequency);
         this.detune.connect(this._oscillator.detune);
         this._oscillator.start(computedTime);
@@ -5655,7 +5657,7 @@ class LFO extends ToneAudioNode {
         });
         this._zeros = new Zero({ context: this.context });
         this._a2g = new AudioToGain({ context: this.context });
-        this._scaler = this.output = new Scale({
+        this._scaler = this.baseOutputNode = new Scale({
             context: this.context,
             max: options.max,
             min: options.min,
@@ -5785,7 +5787,7 @@ class Delay extends ToneAudioNode {
         this._maxDelay = Math.max(maxDelayInSeconds, this.toSeconds(options.delayTime));
         this._delayNode =
             this.input =
-                this.output =
+                this.baseOutputNode =
                     this.context.createDelay(maxDelayInSeconds);
         this.delayTime = new Param({
             context: this.context,
@@ -5822,7 +5824,7 @@ class GainToAudio extends SignalOperator {
             mapping: (x) => Math.abs(x) * 2 - 1,
         });
         this.input = this._norm;
-        this.output = this._norm;
+        this.baseOutputNode = this._norm;
     }
     dispose() {
         super.dispose();
@@ -5835,7 +5837,7 @@ class PitchShift extends FeedbackEffect {
         const options = optionsFromArguments(PitchShift.getDefaults(), arguments, ["pitch"]);
         super(options);
         this.name = "PitchShift";
-        this._frequency = new Signal({ context: this.context });
+        this.__frequency = new Signal({ context: this.context });
         this._delayA = new Delay({
             maxDelay: 1,
             context: this.context,
@@ -5875,7 +5877,7 @@ class PitchShift extends FeedbackEffect {
         this._windowSize = options.windowSize;
         this._delayA.connect(this._crossFade.a);
         this._delayB.connect(this._crossFade.b);
-        this._frequency.fan(this._lfoA.frequency, this._lfoB.frequency, this._crossFadeLFO.frequency);
+        this.__frequency.fan(this._lfoA.frequency, this._lfoB.frequency, this._crossFadeLFO.frequency);
         this.effectSend.fan(this._delayA, this._delayB);
         this._crossFade.chain(this._feedbackDelay, this.effectReturn);
         const now = this.now();
@@ -5883,6 +5885,8 @@ class PitchShift extends FeedbackEffect {
         this._lfoB.start(now);
         this._crossFadeLFO.start(now);
         this.windowSize = this._windowSize;
+        console.log('PitchShift output', this.baseOutputNode);
+        console.log('PitchShift input', this.input);
     }
     static getDefaults() {
         return Object.assign(FeedbackEffect.getDefaults(), {
@@ -5912,7 +5916,7 @@ class PitchShift extends FeedbackEffect {
             this._lfoB.max = 0;
             factor = intervalToFrequencyRatio(interval) - 1;
         }
-        this._frequency.value = factor * (1.2 / this._windowSize);
+        this.__frequency.value = factor * (1.2 / this._windowSize);
     }
     get windowSize() {
         return this._windowSize;
@@ -5923,7 +5927,7 @@ class PitchShift extends FeedbackEffect {
     }
     dispose() {
         super.dispose();
-        this._frequency.dispose();
+        this.__frequency.dispose();
         this._delayA.dispose();
         this._delayB.dispose();
         this._lfoA.dispose();
@@ -5934,7 +5938,7 @@ class PitchShift extends FeedbackEffect {
         return this;
     }
 }
-function createShift() {
+function createShift1234() {
     return new PitchShift();
 }
 class WaveShaper extends SignalOperator {
@@ -5944,7 +5948,7 @@ class WaveShaper extends SignalOperator {
         this.name = "WaveShaper";
         this._shaper = this.context.createWaveShaper();
         this.input = this._shaper;
-        this.output = this._shaper;
+        this.baseOutputNode = this._shaper;
         if (isArray(options.mapping) ||
             options.mapping instanceof Float32Array) {
             this.curve = Float32Array.from(options.mapping);
@@ -5988,4 +5992,156 @@ class WaveShaper extends SignalOperator {
     }
 }
 console.log('PureWebAudioShift v1');
+class Tone2 {
+    constructor(ac) {
+    }
+}
+class ToneWithContext2 extends Tone2 {
+    constructor(ac) {
+        super(ac);
+        this._audioContext = ac;
+    }
+}
+class Param2 extends ToneWithContext2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class ToneAudioNode2 extends ToneWithContext2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class Oscillator2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class Source2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class LFO2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+    connectToDelay(delay) {
+    }
+    connectToCrossFade(crossFade) {
+    }
+    start(when) {
+    }
+}
+class Gain2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+    connectToDelay(delay) {
+    }
+}
+class Signal2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+    connectToSignal(signal) {
+    }
+}
+class Delay2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+    connectToCrossFade(crossFade) {
+    }
+    connectToGain(gain) {
+    }
+}
+class CrossFade2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+    connectToDelay(delay) {
+    }
+    connectToGain(gain) {
+    }
+}
+class Effect2 extends ToneAudioNode2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class FeedbackEffect2 extends Effect2 {
+    constructor(ac) {
+        super(ac);
+    }
+}
+class PitchShift2 extends FeedbackEffect2 {
+    shiftFrom(node) {
+        node.connect(this.inputNode);
+    }
+    shiftTo(node) {
+        this.outputNode.connect(node);
+    }
+    connectToGain(gain) {
+    }
+    constructor(ac) {
+        super(ac);
+        this._frequency = new Signal2(ac);
+        this._delayA = new Delay2(ac);
+        this._lfoA = new LFO2(ac);
+        this._delayB = new Delay2(ac);
+        this._lfoB = new LFO2(ac);
+        this._crossFade = new CrossFade2(ac);
+        this._crossFadeLFO = new LFO2(ac);
+        this._feedbackDelay = new Delay2(ac);
+        this._lfoA.connectToDelay(this._delayA);
+        this._lfoB.connectToDelay(this._delayB);
+        this._crossFadeLFO.connectToCrossFade(this._crossFade);
+        this._windowSampleSize = 0.1;
+        this._delayA.connectToCrossFade(this._crossFade);
+        this._delayB.connectToCrossFade(this._crossFade);
+        this._frequency.connectToSignal(this._lfoA.frequency);
+        this._frequency.connectToSignal(this._lfoB.frequency);
+        this._frequency.connectToSignal(this._crossFadeLFO.frequency);
+        this.effectSend.connectToDelay(this._delayA);
+        this.effectSend.connectToDelay(this._delayB);
+        this._crossFade.connectToDelay(this._feedbackDelay);
+        this._feedbackDelay.connectToGain(this.effectReturn);
+        let when = ac.currentTime + 0.1;
+        this._lfoA.start(when);
+        this._lfoB.start(when);
+        this._crossFadeLFO.start(when);
+    }
+    setupPitch(interval) {
+        let factor = 0;
+        if (interval < 0) {
+            this._lfoA.min = 0;
+            this._lfoA.max = this._windowSampleSize;
+            this._lfoB.min = 0;
+            this._lfoB.max = this._windowSampleSize;
+            factor = intervalToFrequencyRatio(interval - 1) + 1;
+        }
+        else {
+            this._lfoA.min = this._windowSampleSize;
+            this._lfoA.max = 0;
+            this._lfoB.min = this._windowSampleSize;
+            this._lfoB.max = 0;
+            factor = intervalToFrequencyRatio(interval) - 1;
+        }
+        this._frequency.value = factor * (1.2 / this._windowSampleSize);
+    }
+    dispose() {
+        return this;
+    }
+}
+function createShift2(ac) {
+    let sh = new PitchShift2(ac);
+    console.log('created2', sh);
+    return sh;
+}
+function createShift() {
+    let sh = new PitchShift();
+    console.log('created', sh);
+    return sh;
+}
 //# sourceMappingURL=purevashift.js.map

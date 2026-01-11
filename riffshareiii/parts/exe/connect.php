@@ -39,7 +39,7 @@ $artist=getIntOrNegative('artist');
 $offset = intval(getVarOrSpace("page"));
 $file = intval(getVarOrSpace("file"));
 $find = getVarOrSpace("find");
-$find = trim(str_replace(array("'", "\"", "%", "&", "<", ">"), "", $find));
+$find = trim(str_replace(array("'","\r","\n","\\", "\"", "%", "&", "<", ">"), "", $find));
 $dbconnection = new mysqli($servername, $username, $password, $db);
 if ($dbconnection->connect_errno) {
 	echo "<p>Failed to connect to MySQL: " . $mysqli->connect_error . '</p>';

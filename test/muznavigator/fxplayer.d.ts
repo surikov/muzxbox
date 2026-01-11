@@ -45,9 +45,8 @@ declare function onEq2k(it: any): void;
 declare function onEq4k(it: any): void;
 declare function onEq8k(it: any): void;
 declare function onEq16k(it: any): void;
-declare function resamplePitchShiftFloat32Array(pitchShift: number, numSampsToProcess: number, fftFrameSize: number, osamp: number, sampleRate: number, indata: Float32Array): Float32Array;
-declare function ShortTimeFourierTransform(fftBuffer: number[], fftFrameSize: number, sign: number): void;
-declare function ___do___PitchShift(audioBuffer: AudioBuffer, ratio: number): void;
+declare class Shift2 {
+}
 declare class FxDelay {
     volume: GainNode;
     delayTime: AudioParam;

@@ -79,7 +79,7 @@ class CrossFade extends ToneAudioNode<CrossFadeOptions> {
 	/**
 	 * The output is a mix between `a` and `b` at the ratio of `fade`
 	 */
-	readonly output: Gain = new Gain({ context: this.context });
+	readonly baseOutputNode: Gain = new Gain({ context: this.context });
 
 	/**
 	 * CrossFade has no input, you must choose either `a` or `b`
@@ -127,8 +127,8 @@ class CrossFade extends ToneAudioNode<CrossFadeOptions> {
 
 		this.fade.chain(this._g2a, this._panner.pan);
 
-		this.a.connect(this.output);
-		this.b.connect(this.output);
+		this.a.connect(this.baseOutputNode);
+		this.b.connect(this.baseOutputNode);
 	}
 
 	static getDefaults(): CrossFadeOptions {
@@ -141,7 +141,7 @@ class CrossFade extends ToneAudioNode<CrossFadeOptions> {
 		super.dispose();
 		this.a.dispose();
 		this.b.dispose();
-		this.output.dispose();
+		this.baseOutputNode.dispose();
 		this.fade.dispose();
 		this._g2a.dispose();
 		this._panner.disconnect();

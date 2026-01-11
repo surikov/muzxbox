@@ -58,7 +58,7 @@ abstract class Source<
 	/**
 	 * The output node
 	 */
-	output: OutputNode;
+	baseOutputNode: OutputNode;
 
 	/**
 	 * Sources have no inputs
@@ -112,7 +112,7 @@ abstract class Source<
 		this._state.memory = 100;
 		this._state.increasing = true;
 
-		this._volume = this.output = new Volume({
+		this._volume = this.baseOutputNode = new Volume({
 			context: this.context,
 			mute: options.mute,
 			volume: options.volume,

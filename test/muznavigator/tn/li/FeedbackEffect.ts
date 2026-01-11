@@ -26,9 +26,7 @@ interface FeedbackEffectOptions extends EffectOptions {
  * NOTE: Feedback effects require at least one DelayNode to be in the feedback cycle.
  */
 //export 
-abstract class FeedbackEffect<
-	Options extends FeedbackEffectOptions,
-> extends Effect<Options> {
+abstract class FeedbackEffect<Options extends FeedbackEffectOptions,> extends Effect<Options> {
 	readonly name: string = "FeedbackEffect";
 
 	/**

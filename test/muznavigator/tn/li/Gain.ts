@@ -48,7 +48,7 @@ extends ToneAudioNode<GainOptions2<TypeName>> {
 
 	// input = output
 	readonly input: GainNode = this._gainNode;
-	readonly output: GainNode = this._gainNode;
+	readonly baseOutputNode: GainNode = this._gainNode;
 
 	/**
 	 * @param  gain The initial gain of the GainNode

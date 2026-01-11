@@ -31,7 +31,7 @@ class Add extends Signal {
 	 */
 	private _sum: Gain = new Gain({ context: this.context });
 	readonly input = this._sum;
-	readonly output = this._sum;
+	readonly baseOutputNode = this._sum;
 
 	/**
 	 * The value which is added to the input signal
