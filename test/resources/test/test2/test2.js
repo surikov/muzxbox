@@ -19063,7 +19063,7 @@ function ballExistsInRow(ball, row) {
     }
 }
 function dumpRows(firstRow, len) {
-    for (let step = 1; step < 40; step++) {
+    for (let step = 1; step < len; step++) {
         let txt = '';
         let levels = rowCountEmpty(firstRow, step);
         levels.sort((a, b) => {
@@ -19071,9 +19071,9 @@ function dumpRows(firstRow, len) {
         });
         for (let kk = 0; kk < cellCount; kk++) {
             let ball = levels[kk].ball;
-            let point = ' ' + t2(ball) + ' ';
+            let point = ' ' + t2(ball) + '';
             if (ballExistsInRow(ball, data2[firstRow])) {
-                point = '[' + t2(ball) + ']';
+                point = '+' + t2(ball) + '';
             }
             txt = txt + point;
         }
@@ -19089,7 +19089,7 @@ function dumpRows(firstRow, len) {
 }
 function start2() {
     let start = Math.round(Math.random() * 5000);
-    console.log('start2', start);
-    dumpRows(start, 20);
+    console.log(start, data2[start].balls);
+    dumpRows(start, 40);
 }
 //# sourceMappingURL=test2.js.map

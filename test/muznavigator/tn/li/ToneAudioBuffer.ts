@@ -180,7 +180,9 @@ class ToneAudioBuffer extends Tone {
 				: (array as Float32Array[]);
 
 		for (let c = 0; c < channels; c++) {
-			buffer.copyToChannel(multiChannelArray[c], c);
+			let converted: Float32Array<ArrayBuffer> = new Float32Array(multiChannelArray[c]);
+			buffer.copyToChannel(converted, c);
+			//buffer.copyToChannel(multiChannelArray[c], c);
 		}
 		this._buffer = buffer;
 		return this;
@@ -262,10 +264,15 @@ class ToneAudioBuffer extends Tone {
 			this.sampleRate
 		);
 		for (let channel = 0; channel < this.numberOfChannels; channel++) {
+			let farr=new Float32Array(this.getChannelData(channel).subarray(startSamples, endSamples));
 			retBuffer.copyToChannel(
-				this.getChannelData(channel).subarray(startSamples, endSamples),
+				farr,
 				channel
 			);
+			/*retBuffer.copyToChannel(
+				this.getChannelData(channel).subarray(startSamples, endSamples),
+				channel
+			);*/
 		}
 		return new ToneAudioBuffer(retBuffer);
 	}
@@ -376,7 +383,7 @@ class ToneAudioBuffer extends Tone {
 		// make sure there is a slash between the baseUrl and the url
 		const baseUrl =
 			ToneAudioBuffer.baseUrl === "" ||
-			ToneAudioBuffer.baseUrl.endsWith("/")
+				ToneAudioBuffer.baseUrl.endsWith("/")
 				? ToneAudioBuffer.baseUrl
 				: ToneAudioBuffer.baseUrl + "/";
 

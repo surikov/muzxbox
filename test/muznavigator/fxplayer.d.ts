@@ -2,6 +2,7 @@ declare var Tone: any;
 declare function setContext(context: any, disposeOld: any): any;
 declare function connect(srcNode: any, dstNode: any): any;
 declare function createShift(): any;
+declare function doTest2(): any;
 declare class FxPlayer {
     mp3arrayBuffer: ArrayBuffer | null;
     mp3audioBuffer: AudioBuffer | null;
@@ -19,6 +20,7 @@ declare class FxPlayer {
     initContext(): void;
     load(file: File): void;
 }
+declare function test2(): void;
 declare let player: FxPlayer;
 declare function startLoadMP3(it: any): void;
 declare function warnInit(): void;
@@ -170,7 +172,7 @@ declare class WebAudioFontPlayer {
     findZone(audioContext: AudioContext, preset: WavePreset, pitch: number): WaveZone | null;
     cancelQueue(audioContext: AudioContext): void;
 }
-type WaveEnvelope = {
+declare type WaveEnvelope = {
     audioBufferSourceNode?: AudioBufferSourceNode | null;
     target: AudioNode;
     when: number;
@@ -179,7 +181,7 @@ type WaveEnvelope = {
     pitch: number;
     preset: WavePreset;
 };
-type WaveZone = {
+declare type WaveZone = {
     keyRangeLow: number;
     keyRangeHigh: number;
     originalPitch: number;
@@ -195,29 +197,29 @@ type WaveZone = {
     file?: string;
     sustain?: number;
 };
-type WavePreset = {
+declare type WavePreset = {
     zones: WaveZone[];
 };
-type WaveSlide = {
+declare type WaveSlide = {
     when: number;
     delta: number;
 };
-type WaveAHDSR = {
+declare type WaveAHDSR = {
     duration: number;
     volume: number;
 };
-type CachedPreset = {
+declare type CachedPreset = {
     variableName: string;
     filePath: string;
 };
-type NumPair = number[];
-type PresetInfo = {
+declare type NumPair = number[];
+declare type PresetInfo = {
     variable: string;
     url: string;
     title: string;
     pitch: number;
 };
-type ChordQueue = {
+declare type ChordQueue = {
     when: number;
     destination: AudioNode;
     preset: WavePreset;

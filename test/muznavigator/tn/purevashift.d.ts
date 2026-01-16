@@ -2159,58 +2159,103 @@ declare class WaveShaper extends SignalOperator<WaveShaperOptions> {
     set oversample(oversampling: OverSampleType);
     dispose(): this;
 }
-declare class Tone2 {
+declare class Oscillator2 {
+    _oscillator: OscillatorNode;
+    frequency: Signal2;
+    detune: Signal2;
+    output: GainNode;
+    audioContext: AudioContext;
     constructor(ac: AudioContext);
+    start(when: number): void;
 }
-declare class ToneWithContext2 extends Tone2 {
-    _audioContext: AudioContext;
-    constructor(ac: AudioContext);
-}
-declare class Param2 extends ToneWithContext2 {
+declare class Add2 {
+    value: AudioParam;
+    _sum: GainNode;
     input: GainNode;
-    _param: AudioParam;
+    output: GainNode;
+    param: AudioParam;
+    constsource: ConstantSourceNode;
     constructor(ac: AudioContext);
 }
-declare class ToneAudioNode2 extends ToneWithContext2 {
+declare class Multiply2 {
+    factor: AudioParam;
+    _mult: GainNode;
+    input: GainNode;
+    output: GainNode;
+    constsource: ConstantSourceNode;
     constructor(ac: AudioContext);
 }
-declare class Oscillator2 extends ToneAudioNode2 {
+declare class Scale2 {
+    input: Multiply2;
+    output: Add2;
     constructor(ac: AudioContext);
 }
-declare class Source2 extends ToneAudioNode2 {
-    constructor(ac: AudioContext);
-}
-declare class LFO2 extends ToneAudioNode2 {
+declare class LFO2 {
     _oscillator: Oscillator2;
     frequency: Signal2;
     min: number;
     max: number;
+    _amplitudeGain: Gain2;
+    amplitude: AudioParam;
+    _stoppedSignal: Signal2;
+    _a2g: AudioToGain2;
+    _scaler: Scale2;
+    output: Scale2;
     constructor(ac: AudioContext);
     connectToDelay(delay: Delay2): void;
     connectToCrossFade(crossFade: CrossFade2): void;
     start(when: number): void;
 }
-declare class Gain2 extends ToneAudioNode2 {
+declare class Gain2 {
+    _gainNode: GainNode;
+    gain: AudioParam;
+    input: AudioNode;
+    output: AudioNode;
     constructor(ac: AudioContext);
     connectToDelay(delay: Delay2): void;
 }
-declare class Signal2 extends ToneAudioNode2 {
+declare class Signal2 {
+    _constantSource: ConstantSourceNode;
+    output: ConstantSourceNode;
     value: number;
+    _param: AudioParam;
+    input: AudioParam;
     constructor(ac: AudioContext);
-    connectToSignal(signal: Signal2): void;
+    connectToSignal(destination: Signal2): void;
 }
-declare class Delay2 extends ToneAudioNode2 {
-    delayTime: Param2;
+declare class Delay2 {
+    delayTime: AudioParam;
+    _delayNode: DelayNode;
+    input: AudioNode;
+    output: AudioNode;
     constructor(ac: AudioContext);
     connectToCrossFade(crossFade: CrossFade2): void;
     connectToGain(gain: Gain2): void;
 }
-declare class CrossFade2 extends ToneAudioNode2 {
+declare class WaveShaper2 {
+    _shaper: WaveShaperNode;
+    constructor(ac: AudioContext);
+    setCurve(mapping: Float32Array<ArrayBuffer> | null): void;
+}
+declare class AudioToGain2 {
+    _norm: WaveShaper2;
+    constructor(ac: AudioContext);
+    curveFn(value: number, index?: number): number;
+}
+declare class GainToAudio2 {
+    _norm: WaveShaper2;
+    constructor(ac: AudioContext);
+    curveFn(value: number, index?: number): number;
+}
+declare class CrossFade2 {
+    _panner: StereoPannerNode;
+    _split: ChannelSplitterNode;
+    _g2a: GainToAudio2;
     constructor(ac: AudioContext);
     connectToDelay(delay: Delay2): void;
     connectToGain(gain: Gain2): void;
 }
-declare class Effect2 extends ToneAudioNode2 {
+declare class Effect2 {
     outputDryWet: CrossFade2;
     inputGainNode: GainNode;
     wet: Signal2;
@@ -2219,7 +2264,7 @@ declare class Effect2 extends ToneAudioNode2 {
     constructor(ac: AudioContext);
 }
 declare class FeedbackEffect2 extends Effect2 {
-    feedback: Param2;
+    feedback: AudioParam;
     _feedbackGain: Gain2;
     constructor(ac: AudioContext);
 }
@@ -2244,3 +2289,6 @@ declare class PitchShift2 extends FeedbackEffect2 {
 }
 declare function createShift2(ac: AudioContext): PitchShift2;
 declare function createShift(): PitchShift;
+declare let cuCo: AudioContext | null;
+declare let o1: Oscillator2 | null;
+declare function doTest2(): void;

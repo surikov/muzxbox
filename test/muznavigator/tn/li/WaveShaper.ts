@@ -116,7 +116,13 @@ class WaveShaper extends SignalOperator<WaveShaperOptions> {
 	}
 
 	set curve(mapping: Float32Array | null) {
-		this._shaper.curve = mapping;
+		if (mapping) {
+			let farr = new Float32Array(mapping);
+			this._shaper.curve = farr;
+		} else {
+			this._shaper.curve = null;
+		}
+		//this._shaper.curve = mapping;
 	}
 
 	/**

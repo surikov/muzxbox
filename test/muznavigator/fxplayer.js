@@ -55,6 +55,7 @@ class FxPlayer {
                 this.mp3sourceNode.loop = true;
                 this.mp3sourceNode.loopStart = 0;
                 this.mp3sourceNode.loopEnd = rebuff.duration;
+                this.mp3sourceNode.start(0, offset);
                 console.log('duration', '' + Math.floor(rebuff.duration / 60) + ':' + Math.floor(rebuff.duration % 60));
             }
         }
@@ -94,6 +95,11 @@ class FxPlayer {
             }
         }
     }
+}
+function test2() {
+    console.log('test2 start');
+    doTest2();
+    console.log('test2 done');
 }
 let player = new FxPlayer();
 function startLoadMP3(it) {

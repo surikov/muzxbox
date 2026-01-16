@@ -42,18 +42,19 @@ function ballExistsInRow(ball: number, row: BalsRow): boolean {
 	}
 }
 function dumpRows(firstRow: number, len: number) {
-	for (let step = 1; step < 40; step++) {
+	for (let step = 1; step < len; step++) {
 		let txt = '';
 		let levels: CellLevel[] = rowCountEmpty(firstRow, step);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
 		});
 		for (let kk = 0; kk < cellCount; kk++) {
-			let ball=levels[kk].ball;
-			let point = ' ' + t2(ball) + ' ';
+			let ball = levels[kk].ball;
+			let point = ' ' + t2(ball) + '';
 			if (ballExistsInRow(ball, data2[firstRow])) {
-				point = '[' + t2(ball) + ']';
+				point = '+' + t2(ball) + '';
 			}
+
 			txt = txt + point;
 		}
 		let cnt = 0;
@@ -69,6 +70,9 @@ function dumpRows(firstRow: number, len: number) {
 function start2() {
 	//console.log('Test string %c[a], b','color: magenta;');
 	let start = Math.round(Math.random() * 5000);
-	console.log('start2', start);
-	dumpRows(start, 20);
+	console.log(start, data2[start].balls);
+	//for (let ii = 1; ii <= 45; ii++) {
+		//console.log(ii,'------------------------');
+		dumpRows(start, 40);//data2[start].balls[0]);
+	//}
 }

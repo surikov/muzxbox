@@ -1,6 +1,6 @@
 
 
-
+/*
 class Tone2 {
 
 	constructor(ac: AudioContext) {
@@ -13,16 +13,16 @@ class ToneWithContext2 extends Tone2 {
 		super(ac);
 		this._audioContext = ac;
 	}
-}
+}*/
+/*
 class Param2 extends ToneWithContext2 {
-	input: GainNode;
 	_param: AudioParam
 
 	constructor(ac: AudioContext) {
 		super(ac);
-
 	}
-}
+}*/
+/*
 class ToneAudioNode2 extends ToneWithContext2 {
 
 
@@ -30,28 +30,96 @@ class ToneAudioNode2 extends ToneWithContext2 {
 		super(ac);
 
 	}
+}*/
+class Oscillator2 {
+	_oscillator: OscillatorNode;
+	frequency: Signal2;
+	detune: Signal2;
+	output: GainNode;
+	audioContext: AudioContext;
+	constructor(ac: AudioContext) {
+		this.audioContext = ac;
+		//this._oscillator = ac.createOscillator();
+		this.detune = new Signal2(ac);
+		this.output = ac.createGain();
+	}
+	start(when: number) {
+		this._oscillator = new OscillatorNode(this.audioContext);
+		this._oscillator.connect(this.output);
+		this._oscillator.frequency.setValueAtTime(440, 0);
+		//this.frequency.output.connect(this._oscillator.frequency);
+		this.detune.output.connect(this._oscillator.detune);
+
+		// start the oscillator
+		this._oscillator.start(when);
+	}
+
 }
-class Oscillator2 extends ToneAudioNode2 {
+
+class Add2 {
+	value: AudioParam;
+	_sum: GainNode;
+	input: GainNode;
+	output: GainNode;
+	param: AudioParam;
+	constsource: ConstantSourceNode;
 
 	constructor(ac: AudioContext) {
-		super(ac);
+		this._sum = ac.createGain();
+		this.param = this.constsource.offset;
+		this.input = this._sum;
+		this.output = this._sum;
+		this.constsource = ac.createConstantSource();
+		this.constsource.connect(this._sum);
 
 	}
 }
-class Source2 extends ToneAudioNode2 {
-
+class Multiply2 {
+	factor: AudioParam;
+	_mult: GainNode;
+	input: GainNode;
+	output: GainNode;
+	constsource: ConstantSourceNode;
 	constructor(ac: AudioContext) {
-		super(ac);
-
+		this._mult = ac.createGain();
+		this.input = this._mult;
+		this.output = this._mult;
+		this.constsource = ac.createConstantSource();
+		this.factor = this.constsource.offset;
+		this.constsource.connect(this._mult);
 	}
 }
-class LFO2 extends ToneAudioNode2 {
+class Scale2 {
+	input: Multiply2;
+	output: Add2;
+	constructor(ac: AudioContext) {
+		this.input = new Multiply2(ac);
+		this.output = new Add2(ac);
+		this.input.output.connect(this.output.input);
+	}
+}
+class LFO2 {
 	_oscillator: Oscillator2;
 	frequency: Signal2;
 	min: number;
 	max: number;
+	_amplitudeGain: Gain2;
+	amplitude: AudioParam;
+	_stoppedSignal: Signal2;
+	_a2g: AudioToGain2;
+	_scaler: Scale2;
+	output: Scale2;
 	constructor(ac: AudioContext) {
-		super(ac);
+		this._oscillator = new Oscillator2(ac);
+		this.frequency = new Signal2(ac);
+		this._amplitudeGain = new Gain2(ac);
+		this._stoppedSignal = new Signal2(ac);
+		this._a2g = new AudioToGain2(ac);
+		this.output = this._scaler;
+		//
+		this.amplitude = this._amplitudeGain.gain;
+		this.frequency = this._oscillator.frequency;
+
 
 	}
 	connectToDelay(delay: Delay2) {
@@ -64,36 +132,55 @@ class LFO2 extends ToneAudioNode2 {
 
 	}
 }
-class Gain2 extends ToneAudioNode2 {
-
+class Gain2 {
+	_gainNode: GainNode;
+	gain: AudioParam;
+	input: AudioNode;
+	output: AudioNode;
 	constructor(ac: AudioContext) {
-		super(ac);
 
+		this._gainNode = ac.createGain();
+		this.gain = this._gainNode.gain;
+		this.input = this._gainNode;
+		this.output = this._gainNode;
 	}
 	connectToDelay(delay: Delay2) {
 
 	}
 
 }
-class Signal2 extends ToneAudioNode2 {
-	_constantSource:ConstantSourceNode;
-	value:number=0;
+class Signal2 {
+	_constantSource: ConstantSourceNode;
+	output: ConstantSourceNode;
+	value: number = 0;
+	_param: AudioParam;
+	input: AudioParam;
 	constructor(ac: AudioContext) {
-		super(ac);
-
+		this._constantSource = ac.createConstantSource();
+		this.output = this._constantSource;
+		this._param = this._constantSource.offset;
+		this.input = this._param;
 	}
-	connectToSignal(signal: Signal2) {
-
+	connectToSignal(destination: Signal2) {
+		destination.input.cancelScheduledValues(0);
+		destination.input.setValueAtTime(0, 0);
+		this.output.connect(destination.input);
 	}
 }
 
-class Delay2 extends ToneAudioNode2 {
-	delayTime: Param2;
-
+class Delay2 {
+	delayTime: AudioParam;
+	_delayNode: DelayNode;
+	input: AudioNode;
+	output: AudioNode;
 	constructor(ac: AudioContext) {
-		super(ac);
 
+		this._delayNode = ac.createDelay(1);
+		this.delayTime = this._delayNode.delayTime;
+		this.input = this._delayNode;
+		this.output = this._delayNode;
 	}
+
 	connectToCrossFade(crossFade: CrossFade2) {
 
 	}
@@ -101,11 +188,65 @@ class Delay2 extends ToneAudioNode2 {
 
 	}
 }
-class CrossFade2 extends ToneAudioNode2 {
+
+class WaveShaper2 {
+	_shaper: WaveShaperNode;
 
 	constructor(ac: AudioContext) {
-		super(ac);
+		this._shaper = ac.createWaveShaper();
 
+	}
+	setCurve(mapping: Float32Array<ArrayBuffer> | null) {//Float32Array | null) {
+		//setCurve(mapping: Float32Array | null) {
+		if (mapping) {
+			this._shaper.curve = mapping;
+		}
+	}
+}
+class AudioToGain2 {
+	_norm: WaveShaper2;
+	constructor(ac: AudioContext) {
+		this._norm = new WaveShaper2(ac);
+		//let fncurve = (x) => Math.abs(x) * 2 - 1;
+		let curveLen = 1024;
+		const array = new Float32Array(curveLen);
+		for (let i = 0; i < curveLen; i++) {
+			const normalized = (i / (curveLen - 1)) * 2 - 1;
+			array[i] = this.curveFn(normalized);
+		}
+		this._norm.setCurve(array);
+	}
+	curveFn(value: number, index?: number) {
+		return (value + 1) / 2;
+		//mapping: (x) => (x + 1) / 2,
+	}
+}
+class GainToAudio2 {
+	_norm: WaveShaper2;
+	constructor(ac: AudioContext) {
+		this._norm = new WaveShaper2(ac);
+		//let fncurve = (x) => Math.abs(x) * 2 - 1;
+		let curveLen = 1024;
+		const array = new Float32Array(curveLen);
+		for (let i = 0; i < curveLen; i++) {
+			const normalized = (i / (curveLen - 1)) * 2 - 1;
+			array[i] = this.curveFn(normalized);
+		}
+		this._norm.setCurve(array);
+	}
+	curveFn(value: number, index?: number) {
+		return Math.abs(value) * 2 - 1;
+	}
+}
+class CrossFade2 {
+	_panner: StereoPannerNode;
+	_split: ChannelSplitterNode;
+	_g2a: GainToAudio2;
+	constructor(ac: AudioContext) {
+
+		this._panner = ac.createStereoPanner();
+		this._split = ac.createChannelSplitter(2);
+		this._g2a = new GainToAudio2(ac);
 	}
 	connectToDelay(delay: Delay2) {
 
@@ -117,7 +258,7 @@ class CrossFade2 extends ToneAudioNode2 {
 }
 
 
-class Effect2 extends ToneAudioNode2 {
+class Effect2 {
 	outputDryWet: CrossFade2;
 	inputGainNode: GainNode;
 	wet: Signal2;
@@ -125,12 +266,12 @@ class Effect2 extends ToneAudioNode2 {
 	effectReturn: Gain2;
 
 	constructor(ac: AudioContext) {
-		super(ac);
+
 
 	}
 }
 class FeedbackEffect2 extends Effect2 {
-	feedback: Param2;
+	feedback: AudioParam;
 	_feedbackGain: Gain2;
 
 	constructor(ac: AudioContext) {
@@ -293,6 +434,15 @@ class PitchShift2 extends FeedbackEffect2
 		return this;
 	}
 }
+class Synth2 {
+	output: GainNode;
+	constructor(ac: AudioContext) {
+		this.output = ac.createGain();
+	}
+	start(when: number) {
+
+	}
+}
 //console.log('retone',window['Tone']);
 //window['Tone'].PitchShift=PitchShift;
 function createShift2(ac: AudioContext) {
@@ -306,3 +456,21 @@ function createShift() {
 	return sh;
 }
 //console.log(window['Tone'].PitchShift);
+let cuCo: AudioContext | null = null;
+let synth: Synth2 | null = null;
+function doTest2() {
+	console.log('doTest2');
+	if (cuCo) {
+
+	} else {
+		cuCo = new AudioContext();
+		synth = new Synth2(cuCo);
+		synth.output.connect(cuCo.destination);
+	}
+	if (cuCo) {
+		if (synth) {
+			synth.start(cuCo.currentTime + 0.1);
+		}
+	}
+
+}

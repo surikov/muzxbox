@@ -1216,7 +1216,8 @@ class ToneAudioBuffer extends Tone {
             ? [array]
             : array;
         for (let c = 0; c < channels; c++) {
-            buffer.copyToChannel(multiChannelArray[c], c);
+            let converted = new Float32Array(multiChannelArray[c]);
+            buffer.copyToChannel(converted, c);
         }
         this._buffer = buffer;
         return this;
@@ -1270,7 +1271,8 @@ class ToneAudioBuffer extends Tone {
         const length = endSamples - startSamples;
         const retBuffer = getContext().createBuffer(this.numberOfChannels, length, this.sampleRate);
         for (let channel = 0; channel < this.numberOfChannels; channel++) {
-            retBuffer.copyToChannel(this.getChannelData(channel).subarray(startSamples, endSamples), channel);
+            let farr = new Float32Array(this.getChannelData(channel).subarray(startSamples, endSamples));
+            retBuffer.copyToChannel(farr, channel);
         }
         return new ToneAudioBuffer(retBuffer);
     }
@@ -5975,7 +5977,13 @@ class WaveShaper extends SignalOperator {
         return this._shaper.curve;
     }
     set curve(mapping) {
-        this._shaper.curve = mapping;
+        if (mapping) {
+            let farr = new Float32Array(mapping);
+            this._shaper.curve = farr;
+        }
+        else {
+            this._shaper.curve = null;
+        }
     }
     get oversample() {
         return this._shaper.oversample;
@@ -5992,39 +6000,57 @@ class WaveShaper extends SignalOperator {
     }
 }
 console.log('PureWebAudioShift v1');
-class Tone2 {
+class Oscillator2 {
     constructor(ac) {
+        this.audioContext = ac;
+        this.detune = new Signal2(ac);
+        this.output = ac.createGain();
+    }
+    start(when) {
+        this._oscillator = new OscillatorNode(this.audioContext);
+        this._oscillator.connect(this.output);
+        this._oscillator.frequency.setValueAtTime(440, 0);
+        this.detune.output.connect(this._oscillator.detune);
+        this._oscillator.start(when);
     }
 }
-class ToneWithContext2 extends Tone2 {
+class Add2 {
     constructor(ac) {
-        super(ac);
-        this._audioContext = ac;
+        this._sum = ac.createGain();
+        this.param = this.constsource.offset;
+        this.input = this._sum;
+        this.output = this._sum;
+        this.constsource = ac.createConstantSource();
+        this.constsource.connect(this._sum);
     }
 }
-class Param2 extends ToneWithContext2 {
+class Multiply2 {
     constructor(ac) {
-        super(ac);
+        this._mult = ac.createGain();
+        this.input = this._mult;
+        this.output = this._mult;
+        this.constsource = ac.createConstantSource();
+        this.factor = this.constsource.offset;
+        this.constsource.connect(this._mult);
     }
 }
-class ToneAudioNode2 extends ToneWithContext2 {
+class Scale2 {
     constructor(ac) {
-        super(ac);
+        this.input = new Multiply2(ac);
+        this.output = new Add2(ac);
+        this.input.output.connect(this.output.input);
     }
 }
-class Oscillator2 extends ToneAudioNode2 {
+class LFO2 {
     constructor(ac) {
-        super(ac);
-    }
-}
-class Source2 extends ToneAudioNode2 {
-    constructor(ac) {
-        super(ac);
-    }
-}
-class LFO2 extends ToneAudioNode2 {
-    constructor(ac) {
-        super(ac);
+        this._oscillator = new Oscillator2(ac);
+        this.frequency = new Signal2(ac);
+        this._amplitudeGain = new Gain2(ac);
+        this._stoppedSignal = new Signal2(ac);
+        this._a2g = new AudioToGain2(ac);
+        this.output = this._scaler;
+        this.amplitude = this._amplitudeGain.gain;
+        this.frequency = this._oscillator.frequency;
     }
     connectToDelay(delay) {
     }
@@ -6033,41 +6059,95 @@ class LFO2 extends ToneAudioNode2 {
     start(when) {
     }
 }
-class Gain2 extends ToneAudioNode2 {
+class Gain2 {
     constructor(ac) {
-        super(ac);
+        this._gainNode = ac.createGain();
+        this.gain = this._gainNode.gain;
+        this.input = this._gainNode;
+        this.output = this._gainNode;
     }
     connectToDelay(delay) {
     }
 }
-class Signal2 extends ToneAudioNode2 {
+class Signal2 {
     constructor(ac) {
-        super(ac);
+        this.value = 0;
+        this._constantSource = ac.createConstantSource();
+        this.output = this._constantSource;
+        this._param = this._constantSource.offset;
+        this.input = this._param;
     }
-    connectToSignal(signal) {
+    connectToSignal(destination) {
+        destination.input.cancelScheduledValues(0);
+        destination.input.setValueAtTime(0, 0);
+        this.output.connect(destination.input);
     }
 }
-class Delay2 extends ToneAudioNode2 {
+class Delay2 {
     constructor(ac) {
-        super(ac);
+        this._delayNode = ac.createDelay(1);
+        this.delayTime = this._delayNode.delayTime;
+        this.input = this._delayNode;
+        this.output = this._delayNode;
     }
     connectToCrossFade(crossFade) {
     }
     connectToGain(gain) {
     }
 }
-class CrossFade2 extends ToneAudioNode2 {
+class WaveShaper2 {
     constructor(ac) {
-        super(ac);
+        this._shaper = ac.createWaveShaper();
+    }
+    setCurve(mapping) {
+        if (mapping) {
+            this._shaper.curve = mapping;
+        }
+    }
+}
+class AudioToGain2 {
+    constructor(ac) {
+        this._norm = new WaveShaper2(ac);
+        let curveLen = 1024;
+        const array = new Float32Array(curveLen);
+        for (let i = 0; i < curveLen; i++) {
+            const normalized = (i / (curveLen - 1)) * 2 - 1;
+            array[i] = this.curveFn(normalized);
+        }
+        this._norm.setCurve(array);
+    }
+    curveFn(value, index) {
+        return (value + 1) / 2;
+    }
+}
+class GainToAudio2 {
+    constructor(ac) {
+        this._norm = new WaveShaper2(ac);
+        let curveLen = 1024;
+        const array = new Float32Array(curveLen);
+        for (let i = 0; i < curveLen; i++) {
+            const normalized = (i / (curveLen - 1)) * 2 - 1;
+            array[i] = this.curveFn(normalized);
+        }
+        this._norm.setCurve(array);
+    }
+    curveFn(value, index) {
+        return Math.abs(value) * 2 - 1;
+    }
+}
+class CrossFade2 {
+    constructor(ac) {
+        this._panner = ac.createStereoPanner();
+        this._split = ac.createChannelSplitter(2);
+        this._g2a = new GainToAudio2(ac);
     }
     connectToDelay(delay) {
     }
     connectToGain(gain) {
     }
 }
-class Effect2 extends ToneAudioNode2 {
+class Effect2 {
     constructor(ac) {
-        super(ac);
     }
 }
 class FeedbackEffect2 extends Effect2 {
@@ -6143,5 +6223,22 @@ function createShift() {
     let sh = new PitchShift();
     console.log('created', sh);
     return sh;
+}
+let cuCo = null;
+let o1 = null;
+function doTest2() {
+    console.log('doTest2');
+    if (cuCo) {
+    }
+    else {
+        cuCo = new AudioContext();
+        o1 = new Oscillator2(cuCo);
+        o1.output.connect(cuCo.destination);
+    }
+    if (cuCo) {
+        if (o1) {
+            o1.start(cuCo.currentTime + 0.1);
+        }
+    }
 }
 //# sourceMappingURL=purevashift.js.map

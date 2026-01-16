@@ -9,7 +9,7 @@
 </head>
 
 <body>
-	<h1>Демо для МузНавигатор</h1>
+	<h1 onclick='test2();'>Демо для МузНавигатор</h1>
 	<p><i>Sergey Surikov</i></p>
 	<p>Открыть локальный файл MP3</button></p>
 	<p><input id="filestart" type="file" onchange="startLoadMP3(this);" accept=".mp3, .wav"></p>
@@ -60,6 +60,9 @@
 	
 	
 	<script>
+		function test(){
+			console.log('test');
+		}
 		//window['Tone'] = new Tone2();
 		/*
 		Tone.PitchShift=PitchShift;

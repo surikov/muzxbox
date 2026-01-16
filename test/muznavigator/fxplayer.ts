@@ -8,6 +8,7 @@ declare function connect(
 	dstNode
 );
 declare function createShift();
+declare function doTest2();
 class FxPlayer {
 	mp3arrayBuffer: ArrayBuffer | null = null;
 	mp3audioBuffer: AudioBuffer | null = null;
@@ -114,11 +115,11 @@ class FxPlayer {
 				this.mp3sourceNode.loop = true;
 				this.mp3sourceNode.loopStart = 0;
 				this.mp3sourceNode.loopEnd = rebuff.duration;
-				
-				
-				
+
+
+
 				/////////////////////////
-				// this.mp3sourceNode.start(0, offset);
+				this.mp3sourceNode.start(0, offset);
 				//this.lastStart = this.currentContext.currentTime;
 				console.log('duration', '' + Math.floor(rebuff.duration / 60) + ':' + Math.floor(rebuff.duration % 60));
 			}
@@ -190,4 +191,9 @@ class FxPlayer {
 		}
 		return null;
 	}*/
+}
+function test2() {
+	console.log('test2 start');
+	doTest2();
+	console.log('test2 done');
 }
