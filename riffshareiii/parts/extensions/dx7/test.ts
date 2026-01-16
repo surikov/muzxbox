@@ -1,6 +1,7 @@
 //https://stackoverflow.com/questions/16923288/whats-wrong-with-this-simple-fm-synth-design
 //https://github.com/mmontag/dx7-synth-js/blob/d4d5e3557bf6d6f178c9a42658a54ce6fb8986fe/src/voice-dx7.js
 //https://github.com/mohayonao/fm-synth
+//https://github.com/g200kg/WebAudioDesigner
 type ROMPresetPitchEnvelope = {
 	rates: number[]
 	, levels: number[]
