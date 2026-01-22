@@ -72,6 +72,14 @@ let _t_all_registerd_plugins_list = [
         "ui": "./plugins/actions/shareyavk/preview.html",
         "evaluate": "",
         "script": ""
+    },
+    {
+        "label": "Share",
+        "purpose": "Action",
+        "kind": "sharemzxbox1",
+        "ui": "./plugins/actions/miniumshare/shareui.html",
+        "evaluate": "",
+        "script": ""
     }
 ];
 function MZXBX_currentPlugins() {

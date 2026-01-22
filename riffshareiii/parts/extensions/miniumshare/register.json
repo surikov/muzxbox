@@ -1,0 +1,8 @@
+{
+    "label": "Share"
+    , "purpose": "Action"
+    , "kind": "sharemzxbox1"
+    , "ui": "./plugins/actions/miniumshare/shareui.html"
+    , "evaluate": ""
+    , "script": ""
+}

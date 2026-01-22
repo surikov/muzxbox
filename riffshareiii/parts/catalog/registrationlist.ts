@@ -138,7 +138,15 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     , "evaluate": ""
     , "script": ""
 }
-
+,
+{
+    "label": "Share"
+    , "purpose": "Action"
+    , "kind": "sharemzxbox1"
+    , "ui": "./plugins/actions/miniumshare/shareui.html"
+    , "evaluate": ""
+    , "script": ""
+}
 
 
 
