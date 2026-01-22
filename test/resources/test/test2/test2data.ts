@@ -4,7 +4,7 @@ type BalsRow = {
 };
 let cellCount = 45;
 let ballCount = 6;
-let data2: BalsRow[] = [{
+let dataRows2: BalsRow[] = [{
 	"balls": [0, 0, 0, 0, 0, 0
 	], "key": "next"
 }, {

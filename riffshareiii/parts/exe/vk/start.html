@@ -1,0 +1,62 @@
+<!--
+<!DOCTYPE html>
+-->
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport"
+		content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
+
+
+	<script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+
+	<title>ZvoogHub</title>
+</head>
+
+<body>
+	<div>test</div>
+	<div>
+		<div id="VkIdSdkOneTap"></div>
+	</div>
+	<script>
+		console.log('start page v1.01', window.VKIDSDK);
+		const VKID = window.VKIDSDK;
+		console.log('VKID', VKID);
+		VKID.Config.init({
+			app: 54348455, // App ID.
+			redirectUrl: 'https://mzxbox.ru/minium/vk/next.html', // Redirect URL after authorization.
+			state: '<randomly generated state>', // Arbitrary app state string.
+			codeChallenge: '<your generated code_challenge>', // codeVerifier, transformed using the S256 algorithm. It's a random string that ensures the security of passed data.
+			scope: 'email phone', // List of permissions required by the app.
+		});
+		// Creating an instance of the button.
+		const oneTap = new VKID.OneTap();
+
+		// Retrieving the container from the markup.
+		const container = document.getElementById('VkIdSdkOneTap');
+
+		// Checking if the container exists in the markup.
+		if (container) {
+			// Rendering the button in the container with the app name APP_NAME, light theme and in Russian.
+			oneTap.render(
+				{
+					container: container
+					, scheme: VKID.Scheme.LIGHT
+					, lang: VKID.Languages.RUS
+				}
+			);
+			oneTap.on(
+				VKID.WidgetEvents.ERROR
+				, (aa, bb, cc, dd) => {
+					console.log('handleError', aa, bb, cc, dd);
+				}
+			); // handleError is an error handler.
+			console.log('started');
+		}
+	</script>
+
+</body>
+
+
+</html>
