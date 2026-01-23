@@ -22,12 +22,26 @@ class ShareExportPlugin {
 	}
 	fogClick() {
 		console.log('start publish');
-		//let url = 'http://127.0.0.1:8000/';
-		let url='https://mzxbox.ru/minium/';
+		//let url = 'http://127.0.0.1:8080/';
+		let url = 'https://mzxbox.ru/minium/';
 		if (this.hostProject) {
 			this.sendRequest('', url + 'tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
 				+ '&txt=' + encodeURIComponent(this.txtPar)
-				+ '&title=' + this.hostProject.title, 'POST', JSON.stringify(this.hostProject)
+				+ '&title=' + this.hostProject.title
+					.replace("\"", " ")
+					.replace("'", " ")
+					.replace("<", " ")
+					.replace(">", " ")
+					.replace("&", " ")
+					.replace("\n", " ")
+					.replace("\r", " ")
+					.replace("\t", " ")
+					.replace("  ", " ")
+					.replace("  ", " ")
+					.replace("  ", " ")
+					.replace("  ", " ")
+					.replace("  ", " ")
+				, 'POST', JSON.stringify(this.hostProject)
 				, (info: string) => {
 					console.log('error', info);
 				}
@@ -43,7 +57,7 @@ class ShareExportPlugin {
 								, (xmlHttpRequest: XMLHttpRequest, vProgressEven: ProgressEvent) => {
 									console.log('request', xmlHttpRequest);
 									if (xmlHttpRequest.status == 200) {
-										let link=url+'tmp/'+key+'.html';
+										let link = url + 'tmp/' + key + '.html';
 										console.log();
 										window.open(link);
 									}

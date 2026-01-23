@@ -25,7 +25,20 @@ class ShareExportPlugin {
         if (this.hostProject) {
             this.sendRequest('', url + 'tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
                 + '&txt=' + encodeURIComponent(this.txtPar)
-                + '&title=' + this.hostProject.title, 'POST', JSON.stringify(this.hostProject), (info) => {
+                + '&title=' + this.hostProject.title
+                .replace("\"", " ")
+                .replace("'", " ")
+                .replace("<", " ")
+                .replace(">", " ")
+                .replace("&", " ")
+                .replace("\n", " ")
+                .replace("\r", " ")
+                .replace("\t", " ")
+                .replace("  ", " ")
+                .replace("  ", " ")
+                .replace("  ", " ")
+                .replace("  ", " ")
+                .replace("  ", " "), 'POST', JSON.stringify(this.hostProject), (info) => {
                 console.log('error', info);
             }, (xmlHttpRequest, vProgressEven) => {
                 console.log('request', xmlHttpRequest);

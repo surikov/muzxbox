@@ -17,10 +17,12 @@ $html = <<<HTMLPREVIEW
 
 	<meta name="twitter:card" content="summary" />
     <meta property="og:title" content="$title" />
-    <meta property="og:url" content="http://mzxbox.ru/minium/tmp/$key.html" />
-    <meta property="og:image" content="http://mzxbox.ru/minium/tmp/$key.png" />
+    <meta property="og:url" content="https://mzxbox.ru/minium/tmp/$key.html" />
+    <meta property="og:image" content="https://mzxbox.ru/minium/tmp/$key.png" />
     <meta property="og:description" content="Minium Studio project" />
     <meta property="og:site_name" content="Minium Studio" />
+
+	<script type='text/javascript' src='../js/tmploader.js'></script>
 	
 	<title>$title</title>
 	<style>
@@ -308,15 +310,7 @@ $html = <<<HTMLPREVIEW
 			text-align: center;
 		}
 
-		a {
-			color: var(--text-color);
-			text-decoration: none;
-		}
-
-		a:hover {
-			color: var(--mode-color);
-			text-decoration: none;
-		}
+		
 
 		body {
 	
@@ -346,7 +340,10 @@ $html = <<<HTMLPREVIEW
 	
 	<h1 id="labeltxt">$title</h1>
 	<p id="picDiv">
-		<img id='picImg' src="http://mzxbox.ru/minium/tmp/$key.png" width=500px height=500px onclick="window.open('https://mzxbox.ru/minium/unzip.php?key=$key');" />
+		<img id='picImg' src="https://mzxbox.ru/minium/tmp/$key.png" 
+		width=500px 
+		height=500px 
+		onclick="starttmpload($key);" />
 	</p>
 	<div id="sharingbuttonsio">
 		<!-- Sharingbutton Facebook -->
@@ -459,7 +456,7 @@ $html = <<<HTMLPREVIEW
 		</a>
 
 		<!-- Sharingbutton VK -->
-		<a class="resp-sharing-button__link" href="http://vk.com/share.php?title=$title&amp;url=$encodedurl" target="_blank" rel="noopener" aria-label="Share on VK">
+		<a class="resp-sharing-button__link" href="https://vk.com/share.php?title=$title&amp;url=$encodedurl" target="_blank" rel="noopener" aria-label="Share on VK">
 			<div class="resp-sharing-button resp-sharing-button--vk resp-sharing-button--large">
 				<div aria-hidden="true" class="resp-sharing-button__icon resp-sharing-button__icon--solid">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
