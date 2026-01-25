@@ -5706,7 +5706,7 @@ class SamplerIcon {
                             globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
                         }
                         else {
-                            globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
                                 let percTrack = globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
                                 globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);
                             });
@@ -5937,6 +5937,73 @@ class FilterIcon {
                     });
                 });
             }
+        }
+        this.addReorderFilterIcon(zidx, order, fanLevelAnchor);
+    }
+    addReorderFilterIcon(zidx, order, fanLevelAnchor) {
+        if (zidx < 4) {
+            let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+            if (zidx >= 3) {
+                ratio = ratio / 2;
+            }
+            let top = globalCommandDispatcher.cfg().automationTop();
+            let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+            let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+            let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+            let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+            let dragOrderFilterAnchor = {
+                xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+                minZoom: fanLevelAnchor.minZoom,
+                beforeZoom: fanLevelAnchor.beforeZoom,
+                content: [],
+                translation: { x: 0, y: 0 }
+            };
+            let reorderAutoButton = {
+                x: xx - 0.5 * sz,
+                y: yy - 0.5 * sz,
+                w: sz,
+                h: sz,
+                rx: 0.5 * sz,
+                ry: 0.5 * sz,
+                css: css,
+                draggable: true
+            };
+            let aim = order;
+            reorderAutoButton.activation = (xx, yy) => {
+                if (dragOrderFilterAnchor.translation) {
+                    if (xx == 0 && yy == 0) {
+                        dragOrderFilterAnchor.translation.x = 0;
+                        dragOrderFilterAnchor.translation.y = 0;
+                        if (aim < 0) {
+                            aim = 0;
+                        }
+                        if (aim > globalCommandDispatcher.cfg().data.filters.length - 1) {
+                            aim = globalCommandDispatcher.cfg().data.filters.length - 1;
+                        }
+                        if (aim == order) {
+                            globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
+                        }
+                        else {
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                                let autoTrack = globalCommandDispatcher.cfg().data.filters.splice(order, 1)[0];
+                                globalCommandDispatcher.cfg().data.filters.splice(aim, 0, autoTrack);
+                            });
+                            globalCommandDispatcher.resetProject();
+                        }
+                    }
+                    else {
+                        dragOrderFilterAnchor.translation.x = sz / 3;
+                        aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
+                            / globalCommandDispatcher.cfg().autoPointHeight) + order;
+                        if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
+                            dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
+                        }
+                        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
+                    }
+                }
+            };
+            dragOrderFilterAnchor.content.push(reorderAutoButton);
+            fanLevelAnchor.content.push(dragOrderFilterAnchor);
         }
     }
 }

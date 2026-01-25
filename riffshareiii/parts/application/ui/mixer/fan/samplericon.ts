@@ -278,7 +278,7 @@ class SamplerIcon {
 						if (aim == percnum) {
 							globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
 						} else {
-							globalCommandDispatcher.exe.commitProjectChanges([], () => {
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 								let percTrack: Zvoog_PercussionTrack
 									= globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
 								globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);

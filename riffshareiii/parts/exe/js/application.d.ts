@@ -553,6 +553,7 @@ declare class FilterIcon {
     constructor(filterId: string);
     buildAutoSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
     addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addReorderFilterIcon(zidx: number, order: number, fanLevelAnchor: TileAnchor): void;
 }
 declare class ControlConnection {
     addAudioStreamLineFlow(secondary: boolean, zIndex: number, yy: number, toX: number, toY: number, anchor: TileAnchor): void;
