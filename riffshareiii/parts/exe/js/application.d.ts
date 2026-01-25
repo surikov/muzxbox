@@ -546,6 +546,7 @@ declare class SamplerIcon {
     constructor(samplerId: string);
     buildSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
     addSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor): void;
 }
 declare class FilterIcon {
     filterId: string;
