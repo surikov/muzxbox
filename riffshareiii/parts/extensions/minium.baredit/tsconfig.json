@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015"
-        ,"outFile": "../../exe/plugins/actions/miniumeditselection1/misel.js"
+        ,"outFile": "../../exe/plugins/actions/baredit1/miedit.js"
         //,"outDir":"../js"
 		,"strictNullChecks": true
 		,"alwaysStrict": true
@@ -28,6 +28,7 @@
 		
         "../../mzxbxapi/musicenginetypes.ts"
 		,"../../mzxbxapi/musicenginedeclarations.ts"
+		,"../../extensions/MZXBX_Plugin_UI.ts"
         ,"miedplugin.ts"
 	]
 

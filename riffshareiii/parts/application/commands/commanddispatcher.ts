@@ -8,6 +8,7 @@ class CommandDispatcher {
 	//onAir = false;
 	//neeToStart = false;
 	playPosition = 0;
+	restartOnInitError = false;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos - 0.25;
 		//this.renderer.timeselectbar.positionTimeMark.x 
@@ -126,6 +127,7 @@ class CommandDispatcher {
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
 		this.player = createSchedulePlayer(this.playCallback);
+		globalCommandDispatcher.setupAndStartPlay();
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		console.log('registerWorkProject', data.menuPerformers)
@@ -339,6 +341,7 @@ class CommandDispatcher {
 	}
 	reStartPlayIfPlay() {
 		if (this.player.playState().play) {
+			console.log('reStartPlayIfPlay');
 			this.stopPlay();
 			this.setupAndStartPlay();
 		}
@@ -356,7 +359,7 @@ class CommandDispatcher {
 			this.onAir = false;
 			this.player.cancel();
 		}*/
-		
+
 		this.player.cancel();
 		this.renderer.menu.rerenderMenuContent(null);
 		this.setHiddenTimeMark();
@@ -364,7 +367,7 @@ class CommandDispatcher {
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		//console.log('setupAndStartPlay');
+		console.log('setupAndStartPlay');
 		//this.onAir = true;
 		let schedule = this.renderCurrentProjectForOutput();
 		let from = 0;
@@ -407,49 +410,33 @@ class CommandDispatcher {
 	}
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
-		//console.log('startPlayLoop', from, position, to);
-		//if (this.neeToStart) {
-		//let me = this;
-		//let n120 = 120 / 60;
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
-			//me.onAir = false;
-			console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
-			//console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
-			/*if (this.renderer.warning.noWarning) {
-				//
-			} else {
-				let me = this;
-				let id = setTimeout(() => {
-					me.startPlayLoop(from, position, to);
-				}, 1000);
-				console.log('setTimeout',id);
-			}*/
-			//this.renderer.warning.setIcon('S');
+			console.log('msg', msg, this.renderer.warning.noWarning);
+			let me = this;
+			this.restartOnInitError = true;
 			this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg//,null);
 				, () => {
 					console.log('cancel wait start loop');
+					me.restartOnInitError = false;
+					me.player.cancel();
 				});
-
-			let me = this;
-			let id = setTimeout(() => {
+			let waitid = setTimeout(() => {
 				if (!me.renderer.warning.noWarning) {
-					me.startPlayLoop(from, position, to);
+					if (me.restartOnInitError) {
+						console.log('me.restartOnInitError', me.restartOnInitError, waitid);
+						me.startPlayLoop(from, position, to);
+					}
 				}
-
 			}, 1000);
-
-			//console.log('wait',id);
+			console.log('waitid', waitid);
 		} else {
-			//console.log('startPlayLoop done', from, position, to, me.player.playState());
-			//me.neeToStart = false;
+			//console.log('empty msg');
 			this.renderer.warning.hideWarning();
 			this.setVisibleTimeMark();
 			this.renderer.menu.rerenderMenuContent(null);
 			this.resetProject();
-			//console.log('startPlayLoop done', from, position, to, me.player.playState());
 		}
-		//}
 	}
 	setThemeLocale(loc: string, ratio: number) {
 		console.log("setThemeLocale", loc, ratio);
@@ -1323,7 +1310,7 @@ class CommandDispatcher {
 	slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean {
 		if (a1.length == a2.length) {
 			for (let ii = 0; ii < a1.length; ii++) {
-				if (Math.abs(a1[ii].delta - a2[ii].delta)<0.005
+				if (Math.abs(a1[ii].delta - a2[ii].delta) < 0.005
 					//&& MMUtil().set(a1[ii].duration).equals(a2[ii].duration)
 				) {
 					//
@@ -1500,7 +1487,7 @@ class CommandDispatcher {
 		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 		this.adjustTimeLineLength();
 		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
-		
+
 		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('3',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
 		this.adjustTracksChords();
 		this.adjustRemoveEmptyChords();

@@ -34,7 +34,6 @@ declare function squashString(data: string): string;
 declare function resolveString(data: string): string | null;
 declare function getNavigatorLanguage(): string;
 declare function saveProjectState(): void;
-declare function initWebAudioFromUI(): void;
 declare function startLoadCSSfile(cssurl: string): void;
 declare class Plugin__DialogPrompt2 {
 }
@@ -158,6 +157,7 @@ declare class CommandDispatcher {
     audioContext: AudioContext;
     tapSizeRatio: number;
     playPosition: number;
+    restartOnInitError: boolean;
     playCallback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
@@ -687,6 +687,7 @@ declare class WarningUI {
     warningSmallText: TileText;
     onCancel: null | (() => void);
     noWarning: boolean;
+    started: boolean;
     cancelWarning(): void;
     initDialogUI(): void;
     resetDialogView(data: Zvoog_Project): void;

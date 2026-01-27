@@ -65,7 +65,7 @@ class EqualizerImplementation implements MZXBX_AudioFilterPlugin {
 				this.values[ii] = (arr[ii]) ? (1 * arr[ii]) : 0;
 			}
 		} catch (xx) {
-			console.log(xx);
+			console.log(parameters,xx);
 		}
 	}
 	bandEqualizer(from: AudioNode, frequency: number): BiquadFilterNode {

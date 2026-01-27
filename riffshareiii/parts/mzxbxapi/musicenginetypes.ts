@@ -360,7 +360,7 @@ type MZXBX_MessageToPlugin = {
 		, click: string// #c39;
 	}
 	, screenData: number[] | null
-	,langID:string
+	, langID: string
 };
 type MZXBX_MessageToHost = {
 	dialogID: string
@@ -368,3 +368,4 @@ type MZXBX_MessageToHost = {
 	, done: boolean
 	, screenWait: boolean
 };
+

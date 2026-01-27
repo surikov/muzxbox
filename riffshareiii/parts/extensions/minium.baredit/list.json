@@ -1,0 +1,8 @@
+{
+    "label": "Timeline editor"
+    , "purpose": "Action"
+    , "kind": "baredit1"
+    , "ui": "miedit.html"
+    , "evaluate": "newBaseFader"
+    , "script": ""
+}

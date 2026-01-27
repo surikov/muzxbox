@@ -1,7 +1,7 @@
 "use strict";
 let _t_all_registerd_plugins_list = [
-    { label: 'Export file', purpose: 'Action', kind: 'exportfile', ui: './plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' },
-    { label: 'Import file', purpose: 'Action', kind: 'importfile', ui: './plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' },
+    { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: './plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' },
+    { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: './plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' },
     {
         label: "Minium Compressor",
         purpose: "Filter",
@@ -13,10 +13,10 @@ let _t_all_registerd_plugins_list = [
     {
         label: "Minium 10-band Equalizer",
         purpose: "Filter",
-        kind: "10band_equalizer1",
-        ui: "./plugins/filters/10band_equalizer1/ui/equi.html",
+        kind: "minium10band_equalizer1",
+        ui: "./plugins/filters/minium.equalizer/ui/equi.html",
         evaluate: "new10bEqualizer",
-        script: "./plugins/filters/10band_equalizer1/audio/eqfilter.js"
+        script: "./plugins/filters/minium.equalizer/audio/eqfilter.js"
     },
     {
         label: "Minium Fader",
@@ -58,7 +58,7 @@ let _t_all_registerd_plugins_list = [
         "script": "./plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
     },
     {
-        "label": "Alpha Tab Import",
+        "label": "Import",
         "purpose": "Action",
         "kind": "alphatabimport1",
         "ui": "./plugins/actions/alphatabimport1/ui.html",
@@ -66,18 +66,18 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
-        "label": "Yandex/VKontakte",
+        "label": "Publish & Share",
         "purpose": "Action",
-        "kind": "shareyavk",
-        "ui": "./plugins/actions/shareyavk/preview.html",
+        "kind": "sharemzxbox1",
+        "ui": "./plugins/actions/miniumshare/shareui.html",
         "evaluate": "",
         "script": ""
     },
     {
-        "label": "Share",
+        "label": "Timeline editor",
         "purpose": "Action",
-        "kind": "sharemzxbox1",
-        "ui": "./plugins/actions/miniumshare/shareui.html",
+        "kind": "baredit1",
+        "ui": "./plugins/actions/baredit1/mied.html",
         "evaluate": "",
         "script": ""
     }

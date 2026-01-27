@@ -17,16 +17,17 @@ class WarningUI {
 	onCancel: null | (() => void);
 
 	noWarning = true;
+	started = false;
 
 	cancelWarning() {
 		//console.log('warning cancel', this.onCancel,(typeof this.onCancel));
-		
-		if(this.onCancel){
+
+		if (this.onCancel) {
 			//console.log('warning start onCancel');
 			this.onCancel();
 		} else {
 			//console.log('warning skip onCancel');
-			
+
 		}
 		this.hideWarning();
 	};
@@ -48,10 +49,17 @@ class WarningUI {
 		this.warningSmallText = { x: 0, y: 0, text: '', css: 'warningSmallText' };
 		this.warningGroup = (document.getElementById("warningDialogGroup") as any) as SVGElement;
 		this.warningRectangle = {
-			x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
-				globalCommandDispatcher.initAudioFromUI();
-				me.cancelWarning();
-				globalCommandDispatcher.setupAndStartPlay();
+			x: 0, y: 0, w: 1, h: 1, css: 'warningBG'
+			, activation: () => {
+				if (me.started) {
+					me.cancelWarning();
+				} else {
+					me.started = true;
+					globalCommandDispatcher.initAudioFromUI();
+					//console.log('play warning');
+					//globalCommandDispatcher.setupAndStartPlay();
+				}
+				
 			}
 
 			//this.cancel.bind(this) 
@@ -103,12 +111,12 @@ class WarningUI {
 	allLayers(): TileLayerDefinition[] {
 		return [this.warningLayer];
 	}
-	setIcon(icon:string){
-		this.warningIcon.text=icon;
-		this.warningInfo1.href='';
-		this.warningInfo2.href='';
-		this.warningInfo3.href='';
-		this.warningInfo4.href='';
+	setIcon(icon: string) {
+		this.warningIcon.text = icon;
+		this.warningInfo1.href = '';
+		this.warningInfo2.href = '';
+		this.warningInfo3.href = '';
+		this.warningInfo4.href = '';
 	}
 	showWarning(title: string, msg: string, smallMsg: string, onCancel: null | (() => void)) {
 		//console.log('WarningUI show', title, msg);

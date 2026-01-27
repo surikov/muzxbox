@@ -161,10 +161,11 @@ function saveProjectState() {
 	}
 	//console.log('done saveProjectState');
 }
+/*
 function initWebAudioFromUI() {
 	console.log('initWebAudioFromUI');
 	globalCommandDispatcher.initAudioFromUI();
-}
+}*/
 function startLoadCSSfile(cssurl: string) {
 	var head = document.getElementsByTagName('head')[0];
 	var link = document.createElement('link');

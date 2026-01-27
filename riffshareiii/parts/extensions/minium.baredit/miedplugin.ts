@@ -1,20 +1,130 @@
-console.log('MINIUMselectionEditPlugin v1.0.1');
-class MINIUMselectionEditPlugin {
+console.log('BarTimeEdit v1.0.1');
+class BarTimeEdit extends MZXBX_Plugin_UI {
 	callbackID = '';
 	currentProject: Zvoog_Project;
 	startMeasure = 0;
 	endMeasure = 0;
+	metrecount = 4;
+	metrepart = 4;
+	tempo = 0;
 	constructor() {
-		this.init();
+		super(false);
 	}
-	init() {
+	onMessageFromHost(message: MZXBX_MessageToPlugin): void {
+		this.currentProject = message.hostData;
+		if (this.currentProject) {
+			this.startMeasure = this.currentProject.selectedPart.startMeasure;
+			this.endMeasure = this.currentProject.selectedPart.endMeasure;
+			if (this.startMeasure < 0) {
+				this.startMeasure = 0;
+				this.endMeasure = this.currentProject.timeline.length - 1;
+			}
+			this.metrecount = this.currentProject.timeline[this.startMeasure].metre.count;
+			this.metrepart = this.currentProject.timeline[this.startMeasure].metre.part;
+			this.tempo = this.currentProject.timeline[this.startMeasure].tempo;
+			this.refreshInfo();
+		}
+	}
+	setText(id: string, txt: string) {
+		let oo = document.getElementById(id);
+		if (oo) {
+			oo.innerHTML = txt;
+		}
+	}
+	onLanguaga(enruzhId: string): void {
+		if (enruzhId == 'zh') {
+			this.setText('plugintitle', '更改选定措施');
+			this.setText('sellabel', '选择');
+			this.setText('splitlabel', '分离');
+			this.setText('tempolabel', '音乐节奏');
+			this.setText('metrelabel', '音乐节拍');
+			this.setText('btndel', '删除');
+			this.setText('btnclear', '清除');
+			this.setText('btnadd', '添加');
+			this.setText('btnpushaside', '推开');
+			this.setText('btnmerge', '合并');
+		} else {
+			if (enruzhId == 'ru') {
+				this.setText('plugintitle', 'Изменить такты');
+				this.setText('sellabel', 'Выбрано');
+				this.setText('splitlabel', 'Отделить');
+				this.setText('tempolabel', 'Темп');
+				this.setText('metrelabel', 'Метр');
+				this.setText('btndel', 'Удалить');
+				this.setText('btnclear', 'Очистить');
+
+				this.setText('btnadd', 'Добавить');
+				this.setText('btnpushaside', 'Отодвинуть');
+				this.setText('btnmerge', 'Объединить');
+			} else {
+				this.setText('plugintitle', 'Change selected measures');
+				this.setText('sellabel', 'Selection');
+				this.setText('splitlabel', 'Split');
+				this.setText('tempolabel', 'Tempo');
+				this.setText('metrelabel', 'Metre');
+				this.setText('btndel', 'Delete');
+				this.setText('btnclear', 'Clrear');
+				this.setText('btnadd', 'Add to end');
+				this.setText('btnpushaside', 'Push aside');
+				this.setText('btnmerge', 'Merge');
+			}
+		}
+
+	}
+	split() {
+		console.log('split');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	setTempo() {
+
+		let bpm = document.getElementById('bpm');
+		//console.log('start setTempo',bpm);
+		if (bpm) {
+			let newTempo = parseInt((bpm as any).value);
+			if (newTempo > 20 && newTempo < 400) {
+				//console.log('setTempo',newTempo);
+				for (let ii = this.startMeasure; ii <= this.endMeasure; ii++) {
+					this.currentProject.timeline[ii].tempo = newTempo;
+				}
+			}
+		}
+		//this.closeDialog(JSON.stringify(this.currentProject));
+		//console.log(this.currentProject);
+	}
+	metre() {
+		console.log('metre');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	deleteBars() {
+		console.log('deleteBars');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	shiftContent() {
+		console.log('shiftContent');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	mergeBars() {
+		console.log('mergeBars');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	addBars() {
+		console.log('addBars');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+	clear() {
+		console.log('clear');
+		this.closeDialog(JSON.stringify(this.currentProject));
+	}
+
+
+	/*init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
 		window.parent.postMessage({
 			dialogID: ''
 			, pluginData: ''
 			, done: false
 		}, '*');
-	}
+	}*/
 	//sendImportedMIDIData() {
 	/*console.log('sendImportedMIDIData', this.parsedProject);
 	if (this.parsedProject) {
@@ -29,21 +139,34 @@ class MINIUMselectionEditPlugin {
 	}*/
 	//}
 	refreshInfo() {
-		let selectionInfo = document.getElementById('selectionInfo');
-		if (selectionInfo) {
-			selectionInfo.innerHTML = '' + (this.startMeasure + 1) + ' - ' + (this.endMeasure + 1);
+		let selfrom = document.getElementById('selfrom');
+		if (selfrom) {
+			(selfrom as any).value = this.startMeasure + 1;
+		}
+		let selto = document.getElementById('selto');
+		if (selto) {
+			(selto as any).value = this.endMeasure + 1;
+		}
+		let metreinput = document.getElementById('metreinput');
+		if (metreinput) {
+			(metreinput as any).value = '' + this.metrecount + '/' + this.metrepart;
+		}
+		let bpm = document.getElementById('bpm');
+		if (bpm) {
+			(bpm as any).value = this.tempo;
 		}
 	}
 
-	sendProjectToHost() {
-		var oo: MZXBX_MessageToHost = {
+	sendProjectToHost222() {
+		/*var oo: MZXBX_MessageToHost = {
 			dialogID: this.callbackID
 			, pluginData: this.currentProject
 			, done: true
 		};
-		window.parent.postMessage(oo, '*');
+		window.parent.postMessage(oo, '*');*/
+		this.updateHostData(JSON.stringify(this.currentProject));
 	}
-	receiveHostMessage(par) {
+	/*receiveHostMessage(par) {
 		let message: MZXBX_MessageToPlugin = par.data;
 		if (this.callbackID) {
 			this.currentProject = par.data.hostData;
@@ -60,8 +183,8 @@ class MINIUMselectionEditPlugin {
 			this.callbackID = message.hostData;
 		}
 		console.log(par);
-	}
-	deleteBars() {
+	}*/
+	deleteBars2() {
 		console.log('deleteBars');
 		let count = this.endMeasure - this.startMeasure + 1;
 		if (count >= this.currentProject.timeline.length) {
@@ -83,7 +206,7 @@ class MINIUMselectionEditPlugin {
 			}
 			this.currentProject.comments.splice(this.startMeasure, 1);
 		}
-		this.sendProjectToHost();
+		//this.sendProjectToHost();
 	}
 	insertEmptyBar(at: number, newTempo: number, metreCount: number, metrePart: number) {
 		this.currentProject.timeline.splice(this.endMeasure + 1, 0, { tempo: newTempo, metre: { count: metreCount, part: metrePart } });
@@ -101,7 +224,7 @@ class MINIUMselectionEditPlugin {
 		}
 		this.currentProject.comments.splice(at, 0, { points: [] });
 	}
-	addBars() {
+	addBars2() {
 		console.log('addBars', this.startMeasure, this.endMeasure, this.currentProject.timeline.length);
 		let count = this.endMeasure - this.startMeasure + 1;
 		//let newTempo = this.currentProject.timeline[this.endMeasure].tempo;
@@ -130,7 +253,7 @@ class MINIUMselectionEditPlugin {
 			*/
 		}
 		console.log('new len', this.currentProject.timeline.length);
-		this.sendProjectToHost();
+		//this.sendProjectToHost();
 	}
 	promptTempo() {
 		console.log('promptTempo');
@@ -143,7 +266,7 @@ class MINIUMselectionEditPlugin {
 				for (let ii = 0; ii < count; ii++) {
 					this.currentProject.timeline[this.startMeasure + ii].tempo = bpm;
 				}
-				this.sendProjectToHost();
+				//this.sendProjectToHost();
 			}
 		}
 	}
@@ -163,11 +286,11 @@ class MINIUMselectionEditPlugin {
 					this.currentProject.timeline[this.startMeasure + ii].metre.part = nPart;
 				}
 				this.adjustContent();
-				this.sendProjectToHost();
+				//this.sendProjectToHost();
 			}
 		}
 	}
-	shiftContent() {
+	shiftContent2() {
 		console.log('shiftContent');
 	}
 	adjustContent() {

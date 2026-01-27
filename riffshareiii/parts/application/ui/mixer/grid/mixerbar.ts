@@ -112,10 +112,14 @@ class MixerBar {
 						let pluginImplementation = arr[ii].plugin as any;// as MZXBX_AudioSamplerPlugin;
 						//console.log('findDurationOfSample',smplr.duration(),'for', samplerId);
 						//return smplr.duration();
-						if (pluginImplementation.duration) {
-							return pluginImplementation.duration();
+						if (pluginImplementation) {
+							if (pluginImplementation.duration) {
+								return pluginImplementation.duration();
+							} else {
+								return 0.001;
+							}
 						} else {
-							return 0.0001;
+							return 0.001;
 						}
 					} catch (xxx) {
 						console.log(xxx);

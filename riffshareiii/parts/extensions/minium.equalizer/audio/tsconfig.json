@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "target": "es2015",
-        "outFile": "../../../exe/plugins/filters/10band_equalizer1/audio/eqfilter.js",
+        "outFile": "../../../exe/plugins/filters/minium.equalizer/audio/eqfilter.js",
         "strictNullChecks": true,
         "alwaysStrict": true,
         "esModuleInterop": true,

@@ -371,10 +371,6 @@ function saveProjectState() {
         }
     }
 }
-function initWebAudioFromUI() {
-    console.log('initWebAudioFromUI');
-    globalCommandDispatcher.initAudioFromUI();
-}
 function startLoadCSSfile(cssurl) {
     var head = document.getElementsByTagName('head')[0];
     var link = document.createElement('link');
@@ -1233,6 +1229,7 @@ class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
         this.playPosition = 0;
+        this.restartOnInitError = false;
         this.playCallback = (start, pos, end) => {
             this.playPosition = pos - 0.25;
             this.reDrawPlayPosition();
@@ -1304,6 +1301,7 @@ class CommandDispatcher {
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
         this.player = createSchedulePlayer(this.playCallback);
+        globalCommandDispatcher.setupAndStartPlay();
     }
     registerWorkProject(data) {
         console.log('registerWorkProject', data.menuPerformers);
@@ -1499,6 +1497,7 @@ class CommandDispatcher {
     }
     reStartPlayIfPlay() {
         if (this.player.playState().play) {
+            console.log('reStartPlayIfPlay');
             this.stopPlay();
             this.setupAndStartPlay();
         }
@@ -1510,6 +1509,7 @@ class CommandDispatcher {
         this.resetProject();
     }
     setupAndStartPlay() {
+        console.log('setupAndStartPlay');
         let schedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
@@ -1544,16 +1544,23 @@ class CommandDispatcher {
         console.log('startPlayLoop', from, position, to);
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
-            console.log('startPlayLoop', msg, this.renderer.warning.noWarning);
+            console.log('msg', msg, this.renderer.warning.noWarning);
+            let me = this;
+            this.restartOnInitError = true;
             this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
                 console.log('cancel wait start loop');
+                me.restartOnInitError = false;
+                me.player.cancel();
             });
-            let me = this;
-            let id = setTimeout(() => {
+            let waitid = setTimeout(() => {
                 if (!me.renderer.warning.noWarning) {
-                    me.startPlayLoop(from, position, to);
+                    if (me.restartOnInitError) {
+                        console.log('me.restartOnInitError', me.restartOnInitError, waitid);
+                        me.startPlayLoop(from, position, to);
+                    }
                 }
             }, 1000);
+            console.log('waitid', waitid);
         }
         else {
             this.renderer.warning.hideWarning();
@@ -4331,11 +4338,16 @@ class MixerBar {
                 if (arr[ii].channelId == samplerId) {
                     try {
                         let pluginImplementation = arr[ii].plugin;
-                        if (pluginImplementation.duration) {
-                            return pluginImplementation.duration();
+                        if (pluginImplementation) {
+                            if (pluginImplementation.duration) {
+                                return pluginImplementation.duration();
+                            }
+                            else {
+                                return 0.001;
+                            }
                         }
                         else {
-                            return 0.0001;
+                            return 0.001;
                         }
                     }
                     catch (xxx) {
@@ -6297,6 +6309,7 @@ class DebugLayerUI {
 class WarningUI {
     constructor() {
         this.noWarning = true;
+        this.started = false;
     }
     cancelWarning() {
         if (this.onCancel) {
@@ -6319,10 +6332,15 @@ class WarningUI {
         this.warningSmallText = { x: 0, y: 0, text: '', css: 'warningSmallText' };
         this.warningGroup = document.getElementById("warningDialogGroup");
         this.warningRectangle = {
-            x: 0, y: 0, w: 1, h: 1, css: 'warningBG', activation: () => {
-                globalCommandDispatcher.initAudioFromUI();
-                me.cancelWarning();
-                globalCommandDispatcher.setupAndStartPlay();
+            x: 0, y: 0, w: 1, h: 1, css: 'warningBG',
+            activation: () => {
+                if (me.started) {
+                    me.cancelWarning();
+                }
+                else {
+                    me.started = true;
+                    globalCommandDispatcher.initAudioFromUI();
+                }
             }
         };
         this.warningAnchor = {
