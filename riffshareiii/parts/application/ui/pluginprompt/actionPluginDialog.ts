@@ -3,7 +3,7 @@ class ActionPluginDialog {
 	waitActionPluginInit = false;
 	dialogID: string = '?';
 	constructor() {
-		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+		window.addEventListener('message', this.receiveMessageFromActionPlugin.bind(this), false);
 	}
 	sendNewIdToPlugin() {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
@@ -54,7 +54,7 @@ class ActionPluginDialog {
 
 		}
 	}
-	receiveMessageFromPlugin(event) {
+	receiveMessageFromActionPlugin(event) {
 		//console.log('action receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
@@ -63,10 +63,11 @@ class ActionPluginDialog {
 			if (message.dialogID) {
 				if (message.dialogID == this.dialogID) {
 					let me = this;
-					console.log('waitProjectCallback');
+					console.log('waitProjectCallback',message);
 					if (message.pluginData) {
+						let project: Zvoog_Project = message.pluginData as Zvoog_Project;
 						globalCommandDispatcher.exe.commitProjectChanges([], () => {
-							let project: Zvoog_Project = message.pluginData;
+							
 							//console.log('set 1',JSON.stringify(project.tracks[0].measures[33]));
 							
 							globalCommandDispatcher.registerWorkProject(project);

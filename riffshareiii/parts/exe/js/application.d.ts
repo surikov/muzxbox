@@ -56,7 +56,7 @@ declare class FilterPluginDialog {
     sendNewIdToPlugin(): void;
     sendPointToPlugin(): void;
     setFilterValue(): void;
-    receiveMessageFromPlugin(event: any): void;
+    receiveMessageFromFilterPlugin(event: any): void;
 }
 declare class SamplerPluginDialog {
     drum: Zvoog_PercussionTrack;
@@ -78,7 +78,7 @@ declare class SamplerPluginDialog {
     sendNewIdToPlugin(): void;
     sendPointToPlugin(): void;
     setFilterValue(): void;
-    receiveMessageFromPlugin(event: any): void;
+    receiveMessageFromSamplerPlugin(event: any): void;
 }
 declare class ActionPluginDialog {
     pluginInfo: MZXBX_PluginRegistrationInformation;
@@ -88,7 +88,7 @@ declare class ActionPluginDialog {
     sendNewIdToPlugin(): void;
     sendDataToActionPlugin(): void;
     sendCurrentProjectToActionPlugin(screen: boolean): void;
-    receiveMessageFromPlugin(event: any): void;
+    receiveMessageFromActionPlugin(event: any): void;
     openActionPluginDialogFrame(info: MZXBX_PluginRegistrationInformation): void;
     closeActionDialogFrame(): void;
     resetActionTitle(): void;
@@ -132,7 +132,7 @@ declare class PointPluginDialog {
     sendNewIdToPlugin(): void;
     sendPointToPlugin(): void;
     setPointValue(data: string): void;
-    receiveMessageFromPlugin(event: any): void;
+    receiveAutoMessageFromPlugin(event: any): void;
 }
 declare class CommandExe {
     lockUndoRedo: boolean;
@@ -217,12 +217,12 @@ declare class CommandDispatcher {
         line: string;
         click: string;
     };
-    mergeSelectedBars(): void;
+    ___mergeSelectedBars(): void;
     calculateRealTrackFarOrder(): number[];
-    dropSelectedBars(): void;
+    ___dropSelectedBars(): void;
     insertAfterSelectedBars(): void;
     promptTempoForSelectedBars(): void;
-    promptMeterForSelectedBars(): void;
+    ___promptMeterForSelectedBars(): void;
     setPlayPositionFromSelectedPart(): void;
     rollTracksClick(left: number, top: number): void;
     adjustTimeLineLength(): void;

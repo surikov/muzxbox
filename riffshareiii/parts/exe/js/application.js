@@ -386,7 +386,7 @@ class FilterPluginDialog {
     constructor() {
         this.dialogID = '?';
         this.waitFilterPluginInit = false;
-        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+        window.addEventListener('message', this.receiveMessageFromFilterPlugin.bind(this), false);
     }
     promptFilterTitle() {
         let newTitle = prompt(this.filter.title, this.filter.title);
@@ -517,7 +517,7 @@ class FilterPluginDialog {
         });
         globalCommandDispatcher.reStartPlayIfPlay();
     }
-    receiveMessageFromPlugin(event) {
+    receiveMessageFromFilterPlugin(event) {
         if (!(event.data)) {
         }
         else {
@@ -546,7 +546,7 @@ class SamplerPluginDialog {
     constructor() {
         this.dialogID = '?';
         this.waitSamplerPluginInit = false;
-        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+        window.addEventListener('message', this.receiveMessageFromSamplerPlugin.bind(this), false);
     }
     promptDrumTitle() {
         let newTitle = prompt(this.drum.title, this.drum.title);
@@ -676,7 +676,7 @@ class SamplerPluginDialog {
         });
         globalCommandDispatcher.reStartPlayIfPlay();
     }
-    receiveMessageFromPlugin(event) {
+    receiveMessageFromSamplerPlugin(event) {
         if (!(event.data)) {
         }
         else {
@@ -705,7 +705,7 @@ class ActionPluginDialog {
     constructor() {
         this.waitActionPluginInit = false;
         this.dialogID = '?';
-        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+        window.addEventListener('message', this.receiveMessageFromActionPlugin.bind(this), false);
     }
     sendNewIdToPlugin() {
         let pluginFrame = document.getElementById("pluginActionFrame");
@@ -749,7 +749,7 @@ class ActionPluginDialog {
             }
         }
     }
-    receiveMessageFromPlugin(event) {
+    receiveMessageFromActionPlugin(event) {
         if (!(event.data)) {
         }
         else {
@@ -757,10 +757,10 @@ class ActionPluginDialog {
             if (message.dialogID) {
                 if (message.dialogID == this.dialogID) {
                     let me = this;
-                    console.log('waitProjectCallback');
+                    console.log('waitProjectCallback', message);
                     if (message.pluginData) {
+                        let project = message.pluginData;
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                            let project = message.pluginData;
                             globalCommandDispatcher.registerWorkProject(project);
                             globalCommandDispatcher.resetProject();
                             globalCommandDispatcher.reStartPlayIfPlay();
@@ -985,7 +985,7 @@ class PointPluginDialog {
     constructor() {
         this.dialogID = '?';
         this.waitPointPluginInit = false;
-        window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+        window.addEventListener('message', this.receiveAutoMessageFromPlugin.bind(this), false);
     }
     resetPointTitle() {
         let pluginTitle = document.getElementById("pluginPointTitle");
@@ -1058,7 +1058,7 @@ class PointPluginDialog {
         });
         globalCommandDispatcher.reStartPlayIfPlay();
     }
-    receiveMessageFromPlugin(event) {
+    receiveAutoMessageFromPlugin(event) {
         if (!(event.data)) {
         }
         else {
@@ -1304,7 +1304,6 @@ class CommandDispatcher {
         globalCommandDispatcher.setupAndStartPlay();
     }
     registerWorkProject(data) {
-        console.log('registerWorkProject', data.menuPerformers);
         this._mixerDataMathUtility = new MixerDataMathUtility(data);
         this.adjustTimelineContent();
     }
@@ -1849,7 +1848,7 @@ class CommandDispatcher {
             click: window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
         };
     }
-    mergeSelectedBars() {
+    ___mergeSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
         let endMeasure = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
         if (startMeasure > -1 && endMeasure >= startMeasure) {
@@ -1910,7 +1909,7 @@ class CommandDispatcher {
         }
         return realOrder.filter((it) => it >= 0 && it < trcnt);
     }
-    dropSelectedBars() {
+    ___dropSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
         let endMeasure = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
         let count = endMeasure - startMeasure + 1;
@@ -2006,7 +2005,7 @@ class CommandDispatcher {
             }
         }
     }
-    promptMeterForSelectedBars() {
+    ___promptMeterForSelectedBars() {
         let startMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
         let endMeasure = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
         let count = endMeasure - startMeasure + 1;
@@ -2834,9 +2833,6 @@ class TimeSelectBar {
                 let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                 left = left + barWidth;
             }
-            let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
-            let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
-                + '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
         }
     }
     fillTimeBar() {

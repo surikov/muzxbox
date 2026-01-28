@@ -5,23 +5,26 @@ abstract class MZXBX_Plugin_UI {
 		window.addEventListener('message', this._receiveHostMessage.bind(this), false);
 		this._sendMessageToHost('', false, screenWait);
 	}
-	closeDialog(data: string) {
-		this._sendMessageToHost('', true, false);
+	closeDialog(data: any) {
+		this._sendMessageToHost(data, true, false);
 	}
-	updateHostData(data: string) {
-		this._sendMessageToHost('', false, false);
+	updateHostData(data: any) {
+		this._sendMessageToHost(data, false, false);
 	}
-	_sendMessageToHost(data: string, done: boolean, screenWait: boolean) {
+	_sendMessageToHost(data: any, done: boolean, screenWait: boolean) {
 		var message: MZXBX_MessageToHost = {
 			dialogID: this.dialogId
 			, pluginData: data
 			, done: done
 			, screenWait: screenWait
 		};
+		console.log('_sendMessageToHost', message);
 		window.parent.postMessage(message, '*');
+
 	}
 	_receiveHostMessage(messageEvent: MessageEvent) {
 		let message: MZXBX_MessageToPlugin = messageEvent.data;
+		console.log('_receiveHostMessage', message);
 		if (message) {
 			if (this.dialogId) {
 				this.hostData = message.hostData;

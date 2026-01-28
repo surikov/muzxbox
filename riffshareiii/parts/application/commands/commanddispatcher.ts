@@ -130,7 +130,7 @@ class CommandDispatcher {
 		globalCommandDispatcher.setupAndStartPlay();
 	}
 	registerWorkProject(data: Zvoog_Project) {
-		console.log('registerWorkProject', data.menuPerformers)
+		//console.log('registerWorkProject', data)
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
 		this.adjustTimelineContent();
 	}
@@ -875,7 +875,7 @@ class CommandDispatcher {
 			, click: window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
 		};
 	}
-	mergeSelectedBars() {
+	___mergeSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
 		if (startMeasure > -1 && endMeasure >= startMeasure) {
@@ -944,7 +944,7 @@ class CommandDispatcher {
 		return realOrder.filter((it) => it >= 0 && it < trcnt);
 	}
 
-	dropSelectedBars() {
+	___dropSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
 		let count = endMeasure - startMeasure + 1;
@@ -1094,7 +1094,7 @@ class CommandDispatcher {
 			}
 		}
 	}
-	promptMeterForSelectedBars() {
+	___promptMeterForSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
 		let count = endMeasure - startMeasure + 1;

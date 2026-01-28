@@ -8,7 +8,7 @@ class PointPluginDialog {
 	dialogID: string = '?';
 	waitPointPluginInit: boolean = false;
 	constructor() {
-		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+		window.addEventListener('message', this.receiveAutoMessageFromPlugin.bind(this), false);
 	}
 	resetPointTitle() {
 		let pluginTitle = document.getElementById("pluginPointTitle") as any;
@@ -85,7 +85,7 @@ class PointPluginDialog {
 		});
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
-	receiveMessageFromPlugin(event) {
+	receiveAutoMessageFromPlugin(event) {
 		//console.log('point receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');

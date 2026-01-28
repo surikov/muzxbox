@@ -241,10 +241,11 @@ class TimeSelectBar {
 				let barWidth = curMeasureMeter.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 				left = left + barWidth;
 			}
+			/*
 			let tempoLabel = '' + Math.round(globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].tempo);
 			let meterLabel = '' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.count
 				+ '/' + globalCommandDispatcher.cfg().data.timeline[globalCommandDispatcher.cfg().data.selectedPart.startMeasure].metre.part;
-
+*/
 			//this.addSelectionMenuButton(tempoLabel, left, 1, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptTempoForSelectedBars);
 			//this.addSelectionMenuButton(meterLabel, left, 2, zz, selectLevelAnchor, 'selectedBarNum', globalCommandDispatcher.promptMeterForSelectedBars);
 			//this.addSelectionMenuButton(icon_addbars, left, 3, zz, selectLevelAnchor, 'selectedBarIcon', globalCommandDispatcher.insertAfterSelectedBars);

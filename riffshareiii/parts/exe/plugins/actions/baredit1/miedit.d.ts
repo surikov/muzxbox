@@ -297,9 +297,9 @@ declare abstract class MZXBX_Plugin_UI {
     dialogId: string;
     hostData: any;
     constructor(screenWait: boolean);
-    closeDialog(data: string): void;
-    updateHostData(data: string): void;
-    _sendMessageToHost(data: string, done: boolean, screenWait: boolean): void;
+    closeDialog(data: any): void;
+    updateHostData(data: any): void;
+    _sendMessageToHost(data: any, done: boolean, screenWait: boolean): void;
     _receiveHostMessage(messageEvent: MessageEvent): void;
     abstract onMessageFromHost(message: MZXBX_MessageToPlugin): void;
     abstract onLanguaga(enruzhId: string): void;
@@ -307,13 +307,9 @@ declare abstract class MZXBX_Plugin_UI {
 declare class BarTimeEdit extends MZXBX_Plugin_UI {
     callbackID: string;
     currentProject: Zvoog_Project;
-    startMeasure: number;
-    endMeasure: number;
-    metrecount: number;
-    metrepart: number;
-    tempo: number;
     constructor();
     onMessageFromHost(message: MZXBX_MessageToPlugin): void;
+    refreshInfo(): void;
     setText(id: string, txt: string): void;
     onLanguaga(enruzhId: string): void;
     split(): void;
@@ -324,13 +320,4 @@ declare class BarTimeEdit extends MZXBX_Plugin_UI {
     mergeBars(): void;
     addBars(): void;
     clear(): void;
-    refreshInfo(): void;
-    sendProjectToHost222(): void;
-    deleteBars2(): void;
-    insertEmptyBar(at: number, newTempo: number, metreCount: number, metrePart: number): void;
-    addBars2(): void;
-    promptTempo(): void;
-    promptMetre(): void;
-    shiftContent2(): void;
-    adjustContent(): void;
 }

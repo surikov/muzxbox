@@ -5,7 +5,7 @@ class SamplerPluginDialog {
 	dialogID: string = '?';
 	waitSamplerPluginInit: boolean = false;
 	constructor() {
-		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+		window.addEventListener('message', this.receiveMessageFromSamplerPlugin.bind(this), false);
 	}
 	promptDrumTitle() {
 		let newTitle = prompt(this.drum.title, this.drum.title);
@@ -136,7 +136,7 @@ class SamplerPluginDialog {
 		});
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
-	receiveMessageFromPlugin(event) {
+	receiveMessageFromSamplerPlugin(event) {
 		//console.log('receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');

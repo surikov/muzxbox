@@ -7,10 +7,10 @@ class MZXBX_Plugin_UI {
         this._sendMessageToHost('', false, screenWait);
     }
     closeDialog(data) {
-        this._sendMessageToHost('', true, false);
+        this._sendMessageToHost(data, true, false);
     }
     updateHostData(data) {
-        this._sendMessageToHost('', false, false);
+        this._sendMessageToHost(data, false, false);
     }
     _sendMessageToHost(data, done, screenWait) {
         var message = {
@@ -19,10 +19,12 @@ class MZXBX_Plugin_UI {
             done: done,
             screenWait: screenWait
         };
+        console.log('_sendMessageToHost', message);
         window.parent.postMessage(message, '*');
     }
     _receiveHostMessage(messageEvent) {
         let message = messageEvent.data;
+        console.log('_receiveHostMessage', message);
         if (message) {
             if (this.dialogId) {
                 this.hostData = message.hostData;
@@ -47,25 +49,38 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
     constructor() {
         super(false);
         this.callbackID = '';
-        this.startMeasure = 0;
-        this.endMeasure = 0;
-        this.metrecount = 4;
-        this.metrepart = 4;
-        this.tempo = 0;
     }
     onMessageFromHost(message) {
         this.currentProject = message.hostData;
         if (this.currentProject) {
-            this.startMeasure = this.currentProject.selectedPart.startMeasure;
-            this.endMeasure = this.currentProject.selectedPart.endMeasure;
-            if (this.startMeasure < 0) {
-                this.startMeasure = 0;
-                this.endMeasure = this.currentProject.timeline.length - 1;
-            }
-            this.metrecount = this.currentProject.timeline[this.startMeasure].metre.count;
-            this.metrepart = this.currentProject.timeline[this.startMeasure].metre.part;
-            this.tempo = this.currentProject.timeline[this.startMeasure].tempo;
             this.refreshInfo();
+        }
+    }
+    refreshInfo() {
+        let startMeasure = this.currentProject.selectedPart.startMeasure;
+        let endMeasure = this.currentProject.selectedPart.endMeasure;
+        if (startMeasure < 0) {
+            startMeasure = 0;
+            endMeasure = this.currentProject.timeline.length - 1;
+        }
+        let metrecount = this.currentProject.timeline[startMeasure].metre.count;
+        let metrepart = this.currentProject.timeline[startMeasure].metre.part;
+        let tempo = this.currentProject.timeline[startMeasure].tempo;
+        let selfrom = document.getElementById('selfrom');
+        if (selfrom) {
+            selfrom.value = startMeasure + 1;
+        }
+        let selto = document.getElementById('selto');
+        if (selto) {
+            selto.value = endMeasure + 1;
+        }
+        let metreinput = document.getElementById('metreinput');
+        if (metreinput) {
+            metreinput.value = '' + metrecount + '/' + metrepart;
+        }
+        let bpm = document.getElementById('bpm');
+        if (bpm) {
+            bpm.value = tempo;
         }
     }
     setText(id, txt) {
@@ -116,211 +131,155 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
     }
     split() {
         console.log('split');
-        this.closeDialog(JSON.stringify(this.currentProject));
+        this.closeDialog(this.currentProject);
     }
     setTempo() {
         let bpm = document.getElementById('bpm');
-        if (bpm) {
-            let newTempo = parseInt(bpm.value);
-            if (newTempo > 20 && newTempo < 400) {
-                for (let ii = this.startMeasure; ii <= this.endMeasure; ii++) {
-                    this.currentProject.timeline[ii].tempo = newTempo;
-                }
+        let selfrom = document.getElementById('selfrom');
+        let selto = document.getElementById('selto');
+        let newTempo = parseInt(bpm.value);
+        let startMeasure = parseInt(selfrom.value) - 1;
+        let endMeasure = parseInt(selto.value) - 1;
+        if (newTempo > 20 && newTempo < 400) {
+            for (let ii = startMeasure; ii <= endMeasure; ii++) {
+                this.currentProject.timeline[ii].tempo = newTempo;
             }
+            this.closeDialog(this.currentProject);
         }
     }
     metre() {
-        console.log('metre');
-        this.closeDialog(JSON.stringify(this.currentProject));
+        let selfrom = document.getElementById('selfrom');
+        let selto = document.getElementById('selto');
+        let _startMeasure = parseInt(selfrom.value) - 1;
+        let _endMeasure = parseInt(selto.value) - 1;
+        let txt = document.getElementById('metreinput').value;
+        let newpart = parseInt(txt.split('/')[1]);
+        let newcount = parseInt(txt.split('/')[0]);
+        if ((newcount > 0) && (newpart == 1 || newpart == 2 || newpart == 4 || newpart == 8 || newpart == 16 || newpart == 32)) {
+            let newMeter = MMUtil().set({ count: newcount, part: newpart });
+            for (let ii = _startMeasure; ii <= _endMeasure; ii++) {
+                let bar = this.currentProject.timeline[ii];
+                bar.metre = newMeter.metre();
+            }
+            this.closeDialog(this.currentProject);
+        }
     }
     deleteBars() {
-        console.log('deleteBars');
-        this.closeDialog(JSON.stringify(this.currentProject));
+        let selfrom = document.getElementById('selfrom');
+        let selto = document.getElementById('selto');
+        let _startMeasure = parseInt(selfrom.value) - 1;
+        let _endMeasure = parseInt(selto.value) - 1;
+        this.currentProject.timeline.splice(_startMeasure, _endMeasure - _startMeasure);
+        for (let ii = 0; ii < this.currentProject.tracks.length; ii++) {
+            this.currentProject.tracks[ii].measures.splice(_startMeasure, _endMeasure - _startMeasure);
+        }
+        for (let ii = 0; ii < this.currentProject.filters.length; ii++) {
+            this.currentProject.filters[ii].automation.splice(_startMeasure, _endMeasure - _startMeasure);
+        }
+        for (let ii = 0; ii < this.currentProject.percussions.length; ii++) {
+            this.currentProject.percussions[ii].measures.splice(_startMeasure, _endMeasure - _startMeasure);
+        }
+        this.currentProject.comments.splice(_startMeasure, _endMeasure - _startMeasure);
+        this.closeDialog(this.currentProject);
     }
     shiftContent() {
         console.log('shiftContent');
         this.closeDialog(JSON.stringify(this.currentProject));
     }
     mergeBars() {
-        console.log('mergeBars');
-        this.closeDialog(JSON.stringify(this.currentProject));
+        let selfrom = document.getElementById('selfrom');
+        let selto = document.getElementById('selto');
+        let startMeasure = parseInt(selfrom.value) - 1;
+        let endMeasure = parseInt(selto.value) - 1;
+        let newDuration = MMUtil().set(this.currentProject.timeline[startMeasure].metre);
+        for (let ii = startMeasure + 1; ii <= endMeasure; ii++) {
+            for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
+                let trackBar = this.currentProject.tracks[nn].measures[ii];
+                let trackPreBar = this.currentProject.tracks[nn].measures[ii - 1];
+                for (let kk = 0; kk < trackBar.chords.length; kk++) {
+                    trackBar.chords[kk].skip = newDuration.plus(trackBar.chords[kk].skip).metre();
+                    trackPreBar.chords.push(trackBar.chords[kk]);
+                }
+                trackBar.chords = [];
+            }
+            for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
+                let percuBar = this.currentProject.percussions[nn].measures[ii];
+                let percuPreBar = this.currentProject.percussions[nn].measures[ii - 1];
+                for (let kk = 0; kk < percuBar.skips.length; kk++) {
+                    percuBar.skips[kk] = newDuration.plus(percuBar.skips[kk]).metre();
+                    percuPreBar.skips.push(percuBar.skips[kk]);
+                }
+                percuBar.skips = [];
+            }
+            for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
+                let autoBar = this.currentProject.filters[nn].automation[ii];
+                let autoPreBar = this.currentProject.filters[nn].automation[ii - 1];
+                for (let kk = 0; kk < autoBar.changes.length; kk++) {
+                    autoBar.changes[kk].skip = newDuration.plus(autoBar.changes[kk].skip).metre();
+                    autoPreBar.changes.push(autoBar.changes[kk]);
+                }
+                autoBar.changes = [];
+            }
+            let txtBar = this.currentProject.comments[ii];
+            let txtPreBar = this.currentProject.comments[ii - 1];
+            for (let kk = 0; kk < txtBar.points.length; kk++) {
+                txtBar.points[kk].skip = newDuration.plus(txtBar.points[kk].skip).metre();
+                txtPreBar.points.push(txtBar.points[kk]);
+            }
+            txtBar.points = [];
+            newDuration = newDuration.plus(this.currentProject.timeline[ii].metre);
+        }
+        this.currentProject.timeline[startMeasure].metre = newDuration.metre();
+        this.currentProject.selectedPart.endMeasure = this.currentProject.selectedPart.startMeasure;
+        this.closeDialog(this.currentProject);
     }
     addBars() {
         console.log('addBars');
         this.closeDialog(JSON.stringify(this.currentProject));
     }
     clear() {
-        console.log('clear');
-        this.closeDialog(JSON.stringify(this.currentProject));
-    }
-    refreshInfo() {
         let selfrom = document.getElementById('selfrom');
-        if (selfrom) {
-            selfrom.value = this.startMeasure + 1;
-        }
         let selto = document.getElementById('selto');
-        if (selto) {
-            selto.value = this.endMeasure + 1;
-        }
-        let metreinput = document.getElementById('metreinput');
-        if (metreinput) {
-            metreinput.value = '' + this.metrecount + '/' + this.metrepart;
-        }
-        let bpm = document.getElementById('bpm');
-        if (bpm) {
-            bpm.value = this.tempo;
-        }
-    }
-    sendProjectToHost222() {
-        this.updateHostData(JSON.stringify(this.currentProject));
-    }
-    deleteBars2() {
-        console.log('deleteBars');
-        let count = this.endMeasure - this.startMeasure + 1;
-        if (count >= this.currentProject.timeline.length) {
-            count = this.currentProject.timeline.length - 1;
-        }
-        for (let ii = 0; ii < count; ii++) {
-            this.currentProject.timeline.splice(this.startMeasure, 1);
-            for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
-                let track = this.currentProject.tracks[nn];
-                track.measures.splice(this.startMeasure, 1);
-            }
-            for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
-                let percu = this.currentProject.percussions[nn];
-                percu.measures.splice(this.startMeasure, 1);
-            }
-            for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
-                let filter = this.currentProject.filters[nn];
-                filter.automation.splice(this.startMeasure, 1);
-            }
-            this.currentProject.comments.splice(this.startMeasure, 1);
-        }
-    }
-    insertEmptyBar(at, newTempo, metreCount, metrePart) {
-        this.currentProject.timeline.splice(this.endMeasure + 1, 0, { tempo: newTempo, metre: { count: metreCount, part: metrePart } });
+        let startMeasure = parseInt(selfrom.value) - 1;
+        let endMeasure = parseInt(selto.value) - 1;
+        let newDuration = MMUtil().set(this.currentProject.timeline[startMeasure].metre);
+        let noSolo = true;
         for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
-            let track = this.currentProject.tracks[nn];
-            track.measures.splice(at, 0, { chords: [] });
+            if (this.currentProject.tracks[nn].performer.state == 2) {
+                noSolo = false;
+                break;
+            }
         }
         for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
-            let percu = this.currentProject.percussions[nn];
-            percu.measures.splice(at, 0, { skips: [] });
-        }
-        for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
-            let filter = this.currentProject.filters[nn];
-            filter.automation.splice(at, 0, { changes: [] });
-        }
-        this.currentProject.comments.splice(at, 0, { points: [] });
-    }
-    addBars2() {
-        console.log('addBars', this.startMeasure, this.endMeasure, this.currentProject.timeline.length);
-        let count = this.endMeasure - this.startMeasure + 1;
-        for (let ii = 0; ii < count; ii++) {
-            this.insertEmptyBar(this.endMeasure + 1, this.currentProject.timeline[this.endMeasure].tempo, this.currentProject.timeline[this.endMeasure].metre.count, this.currentProject.timeline[this.endMeasure].metre.part);
-        }
-        console.log('new len', this.currentProject.timeline.length);
-    }
-    promptTempo() {
-        console.log('promptTempo');
-        let oldTempo = this.currentProject.timeline[this.startMeasure].tempo;
-        let newTempo = prompt('Tempo', '' + oldTempo);
-        if (newTempo) {
-            let bpm = parseInt(newTempo);
-            if (bpm > 39 && bpm < 300) {
-                let count = this.endMeasure - this.startMeasure + 1;
-                for (let ii = 0; ii < count; ii++) {
-                    this.currentProject.timeline[this.startMeasure + ii].tempo = bpm;
-                }
+            if (this.currentProject.percussions[nn].sampler.state == 2) {
+                noSolo = false;
+                break;
             }
         }
-    }
-    promptMetre() {
-        console.log('promptMetre');
-        console.log('promptTempo');
-        let oldMetre = this.currentProject.timeline[this.startMeasure].metre.count + '/' + this.currentProject.timeline[this.startMeasure].metre.part;
-        let newMetre = prompt('Metre', '' + oldMetre);
-        if (newMetre) {
-            let parts = newMetre.split('/');
-            let nCount = parseInt(parts[0]);
-            let nPart = parseInt(parts[1]);
-            if (nCount >= 1 && (nPart == 1 || nPart == 2 || nPart == 4 || nPart == 8)) {
-                let count = this.endMeasure - this.startMeasure + 1;
-                for (let ii = 0; ii < count; ii++) {
-                    this.currentProject.timeline[this.startMeasure + ii].metre.count = nCount;
-                    this.currentProject.timeline[this.startMeasure + ii].metre.part = nPart;
-                }
-                this.adjustContent();
-            }
-        }
-    }
-    shiftContent2() {
-        console.log('shiftContent');
-    }
-    adjustContent() {
-        for (let ii = 0; ii < this.currentProject.timeline.length; ii++) {
-            let barMetre = MMUtil().set(this.currentProject.timeline[ii].metre);
+        for (let ii = startMeasure; ii <= endMeasure; ii++) {
             for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
-                let trackBar = this.currentProject.tracks[nn].measures[ii];
-                for (let kk = 0; kk < trackBar.chords.length; kk++) {
-                    let chord = trackBar.chords[kk];
-                    if (barMetre.less(chord.skip)) {
-                        chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
-                        trackBar.chords.splice(kk, 1);
-                        kk--;
-                        if (ii + 1 >= this.currentProject.timeline.length) {
-                            this.insertEmptyBar(ii + 1, this.currentProject.timeline[ii].tempo, this.currentProject.timeline[ii].metre.count, this.currentProject.timeline[ii].metre.part);
-                        }
-                        this.currentProject.tracks[nn].measures[ii + 1].chords.push(chord);
-                    }
+                if ((this.currentProject.tracks[nn].performer.state == 0 && noSolo) || this.currentProject.tracks[nn].performer.state == 2) {
+                    let trackBar = this.currentProject.tracks[nn].measures[ii];
+                    trackBar.chords = [];
                 }
             }
             for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
-                let percuBar = this.currentProject.percussions[nn].measures[ii];
-                for (let kk = 0; kk < percuBar.skips.length; kk++) {
-                    let skip = percuBar.skips[kk];
-                    if (barMetre.less(skip)) {
-                        let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
-                        percuBar.skips.splice(kk, 1);
-                        kk--;
-                        if (ii + 1 >= this.currentProject.timeline.length) {
-                            this.insertEmptyBar(ii + 1, this.currentProject.timeline[ii].tempo, this.currentProject.timeline[ii].metre.count, this.currentProject.timeline[ii].metre.part);
-                        }
-                        this.currentProject.percussions[nn].measures[ii + 1].skips.push(newSkip);
-                    }
+                if ((this.currentProject.percussions[nn].sampler.state == 0 && noSolo) || this.currentProject.percussions[nn].sampler.state == 2) {
+                    let percuBar = this.currentProject.percussions[nn].measures[ii];
+                    percuBar.skips = [];
                 }
             }
             for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
-                let autoBar = this.currentProject.filters[nn].automation[ii];
-                for (let kk = 0; kk < autoBar.changes.length; kk++) {
-                    let change = autoBar.changes[kk];
-                    if (barMetre.less(change.skip)) {
-                        change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
-                        autoBar.changes.splice(kk, 1);
-                        kk--;
-                        if (ii + 1 >= this.currentProject.timeline.length) {
-                            this.insertEmptyBar(ii + 1, this.currentProject.timeline[ii].tempo, this.currentProject.timeline[ii].metre.count, this.currentProject.timeline[ii].metre.part);
-                        }
-                        this.currentProject.filters[nn].automation[ii + 1].changes.push(change);
-                    }
+                if (this.currentProject.filters[nn].state == 0) {
+                    let autoBar = this.currentProject.filters[nn].automation[ii];
+                    autoBar.changes = [];
                 }
             }
-            for (let nn = 0; nn < this.currentProject.comments.length; nn++) {
-                let textBar = this.currentProject.comments[nn];
-                for (let kk = 0; kk < textBar.points.length; kk++) {
-                    let point = textBar.points[kk];
-                    if (barMetre.less(point.skip)) {
-                        let newSkip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
-                        textBar.points.splice(kk, 1);
-                        kk--;
-                        if (ii + 1 >= this.currentProject.timeline.length) {
-                            this.insertEmptyBar(ii + 1, this.currentProject.timeline[ii].tempo, this.currentProject.timeline[ii].metre.count, this.currentProject.timeline[ii].metre.part);
-                        }
-                        this.currentProject.comments[nn + 1].points.push(point);
-                    }
-                }
-            }
+            let txtBar = this.currentProject.comments[ii];
+            txtBar.points = [];
+            newDuration = newDuration.plus(this.currentProject.timeline[ii].metre);
         }
+        this.closeDialog(this.currentProject);
     }
 }
 //# sourceMappingURL=miedit.js.map

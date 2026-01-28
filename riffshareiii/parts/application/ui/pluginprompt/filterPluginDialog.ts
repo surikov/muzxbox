@@ -5,7 +5,7 @@ class FilterPluginDialog {
 	dialogID: string = '?';
 	waitFilterPluginInit: boolean = false;
 	constructor() {
-		window.addEventListener('message', this.receiveMessageFromPlugin.bind(this), false);
+		window.addEventListener('message', this.receiveMessageFromFilterPlugin.bind(this), false);
 	}
 	promptFilterTitle() {
 		let newTitle = prompt(this.filter.title, this.filter.title);
@@ -139,7 +139,7 @@ class FilterPluginDialog {
 		});
 		globalCommandDispatcher.reStartPlayIfPlay();
 	}
-	receiveMessageFromPlugin(event) {
+	receiveMessageFromFilterPlugin(event) {
 		//console.log('filter receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
