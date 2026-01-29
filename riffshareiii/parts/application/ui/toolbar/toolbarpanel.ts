@@ -3,7 +3,7 @@ class UIToolbar {
 	toolBarGroup: SVGElement;
 	toolBarLayer: TileLayerDefinition;
 
-	openRightMenuButton: ToolBarButton;
+	//openRightMenuButton: ToolBarButton;
 	undoButton: ToolBarButton;
 	redoButton: ToolBarButton;
 	playStopButton: ToolBarButton;
@@ -14,7 +14,7 @@ class UIToolbar {
 		//
 	}
 	createToolbar(): TileLayerDefinition[] {
-		this.openRightMenuButton = new ToolBarButton([/*icon_moveright,*/icon_ver_menu], 0, 2, (nn: number) => {
+		/*this.openRightMenuButton = new ToolBarButton([/icon_moveright,/icon_ver_menu], 0, 2, (nn: number) => {
 			globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
 
 			if (globalCommandDispatcher.cfg().data.list) {
@@ -22,14 +22,14 @@ class UIToolbar {
 			} else {
 				globalCommandDispatcher.showRightMenu();
 			}
-		});
-		this.redoButton = new ToolBarButton([icon_redo], 0, 1, (nn: number) => {
+		});*/
+		this.redoButton = new ToolBarButton([icon_redo], 0, 0.5, (nn: number) => {
 			globalCommandDispatcher.exe.redo(1);
 		});
-		this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn: number) => {
+		this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn: number) => {
 			globalCommandDispatcher.exe.undo(1);
 		});
-		this.playStopButton = new ToolBarButton([icon_pause,icon_play], 0, -1, (nn: number) => {
+		this.playStopButton = new ToolBarButton([icon_pause,icon_play], 0, 1.5, (nn: number) => {
 			//globalCommandDispatcher.toggleStartStop();
 			if (globalCommandDispatcher.player.playState().play) {
 				globalCommandDispatcher.stopPlay();
@@ -39,7 +39,7 @@ class UIToolbar {
 		});
 
 
-		this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn: number) => {
+		this.backHomeButton = new ToolBarButton([icon_home], 0, -1.5, (nn: number) => {
 			//location.href='midiru.php';
 			if (goHomeBackURL) {
 				window.location.replace(goHomeBackURL);
@@ -63,8 +63,9 @@ class UIToolbar {
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
-				this.openRightMenuButton.iconLabelButton.anchor
-				, this.undoButton.iconLabelButton.anchor
+				//this.openRightMenuButton.iconLabelButton.anchor
+				//, 
+				this.undoButton.iconLabelButton.anchor
 				, this.redoButton.iconLabelButton.anchor
 				, this.playStopButton.iconLabelButton.anchor
 				, this.backHomeButton.iconLabelButton.anchor
@@ -82,7 +83,7 @@ class UIToolbar {
 		this.toolBarAnchor.yy = 0;
 		this.toolBarAnchor.ww = viewWIdth;
 		this.toolBarAnchor.hh = viewHeight;
-		this.openRightMenuButton.resize(viewWIdth, viewHeight);
+		//this.openRightMenuButton.resize(viewWIdth, viewHeight);
 		this.undoButton.resize(viewWIdth, viewHeight);
 		this.redoButton.resize(viewWIdth, viewHeight);
 		this.playStopButton.resize(viewWIdth, viewHeight);

@@ -46,6 +46,8 @@ class IconLabelButton {
         this.label.y = top + 0.69;// * localeFontRatio;//*globalCommandDispatcher.tapSizeRatio;
         this.spot.x = left;
         this.spot.y = top;
+		this.spot.w = size;
+        this.spot.h = size;
     }
 }
 

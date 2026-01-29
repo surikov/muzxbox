@@ -2686,22 +2686,13 @@ class UIToolbar {
     constructor() {
     }
     createToolbar() {
-        this.openRightMenuButton = new ToolBarButton([icon_ver_menu], 0, 2, (nn) => {
-            globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
-            if (globalCommandDispatcher.cfg().data.list) {
-                globalCommandDispatcher.hideRightMenu();
-            }
-            else {
-                globalCommandDispatcher.showRightMenu();
-            }
-        });
-        this.redoButton = new ToolBarButton([icon_redo], 0, 1, (nn) => {
+        this.redoButton = new ToolBarButton([icon_redo], 0, 0.5, (nn) => {
             globalCommandDispatcher.exe.redo(1);
         });
-        this.undoButton = new ToolBarButton([icon_undo], 0, 0, (nn) => {
+        this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn) => {
             globalCommandDispatcher.exe.undo(1);
         });
-        this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, -1, (nn) => {
+        this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn) => {
             if (globalCommandDispatcher.player.playState().play) {
                 globalCommandDispatcher.stopPlay();
             }
@@ -2709,7 +2700,7 @@ class UIToolbar {
                 globalCommandDispatcher.setupAndStartPlay();
             }
         });
-        this.backHomeButton = new ToolBarButton([icon_home], 0, -2, (nn) => {
+        this.backHomeButton = new ToolBarButton([icon_home], 0, -1.5, (nn) => {
             if (goHomeBackURL) {
                 window.location.replace(goHomeBackURL);
             }
@@ -2720,7 +2711,6 @@ class UIToolbar {
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.openRightMenuButton.iconLabelButton.anchor,
                 this.undoButton.iconLabelButton.anchor,
                 this.redoButton.iconLabelButton.anchor,
                 this.playStopButton.iconLabelButton.anchor,
@@ -2739,7 +2729,6 @@ class UIToolbar {
         this.toolBarAnchor.yy = 0;
         this.toolBarAnchor.ww = viewWIdth;
         this.toolBarAnchor.hh = viewHeight;
-        this.openRightMenuButton.resize(viewWIdth, viewHeight);
         this.undoButton.resize(viewWIdth, viewHeight);
         this.redoButton.resize(viewWIdth, viewHeight);
         this.playStopButton.resize(viewWIdth, viewHeight);
@@ -2825,11 +2814,21 @@ class RightMenuPanel {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
+        this.menuToggleButton = new IconLabelButton([''], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
+            console.log('locick');
+            if (globalCommandDispatcher.cfg().data.list) {
+                globalCommandDispatcher.hideRightMenu();
+            }
+            else {
+                globalCommandDispatcher.showRightMenu();
+            }
+        });
         this.backgroundAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
+                this.menuToggleButton.anchor,
                 this.listingShadow,
                 this.backgroundRectangle
             ], id: 'rightMenuBackgroundAnchor'
@@ -3146,6 +3145,12 @@ class RightMenuPanel {
         this.contentAnchor.hh = viewHeight;
         this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
+        if (globalCommandDispatcher.cfg().data.list) {
+            this.menuToggleButton.resize(this.shiftX - 0.75, viewHeight / 2 - 1, 2);
+        }
+        else {
+            this.menuToggleButton.resize(this.shiftX - 1.75, viewHeight / 2 - 1, 2);
+        }
         this.rerenderMenuContent(null);
     }
 }
@@ -5924,6 +5929,8 @@ class IconLabelButton {
         this.label.y = top + 0.69;
         this.spot.x = left;
         this.spot.y = top;
+        this.spot.w = size;
+        this.spot.h = size;
     }
 }
 class UIAction {

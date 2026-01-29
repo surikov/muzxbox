@@ -5,6 +5,7 @@ class RightMenuPanel {
 	//menuPlayButton: IconLabelButton;
 
 	menuUpButton: IconLabelButton;
+	menuToggleButton: IconLabelButton;
 	//showState: boolean = true;
 	lastWidth: number = 0;
 	lastHeight: number = 0;
@@ -134,6 +135,15 @@ class RightMenuPanel {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
+		this.menuToggleButton = new IconLabelButton([''], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+			console.log('locick');
+			if (globalCommandDispatcher.cfg().data.list) {
+				globalCommandDispatcher.hideRightMenu();
+			} else {
+				globalCommandDispatcher.showRightMenu();
+			}
+		});
+
 
 		//this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
 
@@ -147,6 +157,8 @@ class RightMenuPanel {
 			, content: [
 				//this.layerCurrentTitle
 				//, 
+ this.menuToggleButton.anchor
+				,
 				this.listingShadow
 				, this.backgroundRectangle
 
@@ -183,6 +195,7 @@ class RightMenuPanel {
 			, content: [
 				//this.menuCloseButton.anchor, 
 				this.menuUpButton.anchor
+				//, this.menuToggleButton.anchor
 				//, this.menuRedoButton.anchor
 				//, this.menuUndoButton.anchor
 				//, this.menuPlayButton.anchor
@@ -842,8 +855,11 @@ class RightMenuPanel {
 		//this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
 
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
-
-
+		if (globalCommandDispatcher.cfg().data.list) {
+			this.menuToggleButton.resize(this.shiftX - 0.75, viewHeight / 2 - 1, 2);
+		} else {
+			this.menuToggleButton.resize(this.shiftX - 1.75, viewHeight / 2 - 1, 2);
+		}
 		this.rerenderMenuContent(null);
 
 

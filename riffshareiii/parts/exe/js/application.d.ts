@@ -325,7 +325,6 @@ declare class UIToolbar {
     toolBarAnchor: TileAnchor;
     toolBarGroup: SVGElement;
     toolBarLayer: TileLayerDefinition;
-    openRightMenuButton: ToolBarButton;
     undoButton: ToolBarButton;
     redoButton: ToolBarButton;
     playStopButton: ToolBarButton;
@@ -343,6 +342,7 @@ declare class ToolBarButton {
 }
 declare class RightMenuPanel {
     menuUpButton: IconLabelButton;
+    menuToggleButton: IconLabelButton;
     lastWidth: number;
     lastHeight: number;
     backgroundRectangle: TileRectangle;
