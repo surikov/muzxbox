@@ -91,6 +91,17 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 	}
 	split() {
 		console.log('split');
+		let selfrom = document.getElementById('selfrom');
+		let startMeasure: number = parseInt((selfrom as any).value) - 1;
+		let txt = (document.getElementById('splitinput') as any).value;
+		let newpart = parseInt(txt.split('/')[1]);
+		let newcount = parseInt(txt.split('/')[0]);
+		let leftMetre = MMUtil().set({ count: newcount, part: newpart });
+		let rightMetre = MMUtil().set(this.currentProject.timeline[startMeasure].metre).minus(leftMetre);
+		this.insertEmptyBar(startMeasure, startMeasure + 1);
+		this.currentProject.timeline[startMeasure].metre = leftMetre.metre();
+		this.currentProject.timeline[startMeasure + 1].metre = rightMetre.metre();
+		this.adjustContentByMeter(this.currentProject);
 		this.closeDialog(this.currentProject);
 	}
 	setTempo() {
@@ -145,8 +156,45 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 		this.closeDialog(this.currentProject);
 	}
 	shiftContent() {
-		console.log('shiftContent');
-		this.closeDialog(JSON.stringify(this.currentProject));
+		this.adjustContentByMeter(this.currentProject);
+		let selfrom = document.getElementById('selfrom');
+		let selto = document.getElementById('selto');
+		let startMeasure: number = parseInt((selfrom as any).value) - 1;
+		let endMeasure: number = parseInt((selto as any).value) - 1;
+		let shiftDuration = MMUtil().set(this.currentProject.timeline[startMeasure].metre);
+
+		for (let ii = startMeasure + 1; ii <= endMeasure; ii++) {
+			shiftDuration = shiftDuration.plus(this.currentProject.timeline[ii].metre);
+		}
+		console.log('shiftContent', startMeasure, endMeasure, shiftDuration);
+		for (let ii = startMeasure; ii < this.currentProject.timeline.length; ii++) {
+			for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
+				let trackBar = this.currentProject.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					//console.log(ii, 'from', JSON.stringify(trackBar.chords[kk].skip));
+					trackBar.chords[kk].skip = shiftDuration.plus(trackBar.chords[kk].skip).metre();
+					//console.log('to', JSON.stringify(trackBar.chords[kk].skip));
+				}
+			}
+			for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
+				let percuBar = this.currentProject.percussions[nn].measures[ii];
+				for (let kk = 0; kk < percuBar.skips.length; kk++) {
+					percuBar.skips[kk] = shiftDuration.plus(percuBar.skips[kk]).metre();
+				}
+			}
+			for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
+				let autoBar = this.currentProject.filters[nn].automation[ii];
+				for (let kk = 0; kk < autoBar.changes.length; kk++) {
+					autoBar.changes[kk].skip = shiftDuration.plus(autoBar.changes[kk].skip).metre();
+				}
+			}
+			let txtBar = this.currentProject.comments[ii];
+			for (let kk = 0; kk < txtBar.points.length; kk++) {
+				txtBar.points[kk].skip = shiftDuration.plus(txtBar.points[kk].skip).metre();
+			}
+		}
+		this.adjustContentByMeter(this.currentProject);
+		this.closeDialog(this.currentProject);
 	}
 	mergeBars() {
 		let selfrom = document.getElementById('selfrom');
@@ -196,9 +244,39 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 		this.closeDialog(this.currentProject);
 
 	}
+	insertEmptyBar(from: number, to: number) {
+		let newTempo = this.currentProject.timeline[from].tempo
+		let metreCount = this.currentProject.timeline[from].metre.count
+		let metrePart = this.currentProject.timeline[from].metre.part
+		this.currentProject.timeline.splice(to, 0, {
+			tempo: newTempo
+			, metre: { count: metreCount, part: metrePart }
+		});
+		for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
+			let track = this.currentProject.tracks[nn];
+			track.measures.splice(to, 0, { chords: [] });
+		}
+		for (let nn = 0; nn < this.currentProject.percussions.length; nn++) {
+			let percu = this.currentProject.percussions[nn];
+			percu.measures.splice(to, 0, { skips: [] });
+		}
+		for (let nn = 0; nn < this.currentProject.filters.length; nn++) {
+			let filter = this.currentProject.filters[nn];
+			filter.automation.splice(to, 0, { changes: [] });
+		}
+		this.currentProject.comments.splice(to, 0, { points: [] });
+	}
 	addBars() {
-		console.log('addBars');
-		this.closeDialog(JSON.stringify(this.currentProject));
+		//console.log('addBars');
+		let selfrom = document.getElementById('selfrom');
+		let selto = document.getElementById('selto');
+		let startMeasure: number = parseInt((selfrom as any).value) - 1;
+		let endMeasure: number = parseInt((selto as any).value) - 1;
+		let len = endMeasure - startMeasure + 1;
+		for (let ii = startMeasure; ii <= endMeasure; ii++) {
+			this.insertEmptyBar(ii, ii + len);
+		}
+		this.closeDialog(this.currentProject);
 	}
 	clear() {
 		let selfrom = document.getElementById('selfrom');
@@ -246,7 +324,78 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 		}
 		this.closeDialog(this.currentProject);
 	}
-
+	adjustContentByMeter(currentProject: Zvoog_Project) {
+		for (let ii = 0; ii < currentProject.timeline.length; ii++) {
+			let barMetre = MMUtil().set(currentProject.timeline[ii].metre);
+			for (let nn = 0; nn < currentProject.tracks.length; nn++) {
+				if (!(currentProject.tracks[nn].measures[ii])) currentProject.tracks[nn].measures[ii] = { chords: [] };
+				let trackBar = currentProject.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					let chord = trackBar.chords[kk];
+					if (barMetre.less(chord.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
+							trackBar.chords.splice(kk, 1);
+							kk--;
+							currentProject.tracks[nn].measures[ii + 1].chords.push(chord);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(chord.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.percussions.length; nn++) {
+				if (!(currentProject.percussions[nn].measures[ii])) currentProject.percussions[nn].measures[ii] = { skips: [] };
+				let percuBar = currentProject.percussions[nn].measures[ii];
+				for (let kk = 0; kk < percuBar.skips.length; kk++) {
+					let skip = percuBar.skips[kk];
+					if (barMetre.less(skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
+							percuBar.skips.splice(kk, 1);
+							kk--;
+							currentProject.percussions[nn].measures[ii + 1].skips.push(newSkip);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.filters.length; nn++) {
+				if (!(currentProject.filters[nn].automation[ii])) currentProject.filters[nn].automation[ii] = { changes: [] };
+				let autoBar = currentProject.filters[nn].automation[ii];
+				for (let kk = 0; kk < autoBar.changes.length; kk++) {
+					let change = autoBar.changes[kk];
+					if (barMetre.less(change.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
+							autoBar.changes.splice(kk, 1);
+							kk--;
+							currentProject.filters[nn].automation[ii + 1].changes.push(change);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(change.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			if (!(currentProject.comments[ii])) currentProject.comments[ii] = { points: [] };
+			let textBar = currentProject.comments[ii];
+			for (let kk = 0; kk < textBar.points.length; kk++) {
+				let point = textBar.points[kk];
+				if (barMetre.less(point.skip)) {
+					if (ii + 1 < currentProject.timeline.length) {
+						point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
+						textBar.points.splice(kk, 1);
+						kk--;
+						console.log();
+						currentProject.comments[ii + 1].points.push(point);
+					} else {
+						currentProject.timeline[ii].metre = MMUtil().set(point.skip).plus({ count: 1, part: 8 }).metre();
+					}
+				}
+			}
+		}
+	}
 
 	/*init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);

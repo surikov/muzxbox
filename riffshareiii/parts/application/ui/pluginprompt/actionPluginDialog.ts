@@ -22,6 +22,7 @@ class ActionPluginDialog {
 	sendCurrentProjectToActionPlugin(screen: boolean) {
 		let pluginFrame = document.getElementById("pluginActionFrame") as any;
 		if (pluginFrame) {
+			//globalCommandDispatcher.adjustTimelineContent();
 			if (screen) {
 				globalCommandDispatcher.makeTileSVGsquareCanvas(500, (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => {
 					//canvas.toBlob((blobresult: Blob) => {

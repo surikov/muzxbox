@@ -217,24 +217,18 @@ declare class CommandDispatcher {
         line: string;
         click: string;
     };
-    ___mergeSelectedBars(): void;
     calculateRealTrackFarOrder(): number[];
-    ___dropSelectedBars(): void;
-    insertAfterSelectedBars(): void;
     promptTempoForSelectedBars(): void;
-    ___promptMeterForSelectedBars(): void;
     setPlayPositionFromSelectedPart(): void;
     rollTracksClick(left: number, top: number): void;
-    adjustTimeLineLength(): void;
-    adjustRemoveEmptyChords(): void;
-    appendBar(): void;
+    adjustTimelineEmptyEnd(project: Zvoog_Project): void;
+    adjustTimeLineLength(project: Zvoog_Project): void;
+    adjustRemoveEmptyChords(project: Zvoog_Project): void;
+    adjustAppendBar(project: Zvoog_Project): void;
     slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean;
     adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
-    adjustTracksChords(): void;
-    adjustSamplerSkips(): void;
-    adjustAutoPoints(): void;
-    adjustLyricsPoints(): void;
-    adjustTimelineContent(): void;
+    adjustContentByMeter(currentProject: Zvoog_Project): void;
+    adjustTimelineContent(project: Zvoog_Project): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 type GridTimeTemplate14 = {

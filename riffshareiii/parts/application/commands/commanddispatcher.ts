@@ -132,7 +132,7 @@ class CommandDispatcher {
 	registerWorkProject(data: Zvoog_Project) {
 		//console.log('registerWorkProject', data)
 		this._mixerDataMathUtility = new MixerDataMathUtility(data);
-		this.adjustTimelineContent();
+		//this.adjustTimelineContent();
 	}
 	registerUI(renderer: UIRenderer) {
 		this.renderer = renderer;
@@ -497,7 +497,7 @@ class CommandDispatcher {
 		//this.registerWorkProject(createNewEmptyProjectData());
 		globalCommandDispatcher.exe.commitProjectChanges([], () => {
 			this.registerWorkProject(createNewEmptyProjectData());
-			globalCommandDispatcher.adjustTimelineContent();
+			globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 		});
 		this.resetProject();
 	}
@@ -875,64 +875,7 @@ class CommandDispatcher {
 			, click: window.getComputedStyle(document.documentElement).getPropertyValue('--click-color')
 		};
 	}
-	___mergeSelectedBars() {
-		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
-		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
-		if (startMeasure > -1 && endMeasure >= startMeasure) {
-			globalCommandDispatcher.exe.commitProjectChanges([], () => {
-				globalCommandDispatcher.adjustTimelineContent();
-				let newDuration = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[startMeasure].metre);
-				for (let ii = startMeasure + 1; ii <= endMeasure; ii++) {
-					//console.log('check', ii, newDuration);
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-						let trackBar = globalCommandDispatcher.cfg().data.tracks[nn].measures[ii];
-						let trackPreBar = globalCommandDispatcher.cfg().data.tracks[nn].measures[ii - 1];
-						for (let kk = 0; kk < trackBar.chords.length; kk++) {
-							//console.log('setup chord', kk, newDuration, JSON.stringify(trackBar.chords[kk].skip));
-							trackBar.chords[kk].skip = newDuration.plus(trackBar.chords[kk].skip).metre();
-							trackPreBar.chords.push(trackBar.chords[kk]);
-							//console.log('result', JSON.stringify(trackBar.chords[kk].skip));
-						}
-						trackBar.chords = [];
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-						let percuBar = globalCommandDispatcher.cfg().data.percussions[nn].measures[ii];
-						let percuPreBar = globalCommandDispatcher.cfg().data.percussions[nn].measures[ii - 1];
-						for (let kk = 0; kk < percuBar.skips.length; kk++) {
-							percuBar.skips[kk] = newDuration.plus(percuBar.skips[kk]).metre();
-							percuPreBar.skips.push(percuBar.skips[kk]);
-						}
-						percuBar.skips = [];
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-						let autoBar = globalCommandDispatcher.cfg().data.filters[nn].automation[ii];
-						let autoPreBar = globalCommandDispatcher.cfg().data.filters[nn].automation[ii - 1];
-						for (let kk = 0; kk < autoBar.changes.length; kk++) {
-							autoBar.changes[kk].skip = newDuration.plus(autoBar.changes[kk].skip).metre();
-							autoPreBar.changes.push(autoBar.changes[kk]);
-						}
-						autoBar.changes = [];
-					}
-					let txtBar = globalCommandDispatcher.cfg().data.comments[ii];
-					let txtPreBar = globalCommandDispatcher.cfg().data.comments[ii - 1];
-					for (let kk = 0; kk < txtBar.points.length; kk++) {
-						txtBar.points[kk].skip = newDuration.plus(txtBar.points[kk].skip).metre();
-						txtPreBar.points.push(txtBar.points[kk]);
-					}
-					txtBar.points = [];
-					newDuration = newDuration.plus(globalCommandDispatcher.cfg().data.timeline[ii].metre);
-				}
-				//globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + 1, endMeasure - startMeasure);
-				globalCommandDispatcher.cfg().data.timeline[startMeasure].metre = newDuration.metre();
-				//console.log(startMeasure, globalCommandDispatcher.cfg().data.timeline[startMeasure].metre);
-				globalCommandDispatcher.adjustTimelineContent();
-				globalCommandDispatcher.cfg().data.selectedPart.endMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 
-			});
-			globalCommandDispatcher.resetProject();
-			//console.log(globalCommandDispatcher.cfg().data);
-		}
-	}
 	calculateRealTrackFarOrder(): number[] {
 		let realOrder: number[] = this.cfg().data.farorder.map((it) => it);
 		let trcnt = this.cfg().data.tracks.length;
@@ -944,129 +887,7 @@ class CommandDispatcher {
 		return realOrder.filter((it) => it >= 0 && it < trcnt);
 	}
 
-	___dropSelectedBars() {
-		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
-		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
-		let count = endMeasure - startMeasure + 1;
-		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
-			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
-		}
-		if (startMeasure > -1 && count > 0) {
-			console.log('start delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
-			globalCommandDispatcher.exe.commitProjectChanges([], () => {
-				globalCommandDispatcher.adjustTimelineContent();
-				for (let ii = 0; ii < count; ii++) {
-					globalCommandDispatcher.cfg().data.timeline.splice(startMeasure, 1);
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-						let track = globalCommandDispatcher.cfg().data.tracks[nn];
-						track.measures.splice(startMeasure, 1);
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-						let percu = globalCommandDispatcher.cfg().data.percussions[nn];
-						percu.measures.splice(startMeasure, 1);
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-						let filter = globalCommandDispatcher.cfg().data.filters[nn];
-						filter.automation.splice(startMeasure, 1);
-					}
-					globalCommandDispatcher.cfg().data.comments.splice(startMeasure, 1);
-				}
-				globalCommandDispatcher.adjustTimelineContent();
-				globalCommandDispatcher.cfg().data.selectedPart.startMeasure = -1;
-				globalCommandDispatcher.cfg().data.selectedPart.endMeasure = -1;
 
-			});
-			globalCommandDispatcher.resetProject();
-			console.log('end delete', startMeasure, endMeasure, globalCommandDispatcher.cfg().data.timeline.length);
-		}
-
-
-	}
-	/*
-		align16forSelection() {
-			console.log('align16forSelection');
-			let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
-			let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
-			let count = endMeasure - startMeasure + 1;
-			if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
-				count = globalCommandDispatcher.cfg().data.timeline.length - 1;
-			}
-			if (startMeasure > -1 && count > 0) {
-				globalCommandDispatcher.exe.commitProjectChanges([], () => {
-					globalCommandDispatcher.adjustTimelineContent();
-					for (let ii = 0; ii < count; ii++) {
-						for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-							let trackMeasure = globalCommandDispatcher.cfg().data.tracks[nn].measures[startMeasure + ii];
-							for (let ch = 0; ch < trackMeasure.chords.length; ch++) {
-								trackMeasure.chords[ch].skip = MMUtil().set(trackMeasure.chords[ch].skip).strip(16).metre();
-							}
-						}
-						for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-							let percuBar = globalCommandDispatcher.cfg().data.percussions[nn].measures[startMeasure + ii];
-							for (let ch = 0; ch < percuBar.skips.length; ch++) {
-								let adjusted = MMUtil().set(percuBar.skips[ch]).strip(16).metre();
-								percuBar.skips[ch].count = adjusted.count;
-								percuBar.skips[ch].part = adjusted.part;
-							}
-						}
-						for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-							let autoBar = globalCommandDispatcher.cfg().data.filters[nn].automation[startMeasure + ii];
-							for (let ch = 0; ch < autoBar.changes.length; ch++) {
-								let adjusted = MMUtil().set(autoBar.changes[ch].skip).strip(16).metre();
-								autoBar.changes[ch].skip.count = adjusted.count;
-								autoBar.changes[ch].skip.part = adjusted.part;
-							}
-						}
-						let txtBar = globalCommandDispatcher.cfg().data.comments[startMeasure + ii];
-						for (let ch = 0; ch < txtBar.points.length; ch++) {
-							let adjusted = MMUtil().set(txtBar.points[ch].skip).strip(16).metre();
-							//console.log(txtBar.points[ch].text,JSON.stringify(txtBar.points[ch].skip),JSON.stringify(adjusted));
-							txtBar.points[ch].skip.count = adjusted.count;
-							txtBar.points[ch].skip.part = adjusted.part;
-						}
-					}
-					globalCommandDispatcher.adjustTimelineContent();
-				});
-				globalCommandDispatcher.resetProject();
-			}
-		}*/
-	insertAfterSelectedBars() {
-		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
-		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
-		let count = endMeasure - startMeasure + 1;
-		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
-			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
-		}
-		if (startMeasure > -1 && count > 0) {
-			globalCommandDispatcher.exe.commitProjectChanges([], () => {
-				globalCommandDispatcher.adjustTimelineContent();
-				for (let ii = 0; ii < count; ii++) {
-					let fromBar = globalCommandDispatcher.cfg().data.timeline[startMeasure + ii];
-					globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + count + ii, 0, {
-						tempo: fromBar.tempo
-						, metre: { count: fromBar.metre.count, part: fromBar.metre.part }
-					});
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-						let track = globalCommandDispatcher.cfg().data.tracks[nn];
-						track.measures.splice(startMeasure + count + ii, 0, { chords: [] });
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-						let percu = globalCommandDispatcher.cfg().data.percussions[nn];
-						percu.measures.splice(startMeasure + count + ii, 0, { skips: [] });
-					}
-					for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-						let filter = globalCommandDispatcher.cfg().data.filters[nn];
-						filter.automation.splice(startMeasure + count + ii, 0, { changes: [] });
-					}
-					globalCommandDispatcher.cfg().data.comments.splice(startMeasure + count + ii, 0, { points: [] });
-				}
-				globalCommandDispatcher.adjustTimelineContent();
-				globalCommandDispatcher.cfg().data.selectedPart.endMeasure = globalCommandDispatcher.cfg().data.selectedPart.startMeasure + count * 2 - 1;
-
-			});
-			globalCommandDispatcher.resetProject();
-		}
-	}
 	promptTempoForSelectedBars() {
 		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
 		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
@@ -1081,12 +902,12 @@ class CommandDispatcher {
 				let newTempo = parseInt(txt);
 				if (newTempo > 20 && newTempo < 400) {
 					globalCommandDispatcher.exe.commitProjectChanges([], () => {
-						globalCommandDispatcher.adjustTimelineContent();
+						globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 						for (let ii = 0; ii < count; ii++) {
 							globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].tempo = newTempo;
 							//console.log(ii, globalCommandDispatcher.cfg().data.timeline[ii]);
 						}
-						globalCommandDispatcher.adjustTimelineContent();
+						globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 					});
 					globalCommandDispatcher.resetProject();
 					//console.log(globalCommandDispatcher.cfg().data);
@@ -1094,61 +915,7 @@ class CommandDispatcher {
 			}
 		}
 	}
-	___promptMeterForSelectedBars() {
-		let startMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.startMeasure;
-		let endMeasure: number = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
-		let count = endMeasure - startMeasure + 1;
-		if (count >= globalCommandDispatcher.cfg().data.timeline.length) {
-			count = globalCommandDispatcher.cfg().data.timeline.length - 1;
-		}
-		if (startMeasure > -1 && count > 0) {
-			let oldMeter = '' + globalCommandDispatcher.cfg().data.timeline[startMeasure].metre.count + '/' + globalCommandDispatcher.cfg().data.timeline[startMeasure].metre.part;
-			let txt = prompt('Metre', '' + oldMeter);
 
-			if (txt) {
-				let newpart = parseInt(txt.split('/')[1]);
-				let newcount = parseInt(txt.split('/')[0]);
-				if (newpart == 1 || newpart == 2 || newpart == 4 || newpart == 8 || newpart == 16 || newpart == 32) {
-					let newMeter = MMUtil().set({ count: newcount, part: newpart });
-					globalCommandDispatcher.exe.commitProjectChanges([], () => {
-						globalCommandDispatcher.adjustTimelineContent();
-						for (let ii = 0; ii < count; ii++) {
-							let bar = globalCommandDispatcher.cfg().data.timeline[startMeasure + ii];
-							//console.log(startMeasure + ii,bar.metre , newMeter);
-
-							if (newMeter.less(bar.metre)) {
-								globalCommandDispatcher.cfg().data.timeline.splice(startMeasure + ii + 1, 0
-									, {
-										tempo: bar.tempo
-										, metre: MMUtil().set(bar.metre).minus(newMeter).metre()
-									});
-								for (let nn = 0; nn < globalCommandDispatcher.cfg().data.tracks.length; nn++) {
-									let track = globalCommandDispatcher.cfg().data.tracks[nn];
-									track.measures.splice(startMeasure + ii + 1, 0, { chords: [] });
-								}
-								for (let nn = 0; nn < globalCommandDispatcher.cfg().data.percussions.length; nn++) {
-									let percu = globalCommandDispatcher.cfg().data.percussions[nn];
-									percu.measures.splice(startMeasure + ii + 1, 0, { skips: [] });
-								}
-								for (let nn = 0; nn < globalCommandDispatcher.cfg().data.filters.length; nn++) {
-									let filter = globalCommandDispatcher.cfg().data.filters[nn];
-									filter.automation.splice(startMeasure + ii + 1, 0, { changes: [] });
-								}
-								globalCommandDispatcher.cfg().data.comments.splice(startMeasure + ii + 1, 0, { points: [] });
-								ii++;
-								globalCommandDispatcher.cfg().data.selectedPart.endMeasure++;
-							}
-							//console.log(ii, globalCommandDispatcher.cfg().data.timeline[ii]);
-							bar.metre = newMeter.metre();
-						}
-						globalCommandDispatcher.adjustTimelineContent();
-					});
-					globalCommandDispatcher.resetProject();
-					//console.log(globalCommandDispatcher.cfg().data);
-				}
-			}
-		}
-	}
 	setPlayPositionFromSelectedPart() {
 		//console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
@@ -1228,60 +995,56 @@ class CommandDispatcher {
 			});
 		}
 	}
-	adjustTimeLineLength() {
+	adjustTimelineEmptyEnd(project: Zvoog_Project) {
+		if (project.timeline.length > 1) {
+			if (!(project.timeline[project.timeline.length - 1])) {
+				project.timeline.length = project.timeline.length - 1;
+			}
+		}
+	}
+	adjustTimeLineLength(project: Zvoog_Project) {
 		console.log('adjustTimeLineLength');
-		if (this.cfg().data.timeline.length > 1) {
-			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
-				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
-			}
-		}
-		if (this.cfg().data.timeline.length > 1) {
-			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
-				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
-			}
-		}
-		if (this.cfg().data.timeline.length > 1) {
-			if (!(this.cfg().data.timeline[this.cfg().data.timeline.length - 1])) {
-				this.cfg().data.timeline.length = this.cfg().data.timeline.length - 1;
-			}
-		}
-		for (let tt = 0; tt < this.cfg().data.timeline.length; tt++) {
-			for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-				let track = this.cfg().data.tracks[nn];
+		this.adjustTimelineEmptyEnd(project);
+		this.adjustTimelineEmptyEnd(project);
+		this.adjustTimelineEmptyEnd(project);
+
+		for (let tt = 0; tt < project.timeline.length; tt++) {
+			for (let nn = 0; nn < project.tracks.length; nn++) {
+				let track = project.tracks[nn];
 				if (!(track.measures[tt])) {
 					track.measures[tt] = { chords: [] };
 				}
 			}
-			for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
-				let percu = this.cfg().data.percussions[nn];
+			for (let nn = 0; nn < project.percussions.length; nn++) {
+				let percu = project.percussions[nn];
 				if (!(percu.measures[tt])) {
 					percu.measures[tt] = { skips: [] };
 				}
 			}
-			for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
-				let filter = this.cfg().data.filters[nn];
+			for (let nn = 0; nn < project.filters.length; nn++) {
+				let filter = project.filters[nn];
 				if (!(filter.automation[tt])) {
 					filter.automation[tt] = { changes: [] };
 				}
 			}
-			if (!(this.cfg().data.comments[tt])) {
-				this.cfg().data.comments[tt] = { points: [] };
+			if (!(project.comments[tt])) {
+				project.comments[tt] = { points: [] };
 			}
 		}
-		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-			this.cfg().data.tracks[nn].measures.length = this.cfg().data.timeline.length;
+		for (let nn = 0; nn < project.tracks.length; nn++) {
+			project.tracks[nn].measures.length = project.timeline.length;
 		}
-		for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
-			this.cfg().data.percussions[nn].measures.length = this.cfg().data.timeline.length;
+		for (let nn = 0; nn < project.percussions.length; nn++) {
+			project.percussions[nn].measures.length = project.timeline.length;
 		}
-		for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
-			this.cfg().data.filters[nn].automation.length = this.cfg().data.timeline.length;
+		for (let nn = 0; nn < project.filters.length; nn++) {
+			project.filters[nn].automation.length = project.timeline.length;
 		}
-		this.cfg().data.comments.length = this.cfg().data.timeline.length;
+		project.comments.length = project.timeline.length;
 	}
-	adjustRemoveEmptyChords() {
-		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-			let track = this.cfg().data.tracks[nn];
+	adjustRemoveEmptyChords(project: Zvoog_Project) {
+		for (let nn = 0; nn < project.tracks.length; nn++) {
+			let track = project.tracks[nn];
 			for (let mm = 0; mm < track.measures.length; mm++) {
 				let trackMeasure = track.measures[mm];
 				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
@@ -1297,15 +1060,15 @@ class CommandDispatcher {
 			}
 		}
 	}
-	appendBar() {
-		this.cfg().data.timeline.push({
-			tempo: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].tempo
+	adjustAppendBar(project: Zvoog_Project) {
+		project.timeline.push({
+			tempo: project.timeline[project.timeline.length - 1].tempo
 			, metre: {
-				count: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].metre.count
-				, part: this.cfg().data.timeline[this.cfg().data.timeline.length - 1].metre.part
+				count: project.timeline[project.timeline.length - 1].metre.count
+				, part: project.timeline[project.timeline.length - 1].metre.part
 			}
 		});
-		this.adjustTimeLineLength();
+		this.adjustTimeLineLength(project);
 	}
 	slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean {
 		if (a1.length == a2.length) {
@@ -1352,28 +1115,30 @@ class CommandDispatcher {
 		}
 		//if(this.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 	}
-	adjustTracksChords() {
-		//if(this.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
-		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-			for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-				let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
-				let trackBar = this.cfg().data.tracks[nn].measures[ii];
+	/*adjustTracksChords(project: Zvoog_Project) {
+		for (let nn = 0; nn < project.tracks.length; nn++) {
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				let barMetre = MMUtil().set(project.timeline[ii].metre);
+				let trackBar = project.tracks[nn].measures[ii];
 				for (let kk = 0; kk < trackBar.chords.length; kk++) {
 					let chord = trackBar.chords[kk];
 					if (barMetre.less(chord.skip)) {
-						if (ii >= this.cfg().data.timeline.length) {
+						if (ii >= project.timeline.length) {
 							//
 						}
 						chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy().metre();
-						this.cfg().data.tracks[nn].measures[ii + 1].chords.push(chord);
+						if (!(project.tracks[nn].measures[ii + 1].chords)) {
+							project.tracks[nn].measures[ii + 1].chords = [];
+						}
+						project.tracks[nn].measures[ii + 1].chords.push(chord);
 						trackBar.chords.splice(kk, 1);
 						kk--;
 					} else {
 						if (chord.skip.count < 0) {
 							if (ii > 0) {
-								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								let preMetre = MMUtil().set(project.timeline[ii - 1].metre);
 								chord.skip = preMetre.plus(chord.skip).simplyfy().metre();
-								this.cfg().data.tracks[nn].measures[ii - 1].chords.push(chord);
+								project.tracks[nn].measures[ii - 1].chords.push(chord);
 							}
 							trackBar.chords.splice(kk, 1);
 							kk--;
@@ -1382,37 +1147,35 @@ class CommandDispatcher {
 				}
 			}
 		}
-		//if (this.cfg().data.tracks[0].measures.length > 33) console.log('2', JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
-		for (let nn = 0; nn < this.cfg().data.tracks.length; nn++) {
-			for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-				let trackBar = this.cfg().data.tracks[nn].measures[ii];
+		for (let nn = 0; nn < project.tracks.length; nn++) {
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				let trackBar = project.tracks[nn].measures[ii];
 				this.adjustMergeChordByTime(trackBar);
 			}
 		}
-		//if (this.cfg().data.tracks[0].measures.length > 33) console.log('3', JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
-	}
-	adjustSamplerSkips() {
-		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
-			for (let nn = 0; nn < this.cfg().data.percussions.length; nn++) {
-				let percuBar = this.cfg().data.percussions[nn].measures[ii];
+	}*/
+	/*adjustSamplerSkips(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let barMetre = MMUtil().set(project.timeline[ii].metre);
+			for (let nn = 0; nn < project.percussions.length; nn++) {
+				let percuBar = project.percussions[nn].measures[ii];
 				for (let kk = 0; kk < percuBar.skips.length; kk++) {
 					if (barMetre.less(percuBar.skips[kk])) {
-						if (ii >= this.cfg().data.timeline.length) {
-							this.appendBar();
-							this.cfg().data.percussions[nn].measures.push({ skips: [] });
+						if (ii >= project.timeline.length) {
+							this.adjustAppendBar(project);
+							project.percussions[nn].measures.push({ skips: [] });
 						}
 						percuBar.skips[kk] = MMUtil().set(percuBar.skips[kk]).minus(barMetre).simplyfy();
-						this.cfg().data.percussions[nn].measures[ii + 1].skips.push(percuBar.skips[kk]);
+						project.percussions[nn].measures[ii + 1].skips.push(percuBar.skips[kk]);
 
 						percuBar.skips.splice(kk, 1);
 						kk--;
 					} else {
 						if (percuBar.skips[kk].count < 0) {
 							if (ii > 0) {
-								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								let preMetre = MMUtil().set(project.timeline[ii - 1].metre);
 								percuBar.skips[kk] = preMetre.plus(percuBar.skips[kk]).simplyfy();
-								this.cfg().data.percussions[nn].measures[ii - 1].skips.push(percuBar.skips[kk]);
+								project.percussions[nn].measures[ii - 1].skips.push(percuBar.skips[kk]);
 							}
 							percuBar.skips.splice(kk, 1);
 							kk--;
@@ -1421,28 +1184,28 @@ class CommandDispatcher {
 				}
 			}
 		}
-	}
-	adjustAutoPoints() {
-		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
-			for (let nn = 0; nn < this.cfg().data.filters.length; nn++) {
-				let autoBar = this.cfg().data.filters[nn].automation[ii];
+	}*/
+	/*adjustAutoPoints(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let barMetre = MMUtil().set(project.timeline[ii].metre);
+			for (let nn = 0; nn < project.filters.length; nn++) {
+				let autoBar = project.filters[nn].automation[ii];
 				for (let kk = 0; kk < autoBar.changes.length; kk++) {
 					if (barMetre.less(autoBar.changes[kk].skip)) {
-						if (ii >= this.cfg().data.timeline.length) {
-							this.appendBar();
-							this.cfg().data.filters[nn].automation.push({ changes: [] });
+						if (ii >= project.timeline.length) {
+							this.adjustAppendBar(project);
+							project.filters[nn].automation.push({ changes: [] });
 						}
 						autoBar.changes[kk].skip = MMUtil().set(autoBar.changes[kk].skip).minus(barMetre).simplyfy().metre();
-						this.cfg().data.percussions[nn].measures[ii + 1].skips.push(autoBar.changes[kk].skip);
+						project.percussions[nn].measures[ii + 1].skips.push(autoBar.changes[kk].skip);
 						autoBar.changes.splice(kk, 1);
 						kk--;
 					} else {
 						if (autoBar.changes[kk].skip.count < 0) {
 							if (ii > 0) {
-								let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+								let preMetre = MMUtil().set(project.timeline[ii - 1].metre);
 								autoBar.changes[kk].skip = preMetre.plus(autoBar.changes[kk].skip).simplyfy().metre();
-								this.cfg().data.percussions[nn].measures[ii - 1].skips.push(autoBar.changes[kk].skip);
+								project.percussions[nn].measures[ii - 1].skips.push(autoBar.changes[kk].skip);
 							}
 							autoBar.changes.splice(kk, 1);
 							kk--;
@@ -1451,28 +1214,28 @@ class CommandDispatcher {
 				}
 			}
 		}
-	}
-	adjustLyricsPoints() {
-		for (let ii = 0; ii < this.cfg().data.timeline.length; ii++) {
-			let barMetre = MMUtil().set(this.cfg().data.timeline[ii].metre);
-			let txtBar = this.cfg().data.comments[ii];
+	}*/
+	/*adjustLyricsPoints(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			let barMetre = MMUtil().set(project.timeline[ii].metre);
+			let txtBar = project.comments[ii];
 			for (let kk = 0; kk < txtBar.points.length; kk++) {
 				if (barMetre.less(txtBar.points[kk].skip)) {
-					if (ii >= this.cfg().data.timeline.length) {
-						this.appendBar();
-						this.cfg().data.comments.push({ points: [] });
+					if (ii >= project.timeline.length) {
+						this.adjustAppendBar(project);
+						project.comments.push({ points: [] });
 					}
 					txtBar.points[kk].skip = MMUtil().set(txtBar.points[kk].skip).minus(barMetre).simplyfy().metre();
-					this.cfg().data.comments[ii + 1].points.push(txtBar.points[kk]);
+					project.comments[ii + 1].points.push(txtBar.points[kk]);
 
 					txtBar.points.splice(kk, 1);
 					kk--;
 				} else {
 					if (txtBar.points[kk].skip.count < 0) {
 						if (ii > 0) {
-							let preMetre = MMUtil().set(this.cfg().data.timeline[ii - 1].metre);
+							let preMetre = MMUtil().set(project.timeline[ii - 1].metre);
 							txtBar.points[kk].skip = preMetre.plus(txtBar.points[kk].skip).simplyfy().metre();
-							this.cfg().data.comments[ii - 1].points.push(txtBar.points[kk]);
+							project.comments[ii - 1].points.push(txtBar.points[kk]);
 						}
 						txtBar.points.splice(kk, 1);
 						kk--;
@@ -1481,22 +1244,91 @@ class CommandDispatcher {
 			}
 
 		}
+	}*/
+	adjustContentByMeter(currentProject: Zvoog_Project) {
+		for (let ii = 0; ii < currentProject.timeline.length; ii++) {
+			let barMetre = MMUtil().set(currentProject.timeline[ii].metre);
+			for (let nn = 0; nn < currentProject.tracks.length; nn++) {
+				if (!(currentProject.tracks[nn].measures[ii])) currentProject.tracks[nn].measures[ii] = { chords: [] };
+				let trackBar = currentProject.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					let chord = trackBar.chords[kk];
+					if (barMetre.less(chord.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
+							trackBar.chords.splice(kk, 1);
+							kk--;
+							currentProject.tracks[nn].measures[ii + 1].chords.push(chord);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(chord.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.percussions.length; nn++) {
+				if (!(currentProject.percussions[nn].measures[ii])) currentProject.percussions[nn].measures[ii] = { skips: [] };
+				let percuBar = currentProject.percussions[nn].measures[ii];
+				for (let kk = 0; kk < percuBar.skips.length; kk++) {
+					let skip = percuBar.skips[kk];
+					if (barMetre.less(skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
+							percuBar.skips.splice(kk, 1);
+							kk--;
+							currentProject.percussions[nn].measures[ii + 1].skips.push(newSkip);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.filters.length; nn++) {
+				if (!(currentProject.filters[nn].automation[ii])) currentProject.filters[nn].automation[ii] = { changes: [] };
+				let autoBar = currentProject.filters[nn].automation[ii];
+				for (let kk = 0; kk < autoBar.changes.length; kk++) {
+					let change = autoBar.changes[kk];
+					if (barMetre.less(change.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
+							autoBar.changes.splice(kk, 1);
+							kk--;
+							currentProject.filters[nn].automation[ii + 1].changes.push(change);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(change.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			if (!(currentProject.comments[ii])) currentProject.comments[ii] = { points: [] };
+			let textBar = currentProject.comments[ii];
+			for (let kk = 0; kk < textBar.points.length; kk++) {
+				let point = textBar.points[kk];
+				if (barMetre.less(point.skip)) {
+					if (ii + 1 < currentProject.timeline.length) {
+						point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
+						textBar.points.splice(kk, 1);
+						kk--;
+						console.log();
+						currentProject.comments[ii + 1].points.push(point);
+					} else {
+						currentProject.timeline[ii].metre = MMUtil().set(point.skip).plus({ count: 1, part: 8 }).metre();
+					}
+				}
+			}
+		}
 	}
-	adjustTimelineContent() {
+	adjustTimelineContent(project: Zvoog_Project) {
 		console.log('adjustTimelineContent');
-		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
-		this.adjustTimeLineLength();
-		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
+		this.adjustTimeLineLength(project);
+		this.adjustContentByMeter(project);
 
-		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('3',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
-		this.adjustTracksChords();
-		this.adjustRemoveEmptyChords();
-		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('4',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
-		this.adjustSamplerSkips();
-		this.adjustAutoPoints();
-		this.adjustLyricsPoints();
-		this.adjustTimeLineLength();
-		//if(globalCommandDispatcher.cfg().data.tracks[0].measures.length>33) console.log('=',JSON.stringify(globalCommandDispatcher.cfg().data.tracks[0].measures[33].chords[0]));
+		//this.adjustTracksChords(project);
+		this.adjustRemoveEmptyChords(project);
+		//this.adjustSamplerSkips(project);
+		//this.adjustAutoPoints(project);
+		//this.adjustLyricsPoints(project);
+
+		this.adjustTimeLineLength(project);
 	}
 }
 let globalCommandDispatcher = new CommandDispatcher();

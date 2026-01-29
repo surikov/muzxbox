@@ -318,6 +318,8 @@ declare class BarTimeEdit extends MZXBX_Plugin_UI {
     deleteBars(): void;
     shiftContent(): void;
     mergeBars(): void;
+    insertEmptyBar(from: number, to: number): void;
     addBars(): void;
     clear(): void;
+    adjustContentByMeter(currentProject: Zvoog_Project): void;
 }

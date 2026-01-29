@@ -298,7 +298,8 @@ function fillPluginsLists() {
 										, measures: []
 										, title: MZXBX_currentPlugins()[ii].label
 									});
-									globalCommandDispatcher.adjustTimelineContent();
+									//globalCommandDispatcher.adjustTimelineContent();
+									globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 								});
 							} else {
 								globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
@@ -359,7 +360,8 @@ function fillPluginsLists() {
 											, measures: []
 											, title: MZXBX_currentPlugins()[ii].label
 										});
-										globalCommandDispatcher.adjustTimelineContent();
+										//globalCommandDispatcher.adjustTimelineContent();
+										globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 									});
 								} else {
 									globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
@@ -409,8 +411,9 @@ function fillPluginsLists() {
 												, state: 0
 												, title: MZXBX_currentPlugins()[ii].label
 											});
+											globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 										});
-										globalCommandDispatcher.adjustTimelineContent();
+										//globalCommandDispatcher.adjustTimelineContent();
 									} else {
 										globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
 									}
