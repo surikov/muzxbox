@@ -3490,64 +3490,85 @@ let menuPointSettings = {
 function fillClipboardList() {
     menuPointClipboard.children = [copyToClipboard];
     if (globalCommandDispatcher.clipboard) {
+        let noSolo = true;
         for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
             let track = globalCommandDispatcher.clipboard.tracks[ii];
-            let empty = true;
-            for (let kk = 0; kk < track.measures.length; kk++) {
-                if (track.measures[kk].chords.length > 0) {
-                    empty = false;
-                    break;
-                }
-            }
-            if (!empty) {
-                menuPointClipboard.children.push({
-                    text: track.title,
-                    noLocalization: true,
-                    onDrag: () => {
-                        console.log('onDrag', track.title);
-                    },
-                    itemKind: kindDraggableCircle
-                });
+            if (track.performer.state == 2) {
+                noSolo = false;
+                break;
             }
         }
         for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
             let percussion = globalCommandDispatcher.clipboard.percussions[ii];
-            let empty = true;
-            for (let kk = 0; kk < percussion.measures.length; kk++) {
-                if (percussion.measures[kk].skips.length > 0) {
-                    empty = false;
-                    break;
+            if (percussion.sampler.state == 2) {
+                noSolo = false;
+                break;
+            }
+        }
+        for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
+            let track = globalCommandDispatcher.clipboard.tracks[ii];
+            if ((track.performer.state == 0 && noSolo) || track.performer.state == 2) {
+                let empty = true;
+                for (let kk = 0; kk < track.measures.length; kk++) {
+                    if (track.measures[kk].chords.length > 0) {
+                        empty = false;
+                        break;
+                    }
+                }
+                if (!empty) {
+                    menuPointClipboard.children.push({
+                        text: track.title,
+                        noLocalization: true,
+                        onDrag: () => {
+                            console.log('onDrag', track.title);
+                        },
+                        itemKind: kindDraggableSquare
+                    });
                 }
             }
-            if (!empty) {
-                menuPointClipboard.children.push({
-                    text: percussion.title,
-                    noLocalization: true,
-                    onDrag: () => {
-                        console.log('onDrag', percussion.title);
-                    },
-                    itemKind: kindDraggableTriangle
-                });
+        }
+        for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
+            let percussion = globalCommandDispatcher.clipboard.percussions[ii];
+            if ((percussion.sampler.state == 0 && noSolo) || percussion.sampler.state == 2) {
+                let empty = true;
+                for (let kk = 0; kk < percussion.measures.length; kk++) {
+                    if (percussion.measures[kk].skips.length > 0) {
+                        empty = false;
+                        break;
+                    }
+                }
+                if (!empty) {
+                    menuPointClipboard.children.push({
+                        text: percussion.title,
+                        noLocalization: true,
+                        onDrag: () => {
+                            console.log('onDrag', percussion.title);
+                        },
+                        itemKind: kindDraggableTriangle
+                    });
+                }
             }
         }
         for (let ii = 0; ii < globalCommandDispatcher.clipboard.filters.length; ii++) {
             let filter = globalCommandDispatcher.clipboard.filters[ii];
-            let empty = true;
-            for (let kk = 0; kk < filter.automation.length; kk++) {
-                if (filter.automation[kk].changes.length > 0) {
-                    empty = false;
-                    break;
+            if (filter.state == 0) {
+                let empty = true;
+                for (let kk = 0; kk < filter.automation.length; kk++) {
+                    if (filter.automation[kk].changes.length > 0) {
+                        empty = false;
+                        break;
+                    }
                 }
-            }
-            if (!empty) {
-                menuPointClipboard.children.push({
-                    text: filter.title,
-                    noLocalization: true,
-                    onDrag: () => {
-                        console.log('onDrag', filter.title);
-                    },
-                    itemKind: kindDraggableCircle
-                });
+                if (!empty) {
+                    menuPointClipboard.children.push({
+                        text: filter.title,
+                        noLocalization: true,
+                        onDrag: () => {
+                            console.log('onDrag', filter.title);
+                        },
+                        itemKind: kindDraggableCircle
+                    });
+                }
             }
         }
     }
