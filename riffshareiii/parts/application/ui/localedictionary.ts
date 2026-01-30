@@ -40,6 +40,7 @@ let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 //let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
 
 let localMenuNewPlugin = 'localMenuNewPlugin';
+let localMenuClipboard = 'localMenuClipboard';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
 	{

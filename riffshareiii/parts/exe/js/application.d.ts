@@ -156,6 +156,7 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
+    clipboard: Zvoog_Project | null;
     playPosition: number;
     restartOnInitError: boolean;
     playCallback: (start: number, position: number, end: number) => void;
@@ -178,6 +179,7 @@ declare class CommandDispatcher {
     setVisibleTimeMark(): void;
     setHiddenTimeMark(): void;
     reDrawPlayPosition(): void;
+    copySelectionToClipboard(): void;
     initAudioFromUI(): void;
     registerWorkProject(data: Zvoog_Project): void;
     registerUI(renderer: UIRenderer): void;
@@ -196,6 +198,7 @@ declare class CommandDispatcher {
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
     changeTapSize(ratio: number): void;
     newEmptyProject(): void;
+    tryFullScreen(): void;
     resetProject(): void;
     findPluginRegistrationByKind(kind: String): null | MZXBX_PluginRegistrationInformation;
     timeSelectChange(idx: number): void;
@@ -288,6 +291,7 @@ declare let localMenuInsTracksFolder: string;
 declare let localMenuDrumTracksFolder: string;
 declare let localMenuFxTracksFolder: string;
 declare let localMenuNewPlugin: string;
+declare let localMenuClipboard: string;
 declare let localeDictionary: {
     id: string;
     data: {
@@ -428,8 +432,11 @@ type MenuInfo = {
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
+declare let copyToClipboard: MenuInfo;
+declare let menuPointClipboard: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
+declare function fillClipboardList(): void;
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {

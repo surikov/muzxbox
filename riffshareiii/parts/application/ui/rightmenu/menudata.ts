@@ -73,6 +73,23 @@ let menuPointSamplers: MenuInfo = {
 		//console.log('samplers');
 	}
 };*/
+let copyToClipboard: MenuInfo = {
+	text: 'copy vis', onClick: () => {
+		globalCommandDispatcher.copySelectionToClipboard()
+	}, itemKind: kindAction
+};
+let menuPointClipboard: MenuInfo = {
+	text: localMenuClipboard
+	, onFolderCloseOpen: () => {
+		if (menuPointClipboard.itemKind == kindClosedFolder) {
+			globalCommandDispatcher.cfg().data.menuClipboard = true;
+		} else {
+			globalCommandDispatcher.cfg().data.menuClipboard = false;
+		}
+	}
+	, itemKind: kindClosedFolder
+	, children: [copyToClipboard]
+};
 let menuPointAddPlugin: MenuInfo = {
 	text: localMenuNewPlugin
 	, onFolderCloseOpen: () => {
@@ -239,6 +256,72 @@ let menuPlayStop: MenuInfo = {
 		menuItemsData = null;
 	}
 };*/
+function fillClipboardList() {
+	//console.log('fillClipboardList', globalCommandDispatcher.clipboard);
+	menuPointClipboard.children = [copyToClipboard];
+	if (globalCommandDispatcher.clipboard) {
+		for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
+			let track = globalCommandDispatcher.clipboard.tracks[ii];
+			let empty = true;
+			for (let kk = 0; kk < track.measures.length; kk++) {
+				if (track.measures[kk].chords.length > 0) {
+					empty = false;
+					break;
+				}
+			}
+			if (!empty) {
+				menuPointClipboard.children.push({
+					text: track.title
+					, noLocalization: true
+					, onDrag: () => {
+						console.log('onDrag', track.title);
+					}
+					, itemKind: kindDraggableCircle
+				});
+			}
+		}
+		for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
+			let percussion = globalCommandDispatcher.clipboard.percussions[ii];
+			let empty = true;
+			for (let kk = 0; kk < percussion.measures.length; kk++) {
+				if (percussion.measures[kk].skips.length > 0) {
+					empty = false;
+					break;
+				}
+			}
+			if (!empty) {
+				menuPointClipboard.children.push({
+					text: percussion.title
+					, noLocalization: true
+					, onDrag: () => {
+						console.log('onDrag', percussion.title);
+					}
+					, itemKind: kindDraggableTriangle
+				});
+			}
+		}
+		for (let ii = 0; ii < globalCommandDispatcher.clipboard.filters.length; ii++) {
+			let filter = globalCommandDispatcher.clipboard.filters[ii];
+			let empty = true;
+			for (let kk = 0; kk < filter.automation.length; kk++) {
+				if (filter.automation[kk].changes.length > 0) {
+					empty = false;
+					break;
+				}
+			}
+			if (!empty) {
+				menuPointClipboard.children.push({
+					text: filter.title
+					, noLocalization: true
+					, onDrag: () => {
+						console.log('onDrag', filter.title);
+					}
+					, itemKind: kindDraggableCircle
+				});
+			}
+		}
+	}
+}
 function fillPluginsLists() {
 	//console.log('fillPluginsLists');
 	//menuPointFilters.children = [];
@@ -246,6 +329,7 @@ function fillPluginsLists() {
 	//menuPointSamplers.children = [];
 	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
+
 	/*menuPointStore.children = [];
 	menuPointStore.children.push({
 		text: 'fragment 1'
@@ -259,6 +343,26 @@ function fillPluginsLists() {
 		, url: 'url main 1'
 		, itemKind: kindPreview
 	});*/
+
+	/*
+		menuPointClipboard.children.push({
+			text: 'test1'
+			, onDrag: () => {
+				console.log('test1 onDrag');
+			}
+			, itemKind: kindDraggableCircle
+		});
+		menuPointClipboard.children.push({
+			text: 'test2', onDrag: () => {
+				console.log('test2');
+			}, itemKind: kindDraggableSquare
+		});
+		menuPointClipboard.children.push({
+			text: 'test3', onDrag: () => {
+				console.log('test3');
+			}, itemKind: kindDraggableTriangle
+		});
+		*/
 	for (let ii = 0; ii < MZXBX_currentPlugins().length; ii++) {
 		let label: string = MZXBX_currentPlugins()[ii].label;
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
@@ -456,10 +560,12 @@ function composeBaseMenu(): MenuInfo[] {
 			menuPlayStop.text = localMenuPause;
 		}
 	}*/
+	fillClipboardList();
 	if (menuItemsData) {
 		return menuItemsData;
 	} else {
 		fillPluginsLists();
+
 		menuItemsData = [
 			//menuPlayStop
 			//menuPointInsTracks
@@ -467,13 +573,19 @@ function composeBaseMenu(): MenuInfo[] {
 			//, menuPointFxTracks
 			//, 
 			{
-			text: localMenuNewEmptyProject, onClick: () => {
-				globalCommandDispatcher.newEmptyProject();
-			}, itemKind: kindAction
-		},
+				text: 'fullscrn', onClick: () => {
+					globalCommandDispatcher.tryFullScreen();
+				}, itemKind: kindAction
+			},
+			{
+				text: localMenuNewEmptyProject, onClick: () => {
+					globalCommandDispatcher.newEmptyProject();
+				}, itemKind: kindAction
+			},
 			menuPointActions
 			, menuPointAddPlugin
 			//, menuPointStore
+			, menuPointClipboard
 			, menuPointSettings
 			/*, {
 				text: localMenuNewPlugin, children: [

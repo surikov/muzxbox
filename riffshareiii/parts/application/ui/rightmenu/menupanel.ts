@@ -294,6 +294,11 @@ class RightMenuPanel {
 			} else {
 				menuPointSettings.itemKind = kindClosedFolder;
 			}
+			if (globalCommandDispatcher.cfg().data.menuClipboard) {
+				menuPointClipboard.itemKind = kindOpenedFolder;
+			} else {
+				menuPointClipboard.itemKind = kindClosedFolder;
+			}
 		}
 		let me = this;
 		for (let ii = 0; ii < infos.length; ii++) {

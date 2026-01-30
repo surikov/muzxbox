@@ -1228,6 +1228,7 @@ let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
+        this.clipboard = null;
         this.playPosition = 0;
         this.restartOnInitError = false;
         this.playCallback = (start, pos, end) => {
@@ -1296,6 +1297,36 @@ class CommandDispatcher {
         this.renderer.timeselectbar.positionTimeAnchor.translation = { x: xx, y: 0 };
         this.renderer.timeselectbar.positionTimeMark.w = ww;
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
+    }
+    copySelectionToClipboard() {
+        this.clipboard = null;
+        let st = this.cfg().data.selectedPart.startMeasure;
+        let en = this.cfg().data.selectedPart.endMeasure;
+        if (0 <= st && st <= en) {
+            let txt = JSON.stringify(this.cfg().data);
+            this.clipboard = JSON.parse(txt);
+            if (this.clipboard) {
+                this.adjustContentByMeter(this.clipboard);
+                this.clipboard.timeline.splice(0, st);
+                this.clipboard.timeline.splice(en - st + 1);
+                for (let ii = 0; ii < this.clipboard.tracks.length; ii++) {
+                    this.clipboard.tracks[ii].measures.splice(0, st);
+                    this.clipboard.tracks[ii].measures.splice(en - st + 1);
+                }
+                for (let ii = 0; ii < this.clipboard.percussions.length; ii++) {
+                    this.clipboard.percussions[ii].measures.splice(0, st);
+                    this.clipboard.percussions[ii].measures.splice(en - st + 1);
+                }
+                for (let ii = 0; ii < this.clipboard.filters.length; ii++) {
+                    this.clipboard.filters[ii].automation.splice(0, st);
+                    this.clipboard.filters[ii].automation.splice(en - st + 1);
+                }
+                this.clipboard.comments.splice(0, st);
+                this.clipboard.comments.splice(en - st + 1);
+            }
+        }
+        globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
+        globalCommandDispatcher.resetProject();
     }
     initAudioFromUI() {
         var AudioContext = window.AudioContext;
@@ -1628,6 +1659,19 @@ class CommandDispatcher {
             globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
         });
         this.resetProject();
+    }
+    tryFullScreen() {
+        var elem = document.documentElement;
+        console.log('root', elem);
+        if (elem.requestFullscreen) {
+            elem.requestFullscreen();
+        }
+        else if (elem.webkitRequestFullscreen) {
+            elem.webkitRequestFullscreen();
+        }
+        else if (elem.msRequestFullscreen) {
+            elem.msRequestFullscreen();
+        }
     }
     resetProject() {
         try {
@@ -2314,6 +2358,7 @@ let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 let localMenuNewPlugin = 'localMenuNewPlugin';
+let localMenuClipboard = 'localMenuClipboard';
 let localeDictionary = [
     {
         id: localNameLocal, data: [
@@ -2920,6 +2965,12 @@ class RightMenuPanel {
             else {
                 menuPointSettings.itemKind = kindClosedFolder;
             }
+            if (globalCommandDispatcher.cfg().data.menuClipboard) {
+                menuPointClipboard.itemKind = kindOpenedFolder;
+            }
+            else {
+                menuPointClipboard.itemKind = kindClosedFolder;
+            }
         }
         let me = this;
         for (let ii = 0; ii < infos.length; ii++) {
@@ -3305,6 +3356,24 @@ let menuPointActions = {
     },
     itemKind: kindClosedFolder
 };
+let copyToClipboard = {
+    text: 'copy vis', onClick: () => {
+        globalCommandDispatcher.copySelectionToClipboard();
+    }, itemKind: kindAction
+};
+let menuPointClipboard = {
+    text: localMenuClipboard,
+    onFolderCloseOpen: () => {
+        if (menuPointClipboard.itemKind == kindClosedFolder) {
+            globalCommandDispatcher.cfg().data.menuClipboard = true;
+        }
+        else {
+            globalCommandDispatcher.cfg().data.menuClipboard = false;
+        }
+    },
+    itemKind: kindClosedFolder,
+    children: [copyToClipboard]
+};
 let menuPointAddPlugin = {
     text: localMenuNewPlugin,
     onFolderCloseOpen: () => {
@@ -3418,6 +3487,71 @@ let menuPointSettings = {
         }
     ], itemKind: kindClosedFolder
 };
+function fillClipboardList() {
+    menuPointClipboard.children = [copyToClipboard];
+    if (globalCommandDispatcher.clipboard) {
+        for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
+            let track = globalCommandDispatcher.clipboard.tracks[ii];
+            let empty = true;
+            for (let kk = 0; kk < track.measures.length; kk++) {
+                if (track.measures[kk].chords.length > 0) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (!empty) {
+                menuPointClipboard.children.push({
+                    text: track.title,
+                    noLocalization: true,
+                    onDrag: () => {
+                        console.log('onDrag', track.title);
+                    },
+                    itemKind: kindDraggableCircle
+                });
+            }
+        }
+        for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
+            let percussion = globalCommandDispatcher.clipboard.percussions[ii];
+            let empty = true;
+            for (let kk = 0; kk < percussion.measures.length; kk++) {
+                if (percussion.measures[kk].skips.length > 0) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (!empty) {
+                menuPointClipboard.children.push({
+                    text: percussion.title,
+                    noLocalization: true,
+                    onDrag: () => {
+                        console.log('onDrag', percussion.title);
+                    },
+                    itemKind: kindDraggableTriangle
+                });
+            }
+        }
+        for (let ii = 0; ii < globalCommandDispatcher.clipboard.filters.length; ii++) {
+            let filter = globalCommandDispatcher.clipboard.filters[ii];
+            let empty = true;
+            for (let kk = 0; kk < filter.automation.length; kk++) {
+                if (filter.automation[kk].changes.length > 0) {
+                    empty = false;
+                    break;
+                }
+            }
+            if (!empty) {
+                menuPointClipboard.children.push({
+                    text: filter.title,
+                    noLocalization: true,
+                    onDrag: () => {
+                        console.log('onDrag', filter.title);
+                    },
+                    itemKind: kindDraggableCircle
+                });
+            }
+        }
+    }
+}
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
     menuPointActions.children = [];
@@ -3599,6 +3733,7 @@ function fillPluginsLists() {
     }
 }
 function composeBaseMenu() {
+    fillClipboardList();
     if (menuItemsData) {
         return menuItemsData;
     }
@@ -3606,12 +3741,18 @@ function composeBaseMenu() {
         fillPluginsLists();
         menuItemsData = [
             {
+                text: 'fullscrn', onClick: () => {
+                    globalCommandDispatcher.tryFullScreen();
+                }, itemKind: kindAction
+            },
+            {
                 text: localMenuNewEmptyProject, onClick: () => {
                     globalCommandDispatcher.newEmptyProject();
                 }, itemKind: kindAction
             },
             menuPointActions,
             menuPointAddPlugin,
+            menuPointClipboard,
             menuPointSettings
         ];
         return menuItemsData;

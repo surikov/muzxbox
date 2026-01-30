@@ -5,6 +5,7 @@ class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
+	clipboard: Zvoog_Project | null = null;
 	//onAir = false;
 	//neeToStart = false;
 	playPosition = 0;
@@ -122,6 +123,38 @@ class CommandDispatcher {
 		}
 		this.resetProject();
 	}*/
+	copySelectionToClipboard() {
+		//console.log('copySelectionToClipboard');
+		this.clipboard = null;
+		let st = this.cfg().data.selectedPart.startMeasure;
+		let en = this.cfg().data.selectedPart.endMeasure;
+		if (0 <= st && st <= en) {
+			let txt = JSON.stringify(this.cfg().data);
+			this.clipboard = JSON.parse(txt);
+			if (this.clipboard) {
+				this.adjustContentByMeter(this.clipboard);
+				this.clipboard.timeline.splice(0, st);
+				this.clipboard.timeline.splice(en - st + 1);
+				for (let ii = 0; ii < this.clipboard.tracks.length; ii++) {
+					this.clipboard.tracks[ii].measures.splice(0, st);
+					this.clipboard.tracks[ii].measures.splice(en - st + 1);
+				}
+				for (let ii = 0; ii < this.clipboard.percussions.length; ii++) {
+					this.clipboard.percussions[ii].measures.splice(0, st);
+					this.clipboard.percussions[ii].measures.splice(en - st + 1);
+				}
+				for (let ii = 0; ii < this.clipboard.filters.length; ii++) {
+					this.clipboard.filters[ii].automation.splice(0, st);
+					this.clipboard.filters[ii].automation.splice(en - st + 1);
+				}
+				this.clipboard.comments.splice(0, st);
+				this.clipboard.comments.splice(en - st + 1);
+			}
+		}
+		//console.log(this.clipboard);
+		globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
+		globalCommandDispatcher.resetProject();
+	}
 	initAudioFromUI() {
 		//console.log('initAudioFromUI');
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
@@ -501,7 +534,22 @@ class CommandDispatcher {
 		});
 		this.resetProject();
 	}
+	tryFullScreen() {
+		//var elem = document.getElementById('fsbodyroot') as any;
+		var elem = document.documentElement as any;
+		console.log('root', elem);
+		/* When the openFullscreen() function is executed, open the video in fullscreen.
+		Note that we must include prefixes for different browsers, as they don't support the requestFullscreen method yet */
 
+		if (elem.requestFullscreen) {
+			elem.requestFullscreen();
+		} else if (elem.webkitRequestFullscreen) { /* Safari */
+			elem.webkitRequestFullscreen();
+		} else if (elem.msRequestFullscreen) { /* IE11 */
+			elem.msRequestFullscreen();
+		}
+
+	}
 
 
 	resetProject() {
