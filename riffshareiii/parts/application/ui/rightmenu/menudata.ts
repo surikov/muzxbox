@@ -96,11 +96,11 @@ let menuPointSettings: MenuInfo = {
 			}
 		}
 	}, children: [
-		{
+		/*{
 			text: localMenuNewEmptyProject, onClick: () => {
 				globalCommandDispatcher.newEmptyProject();
 			}, itemKind: kindAction
-		}, {
+		}, */{
 			text: 'Size', children: [
 				{
 					text: 'Small', onClick: () => {
@@ -466,6 +466,11 @@ function composeBaseMenu(): MenuInfo[] {
 			//, menuPointDrumTracks
 			//, menuPointFxTracks
 			//, 
+			{
+			text: localMenuNewEmptyProject, onClick: () => {
+				globalCommandDispatcher.newEmptyProject();
+			}, itemKind: kindAction
+		},
 			menuPointActions
 			, menuPointAddPlugin
 			//, menuPointStore

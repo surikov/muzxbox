@@ -565,6 +565,7 @@ declare class FanOutputLine {
 declare class IconLabelButton {
     anchor: TileAnchor;
     bg: TileRectangle;
+    shadow: TileRectangle | null;
     spot: TileRectangle;
     label: TileText;
     left: number;

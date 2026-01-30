@@ -855,10 +855,11 @@ class RightMenuPanel {
 		//this.menuPlayButton.resize(this.shiftX + this.itemsWidth - 4, viewHeight - 1, 1);
 
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
+		let msz=1.75;
 		if (globalCommandDispatcher.cfg().data.list) {
-			this.menuToggleButton.resize(this.shiftX - 0.75, viewHeight / 2 - 1, 2);
+			this.menuToggleButton.resize(this.shiftX - msz/2, viewHeight / 2 - msz/2, msz);
 		} else {
-			this.menuToggleButton.resize(this.shiftX - 1.75, viewHeight / 2 - 1, 2);
+			this.menuToggleButton.resize(this.shiftX - msz, viewHeight / 2 - msz/2, msz);
 		}
 		this.rerenderMenuContent(null);
 
