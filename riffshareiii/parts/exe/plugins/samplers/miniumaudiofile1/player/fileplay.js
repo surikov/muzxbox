@@ -43,14 +43,12 @@ class AudioFileParametersUrility {
         xmlHttpRequest.onerror = (proevent) => {
             console.log('onerror', proevent);
             console.log('xmlHttpRequest', xmlHttpRequest);
-            alert('Error ' + proevent);
         };
         try {
             xmlHttpRequest.send(null);
         }
         catch (xx) {
             console.log(xx);
-            alert('Error ' + xx);
         }
     }
     startDecodeBuffer(arrayBuffer, path, ratio, onDone) {

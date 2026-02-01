@@ -5,7 +5,7 @@ class CommandDispatcher {
 	renderer: UIRenderer;
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
-	clipboard: Zvoog_Project | null = null;
+	clipboardData: Zvoog_Project | null = null;
 	//onAir = false;
 	//neeToStart = false;
 	playPosition = 0;
@@ -125,30 +125,30 @@ class CommandDispatcher {
 	}*/
 	copySelectionToClipboard() {
 		//console.log('copySelectionToClipboard');
-		this.clipboard = null;
+		this.clipboardData = null;
 		let st = this.cfg().data.selectedPart.startMeasure;
 		let en = this.cfg().data.selectedPart.endMeasure;
 		if (0 <= st && st <= en) {
 			let txt = JSON.stringify(this.cfg().data);
-			this.clipboard = JSON.parse(txt);
-			if (this.clipboard) {
-				this.adjustContentByMeter(this.clipboard);
-				this.clipboard.timeline.splice(0, st);
-				this.clipboard.timeline.splice(en - st + 1);
-				for (let ii = 0; ii < this.clipboard.tracks.length; ii++) {
-					this.clipboard.tracks[ii].measures.splice(0, st);
-					this.clipboard.tracks[ii].measures.splice(en - st + 1);
+			this.clipboardData = JSON.parse(txt);
+			if (this.clipboardData) {
+				this.adjustContentByMeter(this.clipboardData);
+				this.clipboardData.timeline.splice(0, st);
+				this.clipboardData.timeline.splice(en - st + 1);
+				for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
+					this.clipboardData.tracks[ii].measures.splice(0, st);
+					this.clipboardData.tracks[ii].measures.splice(en - st + 1);
 				}
-				for (let ii = 0; ii < this.clipboard.percussions.length; ii++) {
-					this.clipboard.percussions[ii].measures.splice(0, st);
-					this.clipboard.percussions[ii].measures.splice(en - st + 1);
+				for (let ii = 0; ii < this.clipboardData.percussions.length; ii++) {
+					this.clipboardData.percussions[ii].measures.splice(0, st);
+					this.clipboardData.percussions[ii].measures.splice(en - st + 1);
 				}
-				for (let ii = 0; ii < this.clipboard.filters.length; ii++) {
-					this.clipboard.filters[ii].automation.splice(0, st);
-					this.clipboard.filters[ii].automation.splice(en - st + 1);
+				for (let ii = 0; ii < this.clipboardData.filters.length; ii++) {
+					this.clipboardData.filters[ii].automation.splice(0, st);
+					this.clipboardData.filters[ii].automation.splice(en - st + 1);
 				}
-				this.clipboard.comments.splice(0, st);
-				this.clipboard.comments.splice(en - st + 1);
+				this.clipboardData.comments.splice(0, st);
+				this.clipboardData.comments.splice(en - st + 1);
 			}
 		}
 		//console.log(this.clipboard);

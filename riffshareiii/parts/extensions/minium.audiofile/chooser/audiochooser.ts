@@ -29,7 +29,7 @@ class AudioFilePicker {
 		this.updateUI();
 	}
 	sendMessageToHost(data: string) {
-		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false };
+		var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: data, done: false,screenWait:false };
 		window.parent.postMessage(message, '*');
 	}
 	receiveHostMessage(messageEvent: MessageEvent) {

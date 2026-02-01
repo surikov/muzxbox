@@ -46,6 +46,11 @@ function startApplication() {
 				globalCommandDispatcher.redoQueue = redocommands;
 			}
 		}
+		globalCommandDispatcher.clipboardData=null;
+		let lastClipboardData = readLzObjectFromlocalStorage('clipboardData');
+		if (lastClipboardData) {
+			globalCommandDispatcher.clipboardData=lastClipboardData;
+		}
 	} catch (xx) {
 		console.log(xx);
 
@@ -100,12 +105,12 @@ function setupHomeBackURL() {
 	}
 	saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
 }
-function squashString(data: string): string {
+/*function squashString(data: string): string {
 	return data;
 }
 function resolveString(data: string): string | null {
 	return data;
-}
+}*/
 function getNavigatorLanguage(): string {
 	console.log('navigator.languages', navigator.languages);
 	console.log('navigator.language', navigator.language);
@@ -132,6 +137,7 @@ function saveProjectState() {
 	//console.log('saveProjectState');
 	//https://github.com/pieroxy/lz-string
 	globalCommandDispatcher.exe.cutLongUndo();
+
 	let txtdata = JSON.stringify(globalCommandDispatcher.cfg().data);
 	try {
 
@@ -139,6 +145,10 @@ function saveProjectState() {
 		saveLzText2localStorage('lastprojectdata', txtdata);
 		saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
 		saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+		localStorage.setItem('clipboardData', '');
+		if (globalCommandDispatcher.clipboardData) {
+			saveLzText2localStorage('clipboardData', JSON.stringify(globalCommandDispatcher.clipboardData));
+		}
 	} catch (xx) {
 		console.log(xx);
 		globalCommandDispatcher.clearUndo();

@@ -269,6 +269,11 @@ function startApplication() {
                 globalCommandDispatcher.redoQueue = redocommands;
             }
         }
+        globalCommandDispatcher.clipboardData = null;
+        let lastClipboardData = readLzObjectFromlocalStorage('clipboardData');
+        if (lastClipboardData) {
+            globalCommandDispatcher.clipboardData = lastClipboardData;
+        }
     }
     catch (xx) {
         console.log(xx);
@@ -309,12 +314,6 @@ function setupHomeBackURL() {
     }
     saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
 }
-function squashString(data) {
-    return data;
-}
-function resolveString(data) {
-    return data;
-}
 function getNavigatorLanguage() {
     console.log('navigator.languages', navigator.languages);
     console.log('navigator.language', navigator.language);
@@ -347,6 +346,10 @@ function saveProjectState() {
         saveLzText2localStorage('lastprojectdata', txtdata);
         saveRawText2localStorage('undocommands', JSON.stringify(globalCommandDispatcher.undo()));
         saveRawText2localStorage('redocommands', JSON.stringify(globalCommandDispatcher.redo()));
+        localStorage.setItem('clipboardData', '');
+        if (globalCommandDispatcher.clipboardData) {
+            saveLzText2localStorage('clipboardData', JSON.stringify(globalCommandDispatcher.clipboardData));
+        }
     }
     catch (xx) {
         console.log(xx);
@@ -1228,7 +1231,7 @@ let uiLinkFilterToFilter = 'uiLinkFilterToFilter';
 class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
-        this.clipboard = null;
+        this.clipboardData = null;
         this.playPosition = 0;
         this.restartOnInitError = false;
         this.playCallback = (start, pos, end) => {
@@ -1299,30 +1302,30 @@ class CommandDispatcher {
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.positionTimeSVGGroup, this.renderer.timeselectbar.positionTimeAnchor, LevelModes.normal);
     }
     copySelectionToClipboard() {
-        this.clipboard = null;
+        this.clipboardData = null;
         let st = this.cfg().data.selectedPart.startMeasure;
         let en = this.cfg().data.selectedPart.endMeasure;
         if (0 <= st && st <= en) {
             let txt = JSON.stringify(this.cfg().data);
-            this.clipboard = JSON.parse(txt);
-            if (this.clipboard) {
-                this.adjustContentByMeter(this.clipboard);
-                this.clipboard.timeline.splice(0, st);
-                this.clipboard.timeline.splice(en - st + 1);
-                for (let ii = 0; ii < this.clipboard.tracks.length; ii++) {
-                    this.clipboard.tracks[ii].measures.splice(0, st);
-                    this.clipboard.tracks[ii].measures.splice(en - st + 1);
+            this.clipboardData = JSON.parse(txt);
+            if (this.clipboardData) {
+                this.adjustContentByMeter(this.clipboardData);
+                this.clipboardData.timeline.splice(0, st);
+                this.clipboardData.timeline.splice(en - st + 1);
+                for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
+                    this.clipboardData.tracks[ii].measures.splice(0, st);
+                    this.clipboardData.tracks[ii].measures.splice(en - st + 1);
                 }
-                for (let ii = 0; ii < this.clipboard.percussions.length; ii++) {
-                    this.clipboard.percussions[ii].measures.splice(0, st);
-                    this.clipboard.percussions[ii].measures.splice(en - st + 1);
+                for (let ii = 0; ii < this.clipboardData.percussions.length; ii++) {
+                    this.clipboardData.percussions[ii].measures.splice(0, st);
+                    this.clipboardData.percussions[ii].measures.splice(en - st + 1);
                 }
-                for (let ii = 0; ii < this.clipboard.filters.length; ii++) {
-                    this.clipboard.filters[ii].automation.splice(0, st);
-                    this.clipboard.filters[ii].automation.splice(en - st + 1);
+                for (let ii = 0; ii < this.clipboardData.filters.length; ii++) {
+                    this.clipboardData.filters[ii].automation.splice(0, st);
+                    this.clipboardData.filters[ii].automation.splice(en - st + 1);
                 }
-                this.clipboard.comments.splice(0, st);
-                this.clipboard.comments.splice(en - st + 1);
+                this.clipboardData.comments.splice(0, st);
+                this.clipboardData.comments.splice(en - st + 1);
             }
         }
         globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
@@ -3489,24 +3492,24 @@ let menuPointSettings = {
 };
 function fillClipboardList() {
     menuPointClipboard.children = [copyToClipboard];
-    if (globalCommandDispatcher.clipboard) {
+    if (globalCommandDispatcher.clipboardData) {
         let noSolo = true;
-        for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
-            let track = globalCommandDispatcher.clipboard.tracks[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.clipboardData.tracks.length; ii++) {
+            let track = globalCommandDispatcher.clipboardData.tracks[ii];
             if (track.performer.state == 2) {
                 noSolo = false;
                 break;
             }
         }
-        for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
-            let percussion = globalCommandDispatcher.clipboard.percussions[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.clipboardData.percussions.length; ii++) {
+            let percussion = globalCommandDispatcher.clipboardData.percussions[ii];
             if (percussion.sampler.state == 2) {
                 noSolo = false;
                 break;
             }
         }
-        for (let ii = 0; ii < globalCommandDispatcher.clipboard.tracks.length; ii++) {
-            let track = globalCommandDispatcher.clipboard.tracks[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.clipboardData.tracks.length; ii++) {
+            let track = globalCommandDispatcher.clipboardData.tracks[ii];
             if ((track.performer.state == 0 && noSolo) || track.performer.state == 2) {
                 let empty = true;
                 for (let kk = 0; kk < track.measures.length; kk++) {
@@ -3516,19 +3519,18 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    menuPointClipboard.children.push({
-                        text: track.title,
-                        noLocalization: true,
-                        onDrag: () => {
-                            console.log('onDrag', track.title);
-                        },
-                        itemKind: kindDraggableSquare
+                    let info = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
+                    let tri = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+                    let dragger = new DragMenuItemUtil(tri, info, () => {
+                        console.log('dnd track', track.title);
                     });
+                    info.onDrag = dragger.doDrag.bind(dragger);
+                    menuPointClipboard.children.push(info);
                 }
             }
         }
-        for (let ii = 0; ii < globalCommandDispatcher.clipboard.percussions.length; ii++) {
-            let percussion = globalCommandDispatcher.clipboard.percussions[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.clipboardData.percussions.length; ii++) {
+            let percussion = globalCommandDispatcher.clipboardData.percussions[ii];
             if ((percussion.sampler.state == 0 && noSolo) || percussion.sampler.state == 2) {
                 let empty = true;
                 for (let kk = 0; kk < percussion.measures.length; kk++) {
@@ -3538,19 +3540,18 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    menuPointClipboard.children.push({
-                        text: percussion.title,
-                        noLocalization: true,
-                        onDrag: () => {
-                            console.log('onDrag', percussion.title);
-                        },
-                        itemKind: kindDraggableTriangle
+                    let info = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle };
+                    let tri = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+                    let dragger = new DragMenuItemUtil(tri, info, () => {
+                        console.log('dnd percussion', percussion.title);
                     });
+                    info.onDrag = dragger.doDrag.bind(dragger);
+                    menuPointClipboard.children.push(info);
                 }
             }
         }
-        for (let ii = 0; ii < globalCommandDispatcher.clipboard.filters.length; ii++) {
-            let filter = globalCommandDispatcher.clipboard.filters[ii];
+        for (let ii = 0; ii < globalCommandDispatcher.clipboardData.filters.length; ii++) {
+            let filter = globalCommandDispatcher.clipboardData.filters[ii];
             if (filter.state == 0) {
                 let empty = true;
                 for (let kk = 0; kk < filter.automation.length; kk++) {
@@ -3560,16 +3561,40 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    menuPointClipboard.children.push({
-                        text: filter.title,
-                        noLocalization: true,
-                        onDrag: () => {
-                            console.log('onDrag', filter.title);
-                        },
-                        itemKind: kindDraggableCircle
+                    let info = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle };
+                    let tri = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+                    let dragger = new DragMenuItemUtil(tri, info, () => {
+                        console.log('dnd filter', filter.title);
                     });
+                    info.onDrag = dragger.doDrag.bind(dragger);
+                    menuPointClipboard.children.push(info);
                 }
             }
+        }
+    }
+}
+class DragMenuItemUtil {
+    constructor(dragItem, info, onDone) {
+        this.dragStarted = false;
+        this.dragItem = dragItem;
+        this.info = info;
+        this.onDone = onDone;
+    }
+    doDrag(x, y) {
+        if (!this.dragStarted) {
+            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+            let ss = globalCommandDispatcher.renderer.menu.scrollY;
+            let tt = this.info.menuTop ? this.info.menuTop : 0;
+            let yy = (tt + ss - 0.0) * zz;
+            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+            this.dragStarted = true;
+            globalCommandDispatcher.hideRightMenu();
+            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
+        }
+        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+        if (x == 0 && y == 0) {
+            globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+            this.onDone();
         }
     }
 }
@@ -3589,160 +3614,80 @@ function fillPluginsLists() {
         }
         else {
             if (purpose == 'Sampler') {
-                let dragStarted = false;
-                let info;
-                info = {
-                    text: label,
-                    noLocalization: true,
-                    onDrag: (x, y) => {
-                        if (dragStarted) {
-                            if (x == 0 && y == 0) {
-                                dragStarted = false;
-                                let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-                                globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                                    globalCommandDispatcher.cfg().data.percussions.push({
-                                        sampler: {
-                                            id: '' + Math.random(),
-                                            kind: MZXBX_currentPlugins()[ii].kind,
-                                            data: '',
-                                            outputs: [''],
-                                            iconPosition: newPos,
-                                            state: 0
-                                        },
-                                        measures: [],
-                                        title: MZXBX_currentPlugins()[ii].label
-                                    });
-                                    globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-                                });
-                            }
-                            else {
-                                globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-                            }
-                        }
-                        else {
-                            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-                            let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                            let tt = info.menuTop ? info.menuTop : 0;
-                            let yy = (tt + ss - 0.0) * zz;
-                            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-                            dragStarted = true;
-                            globalCommandDispatcher.hideRightMenu();
-                            let sz = 1;
-                            let tri = {
-                                x: 0,
-                                y: 0,
-                                dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9],
-                                css: 'rectangleDragItem'
-                            };
-                            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, tri);
-                        }
-                    },
-                    itemKind: kindDraggableTriangle
-                };
+                let info = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
+                let tri = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
+                let dragger = new DragMenuItemUtil(tri, info, () => {
+                    let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                    globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                        globalCommandDispatcher.cfg().data.percussions.push({
+                            sampler: {
+                                id: '' + Math.random(),
+                                kind: MZXBX_currentPlugins()[ii].kind,
+                                data: '',
+                                outputs: [''],
+                                iconPosition: newPos,
+                                state: 0
+                            },
+                            measures: [],
+                            title: MZXBX_currentPlugins()[ii].label
+                        });
+                        globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                    });
+                });
+                info.onDrag = dragger.doDrag.bind(dragger);
                 menuPointAddPlugin.children.push(info);
             }
             else {
                 if (purpose == 'Performer') {
-                    let dragStarted = false;
-                    let info;
-                    info = {
-                        text: label,
-                        noLocalization: true,
-                        onDrag: (x, y) => {
-                            if (dragStarted) {
-                                if (x == 0 && y == 0) {
-                                    dragStarted = false;
-                                    let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-                                    globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-                                        globalCommandDispatcher.cfg().data.tracks.push({
-                                            performer: {
-                                                id: '' + Math.random(),
-                                                kind: MZXBX_currentPlugins()[ii].kind,
-                                                data: '',
-                                                outputs: [''],
-                                                iconPosition: newPos,
-                                                state: 0
-                                            },
-                                            measures: [],
-                                            title: MZXBX_currentPlugins()[ii].label
-                                        });
-                                        globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-                                    });
-                                }
-                                else {
-                                    globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-                                }
-                            }
-                            else {
-                                let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-                                let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                                let tt = info.menuTop ? info.menuTop : 0;
-                                let yy = (tt + ss - 0.0) * zz;
-                                let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-                                dragStarted = true;
-                                globalCommandDispatcher.hideRightMenu();
-                                let sz = 1;
-                                globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
-                                    x: 0, y: 0,
-                                    w: sz, h: sz,
-                                    rx: sz / 20, ry: sz / 20,
-                                    css: 'rectangleDragItem'
-                                });
-                            }
-                        },
-                        itemKind: kindDraggableSquare
+                    let info = { text: label, noLocalization: true, itemKind: kindDraggableSquare };
+                    let square = {
+                        x: 0, y: 0,
+                        w: 1, h: 1,
+                        rx: 1 / 20, ry: 1 / 20,
+                        css: 'rectangleDragItem'
                     };
+                    let dragger = new DragMenuItemUtil(square, info, () => {
+                        let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                        globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                            globalCommandDispatcher.cfg().data.tracks.push({
+                                performer: {
+                                    id: '' + Math.random(),
+                                    kind: MZXBX_currentPlugins()[ii].kind,
+                                    data: '',
+                                    outputs: [''],
+                                    iconPosition: newPos,
+                                    state: 0
+                                },
+                                measures: [],
+                                title: MZXBX_currentPlugins()[ii].label
+                            });
+                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        });
+                    });
+                    info.onDrag = dragger.doDrag.bind(dragger);
                     menuPointAddPlugin.children.push(info);
                 }
                 else {
                     if (purpose == 'Filter') {
-                        let dragStarted = false;
-                        let info;
-                        info = {
-                            text: label,
-                            noLocalization: true,
-                            onDrag: (x, y) => {
-                                if (dragStarted) {
-                                    if (x == 0 && y == 0) {
-                                        dragStarted = false;
-                                        let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-                                        globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                                            globalCommandDispatcher.cfg().data.filters.push({
-                                                id: '' + Math.random(),
-                                                kind: MZXBX_currentPlugins()[ii].kind,
-                                                data: '',
-                                                outputs: [''],
-                                                automation: [],
-                                                iconPosition: newPos,
-                                                state: 0,
-                                                title: MZXBX_currentPlugins()[ii].label
-                                            });
-                                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-                                        });
-                                    }
-                                    else {
-                                        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-                                    }
-                                }
-                                else {
-                                    let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-                                    let ss = globalCommandDispatcher.renderer.menu.scrollY;
-                                    let tt = info.menuTop ? info.menuTop : 0;
-                                    let yy = (tt + ss - 0.0) * zz;
-                                    let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-                                    dragStarted = true;
-                                    globalCommandDispatcher.hideRightMenu();
-                                    let sz = 1;
-                                    globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
-                                        x: 0, y: 0,
-                                        w: sz, h: sz,
-                                        rx: sz / 2, ry: sz / 2,
-                                        css: 'rectangleDragItem'
-                                    });
-                                }
-                            },
-                            itemKind: kindDraggableCircle
-                        };
+                        let info = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
+                        let circle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
+                        let dragger = new DragMenuItemUtil(circle, info, () => {
+                            let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                                globalCommandDispatcher.cfg().data.filters.push({
+                                    id: '' + Math.random(),
+                                    kind: MZXBX_currentPlugins()[ii].kind,
+                                    data: '',
+                                    outputs: [''],
+                                    automation: [],
+                                    iconPosition: newPos,
+                                    state: 0,
+                                    title: MZXBX_currentPlugins()[ii].label
+                                });
+                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                            });
+                        });
+                        info.onDrag = dragger.doDrag.bind(dragger);
                         menuPointAddPlugin.children.push(info);
                     }
                     else {

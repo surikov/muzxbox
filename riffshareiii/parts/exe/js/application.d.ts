@@ -30,8 +30,6 @@ declare function createTileLevel(): TileLevelBase;
 declare let goHomeBackURL: string;
 declare function startApplication(): void;
 declare function setupHomeBackURL(): void;
-declare function squashString(data: string): string;
-declare function resolveString(data: string): string | null;
 declare function getNavigatorLanguage(): string;
 declare function saveProjectState(): void;
 declare function startLoadCSSfile(cssurl: string): void;
@@ -156,7 +154,7 @@ declare class CommandDispatcher {
     renderer: UIRenderer;
     audioContext: AudioContext;
     tapSizeRatio: number;
-    clipboard: Zvoog_Project | null;
+    clipboardData: Zvoog_Project | null;
     playPosition: number;
     restartOnInitError: boolean;
     playCallback: (start: number, position: number, end: number) => void;
@@ -437,6 +435,14 @@ declare let menuPointClipboard: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
 declare function fillClipboardList(): void;
+declare class DragMenuItemUtil {
+    dragStarted: boolean;
+    dragItem: TileItem;
+    info: MenuInfo;
+    onDone: () => void;
+    constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void);
+    doDrag(x: number, y: number): void;
+}
 declare function fillPluginsLists(): void;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
