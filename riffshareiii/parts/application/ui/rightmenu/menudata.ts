@@ -275,6 +275,18 @@ function fillClipboardList() {
 				break;
 			}
 		}
+
+		let mm: Zvoog_MetreMathType = MMUtil();
+		let pasteWidth = 0;
+		for (let ii = 0; ii < globalCommandDispatcher.clipboardData.timeline.length; ii++) {
+			let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
+			if (!(timebar)) {
+				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+			}
+			pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+		}
+
+
 		for (let ii = 0; ii < globalCommandDispatcher.clipboardData.tracks.length; ii++) {
 			let track = globalCommandDispatcher.clipboardData.tracks[ii];
 			if ((track.performer.state == 0 && noSolo) || track.performer.state == 2) {
@@ -287,9 +299,12 @@ function fillClipboardList() {
 				}
 				if (!empty) {
 					let info: MenuInfo = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
-					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, () => {
-						console.log('dnd track',track.title);
+						console.log('dnd track', track.title);
+					}, (zz: number) => {
+						tri.h = 12*globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
+						tri.w = pasteWidth / zz;
 					});
 					info.onDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
@@ -316,9 +331,12 @@ function fillClipboardList() {
 				}
 				if (!empty) {
 					let info: MenuInfo = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle };
-					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, () => {
-						console.log('dnd percussion',percussion.title);
+						console.log('dnd percussion', percussion.title);
+					}, (zz: number) => {
+						tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
+						tri.w = pasteWidth / zz;
 					});
 					info.onDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
@@ -345,21 +363,15 @@ function fillClipboardList() {
 				}
 				if (!empty) {
 					let info: MenuInfo = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle };
-					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'rectangleDragItem' };
+					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, () => {
-						console.log('dnd filter',filter.title);
+						console.log('dnd filter', filter.title);
+					}, (zz: number) => {
+						tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
+						tri.w = pasteWidth / zz;
 					});
 					info.onDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
-					/*
-										menuPointClipboard.children.push({
-											text: filter.title
-											, noLocalization: true
-											, onDrag: () => {
-												console.log('onDrag', filter.title);
-											}
-											, itemKind: kindDraggableCircle
-										});*/
 				}
 			}
 		}
@@ -370,12 +382,16 @@ class DragMenuItemUtil {
 	dragItem: TileItem;
 	info: MenuInfo
 	onDone: () => void;
-	constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void) {
+	onPluck: null | ((zz: number) => void) = null;
+	constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void, onPluck?: (zz: number) => void) {
 		this.dragStarted = false;
 		this.dragItem = dragItem;
 		this.info = info;
 		this.onDone = onDone;
 		//console.log(this);
+		if (onPluck) {
+			this.onPluck = onPluck;
+		}
 	}
 	doDrag(x: number, y: number) {
 		if (!this.dragStarted) {
@@ -387,6 +403,9 @@ class DragMenuItemUtil {
 			let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
 			this.dragStarted = true;
 			globalCommandDispatcher.hideRightMenu();
+			if (this.onPluck) {
+				this.onPluck(zz);
+			}
 			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
 		}
 		globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);

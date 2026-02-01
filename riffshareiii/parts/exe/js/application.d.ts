@@ -440,7 +440,8 @@ declare class DragMenuItemUtil {
     dragItem: TileItem;
     info: MenuInfo;
     onDone: () => void;
-    constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void);
+    onPluck: null | ((zz: number) => void);
+    constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void, onPluck?: (zz: number) => void);
     doDrag(x: number, y: number): void;
 }
 declare function fillPluginsLists(): void;
