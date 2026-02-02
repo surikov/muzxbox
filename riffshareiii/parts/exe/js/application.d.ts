@@ -434,14 +434,15 @@ declare let copyToClipboard: MenuInfo;
 declare let menuPointClipboard: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
+declare function findNearestFilterByKind(idx: number, kind: string): Zvoog_FilterTarget;
 declare function fillClipboardList(): void;
 declare class DragMenuItemUtil {
     dragStarted: boolean;
     dragItem: TileItem;
     info: MenuInfo;
-    onDone: () => void;
+    onDone: (xx: number, yy: number) => void;
     onPluck: null | ((zz: number) => void);
-    constructor(dragItem: TileItem, info: MenuInfo, onDone: () => void, onPluck?: (zz: number) => void);
+    constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onPluck?: (zz: number) => void);
     doDrag(x: number, y: number): void;
 }
 declare function fillPluginsLists(): void;

@@ -136,7 +136,7 @@ class RightMenuPanel {
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
 		this.menuToggleButton = new IconLabelButton([''], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-			console.log('locick');
+			//console.log('locick');
 			if (globalCommandDispatcher.cfg().data.list) {
 				globalCommandDispatcher.hideRightMenu();
 			} else {

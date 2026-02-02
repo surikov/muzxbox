@@ -1576,7 +1576,6 @@ class CommandDispatcher {
         console.log('startPlayLoop', from, position, to);
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
-            console.log('msg', msg, this.renderer.warning.noWarning);
             let me = this;
             this.restartOnInitError = true;
             this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
@@ -1592,7 +1591,6 @@ class CommandDispatcher {
                     }
                 }
             }, 1000);
-            console.log('waitid', waitid);
         }
         else {
             this.renderer.warning.hideWarning();
@@ -2198,7 +2196,6 @@ class CommandDispatcher {
         }
     }
     adjustTimelineContent(project) {
-        console.log('adjustTimelineContent');
         this.adjustTimeLineLength(project);
         this.adjustContentByMeter(project);
         this.adjustRemoveEmptyChords(project);
@@ -2863,7 +2860,6 @@ class RightMenuPanel {
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
         this.menuToggleButton = new IconLabelButton([''], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            console.log('locick');
             if (globalCommandDispatcher.cfg().data.list) {
                 globalCommandDispatcher.hideRightMenu();
             }
@@ -3490,6 +3486,20 @@ let menuPointSettings = {
         }
     ], itemKind: kindClosedFolder
 };
+function findNearestFilterByKind(idx, kind) {
+    let nearest = 987654;
+    if (globalCommandDispatcher.cfg().data.filters[idx].kind == kind) {
+        nearest = idx;
+    }
+    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+        if (globalCommandDispatcher.cfg().data.filters[ii].kind == kind) {
+            if (Math.abs(nearest - ii) < nearest) {
+                nearest = ii;
+            }
+        }
+    }
+    return globalCommandDispatcher.cfg().data.filters[nearest];
+}
 function fillClipboardList() {
     menuPointClipboard.children = [copyToClipboard];
     if (globalCommandDispatcher.clipboardData) {
@@ -3530,8 +3540,35 @@ function fillClipboardList() {
                 if (!empty) {
                     let info = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
-                    let dragger = new DragMenuItemUtil(tri, info, () => {
-                        console.log('dnd track', track.title);
+                    let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
+                        let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                        let mm = MMUtil();
+                        let barIdx = globalCommandDispatcher.cfg().data.timeline.length - 1;
+                        let ww = 0;
+                        for (let jj = 0; jj < globalCommandDispatcher.cfg().data.timeline.length; jj++) {
+                            let timebar = globalCommandDispatcher.cfg().data.timeline[jj];
+                            ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                            if (xx + startX < ww) {
+                                barIdx = jj;
+                                break;
+                            }
+                        }
+                        let nearIdx = globalCommandDispatcher.cfg().data.farorder[0];
+                        let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
+                        globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
+                            if (globalCommandDispatcher.clipboardData) {
+                                for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+                                    let from = track.measures[pp];
+                                    for (let tt = 0; tt < from.chords.length; tt++) {
+                                        if (from.chords[tt]) {
+                                            let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
+                                            to[barIdx].chords.push(fromChord);
+                                        }
+                                    }
+                                }
+                            }
+                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        });
                     }, (zz) => {
                         tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
                         tri.w = pasteWidth / zz;
@@ -3554,8 +3591,41 @@ function fillClipboardList() {
                 if (!empty) {
                     let info = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
-                    let dragger = new DragMenuItemUtil(tri, info, () => {
-                        console.log('dnd percussion', percussion.title);
+                    let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
+                        let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                        let mm = MMUtil();
+                        let barIdx = globalCommandDispatcher.cfg().data.timeline.length - 1;
+                        let ww = 0;
+                        for (let jj = 0; jj < globalCommandDispatcher.cfg().data.timeline.length; jj++) {
+                            let timebar = globalCommandDispatcher.cfg().data.timeline[jj];
+                            ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                            if (xx + startX < ww) {
+                                barIdx = jj;
+                                break;
+                            }
+                        }
+                        let startY = Math.round((yy - globalCommandDispatcher.cfg().padGrid2Sampler - globalCommandDispatcher.cfg().gridHeight()) / globalCommandDispatcher.cfg().samplerDotHeight);
+                        if (startY < 0) {
+                            startY = 0;
+                        }
+                        if (startY > globalCommandDispatcher.cfg().data.percussions.length - 1) {
+                            startY = globalCommandDispatcher.cfg().data.percussions.length - 1;
+                        }
+                        let to = globalCommandDispatcher.cfg().data.percussions[startY].measures;
+                        globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
+                            if (globalCommandDispatcher.clipboardData) {
+                                for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+                                    let from = percussion.measures[pp];
+                                    for (let tt = 0; tt < from.skips.length; tt++) {
+                                        if (from.skips[tt]) {
+                                            let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
+                                            to[barIdx].skips.push(fromIt);
+                                        }
+                                    }
+                                }
+                            }
+                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        });
                     }, (zz) => {
                         tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
                         tri.w = pasteWidth / zz;
@@ -3578,8 +3648,48 @@ function fillClipboardList() {
                 if (!empty) {
                     let info = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
-                    let dragger = new DragMenuItemUtil(tri, info, () => {
-                        console.log('dnd filter', filter.title);
+                    let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
+                        let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                        let mm = MMUtil();
+                        let barIdx = globalCommandDispatcher.cfg().data.timeline.length - 1;
+                        let ww = 0;
+                        for (let jj = 0; jj < globalCommandDispatcher.cfg().data.timeline.length; jj++) {
+                            let timebar = globalCommandDispatcher.cfg().data.timeline[jj];
+                            ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                            if (xx + startX < ww) {
+                                barIdx = jj;
+                                break;
+                            }
+                        }
+                        let startY = Math.round((yy
+                            - globalCommandDispatcher.cfg().padGrid2Sampler
+                            - globalCommandDispatcher.cfg().gridHeight()
+                            - globalCommandDispatcher.cfg().padSampler2Automation
+                            - globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().samplerDotHeight) / globalCommandDispatcher.cfg().autoPointHeight);
+                        if (startY < 0) {
+                            startY = 0;
+                        }
+                        if (startY > globalCommandDispatcher.cfg().data.filters.length - 1) {
+                            startY = globalCommandDispatcher.cfg().data.filters.length - 1;
+                        }
+                        let pasteTo = findNearestFilterByKind(startY, filter.kind);
+                        if (pasteTo.kind == filter.kind) {
+                            let to = pasteTo.automation;
+                            globalCommandDispatcher.exe.commitProjectChanges(['filters', startY], () => {
+                                if (globalCommandDispatcher.clipboardData) {
+                                    for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+                                        let from = filter.automation[pp];
+                                        for (let tt = 0; tt < from.changes.length; tt++) {
+                                            if (from.changes[tt]) {
+                                                let fromIt = JSON.parse(JSON.stringify(from.changes[tt]));
+                                                to[barIdx].changes.push(fromIt);
+                                            }
+                                        }
+                                    }
+                                }
+                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                            });
+                        }
                     }, (zz) => {
                         tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
                         tri.w = pasteWidth / zz;
@@ -3618,8 +3728,8 @@ class DragMenuItemUtil {
         }
         globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
         if (x == 0 && y == 0) {
-            globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-            this.onDone();
+            let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+            this.onDone(pos.x, pos.y);
         }
     }
 }
@@ -3641,8 +3751,7 @@ function fillPluginsLists() {
             if (purpose == 'Sampler') {
                 let info = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
                 let tri = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
-                let dragger = new DragMenuItemUtil(tri, info, () => {
-                    let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
                     globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
                         globalCommandDispatcher.cfg().data.percussions.push({
                             sampler: {
@@ -3650,7 +3759,7 @@ function fillPluginsLists() {
                                 kind: MZXBX_currentPlugins()[ii].kind,
                                 data: '',
                                 outputs: [''],
-                                iconPosition: newPos,
+                                iconPosition: { x: xx, y: yy },
                                 state: 0
                             },
                             measures: [],
@@ -3671,8 +3780,7 @@ function fillPluginsLists() {
                         rx: 1 / 20, ry: 1 / 20,
                         css: 'rectangleDragItem'
                     };
-                    let dragger = new DragMenuItemUtil(square, info, () => {
-                        let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                    let dragger = new DragMenuItemUtil(square, info, (xx, yy) => {
                         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                             globalCommandDispatcher.cfg().data.tracks.push({
                                 performer: {
@@ -3680,7 +3788,7 @@ function fillPluginsLists() {
                                     kind: MZXBX_currentPlugins()[ii].kind,
                                     data: '',
                                     outputs: [''],
-                                    iconPosition: newPos,
+                                    iconPosition: { x: xx, y: yy },
                                     state: 0
                                 },
                                 measures: [],
@@ -3696,8 +3804,7 @@ function fillPluginsLists() {
                     if (purpose == 'Filter') {
                         let info = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
                         let circle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
-                        let dragger = new DragMenuItemUtil(circle, info, () => {
-                            let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+                        let dragger = new DragMenuItemUtil(circle, info, (xx, yy) => {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
                                 globalCommandDispatcher.cfg().data.filters.push({
                                     id: '' + Math.random(),
@@ -3705,7 +3812,7 @@ function fillPluginsLists() {
                                     data: '',
                                     outputs: [''],
                                     automation: [],
-                                    iconPosition: newPos,
+                                    iconPosition: { x: xx, y: yy },
                                     state: 0,
                                     title: MZXBX_currentPlugins()[ii].label
                                 });

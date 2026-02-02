@@ -445,7 +445,7 @@ class CommandDispatcher {
 		console.log('startPlayLoop', from, position, to);
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
-			console.log('msg', msg, this.renderer.warning.noWarning);
+			//console.log('msg', msg, this.renderer.warning.noWarning);
 			let me = this;
 			this.restartOnInitError = true;
 			this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg//,null);
@@ -462,7 +462,7 @@ class CommandDispatcher {
 					}
 				}
 			}, 1000);
-			console.log('waitid', waitid);
+			//console.log('waitid', waitid);
 		} else {
 			//console.log('empty msg');
 			this.renderer.warning.hideWarning();
@@ -1366,7 +1366,7 @@ class CommandDispatcher {
 		}
 	}
 	adjustTimelineContent(project: Zvoog_Project) {
-		console.log('adjustTimelineContent');
+		//console.log('adjustTimelineContent');
 		this.adjustTimeLineLength(project);
 		this.adjustContentByMeter(project);
 

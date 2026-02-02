@@ -4,6 +4,7 @@ class CommandExe {
 		globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
 	}
 	commitProjectChanges(path: (string | number)[], proAction: () => void) {
+		//console.log('commitProjectChanges',path);
 		let state = new StateDiff(path);
 		proAction();
 		this.addUndoCommandActiions(state.diffChangedCommands());
@@ -196,6 +197,7 @@ class CommandExe {
 				if (globalCommandDispatcher.undo().length) {
 					//let cmd = globalCommandDispatcher.undo().pop();
 					let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
+					//console.log(cmd);
 					if (cmd) {
 						//this.executeCommand(cmd.kind, cmd.params, true);
 						this.unAction(cmd);
