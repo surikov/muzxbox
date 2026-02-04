@@ -1,0 +1,74 @@
+{
+	"compilerOptions": {
+		"target": "es2018"
+		//,"outFile": "../../exe/plugins/actions/midiexport1/mx.js"
+		,"outFile": "mx.js"
+		//,"outDir":"../js"
+		,		"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+		,"noImplicitAny": false
+		,"removeComments": true
+		,"preserveConstEnums": true
+		,"sourceMap": true
+		,"experimentalDecorators": true
+		,"isolatedModules": false
+		//,"moduleResolution":"nodenext" 
+		,"module": "AMD"
+		//,"module": "nodenext"
+		,"lib": [
+			"dom"
+			,"es2018"
+			,"es5"
+		]
+		,"declaration": true
+		//,"typeRoots": [ "./node_types" ]
+		//,"types": ["node"]
+		//,"types": []
+		//,"allowJs":true
+	}
+	,"files": [
+		"../../mzxbxapi/musicenginetypes.ts"
+		,"../../mzxbxapi/musicenginedeclarations.ts"
+		,"../../extensions/MZXBX_Plugin_UI.ts"
+		//,"ethereumjs-tx-1.3.3.js"
+		//,"midiwriter.ts"
+		//,"MidiWriterJS-master/build/index.browser.js"
+
+		,"midiwriterjs/midi-events/controller-change-event.ts"
+		,"midiwriterjs/midi-events/midi-event.ts"
+		,"midiwriterjs/midi-events/note-event.ts"
+		,"midiwriterjs/midi-events/note-off-event.ts"
+		,"midiwriterjs/midi-events/note-on-event.ts"
+		,"midiwriterjs/midi-events/pitch-bend-event.ts"
+		,"midiwriterjs/midi-events/program-change-event.ts"
+		
+
+		,"midiwriterjs/meta-events/copyright-event.ts"
+		,"midiwriterjs/meta-events/cue-point-event.ts"
+		,"midiwriterjs/meta-events/end-track-event.ts"
+		,"midiwriterjs/meta-events/instrument-name-event.ts"
+		,"midiwriterjs/meta-events/key-signature-event.ts"
+		,"midiwriterjs/meta-events/lyric-event.ts"
+		,"midiwriterjs/meta-events/marker-event.ts"
+		,"midiwriterjs/meta-events/meta-event.ts"
+		,"midiwriterjs/meta-events/tempo-event.ts"
+		,"midiwriterjs/meta-events/text-event.ts"
+		,"midiwriterjs/meta-events/time-signature-event.ts"
+		,"midiwriterjs/meta-events/track-name-event.ts"
+
+
+		,"midiwriterjs/chunks/header.ts"
+		,"midiwriterjs/chunks/chunk.ts"
+		,"midiwriterjs/chunks/track.ts"
+
+		,"midiwriterjs/abstract-event.ts"
+		,"midiwriterjs/constants.ts"
+		,"midiwriterjs/main.ts"
+		,"midiwriterjs/utils.ts"
+		,"midiwriterjs/writer.ts"
+
+		,"midiexportedplugin.ts"
+	]
+}

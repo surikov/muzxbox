@@ -1,0 +1,8 @@
+{
+    "label": "MIDI export"
+    , "purpose": "Action"
+    , "kind": "midiexport1"
+    , "ui": "miex.html"
+    , "evaluate": ""
+    , "script": ""
+}
