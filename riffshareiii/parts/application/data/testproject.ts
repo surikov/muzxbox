@@ -18,7 +18,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 			{
 				title: "Piano track"
 				, measures: [{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }]
-				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0 }
+				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0 ,hint1_128:0}
 			}
 		]
 		, percussions: []
@@ -105,7 +105,7 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 					]
 				}, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 }
+			, performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 ,hint1_128:0}
 		}
 		, {
 			title: "Second track", measures: [
@@ -124,7 +124,7 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 				, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 }
+			, performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 ,hint1_128:0}
 		}
 		, {
 			title: "Third track", measures: [
@@ -139,19 +139,19 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 				, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0 }
+			, performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0,hint1_128:0 }
 		}
 		, {
 			title: "A track 1", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 }
+			, performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 ,hint1_128:0}
 		}, {
 			title: "A track 987654321", measures: [
 				{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
 				, { chords: [] }
 			]//, filters: []
-			, performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 }, state: 0 }
+			, performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 }, state: 0 ,hint1_128:0}
 		}
 	]
 	, percussions: [
@@ -159,15 +159,15 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 			title: "Snare", measures: [
 				{ skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
 			]//, filters: []
-			, sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 }
+			, sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 ,hint35_81:0}
 		}
 		, {
 			title: "Snare2", measures: []//, filters: []
-			, sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 }
+			, sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 ,hint35_81:0}
 		}
 		, {
 			title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }]//, filters: []
-			, sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 }
+			, sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 ,hint35_81:0}
 		}
 	]
 	, comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {

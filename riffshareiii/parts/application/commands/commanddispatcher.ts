@@ -6,6 +6,7 @@ class CommandDispatcher {
 	audioContext: AudioContext;
 	tapSizeRatio: number = 1;
 	clipboardData: Zvoog_Project | null = null;
+	lastUsedSchedule: MZXBX_Schedule | null = null;
 	//onAir = false;
 	//neeToStart = false;
 	playPosition = 0;
@@ -250,6 +251,7 @@ class CommandDispatcher {
 					, properties: sampler.sampler.data
 					, description: 'sampler ' + sampler.title
 				}
+				, hint: 0
 			};
 			if (
 				(soloOnly && sampler.sampler.state != 2)
@@ -273,6 +275,7 @@ class CommandDispatcher {
 					, properties: track.performer.data
 					, description: 'track ' + track.title
 				}
+				, hint: 0
 			};
 			if (
 				(soloOnly && track.performer.state != 2)
@@ -332,7 +335,7 @@ class CommandDispatcher {
 					for (let ski = 0; ski < percBar.skips.length; ski++) {
 						let askip = percBar.skips[ski];
 						let start = MMUtil().set(askip).duration(measure.tempo);
-						let it: MZXBX_PlayItem = { skip: start, channelId: channel.id, pitches: [], slides: [] };
+						let it: MZXBX_PlayItem = { skip: start, channel: channel, pitches: [], slides: [] };
 						singleSet.items.push(it);
 					}
 				}
@@ -347,7 +350,7 @@ class CommandDispatcher {
 						//for (let ski = 0; ski < trackBar.skips.length; ski++) {
 						//let askip = trackBar.skips[ski];
 						let start = MMUtil().set(chord.skip).duration(measure.tempo);
-						let it: MZXBX_PlayItem = { skip: start, channelId: channel.id, pitches: chord.pitches, slides: [] };
+						let it: MZXBX_PlayItem = { skip: start, channel: channel, pitches: chord.pitches, slides: [] };
 						singleSet.items.push(it);
 						for (let kk = 0; kk < chord.slides.length; kk++) {
 							let one = chord.slides[kk];
@@ -402,23 +405,23 @@ class CommandDispatcher {
 	setupAndStartPlay() {
 		console.log('setupAndStartPlay');
 		//this.onAir = true;
-		let schedule = this.renderCurrentProjectForOutput();
+		this.lastUsedSchedule = this.renderCurrentProjectForOutput();
 		let from = 0;
 		let to = 0;
 		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
 			for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
-				to = to + schedule.series[nn].duration;
+				to = to + this.lastUsedSchedule.series[nn].duration;
 				if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
 					from = to;
 				}
 			}
 		} else {
-			for (let nn = 0; nn < schedule.series.length; nn++) {
-				to = to + schedule.series[nn].duration;
+			for (let nn = 0; nn < this.lastUsedSchedule.series.length; nn++) {
+				to = to + this.lastUsedSchedule.series[nn].duration;
 			}
 		}
 		//let me = this;
-		let result = this.player.startSetupPlugins(this.audioContext, schedule);
+		let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
 		//console.log('after setupPlugins',schedule);
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
@@ -437,9 +440,37 @@ class CommandDispatcher {
 		} else {
 			//this.renderer.menu.rerenderMenuContent()
 		}
-
+		//
 		this.startPlayLoop(from, this.playPosition, to);
 
+	}
+	updatePluginHint(schedule: MZXBX_Schedule) {
+
+		for (let kk = 0; kk < this.cfg().data.tracks.length; kk++) {
+			for (let ii = 0; ii < schedule.channels.length; ii++) {
+				//console.log(ii, schedule.channels[ii]);
+				if (schedule.channels[ii].id == this.cfg().data.tracks[kk].performer.id) {
+					let hint = schedule.channels[ii].hint;
+					if (hint >= 1 && hint <= 128) {
+						this.cfg().data.tracks[kk].performer.hint1_128 = hint;
+					}
+					break;
+				}
+			}
+		}
+		for (let kk = 0; kk < this.cfg().data.percussions.length; kk++) {
+			for (let ii = 0; ii < schedule.channels.length; ii++) {
+				//console.log(ii, schedule.channels[ii]);
+				if (schedule.channels[ii].id == this.cfg().data.percussions[kk].sampler.id) {
+					let hint = schedule.channels[ii].hint;
+					if (hint >= 35 && hint <= 81) {
+						this.cfg().data.percussions[kk].sampler.hint35_81 = hint;
+					}
+					break;
+				}
+			}
+		}
+		//console.log('updatePluginHint', this.cfg().data);
 	}
 	startPlayLoop(from: number, position: number, to: number) {
 		console.log('startPlayLoop', from, position, to);
@@ -465,6 +496,9 @@ class CommandDispatcher {
 			//console.log('waitid', waitid);
 		} else {
 			//console.log('empty msg');
+			if (this.lastUsedSchedule) {
+				this.updatePluginHint(this.lastUsedSchedule);
+			}
 			this.renderer.warning.hideWarning();
 			this.setVisibleTimeMark();
 			this.renderer.menu.rerenderMenuContent(null);

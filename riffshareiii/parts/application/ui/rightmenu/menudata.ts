@@ -578,6 +578,7 @@ function fillPluginsLists() {
 								, outputs: ['']
 								, iconPosition: { x: xx, y: yy }
 								, state: 0
+								, hint35_81: 0
 							}
 							, measures: []
 							, title: MZXBX_currentPlugins()[ii].label
@@ -655,9 +656,10 @@ function fillPluginsLists() {
 									, outputs: ['']
 									, iconPosition: { x: xx, y: yy }
 									, state: 0
+									,hint1_128:0
 								}
 								, measures: []
-								, title: MZXBX_currentPlugins()[ii].label
+								, title: MZXBX_currentPlugins()[ii].label								
 							});
 							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 						});

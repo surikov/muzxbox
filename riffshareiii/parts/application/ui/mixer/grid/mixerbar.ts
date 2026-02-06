@@ -107,7 +107,7 @@ class MixerBar {
 			let arr = globalCommandDispatcher.player.allPerformersSamplers();
 			//console.log('findDurationOfSample', samplerId,arr);
 			for (let ii = 0; ii < arr.length; ii++) {
-				if (arr[ii].channelId == samplerId) {
+				if (arr[ii].channel.id == samplerId) {
 					try {
 						let pluginImplementation = arr[ii].plugin as any;// as MZXBX_AudioSamplerPlugin;
 						//console.log('findDurationOfSample',smplr.duration(),'for', samplerId);

@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
 		"target": "es2018"
-		//,"outFile": "../../exe/plugins/actions/midiexport1/mx.js"
-		,"outFile": "mx.js"
+		,"outFile": "../../exe/plugins/actions/midiexport1/mx.js"
+		//,"outFile": "mx.js"
 		//,"outDir":"../js"
 		,		"strictNullChecks": true
 		,"alwaysStrict": true

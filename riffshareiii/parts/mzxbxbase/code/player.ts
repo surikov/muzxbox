@@ -50,7 +50,7 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	launchCollectedPlugins(): null | string {
 		//console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
-		let trackName:string='?';
+		let trackName: string = '?';
 		try {
 			//
 			for (let ff = 0; ff < this.filterHolders.length; ff++) {
@@ -62,18 +62,19 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 			}
 			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
-				//console.log('launch performer/drum',pp,this.performerDrumHolders[pp]);
-				trackName=this.performerDrumHolders[pp].description;
+				//
+				trackName = this.performerDrumHolders[pp].description;
 				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
 				if (plugin) {
-					plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
+					this.performerDrumHolders[pp].channel.hint = plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
+					//console.log('launch performer/drum', pp, this.performerDrumHolders[pp]);
 				}
 			}
 			return null;
 		} catch (xx) {
-			let ermsg='Can not launch ['+trackName+ '] due';
+			let ermsg = 'Can not launch [' + trackName + '] due';
 			console.log(ermsg, xx);
-			return ermsg+' ' + xx;
+			return ermsg + ' ' + xx;
 		}
 	}
 	checkCollectedPlugins(): null | string {
@@ -178,7 +179,7 @@ class SchedulePlayer implements MZXBX_Player {
 						}
 						for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 							let channel = this.schedule.channels[cc];
-							let performer = this.findPerformerSamplerPlugin(channel.id);
+							let performer = this.findPerformerSamplerPlugin(channel);
 							if (performer) {
 								let output = performer.output();
 								if (output) {
@@ -242,7 +243,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 				for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 					let channel = this.schedule.channels[cc];
-					let plugin = this.findPerformerSamplerPlugin(channel.id);
+					let plugin = this.findPerformerSamplerPlugin(channel);
 					if (plugin) {
 						let output = plugin.output();
 						if (output) {
@@ -318,18 +319,20 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 		}
 	}
-	findPerformerSamplerPlugin(channelId: string): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null {
+	findPerformerSamplerPlugin(//channelId: string
+		channel: MZXBX_Channel
+	): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null {
 		if (this.schedule) {
 			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
-				if (this.schedule.channels[ii].id == channelId) {
+				if (this.schedule.channels[ii].id == channel.id) {
 					for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
 						let performer = this.performerDrumHolders[nn];
-						if (channelId == performer.channelId) {
+						if (channel.id == performer.channel.id) {
 							if (performer.plugin) {
 								let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.plugin;
 								return plugin;
 							} else {
-								console.error('Empty performer plugin for', channelId);
+								console.error('Empty performer plugin for', channel.id);
 							}
 						}
 					}
@@ -337,11 +340,11 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 			console.error('Empty schedule');
 		}
-		console.error('No performer for', channelId);
+		console.error('No performer for', channel.id);
 		return null;
 	}
 	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number) {
-		let pp = this.findPerformerSamplerPlugin(it.channelId) as any;
+		let pp = this.findPerformerSamplerPlugin(it.channel) as any;
 		//console.log('sendPerformerItem',whenAudio,it);
 		if (pp) {
 			if (pp.start) {

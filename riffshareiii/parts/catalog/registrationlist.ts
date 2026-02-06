@@ -164,6 +164,15 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     , "evaluate": ""
     , "script": ""
 }
+,
+{
+    "label": "MIDI export"
+    , "purpose": "Action"
+    , "kind": "midiexport1"
+    , "ui": "./plugins/actions/midiexport1/miex.html"
+    , "evaluate": ""
+    , "script": ""
+}
 
 
 

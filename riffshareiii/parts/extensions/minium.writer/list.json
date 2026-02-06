@@ -2,7 +2,7 @@
     "label": "MIDI export"
     , "purpose": "Action"
     , "kind": "midiexport1"
-    , "ui": "miex.html"
+    , "ui": "./plugins/actions/midiexport1/miex.html"
     , "evaluate": ""
     , "script": ""
 }

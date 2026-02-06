@@ -1232,6 +1232,7 @@ class CommandDispatcher {
     constructor() {
         this.tapSizeRatio = 1;
         this.clipboardData = null;
+        this.lastUsedSchedule = null;
         this.playPosition = 0;
         this.restartOnInitError = false;
         this.playCallback = (start, pos, end) => {
@@ -1418,7 +1419,8 @@ class CommandDispatcher {
                     kind: sampler.sampler.kind,
                     properties: sampler.sampler.data,
                     description: 'sampler ' + sampler.title
-                }
+                },
+                hint: 0
             };
             if ((soloOnly && sampler.sampler.state != 2)
                 || ((!soloOnly) && sampler.sampler.state == 1)) {
@@ -1437,7 +1439,8 @@ class CommandDispatcher {
                     kind: track.performer.kind,
                     properties: track.performer.data,
                     description: 'track ' + track.title
-                }
+                },
+                hint: 0
             };
             if ((soloOnly && track.performer.state != 2)
                 || ((!soloOnly) && track.performer.state == 1)) {
@@ -1493,7 +1496,7 @@ class CommandDispatcher {
                     for (let ski = 0; ski < percBar.skips.length; ski++) {
                         let askip = percBar.skips[ski];
                         let start = MMUtil().set(askip).duration(measure.tempo);
-                        let it = { skip: start, channelId: channel.id, pitches: [], slides: [] };
+                        let it = { skip: start, channel: channel, pitches: [], slides: [] };
                         singleSet.items.push(it);
                     }
                 }
@@ -1506,7 +1509,7 @@ class CommandDispatcher {
                     for (let ch = 0; ch < trackBar.chords.length; ch++) {
                         let chord = trackBar.chords[ch];
                         let start = MMUtil().set(chord.skip).duration(measure.tempo);
-                        let it = { skip: start, channelId: channel.id, pitches: chord.pitches, slides: [] };
+                        let it = { skip: start, channel: channel, pitches: chord.pitches, slides: [] };
                         singleSet.items.push(it);
                         for (let kk = 0; kk < chord.slides.length; kk++) {
                             let one = chord.slides[kk];
@@ -1542,23 +1545,23 @@ class CommandDispatcher {
     }
     setupAndStartPlay() {
         console.log('setupAndStartPlay');
-        let schedule = this.renderCurrentProjectForOutput();
+        this.lastUsedSchedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
         if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
             for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
-                to = to + schedule.series[nn].duration;
+                to = to + this.lastUsedSchedule.series[nn].duration;
                 if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
                     from = to;
                 }
             }
         }
         else {
-            for (let nn = 0; nn < schedule.series.length; nn++) {
-                to = to + schedule.series[nn].duration;
+            for (let nn = 0; nn < this.lastUsedSchedule.series.length; nn++) {
+                to = to + this.lastUsedSchedule.series[nn].duration;
             }
         }
-        let result = this.player.startSetupPlugins(this.audioContext, schedule);
+        let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
         if (this.playPosition < from) {
             this.playPosition = from;
         }
@@ -1571,6 +1574,30 @@ class CommandDispatcher {
         else {
         }
         this.startPlayLoop(from, this.playPosition, to);
+    }
+    updatePluginHint(schedule) {
+        for (let kk = 0; kk < this.cfg().data.tracks.length; kk++) {
+            for (let ii = 0; ii < schedule.channels.length; ii++) {
+                if (schedule.channels[ii].id == this.cfg().data.tracks[kk].performer.id) {
+                    let hint = schedule.channels[ii].hint;
+                    if (hint >= 1 && hint <= 128) {
+                        this.cfg().data.tracks[kk].performer.hint1_128 = hint;
+                    }
+                    break;
+                }
+            }
+        }
+        for (let kk = 0; kk < this.cfg().data.percussions.length; kk++) {
+            for (let ii = 0; ii < schedule.channels.length; ii++) {
+                if (schedule.channels[ii].id == this.cfg().data.percussions[kk].sampler.id) {
+                    let hint = schedule.channels[ii].hint;
+                    if (hint >= 35 && hint <= 81) {
+                        this.cfg().data.percussions[kk].sampler.hint35_81 = hint;
+                    }
+                    break;
+                }
+            }
+        }
     }
     startPlayLoop(from, position, to) {
         console.log('startPlayLoop', from, position, to);
@@ -1593,6 +1620,9 @@ class CommandDispatcher {
             }, 1000);
         }
         else {
+            if (this.lastUsedSchedule) {
+                this.updatePluginHint(this.lastUsedSchedule);
+            }
             this.renderer.warning.hideWarning();
             this.setVisibleTimeMark();
             this.renderer.menu.rerenderMenuContent(null);
@@ -3760,7 +3790,8 @@ function fillPluginsLists() {
                                 data: '',
                                 outputs: [''],
                                 iconPosition: { x: xx, y: yy },
-                                state: 0
+                                state: 0,
+                                hint35_81: 0
                             },
                             measures: [],
                             title: MZXBX_currentPlugins()[ii].label
@@ -3789,7 +3820,8 @@ function fillPluginsLists() {
                                     data: '',
                                     outputs: [''],
                                     iconPosition: { x: xx, y: yy },
-                                    state: 0
+                                    state: 0,
+                                    hint1_128: 0
                                 },
                                 measures: [],
                                 title: MZXBX_currentPlugins()[ii].label
@@ -4350,7 +4382,7 @@ class MixerBar {
         if (globalCommandDispatcher.player) {
             let arr = globalCommandDispatcher.player.allPerformersSamplers();
             for (let ii = 0; ii < arr.length; ii++) {
-                if (arr[ii].channelId == samplerId) {
+                if (arr[ii].channel.id == samplerId) {
                     try {
                         let pluginImplementation = arr[ii].plugin;
                         if (pluginImplementation) {
@@ -6530,7 +6562,7 @@ function createNewEmptyProjectData() {
             {
                 title: "Piano track",
                 measures: [{ chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }],
-                performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0 }
+                performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0, hint1_128: 0 }
             }
         ],
         percussions: [],
@@ -6586,7 +6618,7 @@ let _______mzxbxProjectForTesting2 = {
                     ]
                 }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0 }
+            performer: { id: 'firstPerfoemrID', data: '77', kind: 'zinstr1', outputs: ['track1Volme'], iconPosition: { x: 40, y: 20 }, state: 0, hint1_128: 0 }
         },
         {
             title: "Second track", measures: [
@@ -6605,7 +6637,7 @@ let _______mzxbxProjectForTesting2 = {
                 { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0 }
+            performer: { id: 'secTrPerfId', data: '34', kind: 'zinstr1', outputs: ['track2Volme'], iconPosition: { x: 40, y: 49 }, state: 0, hint1_128: 0 }
         },
         {
             title: "Third track", measures: [
@@ -6620,19 +6652,19 @@ let _______mzxbxProjectForTesting2 = {
                 { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0 }
+            performer: { id: 'at3', data: '23', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 99, y: 44 }, state: 0, hint1_128: 0 }
         },
         {
             title: "A track 1", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }
             ],
-            performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0 }
+            performer: { id: 'bt3', data: '29', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 88, y: 55 }, state: 0, hint1_128: 0 }
         }, {
             title: "A track 987654321", measures: [
                 { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] }, { chords: [] },
                 { chords: [] }
             ],
-            performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 }, state: 0 }
+            performer: { id: 'ct3', data: '44', kind: 'zinstr1', outputs: ['track3Volme'], iconPosition: { x: 77, y: 66 }, state: 0, hint1_128: 0 }
         }
     ],
     percussions: [
@@ -6640,15 +6672,15 @@ let _______mzxbxProjectForTesting2 = {
             title: "Snare", measures: [
                 { skips: [] }, { skips: [{ count: 2, part: 16 }] }, { skips: [] }, { skips: [{ count: 0, part: 16 }] }
             ],
-            sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0 }
+            sampler: { id: 'd1', data: '39', kind: 'zdrum1', outputs: ['drum1Volme'], iconPosition: { x: 22, y: 75 }, state: 0, hint35_81: 0 }
         },
         {
             title: "Snare2", measures: [],
-            sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0 }
+            sampler: { id: 'd2', data: '41', kind: 'zdrum1', outputs: ['drum2Volme'], iconPosition: { x: 22, y: 91 }, state: 0, hint35_81: 0 }
         },
         {
             title: "Snare3", measures: [{ skips: [] }, { skips: [{ count: 1, part: 16 }] }],
-            sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0 }
+            sampler: { id: 'd3', data: '47', kind: 'zdrum1', outputs: ['drum3Volme'], iconPosition: { x: 22, y: 99 }, state: 0, hint35_81: 0 }
         }
     ],
     comments: [{ points: [{ skip: { count: 2, part: 16 }, text: '1-2/16', row: 0 }] }, {

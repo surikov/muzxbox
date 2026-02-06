@@ -4,164 +4,122 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 	constructor() {
 		super(false);
 	}
-	test() {
-		console.log('test');
-		
-		
-var tracks:Track[] = [];
 
-tracks[0] = new  Track();
-tracks[0].setTimeSignatureOnly(3, 4);
-tracks[0].setTempo(100);
+	startExport() {
+		console.log('startExport', this.currentProject);
+		let tracks: Track[] = [];
+		let track0 = new Track();
+		track0.addEvent(new TrackNameEvent({ text: 'Drums' }));
 
-var notes;
-
-// melody
-tracks[1] = new  Track();
-tracks[1].addEvent(new ProgramChangeEvent({instrument: 14-1}));
-
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4', 'C#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['B4', 'D5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['G#4', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4', 'C#5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4', 'C#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['B4', 'D5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['G#4', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4', 'C#5'], duration: '2'});
-tracks[1].addEvent(notes);
-// note how the previous rest is handled: it became the wait
-notes = new  NoteEvent({wait: '4', pitch:['E5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['D#5', 'F#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['D5', 'G#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'A5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['E5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['D#5', 'F#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['D5', 'G#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'A5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch:['C#5', 'E5'], duration: '2'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4', 'C#5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['C#5', 'E5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['B4', 'D5'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['G#4', 'B4'], duration: '4'});
-tracks[1].addEvent(notes);
-notes = new  NoteEvent({pitch:['A4'], duration: '2'});
-tracks[1].addEvent(notes);
-
-// bass
-tracks[2] = new  Track();
-tracks[2].addEvent(new ProgramChangeEvent({instrument: 35-1}));
-
-notes = new  NoteEvent({pitch:['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['E3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['E3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['E3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['E3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['E3'], duration: '2'});
-tracks[2].addEvent(notes);
-notes = new  NoteEvent({wait: '4', pitch: ['A3'], duration: '2'});
-tracks[2].addEvent(notes);
-
-
-var write = new  Writer(tracks);
-
-console.log(write.dataUri());
+		track0.addInstrumentName('Drums');
+		tracks[0] = track0;
+		track0.setTimeSignatureOnly(4, 4);
+		track0.setTempo(120);
+		let drumEvents: { start: number, pitch: number, on: boolean }[] = [];
+		let drumdur = 0.5;
+		for (let ii = 0; ii < this.currentProject.percussions.length; ii++) {
+			let barstart = 0;
+			let perctrack: Zvoog_PercussionTrack = this.currentProject.percussions[ii];
+			for (let mm = 0; mm < this.currentProject.timeline.length; mm++) {
+				let bar = this.currentProject.timeline[mm];
+				let drumeasure = perctrack.measures[mm];
+				for (let dd = 0; dd < drumeasure.skips.length; dd++) {
+					let sk = drumeasure.skips[dd];
+					let pi = perctrack.sampler.hint35_81;
+					if (pi < 35 || pi > 81) pi = 81;
+					drumEvents.push({ pitch: pi, start: barstart + MMUtil().set(sk).duration(bar.tempo), on: true });
+					drumEvents.push({ pitch: pi, start: barstart + MMUtil().set(sk).duration(bar.tempo) + drumdur, on: false });
+				}
+				barstart = barstart + MMUtil().set(bar.metre).duration(bar.tempo);
+			}
+		}
+		drumEvents.sort(function (a, b) {
+			return a.start - b.start;
+		});
+		let preStart = 0;
+		let tickRatio = 128 * 2;//HEADER_CHUNK_DIVISION * bar duration in seconds
+		for (var ii = 0; ii < drumEvents.length; ii++) {
+			var wait = drumEvents[ii].start - preStart;
+			if (drumEvents[ii].on) {
+				let on: NoteOnEventOnOff2 = new NoteOnEventOnOff2(9, Math.round(wait * tickRatio), drumEvents[ii].pitch, 98, true);
+				track0.addEvent(on);
+			} else {
+				let off: NoteOnEventOnOff2 = new NoteOnEventOnOff2(9, Math.round(wait * tickRatio), drumEvents[ii].pitch, 0, false);
+				track0.addEvent(off);
+			}
+			preStart = preStart + wait;
+		}
+		for (let tt = 0; tt < this.currentProject.tracks.length && tt < 15; tt++) {
+			let channn = tt;
+			if (channn > 8) channn = tt + 1;
+			let trckEvents: { start: number, chordpitch: number, on: boolean }[] = [];
+			let barstart = 0;
+			let protrack = this.currentProject.tracks[tt];
+			let newmitrack = new Track();
+			newmitrack.setTimeSignatureOnly(4, 4);
+			newmitrack.setTempo(120);
+			tracks.push(newmitrack);
+			let mins = protrack.performer.hint1_128;
+			if (mins > 0 && mins < 129) {
+				mins = mins - 1;
+			} else {
+				mins = 0;
+			}
+			newmitrack.addEvent(new ProgramChangeEvent({ instrument: mins, channel: channn }));
+			newmitrack.addInstrumentName(protrack.title);
+			newmitrack.addEvent(new TrackNameEvent({ text: protrack.title }));
+			for (let mm = 0; mm < this.currentProject.timeline.length; mm++) {
+				let bar = this.currentProject.timeline[mm];
+				let inmeasure = protrack.measures[mm];
+				for (let cc = 0; cc < inmeasure.chords.length; cc++) {
+					let chord = inmeasure.chords[cc];
+					let sk = chord.skip;
+					let chorddur = 0;
+					for (let sl = 0; sl < chord.slides.length; sl++) {
+						chorddur = chorddur + MMUtil().set(chord.slides[sl].duration).duration(bar.tempo);
+					}
+					for (let nn = 0; nn < chord.pitches.length; nn++) {
+						let pi = chord.pitches[nn];
+						trckEvents.push({ chordpitch: pi, start: barstart + MMUtil().set(sk).duration(bar.tempo), on: true });
+						trckEvents.push({ chordpitch: pi, start: barstart + MMUtil().set(sk).duration(bar.tempo) + chorddur, on: false });
+					}
+				}
+				barstart = barstart + MMUtil().set(bar.metre).duration(bar.tempo);
+			}
+			trckEvents.sort(function (a, b) {
+				return a.start - b.start;
+			});
+			let preStart = 0;
+			for (var ii = 0; ii < trckEvents.length; ii++) {
+				var wait = trckEvents[ii].start - preStart;
+				if (trckEvents[ii].on) {
+					let on: NoteOnEventOnOff2 = new NoteOnEventOnOff2(channn, Math.round(wait * tickRatio), trckEvents[ii].chordpitch, 97, true);
+					newmitrack.addEvent(on);
+				} else {
+					let off: NoteOnEventOnOff2 = new NoteOnEventOnOff2(channn, Math.round(wait * tickRatio), trckEvents[ii].chordpitch, 0, false);
+					newmitrack.addEvent(off);
+				}
+				preStart = preStart + wait;
+			}
+		}
+		var write = new Writer(tracks);
+		/*
+		let uint8Array:Uint8Array=write.buildFile();
+		let bufferSource:BufferSource=uint8Array.buffer;
+		//console.log(write.dataUri());
+		let data:BlobPart[]=[bufferSource];
+		let file = new Blob(data, { type: "audio/midi" });
+		*/
+		let a: HTMLAnchorElement = document.createElement("a");
+		//let url = URL.createObjectURL(file);
+		//a.href = url;
+		a.href = write.dataUri();
+		a.download = "export.mid";
+		document.body.appendChild(a);
+		a.click();
 	}
 	onMessageFromHost(message: MZXBX_MessageToPlugin): void {
 		this.currentProject = message.hostData;
-		if (this.currentProject) {
-			this.refreshInfo();
-		}
-	}
-	refreshInfo() {
-		let startMeasure = this.currentProject.selectedPart.startMeasure;
-		let endMeasure = this.currentProject.selectedPart.endMeasure;
-		if (startMeasure < 0) {
-			startMeasure = 0;
-			endMeasure = this.currentProject.timeline.length - 1;
-		}
-		let metrecount = this.currentProject.timeline[startMeasure].metre.count;
-		let metrepart = this.currentProject.timeline[startMeasure].metre.part;
-		let tempo = this.currentProject.timeline[startMeasure].tempo;
-		let selfrom = document.getElementById('selfrom');
-		if (selfrom) {
-			(selfrom as any).value = startMeasure + 1;
-		}
-		let selto = document.getElementById('selto');
-		if (selto) {
-			(selto as any).value = endMeasure + 1;
-		}
-		let metreinput = document.getElementById('metreinput');
-		if (metreinput) {
-			(metreinput as any).value = '' + metrecount + '/' + metrepart;
-		}
-		let bpm = document.getElementById('bpm');
-		if (bpm) {
-			(bpm as any).value = tempo;
-		}
 	}
 	setText(id: string, txt: string) {
 		let oo = document.getElementById(id);
@@ -171,40 +129,15 @@ console.log(write.dataUri());
 	}
 	onLanguaga(enruzhId: string): void {
 		if (enruzhId == 'zh') {
-			this.setText('plugintitle', '更改选定措施');
-			this.setText('sellabel', '选择');
-			this.setText('splitlabel', '分离');
-			this.setText('tempolabel', '音乐节奏');
-			this.setText('metrelabel', '音乐节拍');
-			this.setText('btndel', '删除');
-			this.setText('btnclear', '清除');
-			this.setText('btnadd', '添加');
-			this.setText('btnpushaside', '推开');
-			this.setText('btnmerge', '合并');
+			this.setText('plugintitle', 'Export MIDI');
+			this.setText('btnsend', 'OK');
 		} else {
 			if (enruzhId == 'ru') {
-				this.setText('plugintitle', 'Изменить такты');
-				this.setText('sellabel', 'Выбрано');
-				this.setText('splitlabel', 'Отделить');
-				this.setText('tempolabel', 'Темп');
-				this.setText('metrelabel', 'Метр');
-				this.setText('btndel', 'Удалить');
-				this.setText('btnclear', 'Очистить');
-
-				this.setText('btnadd', 'Добавить');
-				this.setText('btnpushaside', 'Отодвинуть');
-				this.setText('btnmerge', 'Объединить');
+				this.setText('plugintitle', 'Экспорт MIDI');
+				this.setText('btnsend', 'OK');
 			} else {
-				this.setText('plugintitle', 'Change selected measures');
-				this.setText('sellabel', 'Selection');
-				this.setText('splitlabel', 'Split');
-				this.setText('tempolabel', 'Tempo');
-				this.setText('metrelabel', 'Metre');
-				this.setText('btndel', 'Delete');
-				this.setText('btnclear', 'Clrear');
-				this.setText('btnadd', 'Add to end');
-				this.setText('btnpushaside', 'Push aside');
-				this.setText('btnmerge', 'Merge');
+				this.setText('plugintitle', 'Export MIDI');
+				this.setText('btnsend', 'OK');
 			}
 		}
 

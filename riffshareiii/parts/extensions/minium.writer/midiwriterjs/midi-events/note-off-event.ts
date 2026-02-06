@@ -18,7 +18,7 @@ class NoteOffEvent implements MidiEvent {
 	duration: string|number;
 	tick: number;
 
-	constructor(fields: { channel: number; duration: string|number; velocity: number; pitch: string|number; tick?: number; data?: number[]; delta?: number }) {
+	constructor(fields) {
 		this.name = 'NoteOffEvent';
 		this.channel = fields.channel || 1;
 		this.pitch = fields.pitch;

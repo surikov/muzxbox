@@ -25,7 +25,7 @@ class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 		}
 		return nn;
 	}
-	launch(context: AudioContext, parameters: string): void {
+	launch(context: AudioContext, parameters: string): number {
 		if (this.audioContext) {
 			//
 		} else {
@@ -56,6 +56,8 @@ class PercussionDrumKitImplementation implements MZXBX_AudioSamplerPlugin {
 			});
 		}
 		this.preidx = idx;
+		//console.log(this.info.pitch);
+		return this.info.pitch;
 	}
 	busy(): null | string {
 		if (this.preset == null) {

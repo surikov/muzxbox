@@ -776,6 +776,8 @@ class StrumPerformerImplementation {
                 this.cachedListIdx = this.listidx;
             });
         }
+        let midi = 1 + parseInt(this.info.variable.substring(6, 9));
+        return midi;
     }
     parseParametersData(parameters) {
         let parsed = this.util.checkParameters(parameters);

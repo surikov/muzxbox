@@ -1,15 +1,15 @@
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 class PluginLoader {
 	collectLoadPlugins(schedule: MZXBX_Schedule, allfilters: MZXBX_FilterHolder[], allperformers: MZXBX_PerformerSamplerHolder[]): null | string {
-		
+
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
-			this.collectFilterPlugin(filter.id, filter.kind, filter.properties,filter.description, allfilters);
+			this.collectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
 		}
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
-			let chanid = schedule.channels[ch].id;
-			this.collectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description,allperformers);
+			//let chanid = schedule.channels[ch].id;
+			this.collectPerformerPlugin(schedule.channels[ch], performer.kind, performer.properties, performer.description, allperformers);
 		}
 		let result = this.startLoadCollectedPlugins(allfilters, allperformers);
 		//afterStart();
@@ -38,7 +38,7 @@ class PluginLoader {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -75,17 +75,26 @@ class PluginLoader {
 				return;
 			}
 		}
-		filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties ,description:description});
+		filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties, description: description });
 	}
-	collectPerformerPlugin(id: string, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
+	collectPerformerPlugin(//id: string
+		channel: MZXBX_Channel, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		for (let ii = 0; ii < performers.length; ii++) {
-			if (performers[ii].channelId == id) {
+			//if (performers[ii].channelId == id) {
+			if (performers[ii].channel.id == channel.id) {
 				performers[ii].properties = properties;
 				return;
 			}
 		}
 		//console.log('performer',description);
-		performers.push({ plugin: null, channelId: id, kind: kind, properties: properties ,description:description});
+		performers.push({
+			plugin: null
+			//, channelId: id
+			, channel: channel
+			, kind: kind
+			, properties: properties
+			, description: description
+		});
 	}
 	findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null {
 		for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {

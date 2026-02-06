@@ -58,6 +58,7 @@ type Zvoog_AudioSequencer = {
         y: number;
     };
     state: 0 | 1 | 2;
+    hint1_128: number;
 };
 type Zvoog_AudioSampler = {
     id: string;
@@ -69,6 +70,7 @@ type Zvoog_AudioSampler = {
         y: number;
     };
     state: 0 | 1 | 2;
+    hint35_81: number;
 };
 type Zvoog_Chord = {
     skip: Zvoog_Metre;
@@ -178,7 +180,7 @@ type MZXBX_FilterHolder = {
 };
 type MZXBX_PerformerSamplerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
-    channelId: string;
+    channel: MZXBX_Channel;
     kind: string;
     properties: string;
     description: string;
@@ -187,6 +189,7 @@ type MZXBX_Channel = {
     id: string;
     performer: MZXBX_ChannelSource;
     outputs: string[];
+    hint: number;
 };
 type MZXBX_SlideItem = {
     duration: number;
@@ -194,7 +197,7 @@ type MZXBX_SlideItem = {
 };
 type MZXBX_PlayItem = {
     skip: number;
-    channelId: string;
+    channel: MZXBX_Channel;
     pitches: number[];
     slides: MZXBX_SlideItem[];
 };
@@ -224,7 +227,7 @@ type MZXBX_AudioFilterPlugin = {
     output: () => AudioNode | null;
 };
 type MZXBX_AudioSamplerPlugin = {
-    launch: (context: AudioContext, parameters: string) => void;
+    launch: (context: AudioContext, parameters: string) => number;
     busy: () => null | string;
     start: (when: number, tempo: number) => void;
     cancel: () => void;
@@ -237,7 +240,7 @@ type MZXBX_ChannelSource = {
     description: string;
 };
 type MZXBX_AudioPerformerPlugin = {
-    launch: (context: AudioContext, parameters: string) => void;
+    launch: (context: AudioContext, parameters: string) => number;
     busy: () => null | string;
     strum: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;
@@ -354,15 +357,7 @@ declare class NoteOffEvent implements MidiEvent {
     pitch: string | number;
     duration: string | number;
     tick: number;
-    constructor(fields: {
-        channel: number;
-        duration: string | number;
-        velocity: number;
-        pitch: string | number;
-        tick?: number;
-        data?: number[];
-        delta?: number;
-    });
+    constructor(fields: any);
     buildData(track: any, precisionDelta: number, options?: {
         middleC?: string;
     }): this;
@@ -390,6 +385,14 @@ declare class NoteOnEvent implements MidiEvent {
     buildData(track: any, precisionDelta: any, options?: {
         middleC?: string;
     }): this;
+}
+declare class NoteOnEventOnOff2 implements MidiEvent {
+    channel: number;
+    data: number[];
+    delta: number;
+    status: 0x90;
+    name: string;
+    constructor(channel: number, tickDelta: number, pitch: number, velocity: number, isOn: boolean);
 }
 declare class PitchBendEvent implements MidiEvent {
     channel: number;
@@ -516,7 +519,7 @@ declare class TimeSignatureEvent implements MetaEvent {
     delta: number;
     name: string;
     type: 0x58;
-    constructor(numerator: any, denominator: any, midiclockspertick: any, notespermidiclock: any);
+    constructor(numerator: any, denominator: any, midiclockspertick?: any, notespermidiclock?: any);
 }
 declare class TrackNameEvent implements MetaEvent {
     data: number[];
@@ -555,6 +558,7 @@ declare class Track implements Chunk {
     removeEventsByName(eventName: string): Track;
     setTempo(bpm: number, tick?: number): Track;
     setTimeSignature(numerator: number, denominator: number, midiclockspertick: number, notespermidiclock: number): Track;
+    setTimeSignatureOnly(numerator: number, denominator: number): Track;
     setKeySignature(sf: any, mi: any): Track;
     addText(text: string): Track;
     addCopyright(text: string): Track;
@@ -660,8 +664,8 @@ declare class Writer {
 declare class MiniumMIDIx extends MZXBX_Plugin_UI {
     currentProject: Zvoog_Project;
     constructor();
+    startExport(): void;
     onMessageFromHost(message: MZXBX_MessageToPlugin): void;
-    refreshInfo(): void;
     setText(id: string, txt: string): void;
     onLanguaga(enruzhId: string): void;
 }

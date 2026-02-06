@@ -22,7 +22,7 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 	constructor() {
 		//
 	}
-	launch(context: AudioContext, parameters: string): void {
+	launch(context: AudioContext, parameters: string): number {
 		this.parseParametersData(parameters);
 		if (this.audioContext) {
 
@@ -48,6 +48,10 @@ class StrumPerformerImplementation implements MZXBX_AudioPerformerPlugin {
 				this.cachedListIdx = this.listidx;
 			});
 		}
+		let midi=1+parseInt(this.info.variable.substring(6,9));
+		//console.log(midi,this.info.variable);//"_tone_0810_Chaos_sf2_file"
+		
+		return midi;
 	}
 	parseParametersData(parameters: string) {
 		let parsed = this.util.checkParameters(parameters);

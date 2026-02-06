@@ -12,22 +12,22 @@ class NoteOnEvent implements MidiEvent {
 	delta: number;
 	status: 0x90;
 	name: string;
-	pitch: string|string[]|number|number[];
+	pitch: string | string[] | number | number[];
 	velocity: number;
-	wait: string|number;
+	wait: string | number;
 	tick: number;
 	deltaWithPrecisionCorrection: number;
 
-	constructor(fields: { channel?: number; wait?: string|number; velocity?: number; pitch?: string|string[]|number|number[]; tick?: number; data?: number[]; delta?: number }) {
-		this.name 		= 'NoteOnEvent';
-		this.channel 	= fields.channel || 1;
-		this.pitch 		= (fields.pitch as any);
-		this.wait 		= fields.wait || 0;
-		this.velocity 	= fields.velocity || 50;
+	constructor(fields: { channel?: number; wait?: string | number; velocity?: number; pitch?: string | string[] | number | number[]; tick?: number; data?: number[]; delta?: number }) {
+		this.name = 'NoteOnEvent';
+		this.channel = fields.channel || 1;
+		this.pitch = (fields.pitch as any);
+		this.wait = fields.wait || 0;
+		this.velocity = fields.velocity || 50;
 
-		this.tick 		= (fields.tick || null as any);
-		this.delta 		= (null as any);
-		this.data 		= (fields.data as any);
+		this.tick = (fields.tick || null as any);
+		this.delta = (null as any);
+		this.data = (fields.data as any);
 		this.status = 0x90;
 	}
 
@@ -36,7 +36,7 @@ class NoteOnEvent implements MidiEvent {
 	 * @param {Track} track - parent track
 	 * @return {NoteOnEvent}
 	 */
-	buildData(track, precisionDelta, options: {middleC?: string} = {}) {
+	buildData(track, precisionDelta, options: { middleC?: string } = {}) {
 		this.data = [];
 
 		// Explicitly defined startTick event
@@ -56,14 +56,34 @@ class NoteOnEvent implements MidiEvent {
 		this.deltaWithPrecisionCorrection = Utils.getRoundedIfClose(this.delta - precisionDelta);
 
 		this.data = Utils.numberToVariableLength(this.deltaWithPrecisionCorrection)
-					.concat(
-						this.status | this.channel - 1,
-							Utils.getPitch(this.pitch, options.middleC),
-							Utils.convertVelocity(this.velocity)
-					);
-
+			.concat(
+				this.status | this.channel - 1,
+				Utils.getPitch(this.pitch, options.middleC),
+				Utils.convertVelocity(this.velocity)
+			);
+		console.log(this.deltaWithPrecisionCorrection, 'channel', (this.status | this.channel - 1), this.status, this.channel, 'pitch', Utils.getPitch(this.pitch, options.middleC));
 		return this;
 	}
 }
 
 //export {NoteOnEvent};
+
+class NoteOnEventOnOff2 implements MidiEvent {
+	channel: number;
+	data: number[];
+	delta: number;
+	status: 0x90;
+	name: string;
+	constructor(channel: number, tickDelta: number, pitch: number, velocity: number, isOn: boolean) {
+		let statOnOff = 0x90;
+		if (!isOn) {
+			statOnOff = 0x80
+		}
+		this.data = Utils.numberToVariableLength(tickDelta)
+			.concat(
+				statOnOff | channel ,
+				pitch,
+				velocity
+			);
+	}
+}

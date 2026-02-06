@@ -155,6 +155,7 @@ declare class CommandDispatcher {
     audioContext: AudioContext;
     tapSizeRatio: number;
     clipboardData: Zvoog_Project | null;
+    lastUsedSchedule: MZXBX_Schedule | null;
     playPosition: number;
     restartOnInitError: boolean;
     playCallback: (start: number, position: number, end: number) => void;
@@ -190,6 +191,7 @@ declare class CommandDispatcher {
     reStartPlayIfPlay(): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
+    updatePluginHint(schedule: MZXBX_Schedule): void;
     startPlayLoop(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(idx: string): void;
@@ -996,6 +998,7 @@ type Zvoog_AudioSequencer = {
         y: number;
     };
     state: 0 | 1 | 2;
+    hint1_128: number;
 };
 type Zvoog_AudioSampler = {
     id: string;
@@ -1007,6 +1010,7 @@ type Zvoog_AudioSampler = {
         y: number;
     };
     state: 0 | 1 | 2;
+    hint35_81: number;
 };
 type Zvoog_Chord = {
     skip: Zvoog_Metre;
@@ -1116,7 +1120,7 @@ type MZXBX_FilterHolder = {
 };
 type MZXBX_PerformerSamplerHolder = {
     plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
-    channelId: string;
+    channel: MZXBX_Channel;
     kind: string;
     properties: string;
     description: string;
@@ -1125,6 +1129,7 @@ type MZXBX_Channel = {
     id: string;
     performer: MZXBX_ChannelSource;
     outputs: string[];
+    hint: number;
 };
 type MZXBX_SlideItem = {
     duration: number;
@@ -1132,7 +1137,7 @@ type MZXBX_SlideItem = {
 };
 type MZXBX_PlayItem = {
     skip: number;
-    channelId: string;
+    channel: MZXBX_Channel;
     pitches: number[];
     slides: MZXBX_SlideItem[];
 };
@@ -1162,7 +1167,7 @@ type MZXBX_AudioFilterPlugin = {
     output: () => AudioNode | null;
 };
 type MZXBX_AudioSamplerPlugin = {
-    launch: (context: AudioContext, parameters: string) => void;
+    launch: (context: AudioContext, parameters: string) => number;
     busy: () => null | string;
     start: (when: number, tempo: number) => void;
     cancel: () => void;
@@ -1175,7 +1180,7 @@ type MZXBX_ChannelSource = {
     description: string;
 };
 type MZXBX_AudioPerformerPlugin = {
-    launch: (context: AudioContext, parameters: string) => void;
+    launch: (context: AudioContext, parameters: string) => number;
     busy: () => null | string;
     strum: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
     cancel: () => void;

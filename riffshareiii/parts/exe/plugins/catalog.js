@@ -80,6 +80,14 @@ let _t_all_registerd_plugins_list = [
         "ui": "./plugins/actions/baredit1/mied.html",
         "evaluate": "",
         "script": ""
+    },
+    {
+        "label": "MIDI export",
+        "purpose": "Action",
+        "kind": "midiexport1",
+        "ui": "./plugins/actions/midiexport1/miex.html",
+        "evaluate": "",
+        "script": ""
     }
 ];
 function MZXBX_currentPlugins() {

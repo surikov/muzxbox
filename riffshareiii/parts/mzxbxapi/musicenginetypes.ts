@@ -61,6 +61,7 @@ type Zvoog_AudioSequencer = {
 	outputs: string[];
 	iconPosition: { x: number, y: number };
 	state: 0 | 1 | 2;//on|mute|solo
+	hint1_128: number;
 };
 type Zvoog_AudioSampler = {
 	id: string;
@@ -69,6 +70,7 @@ type Zvoog_AudioSampler = {
 	outputs: string[];
 	iconPosition: { x: number, y: number };
 	state: 0 | 1 | 2;//on|mute|solo
+	hint35_81: number;
 };
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
@@ -234,7 +236,8 @@ type MZXBX_FilterHolder = {
 };
 type MZXBX_PerformerSamplerHolder = {
 	plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null
-	, channelId: string
+	//, channelId: string
+	, channel: MZXBX_Channel
 	, kind: string
 	, properties: string
 	, description: string
@@ -245,6 +248,7 @@ type MZXBX_Channel = {
 	//filters: MZXBX_ChannelFilter[];
 	performer: MZXBX_ChannelSource;
 	outputs: string[];
+	hint: number;
 };
 type MZXBX_SlideItem = {
 	duration: number;
@@ -252,7 +256,8 @@ type MZXBX_SlideItem = {
 }
 type MZXBX_PlayItem = {
 	skip: number;
-	channelId: string;
+	//channelId: string;
+	channel: MZXBX_Channel;
 	pitches: number[];
 	slides: MZXBX_SlideItem[];
 };
@@ -289,12 +294,13 @@ type MZXBX_ChannelSampler = {
 };
 */
 type MZXBX_AudioSamplerPlugin = {
-	launch: (context: AudioContext, parameters: string) => void;
+	launch: (context: AudioContext, parameters: string) => number;
 	busy: () => null | string;
 	start: (when: number, tempo: number) => void;
 	cancel: () => void;
 	output: () => AudioNode | null;
 	duration: () => number;
+	//midi35_81: (parameters: string) => number;
 };
 
 type MZXBX_ChannelSource = {
@@ -305,11 +311,12 @@ type MZXBX_ChannelSource = {
 };
 
 type MZXBX_AudioPerformerPlugin = {
-	launch: (context: AudioContext, parameters: string) => void;
+	launch: (context: AudioContext, parameters: string) => number;
 	busy: () => null | string;
 	strum: (when: number, pitches: number[], tempo: number, slides: MZXBX_SlideItem[]) => void;
 	cancel: () => void;
 	output: () => AudioNode | null;
+	//midi1_128: (parameters: string) => number;
 };
 type MZXBX_Schedule = {
 	series: MZXBX_Set[];

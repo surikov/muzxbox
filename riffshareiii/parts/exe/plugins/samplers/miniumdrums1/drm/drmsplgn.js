@@ -562,6 +562,7 @@ class PercussionDrumKitImplementation {
             });
         }
         this.preidx = idx;
+        return this.info.pitch;
     }
     busy() {
         if (this.preset == null) {

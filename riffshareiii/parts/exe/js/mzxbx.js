@@ -137,7 +137,7 @@ class SchedulePlayer {
                 trackName = this.performerDrumHolders[pp].description;
                 let plugin = this.performerDrumHolders[pp].plugin;
                 if (plugin) {
-                    plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
+                    this.performerDrumHolders[pp].channel.hint = plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
                 }
             }
             return null;
@@ -248,7 +248,7 @@ class SchedulePlayer {
                         }
                         for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                             let channel = this.schedule.channels[cc];
-                            let performer = this.findPerformerSamplerPlugin(channel.id);
+                            let performer = this.findPerformerSamplerPlugin(channel);
                             if (performer) {
                                 let output = performer.output();
                                 if (output) {
@@ -313,7 +313,7 @@ class SchedulePlayer {
                 }
                 for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                     let channel = this.schedule.channels[cc];
-                    let plugin = this.findPerformerSamplerPlugin(channel.id);
+                    let plugin = this.findPerformerSamplerPlugin(channel);
                     if (plugin) {
                         let output = plugin.output();
                         if (output) {
@@ -390,19 +390,19 @@ class SchedulePlayer {
             }
         }
     }
-    findPerformerSamplerPlugin(channelId) {
+    findPerformerSamplerPlugin(channel) {
         if (this.schedule) {
             for (let ii = 0; ii < this.schedule.channels.length; ii++) {
-                if (this.schedule.channels[ii].id == channelId) {
+                if (this.schedule.channels[ii].id == channel.id) {
                     for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
                         let performer = this.performerDrumHolders[nn];
-                        if (channelId == performer.channelId) {
+                        if (channel.id == performer.channel.id) {
                             if (performer.plugin) {
                                 let plugin = performer.plugin;
                                 return plugin;
                             }
                             else {
-                                console.error('Empty performer plugin for', channelId);
+                                console.error('Empty performer plugin for', channel.id);
                             }
                         }
                     }
@@ -410,11 +410,11 @@ class SchedulePlayer {
             }
             console.error('Empty schedule');
         }
-        console.error('No performer for', channelId);
+        console.error('No performer for', channel.id);
         return null;
     }
     sendPerformerItem(it, whenAudio, tempo) {
-        let pp = this.findPerformerSamplerPlugin(it.channelId);
+        let pp = this.findPerformerSamplerPlugin(it.channel);
         if (pp) {
             if (pp.start) {
                 let sampler = pp;
@@ -496,8 +496,7 @@ class PluginLoader {
         }
         for (let ch = 0; ch < schedule.channels.length; ch++) {
             let performer = schedule.channels[ch].performer;
-            let chanid = schedule.channels[ch].id;
-            this.collectPerformerPlugin(chanid, performer.kind, performer.properties, performer.description, allperformers);
+            this.collectPerformerPlugin(schedule.channels[ch], performer.kind, performer.properties, performer.description, allperformers);
         }
         let result = this.startLoadCollectedPlugins(allfilters, allperformers);
         return result;
@@ -556,14 +555,20 @@ class PluginLoader {
         }
         filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties, description: description });
     }
-    collectPerformerPlugin(id, kind, properties, description, performers) {
+    collectPerformerPlugin(channel, kind, properties, description, performers) {
         for (let ii = 0; ii < performers.length; ii++) {
-            if (performers[ii].channelId == id) {
+            if (performers[ii].channel.id == channel.id) {
                 performers[ii].properties = properties;
                 return;
             }
         }
-        performers.push({ plugin: null, channelId: id, kind: kind, properties: properties, description: description });
+        performers.push({
+            plugin: null,
+            channel: channel,
+            kind: kind,
+            properties: properties,
+            description: description
+        });
     }
     findPluginInfo(kind) {
         for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {
