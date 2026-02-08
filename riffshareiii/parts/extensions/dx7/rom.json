@@ -1,0 +1,146 @@
+{
+    "algorithm": 21,
+    "feedback": 7,
+    "parameters": [
+        {
+            "outputLevel": 99,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    99,
+                    0
+                ],
+                "rates": [
+                    67,
+                    36,
+                    27,
+                    71
+                ]
+            }
+        },
+        {
+            "outputLevel": 88,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    96,
+                    0
+                ],
+                "rates": [
+                    35,
+                    32,
+                    28,
+                    58
+                ]
+            }
+        },
+        {
+            "outputLevel": 99,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    99,
+                    0
+                ],
+                "rates": [
+                    67,
+                    36,
+                    27,
+                    71
+                ]
+            }
+        },
+        {
+            "outputLevel": 99,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    99,
+                    0
+                ],
+                "rates": [
+                    67,
+                    36,
+                    27,
+                    71
+                ]
+            }
+        },
+        {
+            "outputLevel": 99,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    99,
+                    0
+                ],
+                "rates": [
+                    67,
+                    36,
+                    27,
+                    71
+                ]
+            }
+        },
+        {
+            "outputLevel": 80,
+            "freqCoarseRaw": 0,
+            "oscMode": 0,
+            "frequencyRatio": 0.5,
+            "envelope": {
+                "levels": [
+                    99,
+                    97,
+                    96,
+                    0
+                ],
+                "rates": [
+                    53,
+                    32,
+                    28,
+                    58
+                ]
+            }
+        }
+    ],
+    "name": "BRASS 3   ",
+    "lfoSpeed": 37,
+    "lfoDelay": 0,
+    "lfoPitchModulationDepth": 0,
+    "lfoAmplitudeModulationDepth": 0,
+    "lfoWaveform": 4,
+    "pitchEnvelope": {
+        "levels": [
+            50,
+            50,
+            50,
+            50
+        ],
+        "rates": [
+            84,
+            95,
+            95,
+            60
+        ]
+    }
+}

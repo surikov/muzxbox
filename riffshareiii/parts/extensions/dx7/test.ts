@@ -2,6 +2,10 @@
 //https://github.com/mmontag/dx7-synth-js/blob/d4d5e3557bf6d6f178c9a42658a54ce6fb8986fe/src/voice-dx7.js
 //https://github.com/mohayonao/fm-synth
 //https://github.com/g200kg/WebAudioDesigner
+//https://vk.com/video-229753126_456239131
+//https://www.tinyloops.com/doc/yamaha_dx7/algorithms.html
+//https://github.com/itsjoesullivan/dx7-patches/tree/master
+
 type ROMPresetPitchEnvelope = {
 	rates: number[]
 	, levels: number[]
