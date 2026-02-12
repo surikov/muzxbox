@@ -19062,58 +19062,22 @@ function ballExistsInRow(ball, row) {
         return false;
     }
 }
-function dumpRows(data, firstRow, len) {
-    for (let step = 1; step < len; step++) {
-        let txt = '';
-        let levels = rowCountEmpty(data, firstRow, step);
-        levels.sort((a, b) => {
-            return b.volume - a.volume;
-        });
-        for (let kk = 0; kk < cellCount; kk++) {
-            let ball = levels[kk].ball;
-            let point = ' ' + t2(ball) + '';
-            if (ballExistsInRow(ball, data[firstRow])) {
-                point = '+' + t2(ball) + '';
-            }
-            txt = txt + point;
-        }
-        let cnt = 0;
-        for (let nn = 0; nn < cellCount; nn++) {
-            if (levels[nn].exists) {
-                break;
-            }
-            cnt++;
-        }
-        console.log(txt, ':', cnt);
-    }
-}
 function dumpLevels(row0, data) {
-    for (let ii = 0; ii < 35; ii++) {
+    for (let ii = 0; ii < 45; ii++) {
         let levels = rowCountEmpty(data, row0 + ii, 1);
         levels.sort((a, b) => {
             return b.volume - a.volume;
         });
         let txt = '';
         for (let kk = 0; kk < levels.length; kk++) {
-            if (levels[kk].volume == 4) {
-                txt = txt + '.';
-            }
-            else {
-                if (levels[kk].volume > 4) {
-                    txt = txt + ' ';
-                }
-                else {
-                    txt = txt + ' ';
-                }
-            }
             if (levels[kk].exists) {
-                txt = txt + '' + t2(levels[kk].ball) + '';
+                txt = txt + '[' + t2(levels[kk].ball) + ']';
             }
             else {
-                txt = txt + '  ';
+                txt = txt + ' ' + t2(levels[kk].ball) + ' ';
             }
         }
-        console.log(txt);
+        console.log(txt + ' : ' + (row0 + ii));
     }
 }
 function start2() {

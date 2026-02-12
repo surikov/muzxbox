@@ -11,4 +11,14 @@
 	background-position-x: center;
 	background-position-y: bottom;
 }
-
+/*
+.toolBarButtonCircle2 {
+    fill: var(--click-color);
+	stroke: var(--main-color);
+    stroke-width: 0.015cm;
+	box-shadow: 0 0 50px 15px #48abe0;
+}
+.fillShadow {
+	fill: var(--shadow-color);
+}
+*/
