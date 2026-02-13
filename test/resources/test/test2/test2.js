@@ -19063,7 +19063,7 @@ function ballExistsInRow(ball, row) {
     }
 }
 function dumpLevels(row0, data) {
-    for (let ii = 0; ii < 99; ii++) {
+    for (let ii = 0; ii < 44; ii++) {
         let levels = rowCountEmpty(data, row0 + ii, 1);
         levels.sort((a, b) => {
             return b.volume - a.volume;
@@ -19074,7 +19074,7 @@ function dumpLevels(row0, data) {
                 txt = txt + '[' + t2(levels[kk].ball) + ']';
             }
             else {
-                txt = txt + ' ' + t2(levels[kk].ball) + ' ';
+                txt = txt + ' .  ';
             }
         }
         console.log(txt + ' : ' + (row0 + ii));

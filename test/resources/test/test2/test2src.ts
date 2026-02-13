@@ -70,7 +70,7 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 }
 */
 function dumpLevels(row0: number, data: BalsRow[]) {
-	for (let ii = 0; ii < 99; ii++) {
+	for (let ii = 0; ii < 44; ii++) {
 		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, 1);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
@@ -89,7 +89,7 @@ function dumpLevels(row0: number, data: BalsRow[]) {
 			if (levels[kk].exists) {
 				txt = txt + '[' + t2(levels[kk].ball) + ']';
 			} else {
-				txt = txt + ' '+ t2(levels[kk].ball) + ' ';
+				txt = txt + ' .  ';
 			}
 		}
 		console.log(txt+' : '+(row0+ii));
