@@ -664,7 +664,11 @@ declare class Writer {
 declare class MiniumMIDIx extends MZXBX_Plugin_UI {
     currentProject: Zvoog_Project;
     constructor();
-    startExport(): void;
+    startExportJSON(): void;
+    exportLocalfile(): void;
+    download(data: string, filename: string, type: string): void;
+    exportImage(): void;
+    startExportMIDI(): void;
     onMessageFromHost(message: MZXBX_MessageToPlugin): void;
     setText(id: string, txt: string): void;
     onLanguaga(enruzhId: string): void;

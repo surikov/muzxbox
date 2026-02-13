@@ -1,7 +1,5 @@
 "use strict";
 let _t_all_registerd_plugins_list = [
-    { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: './plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' },
-    { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: './plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' },
     {
         label: "Minium Compressor",
         purpose: "Filter",
@@ -82,7 +80,7 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
-        "label": "MIDI export",
+        "label": "Export",
         "purpose": "Action",
         "kind": "midiexport1",
         "ui": "./plugins/actions/midiexport1/miex.html",

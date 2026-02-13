@@ -2,11 +2,56 @@ console.log('newMIDIx v1.0.1');
 class MiniumMIDIx extends MZXBX_Plugin_UI {
 	currentProject: Zvoog_Project;
 	constructor() {
-		super(false);
+		super(true);
 	}
+	startExportJSON() {
+		this.exportLocalfile();
+	}
+	exportLocalfile() {
+		//console.log('exportLocalfile', th);
+		if (this.currentProject) {
+			this.download(JSON.stringify(this.currentProject), 'minium', 'application/json');
+		}
+	}
+	download(data: string, filename: string, type: string) {
 
-	startExport() {
-		console.log('startExport', this.currentProject);
+		let file = new Blob([data], { type: type });
+		let a: HTMLAnchorElement = document.createElement("a");
+		let url = URL.createObjectURL(file);
+		a.href = url;
+		a.download = filename;
+		document.body.appendChild(a);
+		a.click();
+
+	}
+	exportImage() {
+		console.log('exportImage');
+		let canvas = document.getElementById("prvw") as HTMLCanvasElement;
+		if (canvas) {
+			let dataURl: string = canvas.toDataURL('image/png');
+			canvas.toBlob((blob: Blob | null) => {
+				console.log('blob', blob);
+				if (blob) {
+					let pro: Promise<ArrayBuffer> = blob.arrayBuffer();
+					pro.catch((reason: any) => {
+						console.log('reason', reason);
+					});
+					pro.then((arrayBuffer: ArrayBuffer) => {
+						console.log('arrayBuffer', arrayBuffer);
+					});
+				}
+			}, 'image/png');
+
+			let a: HTMLAnchorElement = document.createElement("a");
+			a.href = dataURl;
+			a.download = "minium";
+			document.body.appendChild(a);
+			a.click();
+		}
+
+	}
+	startExportMIDI() {
+		console.log('startExportMIDI', this.currentProject);
 		let tracks: Track[] = [];
 		let track0 = new Track();
 		track0.addEvent(new TrackNameEvent({ text: 'Drums' }));
@@ -120,6 +165,17 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 	}
 	onMessageFromHost(message: MZXBX_MessageToPlugin): void {
 		this.currentProject = message.hostData;
+		console.log('onMessageFromHost',message);
+		if (message.screenData) {
+			let sz = 500;
+			let canvas = document.getElementById("prvw") as HTMLCanvasElement;
+			if (canvas) {
+				let context: CanvasRenderingContext2D = canvas.getContext('2d') as CanvasRenderingContext2D;
+				var imageData: ImageData = context.getImageData(0, 0, sz, sz);
+				imageData.data.set(message.screenData);
+				context.putImageData(imageData, 0, 0);
+			}
+		}
 	}
 	setText(id: string, txt: string) {
 		let oo = document.getElementById(id);
@@ -129,15 +185,18 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 	}
 	onLanguaga(enruzhId: string): void {
 		if (enruzhId == 'zh') {
-			this.setText('plugintitle', 'Export MIDI');
-			this.setText('btnsend', 'OK');
+			this.setText('plugintitle', 'Export');
+			this.setText('btnsendmidi', 'MIDI');
+			this.setText('btnsendjson', 'JSON');
 		} else {
 			if (enruzhId == 'ru') {
-				this.setText('plugintitle', 'Экспорт MIDI');
-				this.setText('btnsend', 'OK');
+				this.setText('plugintitle', 'Экспорт');
+				this.setText('btnsendmidi', 'MIDI');
+				this.setText('btnsendjson', 'JSON');
 			} else {
-				this.setText('plugintitle', 'Export MIDI');
-				this.setText('btnsend', 'OK');
+				this.setText('plugintitle', 'Export');
+				this.setText('btnsendmidi', 'MIDI');
+				this.setText('btnsendjson', 'JSON');
 			}
 		}
 

@@ -440,6 +440,14 @@ var FontFileFormat;
     FontFileFormat[FontFileFormat["Svg"] = 5] = "Svg";
 })(FontFileFormat || (FontFileFormat = {}));
 class CoreSettings {
+    static buildDefaultSmuflFontSources(fontDirectory) {
+        const map = new Map();
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
+    }
     constructor() {
         this.scriptFile = null;
         this.fontDirectory = null;
@@ -454,14 +462,6 @@ class CoreSettings {
         this.includeNoteBounds = false;
         this.scriptFile = '';
         this.fontDirectory = '';
-    }
-    static buildDefaultSmuflFontSources(fontDirectory) {
-        const map = new Map();
-        const prefix = fontDirectory ?? '';
-        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
-        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
-        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
-        return map;
     }
 }
 var LogLevel;
@@ -3538,11 +3538,6 @@ class Chord {
     }
 }
 class Tuning {
-    constructor(name = '', tuning = null, isStandard = false) {
-        this.isStandard = isStandard;
-        this.name = name;
-        this.tunings = tuning ?? [];
-    }
     static getTextForTuning(tuning, includeOctave) {
         const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
@@ -3643,6 +3638,11 @@ class Tuning {
             }
         }
         return null;
+    }
+    constructor(name = '', tuning = null, isStandard = false) {
+        this.isStandard = isStandard;
+        this.name = name;
+        this.tunings = tuning ?? [];
     }
     finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
@@ -8893,10 +8893,6 @@ class Adler32 {
 }
 Adler32.Base = 65521;
 class Crc32 {
-    constructor() {
-        this._checkValue = Crc32.CrcInit;
-        this.reset();
-    }
     static buildCrc32Lookup() {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
@@ -8912,6 +8908,10 @@ class Crc32 {
     get value() {
         return ~this._checkValue;
     }
+    constructor() {
+        this._checkValue = Crc32.CrcInit;
+        this.reset();
+    }
     update(data, offset, count) {
         for (let i = 0; i < count; i++) {
             this._checkValue =
@@ -8925,14 +8925,14 @@ class Crc32 {
 Crc32.Crc32Lookup = Crc32.buildCrc32Lookup();
 Crc32.CrcInit = 0xffffffff;
 class Deflater {
+    get inputCrc() {
+        return this._engine.inputCrc.value;
+    }
     constructor() {
         this._state = 0;
         this._pending = new PendingBuffer(DeflaterConstants.PENDING_BUF_SIZE);
         this._engine = new DeflaterEngine(this._pending);
         this.reset();
-    }
-    get inputCrc() {
-        return this._engine.inputCrc.value;
     }
     get isNeedingInput() {
         return this._engine.needsInput();
@@ -9591,16 +9591,6 @@ Tree.Repeat3To6 = 16;
 Tree.Repeat3To10 = 17;
 Tree.Repeat11To138 = 18;
 class DeflaterHuffman {
-    constructor(pending) {
-        this.last_lit = 0;
-        this.extra_bits = 0;
-        this.pending = pending;
-        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
-        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
-        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
-        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
-        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
-    }
     static staticInit() {
         let i = 0;
         while (i < 144) {
@@ -9629,6 +9619,16 @@ class DeflaterHuffman {
             (DeflaterHuffman.bit4Reverse[(toReverse >> 4) & 0xf] << 8) |
             (DeflaterHuffman.bit4Reverse[(toReverse >> 8) & 0xf] << 4) |
             DeflaterHuffman.bit4Reverse[toReverse >> 12]);
+    }
+    constructor(pending) {
+        this.last_lit = 0;
+        this.extra_bits = 0;
+        this.pending = pending;
+        this.literalTree = new Tree(this, DeflaterHuffman.LITERAL_NUM, 257, 15);
+        this.distTree = new Tree(this, DeflaterHuffman.DIST_NUM, 1, 15);
+        this.blTree = new Tree(this, DeflaterHuffman.BITLEN_NUM, 4, 7);
+        this.d_buf = new Int16Array(DeflaterHuffman.BUFSIZE);
+        this.l_buf = new Uint8Array(DeflaterHuffman.BUFSIZE);
     }
     isFull() {
         return this.last_lit >= DeflaterHuffman.BUFSIZE;
@@ -9951,6 +9951,13 @@ class InflateWindow {
 InflateWindow.Size = 1 << 15;
 InflateWindow.BufferSize = 1 << 16;
 class Inflate {
+    static buildFixedHuffman() {
+        const a = [];
+        for (let n = 0; n < 288; n++) {
+            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
+        }
+        return HuffTools.make(a, 0, 288, 10);
+    }
     constructor(readable) {
         this._nbits = 0;
         this._bits = 0;
@@ -9969,13 +9976,6 @@ class Inflate {
         for (let i = 0; i < 19; i++) {
             this._lengths.push(-1);
         }
-    }
-    static buildFixedHuffman() {
-        const a = [];
-        for (let n = 0; n < 288; n++) {
-            a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
-        }
-        return HuffTools.make(a, 0, 288, 10);
     }
     readBytes(b, pos, len) {
         this._needed = len;
@@ -10244,15 +10244,15 @@ Inflate.DistBaseValTbl = [
 Inflate.CodeLengthsPos = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 Inflate._fixedHuffman = Inflate.buildFixedHuffman();
 class PendingBuffer {
+    get isFlushed() {
+        return this._end === 0;
+    }
     constructor(bufferSize) {
         this._start = 0;
         this._end = 0;
         this._bits = 0;
         this.bitCount = 0;
         this._buffer = new Uint8Array(bufferSize);
-    }
-    get isFlushed() {
-        return this._end === 0;
     }
     reset() {
         this._start = 0;
@@ -15952,7 +15952,8 @@ class EventsConverter {
                     kind: 'miniumdrums1',
                     outputs: insOut,
                     iconPosition: { x: left, y: top },
-                    state: 0
+                    state: 0,
+                    hint35_81: 0
                 }
             };
             for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -16046,7 +16047,8 @@ class EventsConverter {
                     kind: 'miniumpitchchord1',
                     outputs: insOut,
                     iconPosition: { x: ii * wwCell, y: ii * hhCell },
-                    state: 0
+                    state: 0,
+                    hint1_128: 0
                 }
             };
             for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -16466,7 +16468,14 @@ class FileLoaderAlpha {
                                     console.log('project', mireader.project);
                                 }
                                 else {
-                                    console.log('wrong path', path);
+                                    if (path.endsWith('.json')) {
+                                        let textDecoder = new TextDecoder();
+                                        let json = textDecoder.decode(uint8Array);
+                                        parsedProject = JSON.parse(json);
+                                    }
+                                    else {
+                                        console.log('wrong path', path);
+                                    }
                                 }
                             }
                         }
@@ -16551,6 +16560,12 @@ class FileLoaderAlpha {
         project.filters.push(filterCompression);
         this.addScoreLyrics(project, score);
         this.addRepeats(project, score);
+        let tracksWidth = 9 * project.tracks.length;
+        let perWidth = 9 * project.percussions.length;
+        project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth;
+        project.filters[0].iconPosition.y = 1 * 9 + 66;
+        project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth;
+        project.filters[1].iconPosition.y = 12;
         this.arrangeTracks(project);
         this.arrangeDrums(project);
         this.arrangeFilters(project);
@@ -16682,16 +16697,20 @@ class FileLoaderAlpha {
         }
     }
     arrangeTracks(project) {
+        let wwCell = 9;
+        let hhCell = 7;
         for (let ii = 0; ii < project.tracks.length; ii++) {
-            project.tracks[ii].performer.iconPosition.x = (project.tracks.length - ii - 1) * 9;
-            project.tracks[ii].performer.iconPosition.y = ii * 6;
+            project.tracks[ii].performer.iconPosition = { x: (ii + 1) * wwCell * 1.1, y: ii * hhCell * 0.8 };
         }
     }
     arrangeDrums(project) {
+        let wwCell = 9;
+        let hhCell = 3;
+        let start = (project.tracks.length + 2) * wwCell * 1.1;
         for (let kk = 0; kk < project.percussions.length; kk++) {
-            let ss = project.percussions[project.percussions.length - 1 - kk];
-            ss.sampler.iconPosition.x = (project.percussions.length - 1 - kk) * 7 + (1 + project.tracks.length) * 9;
-            ss.sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - (1 + kk) * 7;
+            let top = (8 * 12 + 2 * project.percussions.length) + kk * hhCell - project.percussions.length * hhCell;
+            let ss = project.percussions[kk];
+            ss.sampler.iconPosition = { x: start + kk * wwCell, y: top };
         }
     }
     arrangeFilters(project) {
@@ -16699,12 +16718,6 @@ class FileLoaderAlpha {
             project.filters[ii].iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
             project.filters[ii].iconPosition.y = ii * 7;
         }
-        let cmp = project.filters[project.filters.length - 1];
-        let eq = project.filters[project.filters.length - 2];
-        cmp.iconPosition.x = project.filters.length * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
-        cmp.iconPosition.y = 6 * 12;
-        eq.iconPosition.x = cmp.iconPosition.x + 10;
-        eq.iconPosition.y = 5 * 12;
     }
     findVolumeInstrument(program) {
         let re = { idx: 0, ratio: 0.7 };
@@ -16797,7 +16810,8 @@ class FileLoaderAlpha {
                 kind: 'miniumpitchchord1',
                 outputs: [targetId],
                 iconPosition: { x: 0, y: 0 },
-                state: 0
+                state: 0,
+                hint1_128: 0
             }
         };
         let palmMuteTrack = {
@@ -16809,7 +16823,8 @@ class FileLoaderAlpha {
                 kind: 'miniumpitchchord1',
                 outputs: [targetId],
                 iconPosition: { x: 0, y: 0 },
-                state: 0
+                state: 0,
+                hint1_128: 0
             }
         };
         let upTrack = {
@@ -16821,7 +16836,8 @@ class FileLoaderAlpha {
                 kind: 'miniumpitchchord1',
                 outputs: [targetId],
                 iconPosition: { x: 0, y: 0 },
-                state: 0
+                state: 0,
+                hint1_128: 0
             }
         };
         let downTrack = {
@@ -16833,7 +16849,8 @@ class FileLoaderAlpha {
                 kind: 'miniumpitchchord1',
                 outputs: [targetId],
                 iconPosition: { x: 0, y: 0 },
-                state: 0
+                state: 0,
+                hint1_128: 0
             }
         };
         if (scoreTrack.playbackInfo.program == 29
@@ -17071,7 +17088,8 @@ class FileLoaderAlpha {
                     kind: 'miniumdrums1',
                     outputs: [targetId],
                     iconPosition: { x: 0, y: 0 },
-                    state: 0
+                    state: 0,
+                    hint35_81: 0
                 }
             };
             if (idx) {

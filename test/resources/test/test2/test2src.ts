@@ -70,7 +70,7 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 }
 */
 function dumpLevels(row0: number, data: BalsRow[]) {
-	for (let ii = 0; ii < 45; ii++) {
+	for (let ii = 0; ii < 99; ii++) {
 		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, 1);
 		levels.sort((a, b) => {
 			return b.volume - a.volume

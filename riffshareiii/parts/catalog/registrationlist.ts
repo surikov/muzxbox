@@ -18,8 +18,8 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 
 	//{ label: 'Import MIDI from file', purpose: 'Action', kind: 'importmidifile', ui: './plugins/actions/midi/midimusicimport.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Import Guitar Pro file', purpose: 'Action', kind: 'import345gp', ui: './plugins/actions/alphagpimport/guitartab.html', evaluate: 'none', script: 'none' }
-	 { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: './plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' }
-	, { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: './plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' }
+//	 { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: './plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' }
+//	, { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: './plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Base Volume', purpose: 'Filter', kind: 'basevolume', ui: './plugins/filters/basevolume/volume1.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Project info', purpose: 'Action', kind: 'projectstatistics', ui: './plugins/actions/projinfo/info.html', evaluate: 'none', script: 'none' }
 	//, {
@@ -49,7 +49,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	//}
 
 
-,{
+{
     label: "Minium Compressor"
     , purpose: "Filter"
     , kind: "miniumdcompressor1"
@@ -166,7 +166,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 }
 ,
 {
-    "label": "MIDI export"
+    "label": "Export"
     , "purpose": "Action"
     , "kind": "midiexport1"
     , "ui": "./plugins/actions/midiexport1/miex.html"

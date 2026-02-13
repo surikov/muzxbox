@@ -813,10 +813,51 @@ class Writer {
 console.log('newMIDIx v1.0.1');
 class MiniumMIDIx extends MZXBX_Plugin_UI {
     constructor() {
-        super(false);
+        super(true);
     }
-    startExport() {
-        console.log('startExport', this.currentProject);
+    startExportJSON() {
+        this.exportLocalfile();
+    }
+    exportLocalfile() {
+        if (this.currentProject) {
+            this.download(JSON.stringify(this.currentProject), 'minium', 'application/json');
+        }
+    }
+    download(data, filename, type) {
+        let file = new Blob([data], { type: type });
+        let a = document.createElement("a");
+        let url = URL.createObjectURL(file);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+    }
+    exportImage() {
+        console.log('exportImage');
+        let canvas = document.getElementById("prvw");
+        if (canvas) {
+            let dataURl = canvas.toDataURL('image/png');
+            canvas.toBlob((blob) => {
+                console.log('blob', blob);
+                if (blob) {
+                    let pro = blob.arrayBuffer();
+                    pro.catch((reason) => {
+                        console.log('reason', reason);
+                    });
+                    pro.then((arrayBuffer) => {
+                        console.log('arrayBuffer', arrayBuffer);
+                    });
+                }
+            }, 'image/png');
+            let a = document.createElement("a");
+            a.href = dataURl;
+            a.download = "minium";
+            document.body.appendChild(a);
+            a.click();
+        }
+    }
+    startExportMIDI() {
+        console.log('startExportMIDI', this.currentProject);
         let tracks = [];
         let track0 = new Track();
         track0.addEvent(new TrackNameEvent({ text: 'Drums' }));
@@ -925,6 +966,17 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
     }
     onMessageFromHost(message) {
         this.currentProject = message.hostData;
+        console.log('onMessageFromHost', message);
+        if (message.screenData) {
+            let sz = 500;
+            let canvas = document.getElementById("prvw");
+            if (canvas) {
+                let context = canvas.getContext('2d');
+                var imageData = context.getImageData(0, 0, sz, sz);
+                imageData.data.set(message.screenData);
+                context.putImageData(imageData, 0, 0);
+            }
+        }
     }
     setText(id, txt) {
         let oo = document.getElementById(id);
@@ -934,17 +986,20 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
     }
     onLanguaga(enruzhId) {
         if (enruzhId == 'zh') {
-            this.setText('plugintitle', 'Export MIDI');
-            this.setText('btnsend', 'OK');
+            this.setText('plugintitle', 'Export');
+            this.setText('btnsendmidi', 'MIDI');
+            this.setText('btnsendjson', 'JSON');
         }
         else {
             if (enruzhId == 'ru') {
-                this.setText('plugintitle', 'Экспорт MIDI');
-                this.setText('btnsend', 'OK');
+                this.setText('plugintitle', 'Экспорт');
+                this.setText('btnsendmidi', 'MIDI');
+                this.setText('btnsendjson', 'JSON');
             }
             else {
-                this.setText('plugintitle', 'Export MIDI');
-                this.setText('btnsend', 'OK');
+                this.setText('plugintitle', 'Export');
+                this.setText('btnsendmidi', 'MIDI');
+                this.setText('btnsendjson', 'JSON');
             }
         }
     }

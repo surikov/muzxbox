@@ -781,6 +781,7 @@ class EventsConverter {
 					, outputs: insOut//[compresID]
 					, iconPosition: { x: left, y: top }
 					, state: 0
+					,hint35_81:0
 				}
 			};
 			for (let mm = 0; mm < project.timeline.length; mm++) {
@@ -885,6 +886,7 @@ class EventsConverter {
 					, outputs: insOut//[compresID]
 					, iconPosition: { x: ii * wwCell, y: ii * hhCell }
 					, state: 0
+					,hint1_128:0
 				}
 			};
 

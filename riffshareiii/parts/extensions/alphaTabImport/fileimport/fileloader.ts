@@ -69,11 +69,20 @@ class FileLoaderAlpha {
 
 									let mireader: MIDIReader = new MIDIReader(file.name, file.size, arrayBuffer);
 									parsedProject = mireader.project;
-									console.log('parser',mireader.parser);
-									console.log('info',mireader.info);
-									console.log('project',mireader.project);
+									console.log('parser', mireader.parser);
+									console.log('info', mireader.info);
+									console.log('project', mireader.project);
 								} else {
-									console.log('wrong path', path);
+									if (path.endsWith('.json')) {
+										//parsedProject = JSON.parse(progressEvent.target.result);
+										//
+										let textDecoder = new TextDecoder(); // always utf-8
+										let json = textDecoder.decode(uint8Array);
+										//console.log('json', json);
+										parsedProject = JSON.parse(json);
+									} else {
+										console.log('wrong path', path);
+									}
 								}
 							}
 						}
@@ -167,6 +176,13 @@ class FileLoaderAlpha {
 		//console.log(project);
 		this.addRepeats(project, score);
 
+		let tracksWidth = 9 * project.tracks.length;
+		let perWidth = 9 * project.percussions.length;
+		project.filters[0].iconPosition.x = 7 * 7 + tracksWidth + perWidth;
+		project.filters[0].iconPosition.y = 1 * 9 + 66;
+		project.filters[1].iconPosition.x = 3 * 7 + tracksWidth + perWidth;
+		project.filters[1].iconPosition.y = 12;
+
 		this.arrangeTracks(project);
 		this.arrangeDrums(project);
 		this.arrangeFilters(project);
@@ -175,6 +191,8 @@ class FileLoaderAlpha {
 		parsedProject = project;
 		console.log(parsedProject);
 	}
+
+
 	addRepeats(project: Zvoog_Project, score: Score) {
 		let startLoop = -1;
 		let altStart = -1;
@@ -314,16 +332,25 @@ class FileLoaderAlpha {
 		}
 	}
 	arrangeTracks(project: Zvoog_Project) {
+		let wwCell = 9;
+		let hhCell = 7;
 		for (let ii = 0; ii < project.tracks.length; ii++) {
-			project.tracks[ii].performer.iconPosition.x = (project.tracks.length - ii - 1) * 9;
-			project.tracks[ii].performer.iconPosition.y = ii * 6;
+			//project.tracks[ii].performer.iconPosition.x = (project.tracks.length - ii - 1) * 9;
+			//project.tracks[ii].performer.iconPosition.y = ii * 6;
+			project.tracks[ii].performer.iconPosition = { x: (ii + 1) * wwCell * 1.1, y: ii * hhCell * 0.8 };
 		}
 	}
 	arrangeDrums(project: Zvoog_Project) {
+		let wwCell = 9;
+		let hhCell = 3;
+		let start = (project.tracks.length + 2) * wwCell * 1.1;
 		for (let kk = 0; kk < project.percussions.length; kk++) {
-			let ss = project.percussions[project.percussions.length - 1 - kk];
-			ss.sampler.iconPosition.x = (project.percussions.length - 1 - kk) * 7 + (1 + project.tracks.length) * 9;
-			ss.sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - (1 + kk) * 7;
+			//let left = 9 * (kk + 11 + project.tracks.length);
+			let top = (8 * 12 + 2 * project.percussions.length) + kk * hhCell - project.percussions.length * hhCell;
+			let ss = project.percussions[kk];
+			//ss.sampler.iconPosition.x = (project.percussions.length - 1 - kk) * 7 + (1 + project.tracks.length) * 9;
+			//ss.sampler.iconPosition.y = 8 * 12 + project.percussions.length * 2 - (1 + kk) * 7;
+			ss.sampler.iconPosition = { x: start + kk * wwCell, y: top };
 		}
 	}
 	arrangeFilters(project: Zvoog_Project) {
@@ -331,14 +358,14 @@ class FileLoaderAlpha {
 			project.filters[ii].iconPosition.x = ii * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
 			project.filters[ii].iconPosition.y = ii * 7;
 		}
-		let cmp = project.filters[project.filters.length - 1];
+		/*let cmp = project.filters[project.filters.length - 1];
 		let eq = project.filters[project.filters.length - 2];
 
 		cmp.iconPosition.x = project.filters.length * 7 + (1 + project.tracks.length) * 9 + (1 + project.percussions.length) * 7;
 		cmp.iconPosition.y = 6 * 12;
 
 		eq.iconPosition.x = cmp.iconPosition.x + 10;
-		eq.iconPosition.y = 5 * 12;
+		eq.iconPosition.y = 5 * 12;*/
 	}
 	findVolumeInstrument(program: number): { idx: number, ratio: number } {
 		let re = { idx: 0, ratio: 0.7 };
@@ -424,6 +451,7 @@ class FileLoaderAlpha {
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
+				, hint1_128: 0
 			}
 		};
 		let palmMuteTrack: Zvoog_MusicTrack = {
@@ -438,6 +466,7 @@ class FileLoaderAlpha {
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
+				, hint1_128: 0
 			}
 		};
 		let upTrack: Zvoog_MusicTrack = {
@@ -451,6 +480,7 @@ class FileLoaderAlpha {
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
+				, hint1_128: 0
 			}
 		};
 		let downTrack: Zvoog_MusicTrack = {
@@ -464,6 +494,7 @@ class FileLoaderAlpha {
 				, outputs: [targetId]
 				, iconPosition: { x: 0, y: 0 }
 				, state: 0
+				, hint1_128: 0
 			}
 		};
 		if (scoreTrack.playbackInfo.program == 29
@@ -752,6 +783,7 @@ class FileLoaderAlpha {
 					, outputs: [targetId]
 					, iconPosition: { x: 0, y: 0 }
 					, state: 0
+					, hint35_81: 0
 				}
 			};
 			if (idx) {
