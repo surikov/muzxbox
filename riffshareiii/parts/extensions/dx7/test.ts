@@ -5,6 +5,7 @@
 //https://vk.com/video-229753126_456239131
 //https://www.tinyloops.com/doc/yamaha_dx7/algorithms.html
 //https://github.com/itsjoesullivan/dx7-patches/tree/master
+//https://github.com/itsjoesullivan/dx7-envelope
 
 type ROMPresetPitchEnvelope = {
 	rates: number[]

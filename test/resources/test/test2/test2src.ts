@@ -70,7 +70,8 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 }
 */
 function dumpLevels(row0: number, data: BalsRow[]) {
-	for (let ii = 0; ii < 44; ii++) {
+	let counts: number[] = [];
+	for (let ii = 0; ii < 999; ii++) {
 		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, 1);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
@@ -88,12 +89,20 @@ function dumpLevels(row0: number, data: BalsRow[]) {
 			}*/
 			if (levels[kk].exists) {
 				txt = txt + '[' + t2(levels[kk].ball) + ']';
+				counts[kk] = counts[kk] ? counts[kk] + 1 : 1;
 			} else {
-				txt = txt + ' .  ';
+				txt = txt + ' ' + t2(levels[kk].ball) + ' ';
 			}
 		}
-		console.log(txt+' : '+(row0+ii));
+		console.log(txt + ' : ' + (row0 + ii));
+
 	}
+	let line = '';
+	for (let ii = 0; ii < 45; ii++) {
+		counts[ii] = counts[ii] ? counts[ii] : 0;
+		line = line + ':' + t2(Math.round(counts[ii]/10)) + ' ';
+	}
+	console.log(line);
 }
 function start2() {
 	//console.log('Test string %c[a], b','color: magenta;');

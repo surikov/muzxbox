@@ -19063,7 +19063,8 @@ function ballExistsInRow(ball, row) {
     }
 }
 function dumpLevels(row0, data) {
-    for (let ii = 0; ii < 44; ii++) {
+    let counts = [];
+    for (let ii = 0; ii < 999; ii++) {
         let levels = rowCountEmpty(data, row0 + ii, 1);
         levels.sort((a, b) => {
             return b.volume - a.volume;
@@ -19072,13 +19073,20 @@ function dumpLevels(row0, data) {
         for (let kk = 0; kk < levels.length; kk++) {
             if (levels[kk].exists) {
                 txt = txt + '[' + t2(levels[kk].ball) + ']';
+                counts[kk] = counts[kk] ? counts[kk] + 1 : 1;
             }
             else {
-                txt = txt + ' .  ';
+                txt = txt + ' ' + t2(levels[kk].ball) + ' ';
             }
         }
         console.log(txt + ' : ' + (row0 + ii));
     }
+    let line = '';
+    for (let ii = 0; ii < 45; ii++) {
+        counts[ii] = counts[ii] ? counts[ii] : 0;
+        line = line + ':' + t2(Math.round(counts[ii] / 10)) + ' ';
+    }
+    console.log(line);
 }
 function start2() {
     let start = Math.round(Math.random() * 5000);
