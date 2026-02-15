@@ -69,10 +69,10 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 	}
 }
 */
-function dumpLevels(row0: number, data: BalsRow[]) {
+function dumpLevels(row0: number, data: BalsRow[], stepsize: number) {
 	let counts: number[] = [];
 	for (let ii = 0; ii < 40; ii++) {
-		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, 1);
+		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, stepsize);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
 		});
@@ -105,12 +105,29 @@ function dumpLevels(row0: number, data: BalsRow[]) {
 	console.log(line);
 }
 function start2() {
-	//console.log('Test string %c[a], b','color: magenta;');
 	let start = Math.round(Math.random() * 5000);
-	console.log(start);//, dataRows2: BalsRow[][start].balls);
+	let stepsize = Math.round(Math.random() * 50);
+	//console.log(window.location);
+	let txt=window.location.href;
+	//console.log(txt);
+	let url = new URL(txt);
+	let searchParams = new URLSearchParams(url.search);
+	let txtstart=searchParams.get('start');
+	if(txtstart){
+		start=parseInt(txtstart);
+	}
+	let txtstepsize=searchParams.get('step');
+	if(txtstepsize){
+		stepsize=parseInt(txtstepsize);
+	}
+	//console.log(searchParams.get('start'));  // outputs "m2-m3-m4-m5"
+	//console.log(searchParams.get('step'));  // outputs "m2-m3-m4-m5"
+	//console.log('Test string %c[a], b','color: magenta;');
+	
+	console.log('start',start, 'step',stepsize);//, dataRows2: BalsRow[][start].balls);
 	//for (let ii = 1; ii <= 45; ii++) {
 	//console.log(ii,'------------------------');
 	//dumpRows(start, 40);//data2[start].balls[0]);
 	//}
-	dumpLevels(start, dataRows2);
+	dumpLevels(start, dataRows2, stepsize);
 }

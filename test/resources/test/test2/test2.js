@@ -19062,10 +19062,10 @@ function ballExistsInRow(ball, row) {
         return false;
     }
 }
-function dumpLevels(row0, data) {
+function dumpLevels(row0, data, stepsize) {
     let counts = [];
     for (let ii = 0; ii < 40; ii++) {
-        let levels = rowCountEmpty(data, row0 + ii, 1);
+        let levels = rowCountEmpty(data, row0 + ii, stepsize);
         levels.sort((a, b) => {
             return b.volume - a.volume;
         });
@@ -19090,7 +19090,19 @@ function dumpLevels(row0, data) {
 }
 function start2() {
     let start = Math.round(Math.random() * 5000);
-    console.log(start);
-    dumpLevels(start, dataRows2);
+    let stepsize = Math.round(Math.random() * 50);
+    let txt = window.location.href;
+    let url = new URL(txt);
+    let searchParams = new URLSearchParams(url.search);
+    let txtstart = searchParams.get('start');
+    if (txtstart) {
+        start = parseInt(txtstart);
+    }
+    let txtstepsize = searchParams.get('step');
+    if (txtstepsize) {
+        stepsize = parseInt(txtstepsize);
+    }
+    console.log('start', start, 'step', stepsize);
+    dumpLevels(start, dataRows2, stepsize);
 }
 //# sourceMappingURL=test2.js.map
