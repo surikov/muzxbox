@@ -71,7 +71,7 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 */
 function dumpLevels(row0: number, data: BalsRow[]) {
 	let counts: number[] = [];
-	for (let ii = 0; ii < 999; ii++) {
+	for (let ii = 0; ii < 40; ii++) {
 		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, 1);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
@@ -100,7 +100,7 @@ function dumpLevels(row0: number, data: BalsRow[]) {
 	let line = '';
 	for (let ii = 0; ii < 45; ii++) {
 		counts[ii] = counts[ii] ? counts[ii] : 0;
-		line = line + ':' + t2(Math.round(counts[ii]/10)) + ' ';
+		line = line + ':' + t2(counts[ii]) + ' ';
 	}
 	console.log(line);
 }
