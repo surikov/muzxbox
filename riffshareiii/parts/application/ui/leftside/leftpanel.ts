@@ -101,9 +101,33 @@ class LeftPanel {
 
 				}
 			}
-
-			let titleLabel: TileText = {
+			let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
+			let titleButton: TileRectangle = {
 				x: 0
+				, y: globalCommandDispatcher.cfg().gridTop() - butsize + butsize * 0.2
+				, w: butsize, h: butsize
+				, rx: butsize / 2, ry: butsize / 2
+				, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
+				, activation: (x, y) => {
+					//console.log('title');
+					let old = globalCommandDispatcher.cfg().data.title;
+					let newTitle = prompt('', old);
+					if (newTitle) {
+						if (newTitle == old) {
+
+						} else {
+							globalCommandDispatcher.exe.commitProjectChanges([], () => {
+								globalCommandDispatcher.cfg().data.title = newTitle;
+								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+							});
+							globalCommandDispatcher.resetProject();
+						}
+					}
+				}
+			};
+			this.leftZoomAnchors[zz].content.push(titleButton);
+			let titleLabel: TileText = {
+				x: butsize * 0.2
 				, y: globalCommandDispatcher.cfg().gridTop()
 				, text: globalCommandDispatcher.cfg().data.title
 				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
