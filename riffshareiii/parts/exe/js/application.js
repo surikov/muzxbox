@@ -2389,98 +2389,41 @@ let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
 let localMenuNewPlugin = 'localMenuNewPlugin';
 let localMenuClipboard = 'localMenuClipboard';
+let localMenuFullscreen = 'localMenuFullscreen';
+let localMenuCopySelection = 'localMenuCopySelection';
+let localMenuColors = 'localMenuColors';
+let localMenuSize = 'localMenuSize';
+let localMenuNormalFont = 'localMenuNormalFont';
+let localMenuBigFont = 'localMenuBigFont';
+let localMenuHugeFont = 'localMenuHugeFont';
+let localMenuOther = 'localMenuOther';
+let localMenuDebugPlugin = 'localMenuDebugPlugin';
 let localeDictionary = [
-    {
-        id: localNameLocal, data: [
-            { locale: 'en', text: 'English' },
-            { locale: 'ru', text: 'Русский' },
-            { locale: 'zh', text: '中文' }
-        ]
-    }, {
-        id: localMenuItemSettings, data: [
-            { locale: 'en', text: 'Settings' },
-            { locale: 'ru', text: 'Настройки' },
-            { locale: 'zh', text: '设置' }
-        ]
-    },
-    {
-        id: localMenuPercussionFolder, data: [
-            { locale: 'en', text: 'Sampler' },
-            { locale: 'ru', text: 'Сэмплер' },
-            { locale: 'zh', text: '?' }
-        ]
-    },
-    { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] },
-    {
-        id: localMenuAutomationFolder, data: [
-            { locale: 'en', text: 'Automation' },
-            { locale: 'ru', text: 'Автоматизация' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuPlay, data: [
-            { locale: 'en', text: 'Play' },
-            { locale: 'ru', text: 'Старт' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuPause, data: [
-            { locale: 'en', text: 'Pause' },
-            { locale: 'ru', text: 'Стоп' },
-            { locale: 'zh', text: '?' }
-        ]
-    },
-    {
-        id: localMenuActionsFolder, data: [
-            { locale: 'en', text: 'Actions' },
-            { locale: 'ru', text: 'Действия' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuNewPlugin, data: [
-            { locale: 'en', text: 'Add new item to the mixer' },
-            { locale: 'ru', text: 'Добавить дорожку' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuInsTracksFolder, data: [
-            { locale: 'en', text: 'Performers' },
-            { locale: 'ru', text: 'Перформеры' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuFxTracksFolder, data: [
-            { locale: 'en', text: 'Filters' },
-            { locale: 'ru', text: 'Фильтры' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuDrumTracksFolder, data: [
-            { locale: 'en', text: 'Samplers' },
-            { locale: 'ru', text: 'Сэмплеры' },
-            { locale: 'zh', text: '?' }
-        ]
-    }, {
-        id: localMenuUndo, data: [
-            { locale: 'en', text: 'Undo' },
-            { locale: 'ru', text: 'Вернуть' },
-            { locale: 'zh', text: '?' }
-        ]
-    },
-    {
-        id: localMenuRedo, data: [
-            { locale: 'en', text: 'Redo' },
-            { locale: 'ru', text: 'Повторить' },
-            { locale: 'zh', text: '?' }
-        ]
-    },
-    {
-        id: localMenuClearUndoRedo, data: [
-            { locale: 'en', text: 'Clear Undo queue' },
-            { locale: 'ru', text: 'Очистить очередь действий' },
-            { locale: 'zh', text: '?' }
-        ]
-    }
+    { id: localNameLocal, data: [{ locale: 'en', text: 'English' }, { locale: 'ru', text: 'Русский' }, { locale: 'zh', text: '中文' }] },
+    { id: localMenuItemSettings, data: [{ locale: 'en', text: 'Settings' }, { locale: 'ru', text: 'Настройки' }, { locale: 'zh', text: '设置' }] },
+    { id: localMenuPercussionFolder, data: [{ locale: 'en', text: 'Sampler' }, { locale: 'ru', text: 'Сэмплер' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: '新建项目' }] },
+    { id: localMenuAutomationFolder, data: [{ locale: 'en', text: 'Automation' }, { locale: 'ru', text: 'Автоматизация' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuPlay, data: [{ locale: 'en', text: 'Play' }, { locale: 'ru', text: 'Старт' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuPause, data: [{ locale: 'en', text: 'Pause' }, { locale: 'ru', text: 'Стоп' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuActionsFolder, data: [{ locale: 'en', text: 'Actions' }, { locale: 'ru', text: 'Действия' }, { locale: 'zh', text: '服务' }] },
+    { id: localMenuNewPlugin, data: [{ locale: 'en', text: 'Add new item to the mixer' }, { locale: 'ru', text: 'Добавить дорожку' }, { locale: 'zh', text: '添加新曲目' }] },
+    { id: localMenuInsTracksFolder, data: [{ locale: 'en', text: 'Performers' }, { locale: 'ru', text: 'Перформеры' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuFxTracksFolder, data: [{ locale: 'en', text: 'Filters' }, { locale: 'ru', text: 'Фильтры' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuDrumTracksFolder, data: [{ locale: 'en', text: 'Samplers' }, { locale: 'ru', text: 'Сэмплеры' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuUndo, data: [{ locale: 'en', text: 'Undo' }, { locale: 'ru', text: 'Вернуть' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuRedo, data: [{ locale: 'en', text: 'Redo' }, { locale: 'ru', text: 'Повторить' }, { locale: 'zh', text: '?' }] },
+    { id: localMenuClearUndoRedo, data: [{ locale: 'en', text: 'Clear Undo/Redo history' }, { locale: 'ru', text: 'Очистить историю действий' }, { locale: 'zh', text: '清除历史记录' }] },
+    { id: localMenuFullscreen, data: [{ locale: 'en', text: 'Full Screen' }, { locale: 'ru', text: 'На весь экран' }, { locale: 'zh', text: '切换到全屏' }] },
+    { id: localMenuClipboard, data: [{ locale: 'en', text: 'Clipboard' }, { locale: 'ru', text: 'Буфер обмена' }, { locale: 'zh', text: '剪贴板' }] },
+    { id: localMenuCopySelection, data: [{ locale: 'en', text: 'Copy selected bars' }, { locale: 'ru', text: 'Скопировать выделенное' }, { locale: 'zh', text: '复制所选' }] },
+    { id: localMenuColors, data: [{ locale: 'en', text: 'Theme colors' }, { locale: 'ru', text: 'Цветовая тема' }, { locale: 'zh', text: '主题颜色' }] },
+    { id: localMenuSize, data: [{ locale: 'en', text: 'Font size' }, { locale: 'ru', text: 'Размер шрифта' }, { locale: 'zh', text: '字体大小' }] },
+    { id: localMenuNormalFont, data: [{ locale: 'en', text: 'Normall font' }, { locale: 'ru', text: 'Обычный шрифт' }, { locale: 'zh', text: '常规字体' }] },
+    { id: localMenuBigFont, data: [{ locale: 'en', text: 'Big font' }, { locale: 'ru', text: 'Большой шрифт' }, { locale: 'zh', text: '大字体' }] },
+    { id: localMenuHugeFont, data: [{ locale: 'en', text: 'Huge font' }, { locale: 'ru', text: 'Огромный шрифт' }, { locale: 'zh', text: '超大字体' }] },
+    { id: localMenuOther, data: [{ locale: 'en', text: 'Other options' }, { locale: 'ru', text: 'Дополнительно' }, { locale: 'zh', text: '其他选项' }] },
+    { id: localMenuDebugPlugin, data: [{ locale: 'en', text: 'Open plugin' }, { locale: 'ru', text: 'Загрузить плагин' }, { locale: 'zh', text: '加载插件' }] }
 ];
 function setLocaleID(loname, ratio) {
     labelLocaleDictionary = loname;
@@ -3386,7 +3329,7 @@ let menuPointActions = {
     itemKind: kindClosedFolder
 };
 let copyToClipboard = {
-    text: 'copy vis', onClick: () => {
+    text: localMenuCopySelection, onClick: () => {
         globalCommandDispatcher.copySelectionToClipboard();
     }, itemKind: kindAction
 };
@@ -3429,20 +3372,20 @@ let menuPointSettings = {
         }
     }, children: [
         {
-            text: 'Size', children: [
+            text: localMenuSize, children: [
                 {
-                    text: 'Small', onClick: () => {
+                    text: localMenuNormalFont, onClick: () => {
                         startLoadCSSfile('theme/sizesmall.css');
                         globalCommandDispatcher.changeTapSize(1);
                     }, itemKind: kindAction
                 }, {
-                    text: 'Big', onClick: () => {
+                    text: localMenuBigFont, onClick: () => {
                         startLoadCSSfile('theme/sizebig.css');
                         globalCommandDispatcher.changeTapSize(1.5);
                     },
                     itemKind: kindAction
                 }, {
-                    text: 'Huge', onClick: () => {
+                    text: localMenuHugeFont, onClick: () => {
                         startLoadCSSfile('theme/sizehuge.css');
                         globalCommandDispatcher.changeTapSize(4);
                     },
@@ -3450,65 +3393,49 @@ let menuPointSettings = {
                 }
             ], itemKind: kindClosedFolder
         }, {
-            text: 'Colors', children: [
+            text: localMenuColors, children: [
                 {
-                    text: 'Minium', onClick: () => {
+                    text: 'Minium', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('red1');
                     }, itemKind: kindAction
                 }, {
-                    text: 'Greenstone', onClick: () => {
+                    text: 'Greenstone', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('green1');
                     }, itemKind: kindAction
                 }, {
-                    text: 'Deep', onClick: () => {
+                    text: 'Deep', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('blue1');
                     }, itemKind: kindAction
                 }, {
-                    text: 'Neon', onClick: () => {
+                    text: 'Neon', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('neon1');
                     }, itemKind: kindAction
                 },
                 {
-                    text: 'Gjel', onClick: () => {
+                    text: 'Gjel', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('light1');
                     }, itemKind: kindAction
                 },
                 {
-                    text: 'Vorot', onClick: () => {
+                    text: 'Vorot', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('light2');
                     }, itemKind: kindAction
                 },
                 {
-                    text: 'Bereza', onClick: () => {
+                    text: 'Bereza', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('light3');
-                    }, itemKind: kindAction
-                }
-            ], itemKind: kindClosedFolder
-        }, {
-            text: 'Language', children: [
-                {
-                    text: 'Russian', onClick: () => {
-                        globalCommandDispatcher.setThemeLocale('ru', 1);
-                    }, itemKind: kindAction
-                }, {
-                    text: 'English', onClick: () => {
-                        globalCommandDispatcher.setThemeLocale('en', 1);
-                    }, itemKind: kindAction
-                }, {
-                    text: 'kitaiskiy', onClick: () => {
-                        globalCommandDispatcher.setThemeLocale('zh', 1.5);
                     }, itemKind: kindAction
                 }
             ], itemKind: kindClosedFolder
         },
         {
-            text: 'other', children: [{
+            text: localMenuOther, children: [{
                     text: localMenuClearUndoRedo, onClick: () => {
                         globalCommandDispatcher.clearUndo();
                         globalCommandDispatcher.clearRedo();
                     }, itemKind: kindAction
                 }, {
-                    text: 'Plugindebug', onClick: () => {
+                    text: localMenuDebugPlugin, onClick: () => {
                         globalCommandDispatcher.promptPluginInfoDebug();
                     }, itemKind: kindAction
                 }
@@ -3871,7 +3798,7 @@ function composeBaseMenu() {
         fillPluginsLists();
         menuItemsData = [
             {
-                text: 'fullscrn', onClick: () => {
+                text: localMenuFullscreen, onClick: () => {
                     globalCommandDispatcher.tryFullScreen();
                 }, itemKind: kindAction
             },
@@ -3883,7 +3810,20 @@ function composeBaseMenu() {
             menuPointActions,
             menuPointAddPlugin,
             menuPointClipboard,
-            menuPointSettings
+            menuPointSettings,
+            {
+                text: 'English', noLocalization: true, onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('en', 1);
+                }, itemKind: kindAction
+            }, {
+                text: 'Русский', noLocalization: true, onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('ru', 1);
+                }, itemKind: kindAction
+            }, {
+                text: '中文', noLocalization: true, onClick: () => {
+                    globalCommandDispatcher.setThemeLocale('zh', 1.5);
+                }, itemKind: kindAction
+            }
         ];
         return menuItemsData;
     }

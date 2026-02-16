@@ -4,173 +4,62 @@ let localeFontRatio = 1;
 
 let localMenuNewEmptyProject = 'localMenuNewEmptyProject';
 let localMenuItemSettings = 'localMenuItemSettings';
-//let localMenuTracksFolder = 'localMenuTracksFolder';
-//let localMenuImportMIDI = 'localMenuImportMIDI';
 let localMenuPercussionFolder = 'localMenuPercussionFolder';
-//let localMenuImportFolder='localMenuImportFolder';
-//let localMenuFileFolder='localMenuFileFolder';
 let localMenuAutomationFolder = 'localMenuAutomationFolder';
-//let localMenuCommentsLayer='localMenuCommentsLayer';
 let localMenuPlay = 'localMenuPlay';
 let localMenuPause = 'localMenuPause';
-
 let localMenuUndo = 'localMenuUndo';
 let localMenuRedo = 'localMenuRedo';
 let localMenuClearUndoRedo = 'localMenuClearUndoRedo';
-
 let localDropInsTrack = 'localDropInsTrack';
 let localDropSampleTrack = 'localDropSampleTrack';
 let localDropFilterTrack = 'localDropFilterTrack';
 let localDropFilterPoint = 'localDropFilterPoint';
-
 let localMenuActionsFolder = 'localMenuActionsFolder';
 let localMenuPerformersFolder = 'localMenuPerformersFolder';
 let localMenuFiltersFolder = 'localMenuFiltersFolder';
 let localMenuSamplersFolder = 'localMenuSamplersFolder';
-//let localMenuUndoFolder='localMenuUndoFolder';
 let localMenuInsTracksFolder = 'localMenuInsTracksFolder';
 let localMenuDrumTracksFolder = 'localMenuDrumTracksFolder';
 let localMenuFxTracksFolder = 'localMenuFxTracksFolder';
-
-//let localAddEmptyMeasures = 'localAddEmptyMeasures';
-//let localRemoveSelectedMeasures = 'localRemoveSelectedMeasures';
-//let localSplitFirstSelectedMeasure = 'localSplitFirstSelectedMeasure';
-//let localMergeSelectedMeausres = 'localMergeSelectedMeausres';
-//let localMoveAsideContentSelectedMeausres='localMoveAsideContentSelectedMeausres';
-//let localMorphMeterSelectedMeausres = 'localMorphMeterSelectedMeausres';
-
 let localMenuNewPlugin = 'localMenuNewPlugin';
 let localMenuClipboard = 'localMenuClipboard';
+let localMenuFullscreen = 'localMenuFullscreen';
+let localMenuCopySelection = 'localMenuCopySelection';
+let localMenuColors = 'localMenuColors';
+let localMenuSize = 'localMenuSize';
+let localMenuNormalFont = 'localMenuNormalFont';
+let localMenuBigFont = 'localMenuBigFont';
+let localMenuHugeFont = 'localMenuHugeFont';
+let localMenuOther = 'localMenuOther';
+let localMenuDebugPlugin = 'localMenuDebugPlugin';
 
 let localeDictionary: { id: string, data: { locale: string, text: string }[] }[] = [
-	{
-		id: localNameLocal, data: [
-			{ locale: 'en', text: 'English' }
-			, { locale: 'ru', text: 'Русский' }
-			, { locale: 'zh', text: '中文' }]
-	}, {
-		id: localMenuItemSettings, data: [
-			{ locale: 'en', text: 'Settings' }
-			, { locale: 'ru', text: 'Настройки' }
-			, { locale: 'zh', text: '设置' }]
-		/* }, {
-			 id: localMenuTracksFolder, data: [
-				 { locale: 'en', text: 'Tracks' }
-				 , { locale: 'ru', text: 'Треки' }
-				 , { locale: 'zh', text: '?' }]
-		 }, {
-			 id: localMenuImportMIDI, data: [
-				 { locale: 'en', text: 'Import from MIDI-file' }
-				 , { locale: 'ru', text: 'Импорт из файлв MIDI' }
-				 , { locale: 'zh', text: '?' }]*/
-	}
-	, {
-		id: localMenuPercussionFolder, data: [
-			{ locale: 'en', text: 'Sampler' }
-			, { locale: 'ru', text: 'Сэмплер' }
-			, { locale: 'zh', text: '?' }]
-	}
-	//, { id: localAddEmptyMeasures, data: [{ locale: 'en', text: '+' }, { locale: 'ru', text: '+' }, { locale: 'zh', text: '?' }] }
-	//, { id: localRemoveSelectedMeasures, data: [{ locale: 'en', text: 'x' }, { locale: 'ru', text: 'x' }, { locale: 'zh', text: '?' }] }
-	//, { id: localSplitFirstSelectedMeasure, data: [{ locale: 'en', text: 'Split' }, { locale: 'ru', text: 'Разделить' }, { locale: 'zh', text: '?' }] }
-	//, { id: localMergeSelectedMeausres, data: [{ locale: 'en', text: '>|<' }, { locale: 'ru', text: '>|<' }, { locale: 'zh', text: '?' }] }
-	//, { id: localMoveAsideContentSelectedMeausres, data: [{ locale: 'en', text: '|>|' }, { locale: 'ru', text: '|>|' }, { locale: 'zh', text: '?' }] }
-	//, { id: localMorphMeterSelectedMeausres, data: [{ locale: 'en', text: 'Morph' }, { locale: 'ru', text: 'Сменить' }, { locale: 'zh', text: '?' }] }
-
-	, { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: 'тew' }] }
-	
-	/*, {
-        id: localMenuFileFolder, data: [
-            { locale: 'en', text: 'File' }
-            , { locale: 'ru', text: 'Файл' }
-            , { locale: 'zh', text: '?' }]
-    }, {
-        id: localMenuImportFolder, data: [
-            { locale: 'en', text: 'Import' }
-            , { locale: 'ru', text: 'Импорт' }
-            , { locale: 'zh', text: '?' }]
-    }, {
-        id: localMenuCommentsLayer, data: [
-            { locale: 'en', text: 'Comments' }
-            , { locale: 'ru', text: 'Комментарии' }
-            , { locale: 'zh', text: '?' }]
-    }*/, {
-		id: localMenuAutomationFolder, data: [
-			{ locale: 'en', text: 'Automation' }
-			, { locale: 'ru', text: 'Автоматизация' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuPlay, data: [
-			{ locale: 'en', text: 'Play' }
-			, { locale: 'ru', text: 'Старт' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuPause, data: [
-			{ locale: 'en', text: 'Pause' }
-			, { locale: 'ru', text: 'Стоп' }
-			, { locale: 'zh', text: '?' }]
-	}
-
-
-
-	, {
-		id: localMenuActionsFolder, data: [
-			{ locale: 'en', text: 'Actions' }
-			, { locale: 'ru', text: 'Действия' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuNewPlugin, data: [
-			{ locale: 'en', text: 'Add new item to the mixer' }
-			, { locale: 'ru', text: 'Добавить дорожку' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		/*    id: localMenuPerformersFolder, data: [
-				{ locale: 'en', text: 'Add performer' }
-				, { locale: 'ru', text: '+ Перформер' }
-				, { locale: 'zh', text: '?' }]
-		}, {
-			id: localMenuFiltersFolder, data: [
-				{ locale: 'en', text: 'Add filter' }
-				, { locale: 'ru', text: '+ Фильтр' }
-				, { locale: 'zh', text: '?' }]
-		}, {
-			id: localMenuSamplersFolder, data: [
-				{ locale: 'en', text: 'Add sampler' }
-				, { locale: 'ru', text: '+ Сэмплер' }
-				, { locale: 'zh', text: '?' }]
-		}, {*/
-		id: localMenuInsTracksFolder, data: [
-			{ locale: 'en', text: 'Performers' }
-			, { locale: 'ru', text: 'Перформеры' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuFxTracksFolder, data: [
-			{ locale: 'en', text: 'Filters' }
-			, { locale: 'ru', text: 'Фильтры' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuDrumTracksFolder, data: [
-			{ locale: 'en', text: 'Samplers' }
-			, { locale: 'ru', text: 'Сэмплеры' }
-			, { locale: 'zh', text: '?' }]
-	}, {
-		id: localMenuUndo, data: [
-			{ locale: 'en', text: 'Undo' }
-			, { locale: 'ru', text: 'Вернуть' }
-			, { locale: 'zh', text: '?' }]
-	}
-	, {
-		id: localMenuRedo, data: [
-			{ locale: 'en', text: 'Redo' }
-			, { locale: 'ru', text: 'Повторить' }
-			, { locale: 'zh', text: '?' }]
-	}
-	, {
-		id: localMenuClearUndoRedo, data: [
-			{ locale: 'en', text: 'Clear Undo queue' }
-			, { locale: 'ru', text: 'Очистить очередь действий' }
-			, { locale: 'zh', text: '?' }]
-	}
+	{ id: localNameLocal, data: [{ locale: 'en', text: 'English' }, { locale: 'ru', text: 'Русский' }, { locale: 'zh', text: '中文' }] }
+	, { id: localMenuItemSettings, data: [{ locale: 'en', text: 'Settings' }, { locale: 'ru', text: 'Настройки' }, { locale: 'zh', text: '设置' }] }
+	, { id: localMenuPercussionFolder, data: [{ locale: 'en', text: 'Sampler' }, { locale: 'ru', text: 'Сэмплер' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuNewEmptyProject, data: [{ locale: 'en', text: 'New empty project' }, { locale: 'ru', text: 'Новый проект' }, { locale: 'zh', text: '新建项目' }] }
+	, { id: localMenuAutomationFolder, data: [{ locale: 'en', text: 'Automation' }, { locale: 'ru', text: 'Автоматизация' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuPlay, data: [{ locale: 'en', text: 'Play' }, { locale: 'ru', text: 'Старт' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuPause, data: [{ locale: 'en', text: 'Pause' }, { locale: 'ru', text: 'Стоп' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuActionsFolder, data: [{ locale: 'en', text: 'Actions' }, { locale: 'ru', text: 'Действия' }, { locale: 'zh', text: '服务' }] }
+	, { id: localMenuNewPlugin, data: [{ locale: 'en', text: 'Add new item to the mixer' }, { locale: 'ru', text: 'Добавить дорожку' }, { locale: 'zh', text: '添加新曲目' }] }
+	, { id: localMenuInsTracksFolder, data: [{ locale: 'en', text: 'Performers' }, { locale: 'ru', text: 'Перформеры' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuFxTracksFolder, data: [{ locale: 'en', text: 'Filters' }, { locale: 'ru', text: 'Фильтры' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuDrumTracksFolder, data: [{ locale: 'en', text: 'Samplers' }, { locale: 'ru', text: 'Сэмплеры' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuUndo, data: [{ locale: 'en', text: 'Undo' }, { locale: 'ru', text: 'Вернуть' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuRedo, data: [{ locale: 'en', text: 'Redo' }, { locale: 'ru', text: 'Повторить' }, { locale: 'zh', text: '?' }] }
+	, { id: localMenuClearUndoRedo, data: [{ locale: 'en', text: 'Clear Undo/Redo history' }, { locale: 'ru', text: 'Очистить историю действий' }, { locale: 'zh', text: '清除历史记录' }] }
+	, { id: localMenuFullscreen, data: [{ locale: 'en', text: 'Full Screen' }, { locale: 'ru', text: 'На весь экран' }, { locale: 'zh', text: '切换到全屏' }] }
+	, { id: localMenuClipboard, data: [{ locale: 'en', text: 'Clipboard' }, { locale: 'ru', text: 'Буфер обмена' }, { locale: 'zh', text: '剪贴板' }] }
+	, { id: localMenuCopySelection, data: [{ locale: 'en', text: 'Copy selected bars' }, { locale: 'ru', text: 'Скопировать выделенное' }, { locale: 'zh', text: '复制所选' }] }
+	, { id: localMenuColors, data: [{ locale: 'en', text: 'Theme colors' }, { locale: 'ru', text: 'Цветовая тема' }, { locale: 'zh', text: '主题颜色' }] }
+	, { id: localMenuSize, data: [{ locale: 'en', text: 'Font size' }, { locale: 'ru', text: 'Размер шрифта' }, { locale: 'zh', text: '字体大小' }] }
+	, { id: localMenuNormalFont, data: [{ locale: 'en', text: 'Normall font' }, { locale: 'ru', text: 'Обычный шрифт' }, { locale: 'zh', text: '常规字体' }] }
+	, { id: localMenuBigFont, data: [{ locale: 'en', text: 'Big font' }, { locale: 'ru', text: 'Большой шрифт' }, { locale: 'zh', text: '大字体' }] }
+	, { id: localMenuHugeFont, data: [{ locale: 'en', text: 'Huge font' }, { locale: 'ru', text: 'Огромный шрифт' }, { locale: 'zh', text: '超大字体' }] }
+	, { id: localMenuOther, data: [{ locale: 'en', text: 'Other options' }, { locale: 'ru', text: 'Дополнительно' }, { locale: 'zh', text: '其他选项' }] }
+	, { id: localMenuDebugPlugin, data: [{ locale: 'en', text: 'Open plugin' }, { locale: 'ru', text: 'Загрузить плагин' }, { locale: 'zh', text: '加载插件' }] }
 ];
 function setLocaleID(loname: string, ratio: number) {
 	labelLocaleDictionary = loname;

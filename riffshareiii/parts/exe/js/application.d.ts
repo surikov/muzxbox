@@ -292,6 +292,15 @@ declare let localMenuDrumTracksFolder: string;
 declare let localMenuFxTracksFolder: string;
 declare let localMenuNewPlugin: string;
 declare let localMenuClipboard: string;
+declare let localMenuFullscreen: string;
+declare let localMenuCopySelection: string;
+declare let localMenuColors: string;
+declare let localMenuSize: string;
+declare let localMenuNormalFont: string;
+declare let localMenuBigFont: string;
+declare let localMenuHugeFont: string;
+declare let localMenuOther: string;
+declare let localMenuDebugPlugin: string;
 declare let localeDictionary: {
     id: string;
     data: {

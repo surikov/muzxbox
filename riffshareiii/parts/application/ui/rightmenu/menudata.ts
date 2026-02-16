@@ -74,7 +74,7 @@ let menuPointSamplers: MenuInfo = {
 	}
 };*/
 let copyToClipboard: MenuInfo = {
-	text: 'copy vis', onClick: () => {
+	text: localMenuCopySelection, onClick: () => {
 		globalCommandDispatcher.copySelectionToClipboard()
 	}, itemKind: kindAction
 };
@@ -118,20 +118,20 @@ let menuPointSettings: MenuInfo = {
 				globalCommandDispatcher.newEmptyProject();
 			}, itemKind: kindAction
 		}, */{
-			text: 'Size', children: [
+			text: localMenuSize, children: [
 				{
-					text: 'Small', onClick: () => {
+					text: localMenuNormalFont, onClick: () => {
 						startLoadCSSfile('theme/sizesmall.css');
 						globalCommandDispatcher.changeTapSize(1);
 					}, itemKind: kindAction
 				}, {
-					text: 'Big', onClick: () => {
+					text: localMenuBigFont, onClick: () => {
 						startLoadCSSfile('theme/sizebig.css');
 						globalCommandDispatcher.changeTapSize(1.5);
 					}
 					, itemKind: kindAction
 				}, {
-					text: 'Huge', onClick: () => {
+					text: localMenuHugeFont, onClick: () => {
 						startLoadCSSfile('theme/sizehuge.css');
 						globalCommandDispatcher.changeTapSize(4);
 					}
@@ -140,41 +140,41 @@ let menuPointSettings: MenuInfo = {
 
 			], itemKind: kindClosedFolder
 		}, {
-			text: 'Colors', children: [
+			text: localMenuColors, children: [
 				{
-					text: 'Minium', onClick: () => {
+					text: 'Minium', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Greenstone', onClick: () => {
+					text: 'Greenstone', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Deep', onClick: () => {
+					text: 'Deep', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Neon', onClick: () => {
+					text: 'Neon',noLocalization:true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('neon1');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Gjel', onClick: () => {
+					text: 'Gjel', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('light1');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Vorot', onClick: () => {
+					text: 'Vorot', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('light2');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Bereza', onClick: () => {
+					text: 'Bereza', noLocalization:true,onClick: () => {
 						globalCommandDispatcher.setThemeColor('light3');
 					}, itemKind: kindAction
 				}
 			], itemKind: kindClosedFolder
-		}, {
+		}/*, {
 			text: 'Language', children: [
 				{
 					text: 'Russian', onClick: () => {
@@ -190,15 +190,15 @@ let menuPointSettings: MenuInfo = {
 					}, itemKind: kindAction
 				}
 			], itemKind: kindClosedFolder
-		}
+		}*/
 		, {
-			text: 'other', children: [{
+			text: localMenuOther, children: [{
 				text: localMenuClearUndoRedo, onClick: () => {
 					globalCommandDispatcher.clearUndo();
 					globalCommandDispatcher.clearRedo();
 				}, itemKind: kindAction
 			}, {
-				text: 'Plugindebug', onClick: () => {
+				text: localMenuDebugPlugin, onClick: () => {
 					globalCommandDispatcher.promptPluginInfoDebug();
 				}, itemKind: kindAction
 			}
@@ -656,10 +656,10 @@ function fillPluginsLists() {
 									, outputs: ['']
 									, iconPosition: { x: xx, y: yy }
 									, state: 0
-									,hint1_128:0
+									, hint1_128: 0
 								}
 								, measures: []
-								, title: MZXBX_currentPlugins()[ii].label								
+								, title: MZXBX_currentPlugins()[ii].label
 							});
 							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 						});
@@ -811,7 +811,7 @@ function composeBaseMenu(): MenuInfo[] {
 			//, menuPointFxTracks
 			//, 
 			{
-				text: 'fullscrn', onClick: () => {
+				text: localMenuFullscreen, onClick: () => {
 					globalCommandDispatcher.tryFullScreen();
 				}, itemKind: kindAction
 			},
@@ -825,164 +825,19 @@ function composeBaseMenu(): MenuInfo[] {
 			//, menuPointStore
 			, menuPointClipboard
 			, menuPointSettings
-			/*, {
-				text: localMenuNewPlugin, children: [
-
-					menuPointFilters
-					, menuPointPerformers
-					, menuPointSamplers
-				]
-			}*/
-			/*, {
-				text: 'Selection', children: [
-					{
-						text: 'Delete bars', onClick: () => {
-							globalCommandDispatcher.dropSelectedBars();
-						}
-					}, {
-						text: 'Insert bars', onClick: () => {
-							globalCommandDispatcher.insertAfterSelectedBars();
-						}
-
-					}, {
-						text: 'Change tempo', onClick: () => {
-							globalCommandDispatcher.promptTempoForSelectedBars()
-						}
-					}, {
-						text: 'Change meter', onClick: () => {
-							globalCommandDispatcher.promptMeterForSelectedBars()
-						}
-					}, {
-						text: 'Recalculate meter', onClick: () => {
-							//
-						}
-					}, {
-						text: 'Copy visibled items', onClick: () => {
-							//
-						}
-					}, {
-						text: 'Cut visibled items', onClick: () => {
-							//
-						}
-					}, {
-						text: 'Paste', onClick: () => {
-							//
-						}
-					}, {
-
-						text: 'Align to 32th', onClick: () => {
-							//
-						}
-					}
-				]
-			}*/
-			/*
 			, {
-				text: localMenuItemSettings, children: [
-					{
-						text: localMenuNewEmptyProject, onClick: () => {
-							globalCommandDispatcher.newEmptyProject();
-						}
-						, itemKind: kindAction
-					}
-					,
-					{
-						text: 'Size', children: [
-							{
-								text: 'Small', onClick: () => {
-									startLoadCSSfile('theme/sizesmall.css');
-									globalCommandDispatcher.changeTapSize(1);
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'Big', onClick: () => {
-									startLoadCSSfile('theme/sizebig.css');
-									globalCommandDispatcher.changeTapSize(1.5);
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'Huge', onClick: () => {
-									startLoadCSSfile('theme/sizehuge.css');
-									globalCommandDispatcher.changeTapSize(4);
-								}
-								, itemKind: kindAction
-							}
-
-						], itemKind: kindClosedFolder
-					}, {
-						text: 'Colors', children: [
-							{
-								text: 'Minium', onClick: () => {
-									globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'Greenstone', onClick: () => {
-									globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'Deep', onClick: () => {
-									globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'Neon', onClick: () => {
-									globalCommandDispatcher.setThemeColor('neon1');
-								}
-								, itemKind: kindAction
-							}
-							, {
-								text: 'Gjel', onClick: () => {
-									globalCommandDispatcher.setThemeColor('light1');
-								}
-								, itemKind: kindAction
-							}
-							, {
-								text: 'Vorot', onClick: () => {
-									globalCommandDispatcher.setThemeColor('light2');
-								}
-								, itemKind: kindAction
-							}
-						], itemKind: kindClosedFolder
-					}, {
-						text: 'Language', children: [
-							{
-								text: 'Russian', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('ru', 1);
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'English', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('en', 1);
-								}
-								, itemKind: kindAction
-							}, {
-								text: 'kitaiskiy', onClick: () => {
-									globalCommandDispatcher.setThemeLocale('zh', 1.5);
-								}
-								, itemKind: kindAction
-							}
-						], itemKind: kindClosedFolder
-					}
-					, {
-						text: 'other', children: [{
-							text: localMenuClearUndoRedo, onClick: () => {
-								globalCommandDispatcher.clearUndo();
-								globalCommandDispatcher.clearRedo();
-							}
-							, itemKind: kindAction
-						}, {
-							text: 'Plugindebug', onClick: () => {
-								globalCommandDispatcher.promptPluginInfoDebug();
-							}
-							, itemKind: kindAction
-						}
-						], itemKind: kindClosedFolder
-					}
-				], itemKind: kindClosedFolder
+				text: 'English',noLocalization:true, onClick: () => {
+					globalCommandDispatcher.setThemeLocale('en', 1);
+				}, itemKind: kindAction
+			}, {
+				text: 'Русский',noLocalization:true, onClick: () => {
+					globalCommandDispatcher.setThemeLocale('ru', 1);
+				}, itemKind: kindAction
+			}, {
+				text: '中文',noLocalization:true, onClick: () => {
+					globalCommandDispatcher.setThemeLocale('zh', 1.5);
+				}, itemKind: kindAction
 			}
-*/
 		];
 		return menuItemsData;
 	}

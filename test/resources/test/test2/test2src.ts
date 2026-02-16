@@ -72,21 +72,12 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 function dumpLevels(row0: number, data: BalsRow[], stepsize: number) {
 	let counts: number[] = [];
 	for (let ii = 0; ii < 40; ii++) {
-		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii, stepsize);
+		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii * stepsize, stepsize);
 		levels.sort((a, b) => {
 			return b.volume - a.volume
 		});
 		let txt = '';
 		for (let kk = 0; kk < levels.length; kk++) {
-			/*if (levels[kk].volume == 4) {
-				txt = txt + '.';
-			} else {
-				if (levels[kk].volume > 4) {
-					txt = txt + ' ';
-				} else {
-					txt = txt + ' ';
-				}
-			}*/
 			if (levels[kk].exists) {
 				txt = txt + '[' + t2(levels[kk].ball) + ']';
 				counts[kk] = counts[kk] ? counts[kk] + 1 : 1;
@@ -94,37 +85,37 @@ function dumpLevels(row0: number, data: BalsRow[], stepsize: number) {
 				txt = txt + ' ' + t2(levels[kk].ball) + ' ';
 			}
 		}
-		console.log(txt + ' : ' + (row0 + ii));
+		console.log(txt + ' : ' + (row0 + ii * stepsize));
 
 	}
 	let line = '';
-	for (let ii = 0; ii < 45; ii++) {
-		counts[ii] = counts[ii] ? counts[ii] : 0;
-		line = line + ':' + t2(counts[ii]) + ' ';
+	for (let kk = 0; kk < 45; kk++) {
+		counts[kk] = counts[kk] ? counts[kk] : 0;
+		line = line + ':' + t2(counts[kk]) + ' ';
 	}
 	console.log(line);
 }
 function start2() {
 	let start = Math.round(Math.random() * 5000);
-	let stepsize = Math.round(Math.random() * 50);
+	let stepsize = 1 + Math.round(Math.random() * 50);
 	//console.log(window.location);
-	let txt=window.location.href;
+	let txt = window.location.href;
 	//console.log(txt);
 	let url = new URL(txt);
 	let searchParams = new URLSearchParams(url.search);
-	let txtstart=searchParams.get('start');
-	if(txtstart){
-		start=parseInt(txtstart);
+	let txtstart = searchParams.get('start');
+	if (txtstart) {
+		start = parseInt(txtstart);
 	}
-	let txtstepsize=searchParams.get('step');
-	if(txtstepsize){
-		stepsize=parseInt(txtstepsize);
+	let txtstepsize = searchParams.get('step');
+	if (txtstepsize) {
+		stepsize = parseInt(txtstepsize);
 	}
 	//console.log(searchParams.get('start'));  // outputs "m2-m3-m4-m5"
 	//console.log(searchParams.get('step'));  // outputs "m2-m3-m4-m5"
 	//console.log('Test string %c[a], b','color: magenta;');
-	
-	console.log('start',start, 'step',stepsize);//, dataRows2: BalsRow[][start].balls);
+
+	console.log('test2.html?start=' + start + '&step=' + stepsize);//, dataRows2: BalsRow[][start].balls);
 	//for (let ii = 1; ii <= 45; ii++) {
 	//console.log(ii,'------------------------');
 	//dumpRows(start, 40);//data2[start].balls[0]);

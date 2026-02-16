@@ -19065,7 +19065,7 @@ function ballExistsInRow(ball, row) {
 function dumpLevels(row0, data, stepsize) {
     let counts = [];
     for (let ii = 0; ii < 40; ii++) {
-        let levels = rowCountEmpty(data, row0 + ii, stepsize);
+        let levels = rowCountEmpty(data, row0 + ii * stepsize, stepsize);
         levels.sort((a, b) => {
             return b.volume - a.volume;
         });
@@ -19079,18 +19079,18 @@ function dumpLevels(row0, data, stepsize) {
                 txt = txt + ' ' + t2(levels[kk].ball) + ' ';
             }
         }
-        console.log(txt + ' : ' + (row0 + ii));
+        console.log(txt + ' : ' + (row0 + ii * stepsize));
     }
     let line = '';
-    for (let ii = 0; ii < 45; ii++) {
-        counts[ii] = counts[ii] ? counts[ii] : 0;
-        line = line + ':' + t2(counts[ii]) + ' ';
+    for (let kk = 0; kk < 45; kk++) {
+        counts[kk] = counts[kk] ? counts[kk] : 0;
+        line = line + ':' + t2(counts[kk]) + ' ';
     }
     console.log(line);
 }
 function start2() {
     let start = Math.round(Math.random() * 5000);
-    let stepsize = Math.round(Math.random() * 50);
+    let stepsize = 1 + Math.round(Math.random() * 50);
     let txt = window.location.href;
     let url = new URL(txt);
     let searchParams = new URLSearchParams(url.search);
@@ -19102,7 +19102,7 @@ function start2() {
     if (txtstepsize) {
         stepsize = parseInt(txtstepsize);
     }
-    console.log('start', start, 'step', stepsize);
+    console.log('test2.html?start=' + start + '&step=' + stepsize);
     dumpLevels(start, dataRows2, stepsize);
 }
 //# sourceMappingURL=test2.js.map
