@@ -382,6 +382,11 @@ class FileLoaderAlpha {
 
 		if (program == 27) re.ratio = 0.95;
 
+		if (program == 28) re.ratio = 0.99;
+		if (program == 29) re.ratio = 0.99;
+		if (program == 30) re.ratio = 0.99;
+		if (program == 31) re.ratio = 0.99;
+
 		if (program == 32) re.ratio = 0.95;
 		if (program == 33) re.ratio = 0.95;
 		if (program == 34) re.ratio = 0.95;
@@ -406,6 +411,7 @@ class FileLoaderAlpha {
 		//console.log('program', program, 'not found set 0');
 		return re;
 	};
+	/*
 	findModeInstrument(program: number): number {
 		if (program == 24) return 4;
 		if (program == 25) return 4;
@@ -415,7 +421,7 @@ class FileLoaderAlpha {
 		if (program == 30) return 1;
 		return 0;
 	};
-
+*/
 	addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string) {
 		//let perfkind = 'zinstr1';
 		//strumMode: 0 | 1 | 2 | 3 | 4 = this.strumModeFlat;	//Flat / Down / Up / Snap / Pong
@@ -433,10 +439,11 @@ class FileLoaderAlpha {
 		}
 		let idxRatio = this.findVolumeInstrument(scoreTrack.playbackInfo.program);
 		let iidx = idxRatio.idx;
-		let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
+		//let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
 		let volume = 1;
 		let ivolume = Math.round(volume * 100) * idxRatio.ratio;
-		let util = new ChordPitchPerformerUtil();
+		console.log(scoreTrack.playbackInfo.program,scoreTrack.name,idxRatio.ratio);
+		//let util = new ChordPitchPerformerUtil();
 		//let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
 		let midiTitle = this.inames.tonechordinslist()[scoreTrack.playbackInfo.program];
 		//console.log(scoreTrack.playbackInfo.program,midiTitle);
@@ -499,8 +506,8 @@ class FileLoaderAlpha {
 		};
 		if (scoreTrack.playbackInfo.program == 29
 			|| scoreTrack.playbackInfo.program == 30) {
-			mzxbxTrack.performer.data = '30/341';
-			palmMuteTrack.performer.data = '29/323';
+			mzxbxTrack.performer.data = '' + ivolume + '/341/' + strummode;//'30/341';
+			palmMuteTrack.performer.data =  '' + (Math.round(volume * 100) * idxRatio.ratio*0.7) + '/323/0';//'29/323';
 		}
 		let pmFlag = false;
 		let upFlag = false;

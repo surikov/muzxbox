@@ -2582,7 +2582,7 @@ class TimeSelectBar {
         let nm = {
             x: barLeft + size / 4,
             y: zoomPrefixLevelsCSS[zz].minZoom * 1,
-            text: '' + (1 + barnum) + ':' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds,
+            text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs,
             css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(nm);

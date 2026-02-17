@@ -189,7 +189,7 @@ class TimeSelectBar {
 		let nm: TileText = {
 			x: barLeft + size / 4
 			, y: zoomPrefixLevelsCSS[zz].minZoom * 1
-			, text: '' + (1 + barnum) + ':' + mins + '\'' + (secs > 9 ? '' : '0') + secs + '.' + hunds
+			, text: '' + (1 + barnum) + ': ' + mins + '\'' + (secs > 9 ? '' : '0') + secs// + '.' + hunds
 			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
 		};
 		measureAnchor.content.push(nm);

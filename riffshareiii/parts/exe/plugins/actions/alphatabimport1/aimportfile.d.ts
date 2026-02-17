@@ -2809,7 +2809,6 @@ declare class FileLoaderAlpha {
         idx: number;
         ratio: number;
     };
-    findModeInstrument(program: number): number;
     addScoreInsTrack(project: Zvoog_Project, scoreTrack: Track, targetId: string): void;
     beatDuration(beat: Beat): Zvoog_MetreMathType;
     stringFret2pitch(stringNum: number, fretNum: number, tuning: number[], octave: number, tone: number): number;

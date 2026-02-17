@@ -16734,6 +16734,14 @@ class FileLoaderAlpha {
             re.ratio = 0.4;
         if (program == 27)
             re.ratio = 0.95;
+        if (program == 28)
+            re.ratio = 0.99;
+        if (program == 29)
+            re.ratio = 0.99;
+        if (program == 30)
+            re.ratio = 0.99;
+        if (program == 31)
+            re.ratio = 0.99;
         if (program == 32)
             re.ratio = 0.95;
         if (program == 33)
@@ -16767,22 +16775,6 @@ class FileLoaderAlpha {
         return re;
     }
     ;
-    findModeInstrument(program) {
-        if (program == 24)
-            return 4;
-        if (program == 25)
-            return 4;
-        if (program == 26)
-            return 4;
-        if (program == 27)
-            return 4;
-        if (program == 29)
-            return 1;
-        if (program == 30)
-            return 1;
-        return 0;
-    }
-    ;
     addScoreInsTrack(project, scoreTrack, targetId) {
         let strummode = 0;
         if (scoreTrack.playbackInfo.program == 24
@@ -16796,10 +16788,9 @@ class FileLoaderAlpha {
         }
         let idxRatio = this.findVolumeInstrument(scoreTrack.playbackInfo.program);
         let iidx = idxRatio.idx;
-        let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
         let volume = 1;
         let ivolume = Math.round(volume * 100) * idxRatio.ratio;
-        let util = new ChordPitchPerformerUtil();
+        console.log(scoreTrack.playbackInfo.program, scoreTrack.name, idxRatio.ratio);
         let midiTitle = this.inames.tonechordinslist()[scoreTrack.playbackInfo.program];
         let mzxbxTrack = {
             title: scoreTrack.name + ': ' + midiTitle,
@@ -16855,8 +16846,8 @@ class FileLoaderAlpha {
         };
         if (scoreTrack.playbackInfo.program == 29
             || scoreTrack.playbackInfo.program == 30) {
-            mzxbxTrack.performer.data = '30/341';
-            palmMuteTrack.performer.data = '29/323';
+            mzxbxTrack.performer.data = '' + ivolume + '/341/' + strummode;
+            palmMuteTrack.performer.data = '' + (Math.round(volume * 100) * idxRatio.ratio * 0.7) + '/323/0';
         }
         let pmFlag = false;
         let upFlag = false;
