@@ -16,6 +16,6 @@ class SynthDX7 {
 		if (this.testVox == null) {
 			this.testVox = new VoiceDX7(this.output, this.moContext);
 		}
-		this.testVox.startPlayNote(this.moContext.currentTime + 0.1, 0.99, 61);
+		this.testVox.startPlayNote(this.moContext.currentTime + 0.3, 3, 69);
 	}
 }

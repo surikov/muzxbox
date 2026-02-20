@@ -25,6 +25,7 @@
 	},
 	"files": [
 		"algorithms.ts",
+		"envelopenode.ts",
 		"synth.ts",
 		"operator.ts",
 		"vox.ts",

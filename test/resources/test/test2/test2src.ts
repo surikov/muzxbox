@@ -69,7 +69,7 @@ function dumpRows(data: BalsRow[], firstRow: number, len: number) {
 	}
 }
 */
-function dumpLevels(row0: number, data: BalsRow[], len:number,stepsize: number,result:string[]) {
+function dumpLevels(row0: number, data: BalsRow[], len: number, stepsize: number, firstlong: string[], lastshort: string[]) {
 	//let counts: number[] = [];
 	for (let ii = 0; ii < len; ii++) {
 		let levels: CellLevel[] = rowCountEmpty(data, row0 + ii * stepsize, stepsize);
@@ -81,15 +81,18 @@ function dumpLevels(row0: number, data: BalsRow[], len:number,stepsize: number,r
 			if (levels[kk].exists) {
 				txt = txt + '[' + t2(levels[kk].ball) + ']';
 				//counts[kk] = counts[kk] ? counts[kk] + 1 : 1;
-				
+
 			} else {
 				txt = txt + ' ' + t2(levels[kk].ball) + ' ';
 			}
-			
+
 		}
-		if(ii==0 )result[levels[0].ball]=levels[levels[0].ball].exists?'*****':'';
+		if (ii == 0) {
+			firstlong[levels[0].ball] = levels[0].exists ? '*****' : '-';
+			lastshort[levels[44].ball] = levels[44].exists ? '++++++' : '-';
 			//console.log(levels);
-		console.log(txt + ' : ' + (row0 + ii * stepsize)+':'+stepsize);
+		}
+		console.log(txt + ' : ' + (row0 + ii * stepsize) + ':' + stepsize);
 	}
 	//dumpLevelsCounts(counts);
 }
@@ -128,10 +131,12 @@ function start2() {
 	//}
 	//dumpLevels(start, dataRows2,40, stepsize);
 	//console.log('--');
-	let result:string[]=[];
-	for(let ii=0;ii<20;ii++){
-		console.log('test2.html?start=' + start + '&step=' + (ii+1));//, dataRows2: BalsRow[][start].balls);
-		dumpLevels(start, dataRows2,5, ii+1,result);
+	let firstlong: string[] = [];
+	let lastshort: string[] = [];
+	for (let ii = 0; ii < 99; ii=ii+1) {
+		//console.log('test2.html?start=' + start + '&step=' + (ii + 1));//, dataRows2: BalsRow[][start].balls);
+		dumpLevels(start, dataRows2, 1, ii + 1, firstlong,lastshort);
 	}
-	console.log(result);
+	console.log('firstlong',firstlong);
+	console.log('lastshort',lastshort);
 }

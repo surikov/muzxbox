@@ -1,0 +1,10 @@
+<IfModule mod_rewrite.c>
+RewriteEngine on
+RewriteCond %{HTTP_HOST} ^(www.)?mzxbox.ru/$
+RewriteCond %{REQUEST_URI} !^/ww/
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /ww/$1
+RewriteCond %{HTTP_HOST} ^(www.)?mzxbox.ru$
+RewriteRule ^(/)?$ ww/index.php [L] 
+</IfModule>
