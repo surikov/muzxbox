@@ -50,6 +50,7 @@ class VoiceDX7 {
 				, operadata.levels[3], operadata.rates[3]
 				, when, duration, pitch
 				, operadata.oscMode, operadata.freqRatio, operadata.freqFixed
+				,operadata.outputLevel
 			);
 		}
 	}

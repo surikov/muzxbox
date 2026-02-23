@@ -347,15 +347,16 @@ class OperatorDX7 {
         return 440 * Math.pow(2, (note - 69) / 12);
     }
     ;
-    startOperator(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, pitch, oscMode, freqRatio, freqFixed) {
+    startOperator(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, pitch, oscMode, freqRatio, freqFixed, outputLevel) {
         if (this.onNotOff) {
-            console.log('startOperator', when, pitch);
+            console.log('startOperator', when, pitch, freqRatio, outputLevel);
             this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration);
             let opefrequency = freqRatio * this.frequencyFromNoteNumber(pitch);
             if (oscMode > 0) {
                 opefrequency = freqFixed;
             }
             this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
+            this.outGain.gain.setValueAtTime(outputLevel / 16, this.ocntxt.currentTime);
         }
     }
     connectToOutputNode(outNode) {
@@ -388,7 +389,7 @@ class VoiceDX7 {
         console.log('startPlayNote', when, pitch, this.voContext.currentTime);
         for (let ii = 0; ii < this.operators.length; ii++) {
             let operadata = this.dx7voxData.operators[ii];
-            this.operators[ii].startOperator(operadata.levels[0], operadata.rates[0], operadata.levels[1], operadata.rates[1], operadata.levels[2], operadata.rates[2], operadata.levels[3], operadata.rates[3], when, duration, pitch, operadata.oscMode, operadata.freqRatio, operadata.freqFixed);
+            this.operators[ii].startOperator(operadata.levels[0], operadata.rates[0], operadata.levels[1], operadata.rates[1], operadata.levels[2], operadata.rates[2], operadata.levels[3], operadata.rates[3], when, duration, pitch, operadata.oscMode, operadata.freqRatio, operadata.freqFixed, operadata.outputLevel);
         }
     }
     connectMixOperators(scheme) {

@@ -90,7 +90,7 @@ declare class OperatorDX7 {
     };
     constructor(cntxt: AudioContext);
     frequencyFromNoteNumber(note: number): number;
-    startOperator(level1: number, rate1: number, level2: number, rate2: number, level3: number, rate3: number, level4: number, rate4: number, when: number, duration: number, pitch: number, oscMode: number, freqRatio: number, freqFixed: number): void;
+    startOperator(level1: number, rate1: number, level2: number, rate2: number, level3: number, rate3: number, level4: number, rate4: number, when: number, duration: number, pitch: number, oscMode: number, freqRatio: number, freqFixed: number, outputLevel: number): void;
     connectToOutputNode(outNode: AudioNode): void;
     connectSendToOperator(opDX7: OperatorDX7): void;
 }

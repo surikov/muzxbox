@@ -51,9 +51,10 @@ class OperatorDX7 {
 		, level4: number, rate4: number
 		, when: number, duration: number, pitch: number
 		, oscMode: number, freqRatio: number, freqFixed: number
+		, outputLevel: number
 	) {
 		if (this.onNotOff) {
-			console.log('startOperator', when, pitch);
+			console.log('startOperator', when, pitch, freqRatio, outputLevel);
 			/*
 						this.oenvelope.disconnect();
 						this.oenvelope.gain.setValueAtTime(0, when);
@@ -76,7 +77,7 @@ class OperatorDX7 {
 			//this.osc.start(when);
 			//this.osc.stop(when + duration + this.adsr.releaseDuration);
 			//console.log('osc',when,(when + duration + this.adsr.releaseDuration));
-
+			this.outGain.gain.setValueAtTime(outputLevel / 16, this.ocntxt.currentTime);
 		}
 	}
 	connectToOutputNode(outNode: AudioNode) {
