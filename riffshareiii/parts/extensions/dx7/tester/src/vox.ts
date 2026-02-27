@@ -6,7 +6,7 @@ class VoiceDX7 {
 	//algorithm: ConnectionSchemeDX7;
 	voxoutput: GainNode;
 	voContext: AudioContext;
-	dx7voxData = defaultBrass1test;
+	dx7voxData = epiano1preset;//defaultBrass1test;
 	constructor(destination: AudioNode, aContext: AudioContext) {
 		console.log('new VoiceDX7', aContext.currentTime);
 		//this.note = note;
@@ -40,18 +40,21 @@ class VoiceDX7 {
 
 	}*/
 	startPlayNote(when: number, duration: number, pitch: number) {
-		console.log('startPlayNote', when, pitch, this.voContext.currentTime);
+		console.log('startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
 		for (let ii = 0; ii < this.operators.length; ii++) {
 			let operadata = this.dx7voxData.operators[ii];
-			this.operators[ii].startOperator(
-				operadata.levels[0], operadata.rates[0]
-				, operadata.levels[1], operadata.rates[1]
-				, operadata.levels[2], operadata.rates[2]
-				, operadata.levels[3], operadata.rates[3]
-				, when, duration, pitch
-				, operadata.oscMode, operadata.freqRatio, operadata.freqFixed
-				,operadata.outputLevel
-			);
+			if (operadata.enabled) {
+				this.operators[ii].startOperator(
+					operadata.levels[0], operadata.rates[0]
+					, operadata.levels[1], operadata.rates[1]
+					, operadata.levels[2], operadata.rates[2]
+					, operadata.levels[3], operadata.rates[3]
+					, when, duration, pitch
+					, operadata.oscMode, operadata.freqCoarse, operadata.freqFine
+					, operadata.detune
+					, operadata.volume
+				);
+			}
 		}
 	}
 	/*test() {

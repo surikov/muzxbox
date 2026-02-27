@@ -104,7 +104,7 @@
 							<p>город: <?php echo ($row["acity"]); ?></p>
 
 							<p><a class='linkinfo' href="lyrics.php?file=<?php echo $file; ?>"><?php echo ($row["lyrics"]); ?></a>...</p>
-							<p><a class='linkinfo' href="<?php echo $fileurl; ?>">скачать</a></p>
+							<!--<p><a class='linkinfo' href="<?php echo $fileurl; ?>">скачать</a></p>-->
 
 
 					<?php
