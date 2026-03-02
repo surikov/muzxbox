@@ -6,7 +6,7 @@ class VoiceDX7 {
 	//algorithm: ConnectionSchemeDX7;
 	voxoutput: GainNode;
 	voContext: AudioContext;
-	dx7voxData = epiano1preset;//defaultBrass1test;
+	dx7voxData = defaultBrass1test;//epiano1preset;//defaultBrass1test;
 	constructor(destination: AudioNode, aContext: AudioContext) {
 		console.log('new VoiceDX7', aContext.currentTime);
 		//this.note = note;
@@ -40,8 +40,9 @@ class VoiceDX7 {
 
 	}*/
 	startPlayNote(when: number, duration: number, pitch: number) {
-		console.log('startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
-		for (let ii = 0; ii < this.operators.length; ii++) {
+		console.log(this.dx7voxData.name,'startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
+		//for (let ii = 0; ii < this.operators.length; ii++) {
+		for (let ii = 0; ii < 1; ii++) {
 			let operadata = this.dx7voxData.operators[ii];
 			if (operadata.enabled) {
 				this.operators[ii].startOperator(

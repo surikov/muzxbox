@@ -79,8 +79,9 @@ class OperatorDX7 {
 			let detuneRatio = Math.pow(OCTAVE_1024, detune);
 			//this.envelope.setLevelRate(88, 90, 33, 80, 99, 70, 55, 60, when, duration);
 			this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration,volume);
-
-			let freqRatio = (freqCoarse || 0.5) * (1 + freqFine / 100);
+if(freqCoarse==0)freqCoarse=0.5;
+			//let freqRatio = (freqCoarse || 0.5) * (1 + freqFine / 100);
+			let freqRatio = freqCoarse * (1 + freqFine / 100);
 			let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
 			if (oscMode > 0) {
 				opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);;

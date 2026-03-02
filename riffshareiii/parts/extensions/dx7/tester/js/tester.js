@@ -721,7 +721,7 @@ class EnvelopeNode {
         let part = Math.abs(preLevel - nextLevel) / 100;
         let steep = 123.45;
         if (sloperate > 0 && sloperate < 100) {
-            steep = Math.pow(2, sloperate * 16 / 100 - 6);
+            steep = Math.pow(2, sloperate * 16 / 100 - 5);
         }
         return part / steep;
     }
@@ -772,7 +772,7 @@ class SynthDX7 {
         if (this.testVox == null) {
             this.testVox = new VoiceDX7(this.output, this.moContext);
         }
-        this.testVox.startPlayNote(this.moContext.currentTime + 1, 14, 12 * 5);
+        this.testVox.startPlayNote(this.moContext.currentTime + 1, 4, 12 * 5);
     }
 }
 var OCTAVE_1024 = 1.0006771307;
@@ -812,7 +812,9 @@ class OperatorDX7 {
             console.log('startOperator', when, pitch, ('' + freqCoarse + '.' + freqFine + '/' + detune), ('' + volume + '%'));
             let detuneRatio = Math.pow(OCTAVE_1024, detune);
             this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, volume);
-            let freqRatio = (freqCoarse || 0.5) * (1 + freqFine / 100);
+            if (freqCoarse == 0)
+                freqCoarse = 0.5;
+            let freqRatio = freqCoarse * (1 + freqFine / 100);
             let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
             if (oscMode > 0) {
                 opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);
@@ -831,7 +833,7 @@ class OperatorDX7 {
 }
 class VoiceDX7 {
     constructor(destination, aContext) {
-        this.dx7voxData = epiano1preset;
+        this.dx7voxData = defaultBrass1test;
         console.log('new VoiceDX7', aContext.currentTime);
         this.voContext = aContext;
         this.voxoutput = this.voContext.createGain();
@@ -849,8 +851,8 @@ class VoiceDX7 {
         this.connectMixOperators(matrixAlgorithmsDX7[defaultBrass1test.algorithm]);
     }
     startPlayNote(when, duration, pitch) {
-        console.log('startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
-        for (let ii = 0; ii < this.operators.length; ii++) {
+        console.log(this.dx7voxData.name, 'startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
+        for (let ii = 0; ii < 1; ii++) {
             let operadata = this.dx7voxData.operators[ii];
             if (operadata.enabled) {
                 this.operators[ii].startOperator(operadata.levels[0], operadata.rates[0], operadata.levels[1], operadata.rates[1], operadata.levels[2], operadata.rates[2], operadata.levels[3], operadata.rates[3], when, duration, pitch, operadata.oscMode, operadata.freqCoarse, operadata.freqFine, operadata.detune, operadata.volume);

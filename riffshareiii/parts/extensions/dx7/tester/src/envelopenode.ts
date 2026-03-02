@@ -58,7 +58,7 @@ class EnvelopeNode {
 		let part = Math.abs(preLevel - nextLevel) / 100;
 		let steep = 123.45;
 		if (sloperate > 0 && sloperate < 100) {
-			steep = Math.pow(2, sloperate * 16 / 100 - 6);
+			steep = Math.pow(2, sloperate * 16 / 100 - 5);
 		}
 		return part / steep;
 	}
