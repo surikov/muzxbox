@@ -6,9 +6,9 @@ class VoiceDX7 {
 	//algorithm: ConnectionSchemeDX7;
 	voxoutput: GainNode;
 	voContext: AudioContext;
-	dx7voxData = defaultBrass1test;//epiano1preset;//defaultBrass1test;
+	dx7voxData = epiano1preset;//defaultBrass1test;
 	constructor(destination: AudioNode, aContext: AudioContext) {
-		console.log('new VoiceDX7', aContext.currentTime);
+		console.log('new VoiceDX7', aContext.currentTime, 'algorithm', this.dx7voxData.algorithm, matrixAlgorithmsDX7[this.dx7voxData.algorithm - 1]);
 		//this.note = note;
 		//this.velocity = velocity;
 		this.voContext = aContext;
@@ -33,18 +33,20 @@ class VoiceDX7 {
 		for (let ii = 0; ii < this.operators.length; ii++) {
 			this.operators[ii].onNotOff = true;
 		}
-		this.connectMixOperators(matrixAlgorithmsDX7[defaultBrass1test.algorithm]);
+
+		this.connectMixOperators(matrixAlgorithmsDX7[this.dx7voxData.algorithm - 1]);
 	}
 	/*setupMix(algoIdx: number) {
 		let info = matrixAlgorithmsDX7[algoIdx];
 
 	}*/
 	startPlayNote(when: number, duration: number, pitch: number) {
-		console.log(this.dx7voxData.name,'startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
-		//for (let ii = 0; ii < this.operators.length; ii++) {
-		for (let ii = 0; ii < 1; ii++) {
+		console.log(this.dx7voxData.name, 'startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
+		for (let ii = 0; ii < this.operators.length; ii++) {
+			//for (let ii = 0; ii < 1; ii++) {
 			let operadata = this.dx7voxData.operators[ii];
 			if (operadata.enabled) {
+				console.log('startOperator', ii, ('' + operadata.freqCoarse + '.' + operadata.freqFine + '/' + operadata.detune), ('' + operadata.volume + '%'));
 				this.operators[ii].startOperator(
 					operadata.levels[0], operadata.rates[0]
 					, operadata.levels[1], operadata.rates[1]
@@ -63,14 +65,20 @@ class VoiceDX7 {
 	}*/
 
 	connectMixOperators(scheme: ConnectionSchemeDX7) {
+		//console.log(scheme.outputMix);
 		for (let ii = 0; ii < scheme.outputMix.length; ii++) {
 			let outIdx = scheme.outputMix[ii];
 			this.operators[outIdx].connectToOutputNode(this.voxoutput);
+			console.log('' + (1 + outIdx) + ' -> out');
 		}
+		//console.log(scheme.modulationMatrix);
 		for (let ii = 0; ii < scheme.modulationMatrix.length; ii++) {
-			let pars = scheme.modulationMatrix[ii];
-			for (let pp = 0; pp < pars.length; pp++) {
-				this.operators[pp].connectSendToOperator(this.operators[ii]);
+			let carrier=this.operators[ii];
+			let modulators = scheme.modulationMatrix[ii];
+			for (let mm = 0; mm < modulators.length; mm++) {
+				let modulatorIdx = modulators[mm];
+				this.operators[modulatorIdx].connectSendToOperator(carrier);
+				console.log('' + (modulatorIdx + 1) + ' -> ' + (ii + 1));
 			}
 		}
 

@@ -157,6 +157,7 @@ declare class OperatorDX7 {
     freqCoarseFixed0_3: number;
     freqFine0_99: number;
     detune_7_7: number;
+    isModulator: boolean;
     eg: {
         level1: number;
         level2: number;

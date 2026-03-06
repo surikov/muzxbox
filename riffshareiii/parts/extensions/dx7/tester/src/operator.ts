@@ -15,6 +15,7 @@ class OperatorDX7 {
 	freqCoarseFixed0_3: number = 0;
 	freqFine0_99: number = 0;
 	detune_7_7: number = 0;
+	isModulator = false;
 
 	eg: { level1: number, level2: number, level3: number, level4: number, rate1: number, rate2: number, rate3: number, rate4: number };
 	adsr: { attackDuration: number, attackVolume: number, decayDuration: number, decayVolume: number, releaseDuration: number } = {
@@ -60,10 +61,10 @@ class OperatorDX7 {
 		, level4: number, rate4: number
 		, when: number, duration: number, pitch: number
 		, oscMode: number, freqCoarse: number, freqFine: number, detune: number
-		, volume:number
+		, volume: number
 	) {
 		if (this.onNotOff) {
-			console.log('startOperator', when, pitch, ('' + freqCoarse + '.' + freqFine + '/' + detune), ('' + volume + '%'));
+			//console.log('startOperator', when, pitch, ('' + freqCoarse + '.' + freqFine + '/' + detune), ('' + volume + '%'));
 			/*
 						this.oenvelope.disconnect();
 						this.oenvelope.gain.setValueAtTime(0, when);
@@ -78,11 +79,12 @@ class OperatorDX7 {
 
 			let detuneRatio = Math.pow(OCTAVE_1024, detune);
 			//this.envelope.setLevelRate(88, 90, 33, 80, 99, 70, 55, 60, when, duration);
-			this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration,volume);
-if(freqCoarse==0)freqCoarse=0.5;
+			this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, volume);
+			if (freqCoarse == 0) freqCoarse = 0.5;
 			//let freqRatio = (freqCoarse || 0.5) * (1 + freqFine / 100);
 			let freqRatio = freqCoarse * (1 + freqFine / 100);
 			let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
+			console.log('opefrequency',opefrequency);
 			if (oscMode > 0) {
 				opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);;
 			}
@@ -95,14 +97,22 @@ if(freqCoarse==0)freqCoarse=0.5;
 			//this.osc.stop(when + duration + this.adsr.releaseDuration);
 			//console.log('osc',when,(when + duration + this.adsr.releaseDuration));
 			//this.outGain.gain.setValueAtTime(outputLevel016 / 16, this.ocntxt.currentTime);
-			this.outGain.gain.setValueAtTime(volume / 100, this.ocntxt.currentTime);
+			if (this.isModulator) {
+				this.outGain.gain.setValueAtTime(4000*volume / 100, this.ocntxt.currentTime);
+			} else {
+				this.outGain.gain.setValueAtTime(volume / 100, this.ocntxt.currentTime);
+			}
 		}
 	}
 	connectToOutputNode(outNode: AudioNode) {
 		this.outGain.connect(outNode);
 	}
 	connectSendToOperator(opDX7: OperatorDX7) {
-		this.outGain.connect(opDX7.osc.detune);
+		//this.outGain.connect(opDX7.osc.detune);
+		
+		//this.outGain.connect(opDX7.outGain);
+		//this.isModulator = true;
+		this.outGain.connect(opDX7.osc.frequency);
 	}
 	/*updateFrequencyByCoarseFine(op: { freqCoarse: number, freqFine: number, freqRatio: number, freqFixed: number, oscMode: number }) {
 		//var op = params.operators[operatorIndex];

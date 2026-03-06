@@ -9,6 +9,50 @@
 //https://github.com/ftrain/pydxseven
 //https://github.com/google/music-synthesizer-for-android/blob/master/wiki/Dx7Envelope.wiki
 
+function testPlay3() {
+	let audioCtx = new AudioContext();
+
+
+
+	let tt = audioCtx.currentTime + 0.1;
+
+	let tone = 440;
+
+	playOne3(audioCtx, tone, 48000, tt);
+
+	//playOne3(audioCtx, tone, tone*1, tt);
+	//playOne3(audioCtx, tone, tone*2, tt + 0.5);
+	//playOne3(audioCtx, tone, tone*3, tt + 1);
+	//playOne3(audioCtx, tone, tone*4, tt + 1.5);
+	//playOne3(audioCtx, tone, tone*5, tt + 2);
+
+}
+
+function playOne3(audioCtx: AudioContext, tone: number, gainfreq: number, tt: number) {
+
+	let carrier = audioCtx.createOscillator();
+	carrier.frequency.value = tone;
+	carrier.type = 'sine';
+
+	let modulator = audioCtx.createOscillator();
+	modulator.frequency.value = tone;
+	modulator.type = 'sine';
+
+	let level = audioCtx.createGain();
+	level.gain.value = gainfreq;
+
+	modulator.connect(level);
+	level.connect(carrier.frequency);
+	carrier.connect(audioCtx.destination);
+
+	modulator.start(tt);
+	carrier.start(tt);
+	modulator.stop(tt + 0.4);
+	carrier.stop(tt + 0.4);
+}
+
+
+
 type ROMPresetPitchEnvelope = {
 	rates: number[]
 	, levels: number[]
@@ -456,7 +500,40 @@ function testPlay2() {
 	modulator6.stop(when + duration);
 	*/
 }
+function testPlay3aa() {
+	// 1. Create Audio Context
+	const audioCtx = new AudioContext();
 
+	// 2. Create the Carrier Oscillator (the sound you hear)
+	const carrier = audioCtx.createOscillator();
+	carrier.type = 'sawtooth'; // Base shape
+	carrier.frequency.value = 220; // 220Hz (A3)
+
+	// 3. Create the Modulator Oscillator (changes the shape)
+	const modulator = audioCtx.createOscillator();
+	modulator.type = 'sine';
+	modulator.frequency.value = 5; // Modulate 5 times per second (creates vibrato)
+
+	// 4. Create GainNode to control Modulator Depth
+	const modGain = audioCtx.createGain();
+	modGain.gain.value = 100; // How drastically the frequency changes
+
+	// 5. Connect the nodes
+	// Modulator -> Gain -> Carrier Frequency -> Destination
+	modulator.connect(modGain);
+	modGain.connect(carrier.frequency); // This is where the magic happens
+	carrier.connect(audioCtx.destination);
+
+	// 6. Start the oscillators
+	modulator.start();
+	carrier.start();
+
+	// Stop after 3 seconds
+	setTimeout(() => {
+		carrier.stop();
+		modulator.stop();
+	}, 3000);
+}
 class DX7Modulator {
 	fromAnothers: DX7Modulator[] = [];
 	moContext: AudioContext;

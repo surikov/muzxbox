@@ -1,3 +1,41 @@
+//https://stackoverflow.com/questions/16923288/whats-wrong-with-this-simple-fm-synth-design
+//https://github.com/mmontag/dx7-synth-js/blob/d4d5e3557bf6d6f178c9a42658a54ce6fb8986fe/src/voice-dx7.js
+//https://github.com/mohayonao/fm-synth
+//https://github.com/g200kg/WebAudioDesigner
+//https://vk.com/video-229753126_456239131
+//https://www.tinyloops.com/doc/yamaha_dx7/algorithms.html
+//https://github.com/itsjoesullivan/dx7-patches/tree/master
+//https://github.com/itsjoesullivan/dx7-envelope
+//https://github.com/ftrain/pydxseven
+//https://github.com/google/music-synthesizer-for-android/blob/master/wiki/Dx7Envelope.wiki
+function testPlay3() {
+    var audioCtx = new AudioContext();
+    var tt = audioCtx.currentTime + 0.1;
+    var tone = 440;
+    playOne3(audioCtx, tone, 48000, tt);
+    //playOne3(audioCtx, tone, tone*1, tt);
+    //playOne3(audioCtx, tone, tone*2, tt + 0.5);
+    //playOne3(audioCtx, tone, tone*3, tt + 1);
+    //playOne3(audioCtx, tone, tone*4, tt + 1.5);
+    //playOne3(audioCtx, tone, tone*5, tt + 2);
+}
+function playOne3(audioCtx, tone, gainfreq, tt) {
+    var carrier = audioCtx.createOscillator();
+    carrier.frequency.value = tone;
+    carrier.type = 'sine';
+    var modulator = audioCtx.createOscillator();
+    modulator.frequency.value = tone;
+    modulator.type = 'sine';
+    var level = audioCtx.createGain();
+    level.gain.value = gainfreq;
+    modulator.connect(level);
+    level.connect(carrier.frequency);
+    carrier.connect(audioCtx.destination);
+    modulator.start(tt);
+    carrier.start(tt);
+    modulator.stop(tt + 0.4);
+    carrier.stop(tt + 0.4);
+}
 var OUTPUT_LEVEL_TABLE = [
     0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
     0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
@@ -72,50 +110,59 @@ var LFO_PITCH_MOD_TABLE = [
 ];
 var algorithmsDX7 = [
     //stacking
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] },
-    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] },
-    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] }, //1
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] }, //2
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] }, //3
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] }, //4
+    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] }, //5 e.piano 1
+    { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] }, //6
     //branch
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] },
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] },
-    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] },
-    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] },
-    { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] },
-    { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] },
-    { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] },
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] }, //7
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] }, //8
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] }, //9
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] }, //10
+    { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] }, //11
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] }, //12
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] }, //13
+    { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] }, //14
+    { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] }, //15
+    { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] }, //16 bass 1
+    { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] }, //17
+    { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] }, //18
     //rooting/tower combi
-    { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] },
-    { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] },
-    { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] },
-    { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] },
-    { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] },
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] },
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] },
+    { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] }, //19
+    { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] }, //20
+    { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] }, //21
+    { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] }, //22
+    { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] }, //23 vibe 1
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] }, //24
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] }, //25
     //branch/tower combi
-    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] },
-    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] },
-    { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] },
-    { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] },
-    { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },
-    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },
+    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] }, //26
+    { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] }, //27
+    { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] }, //28
+    { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] }, //29
+    { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] }, //30
+    { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] }, //31
     { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] } //32 e.organ 1
 ];
+//lfoWaveform "Triangle", "Sawtooth Down", "Sawtooth Up","Square", "Sine", "Sample and Hold" 
 var testX7rom = [{
-        algorithm: 22, feedback: 7, operators: [{ envelope: { rates: [72, 76, 99, 71], levels: [99, 88, 96, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 14, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 98, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
-            { envelope: { rates: [62, 51, 29, 71], levels: [82, 95, 96, 0] }, keyScaleBreakpoint: 27, keyScaleDepthL: 0, keyScaleDepthR: 7, keyScaleCurveL: 3, keyScaleCurveR: 1, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 86, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 25, idx: 1, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
-            { envelope: { rates: [77, 76, 82, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: -2, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 2, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
-            { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, idx: 3, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
+        algorithm: 22, feedback: 7, operators: [
+            { /*0*/ envelope: { rates: [72, 76, 99, 71], levels: [99, 88, 96, 0] },
+                keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 14, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0,
+                detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 98, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true,
+                outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0
+            },
+            { envelope: { rates: [62, 51, 29, 71], levels: [82, 95, 96, 0] }, keyScaleBreakpoint: 27, keyScaleDepthL: 0, keyScaleDepthR: 7, keyScaleCurveL: 3, keyScaleCurveR: 1, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 86, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 25, idx: 1, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }, /*0*/
+            { envelope: { rates: [77, 76, 82, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: -2, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 2, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }, /*0*/
+            { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 99, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 0, idx: 3, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }, /*0*/
             { envelope: { rates: [77, 36, 41, 71], levels: [99, 98, 98, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 0, keyScaleDepthR: 0, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 1, lfoAmpModSens: 0, velocitySens: 2, volume: 98, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: 25, idx: 4, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
-            { envelope: { rates: [49, 99, 28, 68], levels: [98, 98, 91, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 54, keyScaleDepthR: 50, keyScaleCurveL: 1, keyScaleCurveR: 1, keyScaleRate: 4, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 82, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 5, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }],
-        name: 'BRASS 1', lfoSpeed: 37, lfoDelay: 0, lfoPitchModDepth: 5, lfoAmpModDepth: 0, lfoPitchModSens: 3, lfoWaveform: 4, lfoSync: 0, pitchEnvelope: { rates: [84, 95, 95, 60], levels: [50, 50, 50, 50] }, controllerModVal: 0, aftertouchEnabled: 0, fbRatio: 0
+            { envelope: { rates: [49, 99, 28, 68], levels: [98, 98, 91, 0] }, keyScaleBreakpoint: 39, keyScaleDepthL: 54, keyScaleDepthR: 50, keyScaleCurveL: 1, keyScaleCurveR: 1, keyScaleRate: 4, detune: 0, lfoAmpModSens: 0, velocitySens: 2, volume: 82, oscMode: 0, freqCoarse: 1, freqFine: 0, pan: -25, idx: 5, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 }
+        ],
+        name: 'BRASS 1',
+        lfoSpeed: 37, lfoDelay: 0, lfoPitchModDepth: 5, lfoAmpModDepth: 0, lfoPitchModSens: 3, lfoWaveform: 4, lfoSync: 0,
+        pitchEnvelope: { rates: [84, 95, 95, 60], levels: [50, 50, 50, 50] }, controllerModVal: 0, aftertouchEnabled: 0, fbRatio: 0
     },
     {
         algorithm: 22, feedback: 7, operators: [{ envelope: { rates: [99, 39, 32, 71], levels: [99, 98, 80, 0] }, keyScaleBreakpoint: 51, keyScaleDepthL: 0, keyScaleDepthR: 38, keyScaleCurveL: 3, keyScaleCurveR: 3, keyScaleRate: 0, detune: 7, lfoAmpModSens: 0, velocitySens: 0, volume: 99, oscMode: 0, freqCoarse: 0, freqFine: 0, pan: 0, idx: 0, enabled: true, outputLevel: 0, freqRatio: 0, freqFixed: 0, ampL: 0, ampR: 0 },
@@ -248,7 +295,7 @@ function extractPatchFromRom(bankData, patchId) {
         operators[i] = operator;
     }
     var romset = {
-        algorithm: voiceData.charCodeAt(110) + 1,
+        algorithm: voiceData.charCodeAt(110) + 1, // start at 1 for readability
         feedback: voiceData.charCodeAt(111) & 7,
         operators: operators,
         name: voiceData.substring(118, 128),
@@ -378,6 +425,34 @@ function testPlay2() {
     carrier5.stop(when + duration);
     modulator6.stop(when + duration);
     */
+}
+function testPlay3aa() {
+    // 1. Create Audio Context
+    var audioCtx = new AudioContext();
+    // 2. Create the Carrier Oscillator (the sound you hear)
+    var carrier = audioCtx.createOscillator();
+    carrier.type = 'sawtooth'; // Base shape
+    carrier.frequency.value = 220; // 220Hz (A3)
+    // 3. Create the Modulator Oscillator (changes the shape)
+    var modulator = audioCtx.createOscillator();
+    modulator.type = 'sine';
+    modulator.frequency.value = 5; // Modulate 5 times per second (creates vibrato)
+    // 4. Create GainNode to control Modulator Depth
+    var modGain = audioCtx.createGain();
+    modGain.gain.value = 100; // How drastically the frequency changes
+    // 5. Connect the nodes
+    // Modulator -> Gain -> Carrier Frequency -> Destination
+    modulator.connect(modGain);
+    modGain.connect(carrier.frequency); // This is where the magic happens
+    carrier.connect(audioCtx.destination);
+    // 6. Start the oscillators
+    modulator.start();
+    carrier.start();
+    // Stop after 3 seconds
+    setTimeout(function () {
+        carrier.stop();
+        modulator.stop();
+    }, 3000);
 }
 var DX7Modulator = /** @class */ (function () {
     function DX7Modulator(audioContext) {
