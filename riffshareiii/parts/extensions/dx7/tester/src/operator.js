@@ -70,6 +70,7 @@ var OperatorDX7 = /** @class */ (function () {
             //let freqRatio = (freqCoarse || 0.5) * (1 + freqFine / 100);
             var freqRatio = freqCoarse * (1 + freqFine / 100);
             var opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
+            console.log('opefrequency', opefrequency);
             if (oscMode > 0) {
                 opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);
                 ;
@@ -96,9 +97,9 @@ var OperatorDX7 = /** @class */ (function () {
     };
     OperatorDX7.prototype.connectSendToOperator = function (opDX7) {
         //this.outGain.connect(opDX7.osc.detune);
-        this.outGain.connect(opDX7.outGain);
+        //this.outGain.connect(opDX7.outGain);
         //this.isModulator = true;
-        //this.outGain.connect(opDX7.osc.frequency);
+        this.outGain.connect(opDX7.osc.frequency);
     };
     return OperatorDX7;
 }());

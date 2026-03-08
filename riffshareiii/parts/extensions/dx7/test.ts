@@ -8,8 +8,91 @@
 //https://github.com/itsjoesullivan/dx7-envelope
 //https://github.com/ftrain/pydxseven
 //https://github.com/google/music-synthesizer-for-android/blob/master/wiki/Dx7Envelope.wiki
+//https://github.com/wdebeaum/web-audio-tree
+
+function testA() {
+	let audioContext = new AudioContext();
+	let when = audioContext.currentTime + 0.1;
+	let tone = 440;
+
+	let carrierBeep = audioContext.createOscillator();
+	let modulatorBeep = audioContext.createOscillator();
+	let carrierVolume = audioContext.createGain();
+	let modulatorVolume = audioContext.createGain();
+
+	carrierBeep.frequency.value = tone;
+	modulatorBeep.frequency.value = 4;
+	carrierVolume.gain.value = 0.5;
+	modulatorVolume.gain.value = 0.5;
+
+	carrierVolume.connect(audioContext.destination);
+	carrierBeep.connect(carrierVolume);
+	modulatorVolume.connect(carrierVolume.gain);
+	modulatorBeep.connect(modulatorVolume);
+
+	carrierBeep.start(when);
+	modulatorBeep.start(when + 1);
+
+	carrierBeep.stop(when + 3);
+	modulatorBeep.stop(when + 3);
+}
+function testF() {
+	let audioContext = new AudioContext();
+	let when = audioContext.currentTime + 0.1;
+	let tone = 440;
+
+	let carrierBeep = audioContext.createOscillator();
+	let modulatorBeep = audioContext.createOscillator();
+	let modulatorVolume = audioContext.createGain();
+
+	carrierBeep.frequency.value = tone;
+	modulatorBeep.frequency.value = tone / 2;
+	modulatorVolume.gain.value = 0;
+
+	carrierBeep.connect(audioContext.destination);
+	modulatorVolume.connect(carrierBeep.frequency);
+	modulatorBeep.connect(modulatorVolume);
+
+	carrierBeep.start(when);
+	modulatorBeep.start(when + 1);
+	modulatorVolume.gain.setValueAtTime(tone, when + 1);
+
+	carrierBeep.stop(when + 3);
+	modulatorBeep.stop(when + 3);
+}
+function testPh() {
+	let audioContext = new AudioContext();
+	let when = audioContext.currentTime + 0.1;
+	let tone = 440;
+
+	let carrierBeep = audioContext.createOscillator();
+	let modulatorBeep = audioContext.createOscillator();
+	let modulatorVolume = audioContext.createGain();
+	let phaseDelay = audioContext.createDelay();
+	let toneShift=1 / (Math.PI * tone);
+
+	phaseDelay.delayTime.value = toneShift;
+	carrierBeep.frequency.value = tone;
+	modulatorBeep.frequency.value = tone / 2;
+	modulatorVolume.gain.value = toneShift;
+
+	phaseDelay.connect(audioContext.destination);
+	carrierBeep.connect(phaseDelay);
+	modulatorVolume.connect(phaseDelay.delayTime);
+	modulatorBeep.connect(modulatorVolume);
+
+	carrierBeep.start(when);
+	modulatorBeep.start(when + 1);
+	//modulatorVolume.gain.setValueAtTime(tone, when + 1);
+
+	carrierBeep.stop(when + 3);
+	modulatorBeep.stop(when + 3);
+}
+
+
 
 function testPlay3() {
+	/*
 	let audioCtx = new AudioContext();
 
 
@@ -19,12 +102,58 @@ function testPlay3() {
 	let tone = 440;
 
 	playOne3(audioCtx, tone, 48000, tt);
-
+*/
 	//playOne3(audioCtx, tone, tone*1, tt);
 	//playOne3(audioCtx, tone, tone*2, tt + 0.5);
 	//playOne3(audioCtx, tone, tone*3, tt + 1);
 	//playOne3(audioCtx, tone, tone*4, tt + 1.5);
 	//playOne3(audioCtx, tone, tone*5, tt + 2);
+
+	const audioCtx = new window.AudioContext();
+
+	// 1. Carrier signal (the sound to be modulated)
+	const carrier = audioCtx.createOscillator();
+	carrier.type = 'sawtooth';
+	carrier.frequency.value = 440; // A note
+
+	// 2. Modulator (LFO)
+	const modulator = audioCtx.createOscillator();
+	modulator.type = 'sine';
+	modulator.frequency.value = 5; // 5 Hz modulation rate (for flanger/vibrato effect)
+
+	// 3. Delay Node
+	// Max delay time is 1 second
+	const delayNode = audioCtx.createDelay(1.0);
+	// Set a base delay time (crucial for flanger)
+	delayNode.delayTime.value = 0.003; // e.g., 3ms delay
+
+	// 4. Create a gain node to control the modulation depth
+	const modGain = audioCtx.createGain();
+	modGain.gain.value = 0.002; // e.g., +/- 2ms of delay variation
+
+	// Connect the modulator to the gain node
+	modulator.connect(modGain);
+
+	// Connect the gain node (LFO output) to the delayTime AudioParam
+	// This modulates the delay time value
+	modGain.connect(delayNode.delayTime);
+
+	// Connect the carrier to the delay node input
+	carrier.connect(delayNode);
+
+	// Optional: mix wet (delayed) signal with dry (original) signal for phase effects
+	const dryGain = audioCtx.createGain();
+	dryGain.gain.value = 1.0;
+	carrier.connect(dryGain);
+	dryGain.connect(audioCtx.destination);
+
+	// Connect the delay node output to the destination
+	delayNode.connect(audioCtx.destination);
+
+	// Start the sounds
+	carrier.start();
+	modulator.start();
+
 
 }
 
