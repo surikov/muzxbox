@@ -58,9 +58,10 @@ function testPh() {
     var modulatorVolume = audioContext.createGain();
     var phaseDelay = audioContext.createDelay();
     var toneShift = 1 / (Math.PI * tone);
+    console.log('toneShift', toneShift / 3, toneShift, toneShift * 3);
     phaseDelay.delayTime.value = toneShift;
     carrierBeep.frequency.value = tone;
-    modulatorBeep.frequency.value = tone / 2;
+    modulatorBeep.frequency.value = tone; // / 2;
     modulatorVolume.gain.value = toneShift;
     phaseDelay.connect(audioContext.destination);
     carrierBeep.connect(phaseDelay);
