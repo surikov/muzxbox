@@ -1,5 +1,5 @@
 "use strict";
-let matrixAlgorithmsDX7 = [
+let matrixConnectionAlgorithmsDX7 = [
     { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
     { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
     { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
@@ -38,7 +38,7 @@ let epiano1preset = {
     "feedback": 6,
     "operators": [
         {
-            "rates": [
+            rates: [
                 96,
                 25,
                 25,
@@ -50,22 +50,12 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 0,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": 3,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": 0,
-            "idx": 0,
-            "enabled": false
+            "enabled": true
         },
         {
             "rates": [
@@ -80,25 +70,15 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 0,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": 0,
-            "lfoAmpModSens": 0,
-            "velocitySens": 7,
             "volume": 58,
             "oscMode": 0,
             "freqCoarse": 14,
             "freqFine": 0,
-            "pan": 25,
-            "idx": 1,
             "enabled": false
         },
         {
-            "rates": [
+            rates: [
                 95,
                 20,
                 20,
@@ -110,22 +90,12 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 0,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": 0,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": -25,
-            "idx": 2,
-            "enabled": true
+            "enabled": false
         },
         {
             "rates": [
@@ -140,22 +110,12 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 0,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": 0,
-            "lfoAmpModSens": 0,
-            "velocitySens": 6,
             "volume": 89,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": 0,
-            "idx": 3,
-            "enabled": true
+            "enabled": false
         },
         {
             "rates": [
@@ -170,21 +130,11 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 0,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": -7,
-            "lfoAmpModSens": 0,
-            "velocitySens": 0,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": 25,
-            "idx": 4,
             "enabled": false
         },
         {
@@ -200,48 +150,15 @@ let epiano1preset = {
                 0,
                 0
             ],
-            "keyScaleBreakpoint": 41,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 19,
-            "keyScaleCurveL": 0,
-            "keyScaleCurveR": 0,
-            "keyScaleRate": 3,
             "detune": 7,
-            "lfoAmpModSens": 0,
-            "velocitySens": 6,
             "volume": 79,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": -25,
-            "idx": 5,
             "enabled": false
         }
     ],
     "name": "E.PIANO 1 ",
-    "lfoSpeed": 34,
-    "lfoDelay": 33,
-    "lfoPitchModDepth": 0,
-    "lfoAmpModDepth": 0,
-    "lfoPitchModSens": 3,
-    "lfoWaveform": 4,
-    "lfoSync": 0,
-    "pitchEnvelope": {
-        "rates": [
-            94,
-            67,
-            95,
-            60
-        ],
-        "levels": [
-            50,
-            50,
-            50,
-            50
-        ]
-    },
-    "controllerModVal": 0,
-    "aftertouchEnabled": 0
 };
 let defaultBrass1test = {
     "algorithm": 22,
@@ -694,190 +611,158 @@ let _defaultBrass1test = {
     aftertouchEnabled: 0,
     fbRatio: 1
 };
-var OUTPUT_LEVEL_TABLE = [
-    0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
-    0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
-    0.013975, 0.015240, 0.016619, 0.018123, 0.019764, 0.021552, 0.023503, 0.025630, 0.027950, 0.030480,
-    0.033238, 0.036247, 0.039527, 0.043105, 0.047006, 0.051261, 0.055900, 0.060960, 0.066477, 0.072494,
-    0.079055, 0.086210, 0.094012, 0.102521, 0.111800, 0.121919, 0.132954, 0.144987, 0.158110, 0.172420,
-    0.188025, 0.205043, 0.223601, 0.243838, 0.265907, 0.289974, 0.316219, 0.344839, 0.376050, 0.410085,
-    0.447201, 0.487676, 0.531815, 0.579948, 0.632438, 0.689679, 0.752100, 0.820171, 0.894403, 0.975353,
-    1.063630, 1.159897, 1.264876, 1.379357, 1.504200, 1.640341, 1.788805, 1.950706, 2.127260, 2.319793,
-    2.529752, 2.758714, 3.008399, 3.280683, 3.577610, 3.901411, 4.254519, 4.639586, 5.059505, 5.517429,
-    6.016799, 6.561366, 7.155220, 7.802823, 8.509039, 9.279172, 10.11901, 11.03486, 12.03360, 13.12273
-];
 class EnvelopeNode {
     constructor(ctx) {
         this.minTimeDelta = 0.005;
         this.maxReleaseDelta = 0.5;
+        this.slopes = [];
+        this.volumes = [];
+        this.doneTime = 0;
         this.envelopeContext = ctx;
         this.envelopeGain = this.envelopeContext.createGain();
+        this.down0now();
+    }
+    setupEnvelope(rates, levels) {
+        this.slopes[0] = 1 / Math.pow(2, rates[0] * 16 / 100 - 5);
+        this.slopes[1] = 1 / Math.pow(2, rates[1] * 16 / 100 - 5);
+        this.slopes[2] = 1 / Math.pow(2, rates[2] * 16 / 100 - 5);
+        this.slopes[3] = 1 / Math.pow(2, rates[3] * 16 / 100 - 5);
+        this.volumes[0] = levels[0] / 100;
+        this.volumes[1] = levels[1] / 100;
+        this.volumes[2] = levels[2] / 100;
+        this.volumes[3] = levels[3] / 100;
+    }
+    setupSlope(when, duration, from, to) {
+        if (from < to) {
+            this.envelopeGain.gain.exponentialRampToValueAtTime(to, when + duration);
+        }
+        else {
+            this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
+        }
+    }
+    startEnvelope(when, wholeDuration) {
+        this.envelopeGain.gain.setValueAtTime(1, when);
+        this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
+        console.log('volumes', this.volumes, 'slopes', this.slopes);
     }
     down0now() {
         this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
         this.envelopeGain.gain.linearRampToValueAtTime(0, this.envelopeContext.currentTime + this.minTimeDelta);
     }
-    slopeDuration(preLevel, nextLevel, sloperate) {
-        let part = Math.abs(preLevel - nextLevel) / 100;
-        let steep = 123.45;
-        if (sloperate > 0 && sloperate < 100) {
-            steep = Math.pow(2, sloperate * 16 / 100 - 5);
-        }
-        return part / steep;
-    }
-    mapOutputLevel(input, volume) {
-        let idx = Math.min(99, Math.max(0, Math.floor(input)));
-        let level = OUTPUT_LEVEL_TABLE[idx] / 16;
-        let full = level * volume / 100;
-        return full;
-    }
-    ;
-    setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, volume) {
-        let slope1 = this.slopeDuration(level4, level1, rate1);
-        let slope2 = this.slopeDuration(level1, level2, rate2);
-        let slope3 = this.slopeDuration(level2, level3, rate3);
-        let slope4 = this.slopeDuration(level3, level4, rate4);
-        let volume1 = this.mapOutputLevel(level1, volume);
-        let volume2 = this.mapOutputLevel(level2, volume);
-        let volume3 = this.mapOutputLevel(level3, volume);
-        let volume4 = this.mapOutputLevel(level4, volume);
-        this.envelopeGain.gain.linearRampToValueAtTime(volume4, when);
-        console.log('start', volume4, when);
-        this.envelopeGain.gain.linearRampToValueAtTime(volume1, when + slope1);
-        console.log(volume1, when + slope1);
-        if (slope1 < duration) {
-            this.envelopeGain.gain.linearRampToValueAtTime(volume2, when + slope1 + slope2);
-            console.log(volume2, when + slope1 + slope2);
-            if (slope1 + slope2 < duration) {
-                this.envelopeGain.gain.linearRampToValueAtTime(volume3, when + slope1 + slope2 + slope3);
-                console.log(volume3, when + slope1 + slope2 + slope3);
-            }
-        }
-        this.envelopeGain.gain.cancelAndHoldAtTime(when + duration);
-        this.envelopeGain.gain.linearRampToValueAtTime(volume4, when + duration + slope4 + this.minTimeDelta);
-        console.log('end', volume4, when + duration + slope4 + this.minTimeDelta);
-        this.envelopeGain.gain.linearRampToValueAtTime(0, when + duration + slope4 + 2 * this.minTimeDelta);
-    }
 }
 class SynthDX7 {
     constructor(audioContext) {
-        this.testVox = null;
         console.log('new SynthDX7');
-        this.moContext = audioContext;
-        this.output = this.moContext.createGain();
-        this.output.connect(this.moContext.destination);
+        this.audioContext = audioContext;
+        this.output = this.audioContext.createGain();
+        this.output.connect(this.audioContext.destination);
     }
     test() {
         console.log('SynthDX7 test');
-        if (this.testVox == null) {
-            this.testVox = new VoiceDX7(this.output, this.moContext);
-        }
-        this.testVox.startPlayNote(this.moContext.currentTime + 0.2, 2, 12 * 5);
+        let testVox = new VoiceDX7(this.output, this.audioContext);
+        testVox.setupVoice(epiano1preset);
+        testVox.startPlayNote(this.audioContext.currentTime + 0.321, 2, 12 * 5);
     }
 }
 var OCTAVE_1024 = 1.0006771307;
-class OperatorDX7 {
+class BeepDX7 {
     constructor(cntxt) {
-        this.minimalDelta = 0.001;
-        this.onNotOff = false;
-        this.velocitySens0_7 = 0;
-        this.level0_99 = 0;
-        this.lfoAmpModSens_3_3 = 0;
-        this.freqCoarse0_31 = 0;
-        this.freqCoarseFixed0_3 = 0;
-        this.freqFine0_99 = 0;
-        this.detune_7_7 = 0;
-        this.isModulator = false;
-        this.adsr = {
-            attackDuration: 0.01,
-            attackVolume: 1,
-            decayDuration: 0.02,
-            decayVolume: 0.5,
-            releaseDuration: 0.2
-        };
         this.ocntxt = cntxt;
-        this.envelope = new EnvelopeNode(this.ocntxt);
-        this.osc = this.ocntxt.createOscillator();
-        this.osc.connect(this.envelope.envelopeGain);
+        this.envelopenode = new EnvelopeNode(this.ocntxt);
         this.outGain = this.ocntxt.createGain();
-        this.envelope.envelopeGain.connect(this.outGain);
-        this.envelope.down0now();
-        this.osc.start(this.ocntxt.currentTime + this.envelope.minTimeDelta);
+        this.envelopenode.envelopeGain.connect(this.outGain);
+    }
+    setupOperator(cfg) {
+        this.envelopenode.setupEnvelope(cfg.rates, cfg.levels);
+        this.off = !(cfg.enabled);
+    }
+    startOperator(when, duration, note) {
+        console.log('start at', when, 'duration', duration, 'note', note);
+        let pitch = this.frequencyFromNoteNumber(note);
+        if (this.osc) {
+            this.osc.disconnect(this.envelopenode.envelopeGain);
+        }
+        this.osc = this.ocntxt.createOscillator();
+        this.osc.frequency.setValueAtTime(pitch, when);
+        this.osc.connect(this.envelopenode.envelopeGain);
+        this.osc.start(when);
+        this.envelopenode.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
         return 440 * Math.pow(2, (note - 69) / 12);
     }
     ;
-    startOperator(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, pitch, oscMode, freqCoarse, freqFine, detune, volume) {
-        if (this.onNotOff) {
-            let detuneRatio = Math.pow(OCTAVE_1024, detune);
-            this.envelope.setLevelRate(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, volume);
-            if (freqCoarse == 0)
-                freqCoarse = 0.5;
-            let freqRatio = freqCoarse * (1 + freqFine / 100);
-            let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
-            console.log('opefrequency', opefrequency);
-            if (oscMode > 0) {
-                opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);
-                ;
-            }
-            this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
-            if (this.isModulator) {
-                this.outGain.gain.setValueAtTime(4000 * volume / 100, this.ocntxt.currentTime);
-            }
-            else {
-                this.outGain.gain.setValueAtTime(volume / 100, this.ocntxt.currentTime);
-            }
+    _____________startOperator(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, pitch, oscMode, freqCoarse, freqFine, detune, volume) {
+        let detuneRatio = Math.pow(OCTAVE_1024, detune);
+        if (freqCoarse == 0)
+            freqCoarse = 0.5;
+        let freqRatio = freqCoarse * (1 + freqFine / 100);
+        let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
+        console.log('opefrequency', opefrequency);
+        if (oscMode > 0) {
+            opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);
+            ;
         }
+        this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
     }
     connectToOutputNode(outNode) {
         this.outGain.connect(outNode);
     }
-    connectSendToOperator(opDX7) {
-        this.outGain.connect(opDX7.osc.frequency);
+    connectToCarrier(opDX7) {
+    }
+    connectToSelf() {
     }
 }
 class VoiceDX7 {
     constructor(destination, aContext) {
-        this.dx7voxData = epiano1preset;
-        console.log('new VoiceDX7', aContext.currentTime, 'algorithm', this.dx7voxData.algorithm, matrixAlgorithmsDX7[this.dx7voxData.algorithm - 1]);
         this.voContext = aContext;
         this.voxoutput = this.voContext.createGain();
         this.voxoutput.connect(destination);
-        this.operators = [];
-        this.operators[0] = new OperatorDX7(this.voContext);
-        this.operators[1] = new OperatorDX7(this.voContext);
-        this.operators[2] = new OperatorDX7(this.voContext);
-        this.operators[3] = new OperatorDX7(this.voContext);
-        this.operators[4] = new OperatorDX7(this.voContext);
-        this.operators[5] = new OperatorDX7(this.voContext);
-        for (let ii = 0; ii < this.operators.length; ii++) {
-            this.operators[ii].onNotOff = true;
-        }
-        this.connectMixOperators(matrixAlgorithmsDX7[this.dx7voxData.algorithm - 1]);
+        this.beeps = [];
+        this.beeps[0] = new BeepDX7(this.voContext);
+        this.beeps[1] = new BeepDX7(this.voContext);
+        this.beeps[2] = new BeepDX7(this.voContext);
+        this.beeps[3] = new BeepDX7(this.voContext);
+        this.beeps[4] = new BeepDX7(this.voContext);
+        this.beeps[5] = new BeepDX7(this.voContext);
     }
-    startPlayNote(when, duration, pitch) {
-        console.log(this.dx7voxData.name, 'startPlayNote', when, 'duration', duration, 'pitch', pitch, 'now time', this.voContext.currentTime);
-        for (let ii = 0; ii < this.operators.length; ii++) {
-            let operadata = this.dx7voxData.operators[ii];
-            if (operadata.enabled) {
-                console.log('startOperator', ii, ('' + operadata.freqCoarse + '.' + operadata.freqFine + '/' + operadata.detune), ('' + operadata.volume + '%'));
-                this.operators[ii].startOperator(operadata.levels[0], operadata.rates[0], operadata.levels[1], operadata.rates[1], operadata.levels[2], operadata.rates[2], operadata.levels[3], operadata.rates[3], when, duration, pitch, operadata.oscMode, operadata.freqCoarse, operadata.freqFine, operadata.detune, operadata.volume);
+    setupVoice(presetData) {
+        console.log('setupVoice', presetData);
+        let algIdx = presetData.algorithm - 1;
+        let scheme = matrixConnectionAlgorithmsDX7[algIdx];
+        this.connectMixOperators(scheme);
+        for (let ii = 0; ii < 6; ii++) {
+            this.beeps[ii].setupOperator(presetData.operators[ii]);
+        }
+    }
+    startPlayNote(when, duration, note) {
+        console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
+        for (let ii = 0; ii < this.beeps.length; ii++) {
+            if (this.beeps[ii].off) {
+                console.log('beep', ii, 'skip');
+            }
+            else {
+                this.beeps[ii].startOperator(when, duration, note);
             }
         }
     }
     connectMixOperators(scheme) {
         for (let ii = 0; ii < scheme.outputMix.length; ii++) {
             let outIdx = scheme.outputMix[ii];
-            this.operators[outIdx].connectToOutputNode(this.voxoutput);
+            this.beeps[outIdx].connectToOutputNode(this.voxoutput);
             console.log('' + (1 + outIdx) + ' -> out');
         }
         for (let ii = 0; ii < scheme.modulationMatrix.length; ii++) {
-            let carrier = this.operators[ii];
+            let carrier = this.beeps[ii];
             let modulators = scheme.modulationMatrix[ii];
             for (let mm = 0; mm < modulators.length; mm++) {
                 let modulatorIdx = modulators[mm];
-                this.operators[modulatorIdx].connectSendToOperator(carrier);
+                if (modulatorIdx == ii) {
+                    this.beeps[modulatorIdx].connectToSelf;
+                }
+                else {
+                    this.beeps[modulatorIdx].connectToCarrier(carrier);
+                }
                 console.log('' + (modulatorIdx + 1) + ' -> ' + (ii + 1));
             }
         }

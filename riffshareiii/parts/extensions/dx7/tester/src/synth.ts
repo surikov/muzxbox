@@ -1,21 +1,20 @@
 class SynthDX7 {
-	moContext: AudioContext;
+	audioContext: AudioContext;
 	output: GainNode;
-	testVox: VoiceDX7 | null = null;
+	//testVox: VoiceDX7 | null = null;
 	constructor(audioContext: AudioContext) {
 		console.log('new SynthDX7');
-		this.moContext = audioContext;
-		this.output = this.moContext.createGain();
-		this.output.connect(this.moContext.destination);
+		this.audioContext = audioContext;
+		this.output = this.audioContext.createGain();
+		this.output.connect(this.audioContext.destination);
 	}
 	/*createVoice(): VoiceDX7 {
 		return new VoiceDX7();
 	}*/
 	test() {
 		console.log('SynthDX7 test');
-		if (this.testVox == null) {
-			this.testVox = new VoiceDX7(this.output, this.moContext);
-		}
-		this.testVox.startPlayNote(this.moContext.currentTime + 0.2, 2, 12*5);
+		let testVox: VoiceDX7 = new VoiceDX7(this.output, this.audioContext);
+		testVox.setupVoice(epiano1preset);
+		testVox.startPlayNote(this.audioContext.currentTime + 0.321, 2, 12 * 5);
 	}
 }

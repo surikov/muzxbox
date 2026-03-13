@@ -27,8 +27,8 @@
 		"algorithms.ts",
 		"envelopenode.ts",
 		"synth.ts",
-		"operator.ts",
+		"beep.ts",
 		"vox.ts",
-		"tester.ts"
+		"main.ts"
 	]
 }

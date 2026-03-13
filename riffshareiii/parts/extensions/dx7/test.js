@@ -52,7 +52,8 @@ function testF() {
 function testPh() {
     var audioContext = new AudioContext();
     var when = audioContext.currentTime + 0.1;
-    var tone = 440;
+    var tone = 261.6255653005986;
+    var ratio_cm = 16.6658671 / 7.00713483;
     var carrierBeep = audioContext.createOscillator();
     var modulatorBeep = audioContext.createOscillator();
     var modulatorVolume = audioContext.createGain();
@@ -61,8 +62,8 @@ function testPh() {
     console.log('toneShift', toneShift / 3, toneShift, toneShift * 3);
     phaseDelay.delayTime.value = toneShift;
     carrierBeep.frequency.value = tone;
-    modulatorBeep.frequency.value = tone; // / 2;
-    modulatorVolume.gain.value = toneShift;
+    modulatorBeep.frequency.value = tone * 2;
+    modulatorVolume.gain.value = toneShift * ratio_cm;
     phaseDelay.connect(audioContext.destination);
     carrierBeep.connect(phaseDelay);
     modulatorVolume.connect(phaseDelay.delayTime);
@@ -73,6 +74,130 @@ function testPh() {
     carrierBeep.stop(when + 3);
     modulatorBeep.stop(when + 3);
 }
+function testDx7() {
+    var audioCtx = new AudioContext();
+    // Create two operators with different ratios
+    var op1 = new DX7Operator(audioCtx, 1.0); // Carrier
+    var op2 = new DX7Operator(audioCtx, 2.0); // Modulator (1 octave up)
+    // Setup connections
+    op2.modulate(op1, 0.002); // Op2 modulates Op1's phase
+    op1.connectToOutput(audioCtx.destination); // Op1 goes to speakers
+    // Play a note (A4 = 440Hz)
+    //op1.setFrequency(440);
+    op1.osc.frequency.value = 261.6255653005986;
+    //op2.setFrequency(440);
+    op2.osc.frequency.value = 261.6255653005986;
+    op1.start();
+    op2.start();
+    // Open the envelopes to hear the sound
+    op1.env.gain.setTargetAtTime(0.5, audioCtx.currentTime, 0.1); // Main Volume
+    op2.env.gain.setTargetAtTime(1.0, audioCtx.currentTime, 0.1); // Modulation Depth
+}
+var DX7Operator = /** @class */ (function () {
+    function DX7Operator(audioCtx, ratio) {
+        if (ratio === void 0) { ratio = 1.0; }
+        this.audioCtx = audioCtx;
+        this.ratio = ratio;
+        // DX7 Parameters (0-99 scale)
+        this.rates = [99, 50, 50, 50]; // R1, R2, R3, R4
+        this.levels = [99, 99, 70, 0]; // L1, L2, L3, L4
+        this.osc = audioCtx.createOscillator();
+        this.phaseShifter = audioCtx.createDelay();
+        this.phaseShifter.delayTime.value = 0.01;
+        this.env = audioCtx.createGain();
+        this.env.gain.value = 0;
+        this.osc.connect(this.phaseShifter);
+        this.phaseShifter.connect(this.env);
+    }
+    // Helper to convert DX7 "Rate" (0-99) to seconds
+    // Higher rate = faster speed = shorter time
+    DX7Operator.prototype.rateToTime = function (rate) {
+        return Math.max(0.001, (100 - rate) * 0.05);
+    };
+    // Helper to convert DX7 "Level" (0-99) to Gain (0.0-1.0)
+    DX7Operator.prototype.levelToGain = function (level) {
+        return level / 99;
+    };
+    DX7Operator.prototype.triggerAttack = function (baseFreq) {
+        var now = this.audioCtx.currentTime;
+        this.osc.frequency.setValueAtTime(baseFreq * this.ratio, now);
+        var t1 = this.rateToTime(this.rates[0]);
+        var t2 = this.rateToTime(this.rates[1]);
+        var t3 = this.rateToTime(this.rates[2]);
+        this.env.gain.cancelScheduledValues(now);
+        this.env.gain.setValueAtTime(0, now);
+        // DX7 Logic: Move to L1 at R1, then L2 at R2, then L3 at R3
+        this.env.gain.linearRampToValueAtTime(this.levelToGain(this.levels[0]), now + t1);
+        this.env.gain.linearRampToValueAtTime(this.levelToGain(this.levels[1]), now + t1 + t2);
+        this.env.gain.linearRampToValueAtTime(this.levelToGain(this.levels[2]), now + t1 + t2 + t3);
+        // Note: It stays at L3 (Sustain) until released
+    };
+    DX7Operator.prototype.triggerRelease = function () {
+        var now = this.audioCtx.currentTime;
+        var t4 = this.rateToTime(this.rates[3]);
+        this.env.gain.cancelScheduledValues(now);
+        // Move from current level to L4 at R4
+        this.env.gain.linearRampToValueAtTime(this.levelToGain(this.levels[3]), now + t4);
+    };
+    DX7Operator.prototype.start = function () {
+        this.osc.start();
+    };
+    // Connect this operator to modulate another operator's phase
+    DX7Operator.prototype.modulate = function (targetOperator, intensity) {
+        if (intensity === void 0) { intensity = 0.001; }
+        var modGain = this.audioCtx.createGain();
+        modGain.gain.value = intensity;
+        this.env.connect(modGain);
+        modGain.connect(targetOperator.phaseShifter.delayTime);
+    };
+    // Connect this operator to the final audio output (as a Carrier)
+    DX7Operator.prototype.connectToOutput = function (destination) {
+        this.env.connect(destination);
+    };
+    return DX7Operator;
+}());
+var DX7Operator2 = /** @class */ (function () {
+    function DX7Operator2(audioCtx, frequencyRatio) {
+        if (frequencyRatio === void 0) { frequencyRatio = 1.0; }
+        this.audioCtx = audioCtx;
+        this.ratio = frequencyRatio;
+        // 1. The Core Oscillator (The Sine Wave)
+        this.osc = audioCtx.createOscillator();
+        this.osc.type = 'sine';
+        // 2. The Phase Shifter (DelayNode)
+        // Every operator needs one so it can BE modulated by others
+        this.phaseShifter = audioCtx.createDelay();
+        this.phaseShifter.delayTime.value = 0.01; // 10ms base offset
+        // 3. The Envelope (GainNode)
+        // Controls this operator's output level (Modulation Index or Volume)
+        this.env = audioCtx.createGain();
+        this.env.gain.value = 0;
+        // Internal Routing: Osc -> Delay -> Envelope
+        this.osc.connect(this.phaseShifter);
+        this.phaseShifter.connect(this.env);
+    }
+    // Sets frequency based on a fundamental note (e.g., 440Hz)
+    DX7Operator2.prototype.setFrequency = function (baseFreq) {
+        this.osc.frequency.setValueAtTime(baseFreq * this.ratio, this.audioCtx.currentTime);
+    };
+    // Start the operator's internal oscillator
+    DX7Operator2.prototype.start = function () {
+        this.osc.start();
+    };
+    // Connect this operator to modulate another operator's phase
+    DX7Operator2.prototype.modulate = function (targetOperator, intensity) {
+        if (intensity === void 0) { intensity = 0.001; }
+        var modGain = this.audioCtx.createGain();
+        modGain.gain.value = intensity;
+        this.env.connect(modGain);
+        modGain.connect(targetOperator.phaseShifter.delayTime);
+    };
+    // Connect this operator to the final audio output (as a Carrier)
+    DX7Operator2.prototype.connectToOutput = function (destination) {
+        this.env.connect(destination);
+    };
+    return DX7Operator2;
+}());
 function testPlay3() {
     /*
     let audioCtx = new AudioContext();
