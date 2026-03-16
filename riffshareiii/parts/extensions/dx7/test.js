@@ -74,7 +74,48 @@ function testPh() {
     carrierBeep.stop(when + 3);
     modulatorBeep.stop(when + 3);
 }
+var beepphase = null;
 function testDx7() {
+    var audioContext = new AudioContext();
+    if (beepphase) {
+        //
+    }
+    else {
+        var audioworkletcode = "\n\t\t\tvar prccntr = 0;\n\t\t\tclass PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {\n\t\t\t\tprocess(inputs, outputs, parameters) {\n\t\t\t\tif (prccntr < 10) {\n\t\t\t\tconsole.log(prccntr, inputs, outputs, parameters);\n\t\t\t\tprccntr++;\n\t\t\t\t}\n\t\t\t\tconst output = outputs[0];\n\t\t\t\toutput.forEach((channel) => {\n\t\t\t\t\tfor (let i = 0; i < channel.length; i++) {\n\t\t\t\t\tchannel[i] = Math.random() * 2 - 1;\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t}\n\t\t\tregisterProcessor(\"sinePhaseModuleID\", PhaseSineAudioWorkletProcessor);\n\t\t";
+        console.log(audioworkletcode);
+        var blob = new Blob([audioworkletcode], { type: 'application/javascript' });
+        console.log(blob);
+        var reader_1 = new FileReader();
+        reader_1.onloadend = function () {
+            console.log('reader', reader_1);
+            var blobURL = reader_1.result;
+            audioContext.audioWorklet.addModule(blobURL)
+                .then(function (vv) {
+                console.log('then', vv);
+                beepphase = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
+                beepphase.connect(audioContext.destination);
+            }).catch(function (vv) {
+                console.log('catch', vv);
+            });
+        };
+        reader_1.readAsDataURL(blob);
+        /*
+        
+                let blobURL: string = URL.createObjectURL(blob);
+                console.log(blobURL);
+                audioContext.audioWorklet.addModule(blobURL)
+                    .then((vv) => {
+                        console.log('then', vv);
+                        beepphase = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
+                        beepphase.connect(audioContext.destination);
+                    }).catch((vv) => {
+                        console.log('catch', vv);
+                    })
+                    ;
+        */
+    }
+}
+function testDx7oooo() {
     var audioCtx = new AudioContext();
     // Create two operators with different ratios
     var op1 = new DX7Operator(audioCtx, 1.0); // Carrier
