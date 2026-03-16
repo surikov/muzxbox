@@ -48,11 +48,23 @@ class EnvelopeNode {
 		this.envelopeGain = this.envelopeContext.createGain();
 		this.down0now();
 	}
+	rate99Duration(r99: number, from: number, to: number) {
+		let duration = 3 / Math.pow(2, 16 * r99 / 100 - 7);
+		if (from < to) {
+			//console.log(from,to,'up',r99,duration/2);
+			return duration * 0.5;
+		} else {
+			//console.log(from,to,r99,duration);
+			return duration;
+		}
+		//console.log(r99,duration);
+		//return duration;
+	}
 	setupEnvelope(rates: number[], levels: number[]) {
-		this.slopes[0] = 1 / Math.pow(2, rates[0] * 16 / 100 - 5);
-		this.slopes[1] = 1 / Math.pow(2, rates[1] * 16 / 100 - 5);
-		this.slopes[2] = 1 / Math.pow(2, rates[2] * 16 / 100 - 5);
-		this.slopes[3] = 1 / Math.pow(2, rates[3] * 16 / 100 - 5);
+		this.slopes[0] = this.rate99Duration(rates[0], levels[3], levels[0]);
+		this.slopes[1] = this.rate99Duration(rates[1], levels[0], levels[1]);
+		this.slopes[2] = this.rate99Duration(rates[2], levels[1], levels[2]);
+		this.slopes[3] = this.rate99Duration(rates[3], levels[2], levels[3]);
 		this.volumes[0] = levels[0] / 100;
 		this.volumes[1] = levels[1] / 100;
 		this.volumes[2] = levels[2] / 100;
@@ -71,16 +83,17 @@ class EnvelopeNode {
 	}*/
 	setupSlope(when: number, duration: number, from: number, to: number) {
 		if (from < to) {
-			this.envelopeGain.gain.exponentialRampToValueAtTime(to, when + duration);
+			//this.envelopeGain.gain.exponentialRampToValueAtTime(to, when + duration);
+			this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
 		} else {
 			this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
 		}
 	}
 	startEnvelope(when: number, wholeDuration: number) {
-		this.envelopeGain.gain.setValueAtTime(1, when);
-		this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
+		//this.envelopeGain.gain.setValueAtTime(1, when);
+		//this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
 		console.log('volumes', this.volumes, 'slopes', this.slopes);
-		/*this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
+		this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
 		let attackDuration = this.slopes[0] * Math.abs(this.volumes[3] - this.volumes[0]);
 		this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);
 		let decayDuration = this.slopes[1] * Math.abs(this.volumes[0] - this.volumes[1]);
@@ -98,11 +111,11 @@ class EnvelopeNode {
 			releaseDuration = this.maxReleaseDelta;
 		}
 		this.envelopeGain.gain.linearRampToValueAtTime(0, when + wholeDuration + releaseDuration);
-		*/
+
 	}
 	down0now() {
 		this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
-		this.envelopeGain.gain.linearRampToValueAtTime(0, this.envelopeContext.currentTime + this.minTimeDelta);
+		this.envelopeGain.gain.value = 0;
 	}
 	/*slopeDuration(preLevel: number, nextLevel: number, sloperate: number) {
 		/ *

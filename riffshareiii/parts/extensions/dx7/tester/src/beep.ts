@@ -9,7 +9,13 @@ class BeepDX7 {
 	outGain: GainNode;
 	envelopenode: EnvelopeNode;
 	delay: DelayNode;
-	off: boolean;
+	//off: boolean;
+	ready=false;
+	oscMode: number;
+	freqCoarse: number;
+	freqFine: number;
+	detune: number;
+	//opefrequency: number;
 	//velocitySens0_7: number = 0;
 	//level0_99: number = 0;
 	//lfoAmpModSens_3_3: number = 0;
@@ -32,30 +38,54 @@ class BeepDX7 {
 		this.ocntxt = cntxt;
 		//this.oenvelope = this.ocntxt.createGain();
 		this.envelopenode = new EnvelopeNode(this.ocntxt);
-		
+
 		//this.osc.connect(this.oenvelope);
-		
+
 		this.outGain = this.ocntxt.createGain();
 
 		this.envelopenode.envelopeGain.connect(this.outGain);
 
 		//
-		
+
 	}
 	setupOperator(cfg: DX7OperatorData) {
 		this.envelopenode.setupEnvelope(cfg.rates, cfg.levels);
-		this.off = !(cfg.enabled);
+		this.ready = true;//!(cfg.enabled);
+		this.oscMode = cfg.oscMode;
+		this.freqFine = cfg.freqFine;
+		this.freqCoarse = cfg.freqCoarse;
+		if (cfg.freqCoarse == 0) {
+			this.freqCoarse = 0.5;
+		}
+		this.detune = cfg.detune;
+
+
 	}
 	startOperator(when: number, duration: number, note: number) {
 		console.log('start at', when, 'duration', duration, 'note', note);
-		let pitch = this.frequencyFromNoteNumber(note);
-		if(this.osc){
+		//let pitch = this.frequencyFromNoteNumber(note);
+		if (this.osc) {
 			this.osc.disconnect(this.envelopenode.envelopeGain);
 		}
 		this.osc = this.ocntxt.createOscillator();
-		this.osc.frequency.setValueAtTime(pitch, when);
+		let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
+
+		let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
+		let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
+		console.log('opefrequency', opefrequency);
+		if (this.oscMode > 0) {
+			opefrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);;
+		} else {
+			//
+		}
+		/*console.log('freq', freqRatio
+			, this.frequencyFromNoteNumber(pitch), '>', freqRatio * this.frequencyFromNoteNumber(pitch), '>', opefrequency
+			, ':', detuneRatio, detune);
+*/
+		this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
+		//this.osc.frequency.setValueAtTime(pitch, when);
 		this.osc.connect(this.envelopenode.envelopeGain);
-		this.osc.start(when);
+		this.osc.start(this.ocntxt.currentTime);
 		this.envelopenode.startEnvelope(when, duration);
 	}
 	/*setupCarrier(){

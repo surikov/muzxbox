@@ -111,6 +111,7 @@ declare class EnvelopeNode {
     volumes: number[];
     doneTime: number;
     constructor(ctx: AudioContext);
+    rate99Duration(r99: number, from: number, to: number): number;
     setupEnvelope(rates: number[], levels: number[]): void;
     setupSlope(when: number, duration: number, from: number, to: number): void;
     startEnvelope(when: number, wholeDuration: number): void;
@@ -129,7 +130,11 @@ declare class BeepDX7 {
     outGain: GainNode;
     envelopenode: EnvelopeNode;
     delay: DelayNode;
-    off: boolean;
+    ready: boolean;
+    oscMode: number;
+    freqCoarse: number;
+    freqFine: number;
+    detune: number;
     constructor(cntxt: AudioContext);
     setupOperator(cfg: DX7OperatorData): void;
     startOperator(when: number, duration: number, note: number): void;
@@ -151,3 +156,4 @@ declare class VoiceDX7 {
 declare let synth: SynthDX7;
 declare function initTester(): void;
 declare function testPlay(): void;
+declare function testrate99Duration(r99: number): number;

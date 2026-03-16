@@ -29,7 +29,9 @@ class VoiceDX7 {
 		let scheme: ConnectionSchemeDX7 = matrixConnectionAlgorithmsDX7[algIdx];
 		this.connectMixOperators(scheme);
 		for (let ii = 0; ii < 6; ii++) {
-			this.beeps[ii].setupOperator(presetData.operators[ii]);
+			if (presetData.operators[ii].enabled) {
+				this.beeps[ii].setupOperator(presetData.operators[ii]);
+			}
 		}
 	}
 	startPlayNote(when: number, duration: number, note: number) {
@@ -49,12 +51,13 @@ class VoiceDX7 {
 					, operadata.volume
 				);
 			}*/
-			if(this.beeps[ii].off){
-console.log('beep',ii,'skip');
-			}else{
-this.beeps[ii].startOperator(when, duration, note);
+			if (this.beeps[ii].ready) {
+				this.beeps[ii].startOperator(when, duration, note);
+			} else {
+
+				console.log('beep', ii, 'skip');
 			}
-			
+
 		}
 
 	}

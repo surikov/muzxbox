@@ -622,11 +622,20 @@ class EnvelopeNode {
         this.envelopeGain = this.envelopeContext.createGain();
         this.down0now();
     }
+    rate99Duration(r99, from, to) {
+        let duration = 3 / Math.pow(2, 16 * r99 / 100 - 7);
+        if (from < to) {
+            return duration * 0.5;
+        }
+        else {
+            return duration;
+        }
+    }
     setupEnvelope(rates, levels) {
-        this.slopes[0] = 1 / Math.pow(2, rates[0] * 16 / 100 - 5);
-        this.slopes[1] = 1 / Math.pow(2, rates[1] * 16 / 100 - 5);
-        this.slopes[2] = 1 / Math.pow(2, rates[2] * 16 / 100 - 5);
-        this.slopes[3] = 1 / Math.pow(2, rates[3] * 16 / 100 - 5);
+        this.slopes[0] = this.rate99Duration(rates[0], levels[3], levels[0]);
+        this.slopes[1] = this.rate99Duration(rates[1], levels[0], levels[1]);
+        this.slopes[2] = this.rate99Duration(rates[2], levels[1], levels[2]);
+        this.slopes[3] = this.rate99Duration(rates[3], levels[2], levels[3]);
         this.volumes[0] = levels[0] / 100;
         this.volumes[1] = levels[1] / 100;
         this.volumes[2] = levels[2] / 100;
@@ -634,20 +643,37 @@ class EnvelopeNode {
     }
     setupSlope(when, duration, from, to) {
         if (from < to) {
-            this.envelopeGain.gain.exponentialRampToValueAtTime(to, when + duration);
+            this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
         }
         else {
             this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
         }
     }
     startEnvelope(when, wholeDuration) {
-        this.envelopeGain.gain.setValueAtTime(1, when);
-        this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
         console.log('volumes', this.volumes, 'slopes', this.slopes);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
+        let attackDuration = this.slopes[0] * Math.abs(this.volumes[3] - this.volumes[0]);
+        this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);
+        let decayDuration = this.slopes[1] * Math.abs(this.volumes[0] - this.volumes[1]);
+        if (attackDuration + decayDuration < wholeDuration) {
+            this.setupSlope(when + attackDuration, decayDuration, this.volumes[0], this.volumes[1]);
+            let sustainDuration = this.slopes[2] * Math.abs(this.volumes[1] - this.volumes[2]);
+            if (attackDuration + decayDuration + sustainDuration > wholeDuration) {
+                this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
+            }
+        }
+        else {
+            this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
+        }
+        let releaseDuration = this.slopes[3] * Math.abs(this.volumes[2] - this.volumes[3]);
+        if (releaseDuration > this.maxReleaseDelta) {
+            releaseDuration = this.maxReleaseDelta;
+        }
+        this.envelopeGain.gain.linearRampToValueAtTime(0, when + wholeDuration + releaseDuration);
     }
     down0now() {
         this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
-        this.envelopeGain.gain.linearRampToValueAtTime(0, this.envelopeContext.currentTime + this.minTimeDelta);
+        this.envelopeGain.gain.value = 0;
     }
 }
 class SynthDX7 {
@@ -661,12 +687,13 @@ class SynthDX7 {
         console.log('SynthDX7 test');
         let testVox = new VoiceDX7(this.output, this.audioContext);
         testVox.setupVoice(epiano1preset);
-        testVox.startPlayNote(this.audioContext.currentTime + 0.321, 2, 12 * 5);
+        testVox.startPlayNote(this.audioContext.currentTime + 0.54321, 2, 12 * 5);
     }
 }
 var OCTAVE_1024 = 1.0006771307;
 class BeepDX7 {
     constructor(cntxt) {
+        this.ready = false;
         this.ocntxt = cntxt;
         this.envelopenode = new EnvelopeNode(this.ocntxt);
         this.outGain = this.ocntxt.createGain();
@@ -674,18 +701,34 @@ class BeepDX7 {
     }
     setupOperator(cfg) {
         this.envelopenode.setupEnvelope(cfg.rates, cfg.levels);
-        this.off = !(cfg.enabled);
+        this.ready = true;
+        this.oscMode = cfg.oscMode;
+        this.freqFine = cfg.freqFine;
+        this.freqCoarse = cfg.freqCoarse;
+        if (cfg.freqCoarse == 0) {
+            this.freqCoarse = 0.5;
+        }
+        this.detune = cfg.detune;
     }
     startOperator(when, duration, note) {
         console.log('start at', when, 'duration', duration, 'note', note);
-        let pitch = this.frequencyFromNoteNumber(note);
         if (this.osc) {
             this.osc.disconnect(this.envelopenode.envelopeGain);
         }
         this.osc = this.ocntxt.createOscillator();
-        this.osc.frequency.setValueAtTime(pitch, when);
+        let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
+        let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
+        let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
+        console.log('opefrequency', opefrequency);
+        if (this.oscMode > 0) {
+            opefrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
+            ;
+        }
+        else {
+        }
+        this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
         this.osc.connect(this.envelopenode.envelopeGain);
-        this.osc.start(when);
+        this.osc.start(this.ocntxt.currentTime);
         this.envelopenode.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
@@ -732,17 +775,19 @@ class VoiceDX7 {
         let scheme = matrixConnectionAlgorithmsDX7[algIdx];
         this.connectMixOperators(scheme);
         for (let ii = 0; ii < 6; ii++) {
-            this.beeps[ii].setupOperator(presetData.operators[ii]);
+            if (presetData.operators[ii].enabled) {
+                this.beeps[ii].setupOperator(presetData.operators[ii]);
+            }
         }
     }
     startPlayNote(when, duration, note) {
         console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
         for (let ii = 0; ii < this.beeps.length; ii++) {
-            if (this.beeps[ii].off) {
-                console.log('beep', ii, 'skip');
+            if (this.beeps[ii].ready) {
+                this.beeps[ii].startOperator(when, duration, note);
             }
             else {
-                this.beeps[ii].startOperator(when, duration, note);
+                console.log('beep', ii, 'skip');
             }
         }
     }
@@ -778,4 +823,14 @@ function testPlay() {
     console.log('testPlay');
     synth.test();
 }
+function testrate99Duration(r99) {
+    let duration = 3 / Math.pow(2, 16 * r99 / 100 - 7);
+    return duration;
+}
+console.log(0, testrate99Duration(0));
+console.log(20, testrate99Duration(20));
+console.log(50, testrate99Duration(50));
+console.log(74, testrate99Duration(74));
+console.log(84, testrate99Duration(84));
+console.log(99, testrate99Duration(99));
 //# sourceMappingURL=tester.js.map

@@ -15,6 +15,6 @@ class SynthDX7 {
 		console.log('SynthDX7 test');
 		let testVox: VoiceDX7 = new VoiceDX7(this.output, this.audioContext);
 		testVox.setupVoice(epiano1preset);
-		testVox.startPlayNote(this.audioContext.currentTime + 0.321, 2, 12 * 5);
+		testVox.startPlayNote(this.audioContext.currentTime + 0.54321, 2, 12 * 5);
 	}
 }
