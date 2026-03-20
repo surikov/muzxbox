@@ -109,10 +109,11 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 			}
 		];
 	}
-	process(inputs, outputs, parameters) {//if(this.phase>5){return true;}
+	process(inputs, outputs, parameters) {
 		let outSampleCount = outputs[0][0].length;
 		let frequency = parameters["carrierFrequency"][0];
 		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
+		if(this.phase<5){console.log(sampleRate,incrementBySample);}
 		for (let xx = 0; xx < outSampleCount; xx++) {
 			let inputSumm = 0;
 			for (let ii = 0; ii < inputs.length; ii++) {
@@ -166,12 +167,22 @@ function loadPhaseWorklet(ac: AudioContext, onDone: (ac: AudioContext) => void) 
 	reader.readAsDataURL(blob);
 
 }
+/*
+Operator.updateFrequency 48000 phaseStep 0.034246706414151555 frequency 261.6255653005986 freqRatio 1 detune 0 frequency 261.6255653005986
+incrementBySample 0.05759586531581288
+
+1 'operVolume' 16 'velocity' 0.8 'velocitySens' 7 'outputLevel' 0.4775835
+operator.js:27 Operator.updateFrequency 48000 phaseStep 0.034246706414151555 frequency 261.6255653005986 freqRatio 1 detune 0 frequency 261.6255653005986
+voice-dx7.js:106 2 'operVolume' 16 'velocity' 0.8 'velocitySens' 2 'outputLevel' 16.6658671
+operator.js:27 Operator.updateFrequency 48000 phaseStep 0.034246706414151555 frequency 261.6255653005986 freqRatio 1 detune 0 frequency 261.6255653005986
+
+*/
 function startPaseSynth(ac: AudioContext) {
 	console.log('startPaseSynth');
 	//let audioContext = new AudioContext();
 
 	let when = ac.currentTime + 0.2;
-	let freq = 261;
+	let freq = 261.6255653005986;
 	let beepphase = new AudioWorkletNode(ac, 'sinePhaseModuleID');
 	let pars: any = beepphase.parameters;
 	let carrierParam = pars.get("carrierFrequency") as AudioParam;
@@ -184,7 +195,8 @@ function startPaseSynth(ac: AudioContext) {
 
 	carrierParam.setValueAtTime(freq, when);
 	modulatorBeep.frequency.value = freq;
-	modulatorVolume.gain.value = 3;
+	let ratio=16.6658671/0.4775835;
+	modulatorVolume.gain.value = 1/ratio;
 
 	modulatorBeep.start(when);
 }
