@@ -74,45 +74,53 @@ function testPh() {
     carrierBeep.stop(when + 3);
     modulatorBeep.stop(when + 3);
 }
-var beepphase = null;
+//let beepphase: AudioWorkletNode | null = null;
+var doneaudioworkletcode = false;
+var audioworkletcode = "\nclass PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {\n\tphase = 0;\n\tconstructor() {\n\t\tsuper();\n\t}\n\tstatic get parameterDescriptors() {\n\t\treturn [\n\t\t\t{\n\t\t\t\tname: \"carrierFrequency\",\n\t\t\t\tdefaultValue: 440,\n\t\t\t\tminValue: 0,\n\t\t\t\tmaxValue: 50123,\n\t\t\t\tautomationRate: \"a-rate\",\n\t\t\t}\n\t\t];\n\t}\n\tprocess(inputs, outputs, parameters) {//if(this.phase>5){return true;}\n\t\tlet outSampleCount = outputs[0][0].length;\n\t\tlet frequency = parameters[\"carrierFrequency\"][0];\n\t\tlet incrementBySample = Math.PI * 2 * frequency / sampleRate;\n\t\tfor (let xx = 0; xx < outSampleCount; xx++) {\n\t\t\tlet inputSumm = 0;\n\t\t\tfor (let ii = 0; ii < inputs.length; ii++) {\n\t\t\t\tlet singleInput = inputs[ii];\n\t\t\t\tif (singleInput.length) {\n\t\t\t\t\tlet channelSumm = 0;\n\t\t\t\t\tfor (let ch = 0; ch < singleInput.length; ch++) {\n\t\t\t\t\t\tlet singleChannel = singleInput[ch];\n\t\t\t\t\t\tchannelSumm = channelSumm + singleChannel[xx];\n\t\t\t\t\t}\n\t\t\t\t\tinputSumm = inputSumm + channelSumm / singleInput.length;\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tlet resultValue = Math.sin(this.phase + inputSumm);\n\t\t\tfor (let oo = 0; oo < outputs.length; oo++) {\n\t\t\t\tlet singleOutput = outputs[oo];\n\t\t\t\tfor (let ch = 0; ch < singleOutput.length; ch++) {\n\t\t\t\t\tlet singleChannel = singleOutput[ch];\n\t\t\t\t\tsingleChannel[xx] = resultValue;\n\t\t\t\t}\n\t\t\t}\n\t\t\tthis.phase = this.phase + incrementBySample;\n\t\t}\n\t\treturn true;\n\t}\n}\nregisterProcessor(\"sinePhaseModuleID\", PhaseSineAudioWorkletProcessor);\t\t\n\t\t";
+function loadPhaseWorklet(ac, onDone) {
+    console.log('loadPhaseWorklet');
+    var blob = new Blob([audioworkletcode], { type: 'application/javascript' });
+    console.log(blob);
+    var reader = new FileReader();
+    reader.onloadend = function () {
+        console.log('reader', reader);
+        var blobURL = reader.result;
+        //let audioContext = new AudioContext();
+        ac.audioWorklet.addModule(blobURL)
+            .then(function (vv) {
+            console.log('then', vv);
+            onDone(ac);
+        }).catch(function (vv) {
+            console.log('catch', vv);
+        });
+    };
+    reader.readAsDataURL(blob);
+}
+function startPaseSynth(ac) {
+    console.log('startPaseSynth');
+    //let audioContext = new AudioContext();
+    var when = ac.currentTime + 0.2;
+    var freq = 261;
+    var beepphase = new AudioWorkletNode(ac, 'sinePhaseModuleID');
+    var pars = beepphase.parameters;
+    var carrierParam = pars.get("carrierFrequency");
+    var modulatorBeep = ac.createOscillator();
+    var modulatorVolume = ac.createGain();
+    beepphase.connect(ac.destination);
+    modulatorVolume.connect(beepphase);
+    modulatorBeep.connect(modulatorVolume);
+    carrierParam.setValueAtTime(freq, when);
+    modulatorBeep.frequency.value = freq;
+    modulatorVolume.gain.value = 3;
+    modulatorBeep.start(when);
+}
 function testDx7() {
-    var audioContext = new AudioContext();
-    if (beepphase) {
-        //
+    var ac = new AudioContext();
+    if (doneaudioworkletcode) {
+        startPaseSynth(ac);
     }
     else {
-        var audioworkletcode = "\n\t\t\tvar prccntr = 0;\n\t\t\tclass PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {\n\t\t\t\tprocess(inputs, outputs, parameters) {\n\t\t\t\tif (prccntr < 10) {\n\t\t\t\tconsole.log(prccntr, inputs, outputs, parameters);\n\t\t\t\tprccntr++;\n\t\t\t\t}\n\t\t\t\tconst output = outputs[0];\n\t\t\t\toutput.forEach((channel) => {\n\t\t\t\t\tfor (let i = 0; i < channel.length; i++) {\n\t\t\t\t\tchannel[i] = Math.random() * 2 - 1;\n\t\t\t\t\t}\n\t\t\t\t});\n\t\t\t\treturn true;\n\t\t\t\t}\n\t\t\t}\n\t\t\tregisterProcessor(\"sinePhaseModuleID\", PhaseSineAudioWorkletProcessor);\n\t\t";
-        console.log(audioworkletcode);
-        var blob = new Blob([audioworkletcode], { type: 'application/javascript' });
-        console.log(blob);
-        var reader_1 = new FileReader();
-        reader_1.onloadend = function () {
-            console.log('reader', reader_1);
-            var blobURL = reader_1.result;
-            audioContext.audioWorklet.addModule(blobURL)
-                .then(function (vv) {
-                console.log('then', vv);
-                beepphase = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
-                beepphase.connect(audioContext.destination);
-            }).catch(function (vv) {
-                console.log('catch', vv);
-            });
-        };
-        reader_1.readAsDataURL(blob);
-        /*
-        
-                let blobURL: string = URL.createObjectURL(blob);
-                console.log(blobURL);
-                audioContext.audioWorklet.addModule(blobURL)
-                    .then((vv) => {
-                        console.log('then', vv);
-                        beepphase = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
-                        beepphase.connect(audioContext.destination);
-                    }).catch((vv) => {
-                        console.log('catch', vv);
-                    })
-                    ;
-        */
+        loadPhaseWorklet(ac, startPaseSynth);
     }
 }
 function testDx7oooo() {
