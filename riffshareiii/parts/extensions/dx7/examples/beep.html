@@ -1,0 +1,17 @@
+<html>
+<button onclick='start();'>beep</button>
+<script>
+    function start() {
+        let audioContext = new AudioContext();
+        let when = audioContext.currentTime + 0.1;
+
+        let beep = audioContext.createOscillator();
+        beep.frequency.value = 440;
+        beep.connect(audioContext.destination);
+
+        beep.start(when);
+        beep.stop(when + 1);
+    }
+</script>
+
+</html>

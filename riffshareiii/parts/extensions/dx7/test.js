@@ -76,7 +76,7 @@ function testPh() {
 }
 //let beepphase: AudioWorkletNode | null = null;
 var doneaudioworkletcode = false;
-var audioworkletcode = "\nclass PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {\n\tphase = 0;\n\tconstructor() {\n\t\tsuper();\n\t}\n\tstatic get parameterDescriptors() {\n\t\treturn [\n\t\t\t{\n\t\t\t\tname: \"carrierFrequency\",\n\t\t\t\tdefaultValue: 440,\n\t\t\t\tminValue: 0,\n\t\t\t\tmaxValue: 50123,\n\t\t\t\tautomationRate: \"a-rate\",\n\t\t\t}\n\t\t];\n\t}\n\tprocess(inputs, outputs, parameters) {\n\t\tlet outSampleCount = outputs[0][0].length;\n\t\tlet frequency = parameters[\"carrierFrequency\"][0];\n\t\tlet incrementBySample = Math.PI * 2 * frequency / sampleRate;\n\t\tif(this.phase<5){console.log(sampleRate,incrementBySample);}\n\t\tfor (let xx = 0; xx < outSampleCount; xx++) {\n\t\t\tlet inputSumm = 0;\n\t\t\tfor (let ii = 0; ii < inputs.length; ii++) {\n\t\t\t\tlet singleInput = inputs[ii];\n\t\t\t\tif (singleInput.length) {\n\t\t\t\t\tlet channelSumm = 0;\n\t\t\t\t\tfor (let ch = 0; ch < singleInput.length; ch++) {\n\t\t\t\t\t\tlet singleChannel = singleInput[ch];\n\t\t\t\t\t\tchannelSumm = channelSumm + singleChannel[xx];\n\t\t\t\t\t}\n\t\t\t\t\tinputSumm = inputSumm + channelSumm / singleInput.length;\n\t\t\t\t}\n\t\t\t}\n\t\t\t\n\t\t\tlet resultValue = Math.sin(this.phase + inputSumm);\n\t\t\tfor (let oo = 0; oo < outputs.length; oo++) {\n\t\t\t\tlet singleOutput = outputs[oo];\n\t\t\t\tfor (let ch = 0; ch < singleOutput.length; ch++) {\n\t\t\t\t\tlet singleChannel = singleOutput[ch];\n\t\t\t\t\tsingleChannel[xx] = resultValue;\n\t\t\t\t}\n\t\t\t}\n\t\t\tthis.phase = this.phase + incrementBySample;\n\t\t}\n\t\treturn true;\n\t}\n}\nregisterProcessor(\"sinePhaseModuleID\", PhaseSineAudioWorkletProcessor);\t\t\n\t\t";
+var audioworkletcode = "\nclass PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {\n\tphase = 0;\n\tcntr=0;\n\tconstructor() {\n\t\tsuper();\n\t}\n\tstatic get parameterDescriptors() {\n\t\treturn [\n\t\t\t{\n\t\t\t\tname: \"carrierFrequency\",\n\t\t\t\tdefaultValue: 440,\n\t\t\t\tminValue: 0,\n\t\t\t\tmaxValue: 50123,\n\t\t\t\tautomationRate: \"a-rate\",\n\t\t\t}\n\t\t];\n\t}\n\tprocess(inputs, outputs, parameters) {\n\t\tlet outSampleCount = outputs[0][0].length;\n\t\tlet frequency = parameters[\"carrierFrequency\"][0];\n\t\tlet incrementBySample = Math.PI * 2 * frequency / sampleRate;\n\t\t\n\t\tfor (let xx = 0; xx < outSampleCount; xx++) {\n\t\t\tlet inputSumm = 0;\n\t\t\tfor (let ii = 0; ii < inputs.length; ii++) {\n\t\t\t\tlet singleInput = inputs[ii];\n\t\t\t\tif (singleInput.length) {\n\t\t\t\t\tlet channelSumm = 0;\n\t\t\t\t\tfor (let ch = 0; ch < singleInput.length; ch++) {\n\t\t\t\t\t\tlet singleChannel = singleInput[ch];\n\t\t\t\t\t\tchannelSumm = channelSumm + singleChannel[xx];\n\t\t\t\t\t}\n\t\t\t\t\tinputSumm = inputSumm + channelSumm / singleInput.length;\n\t\t\t\t}\n\t\t\t}\n\t\t\t//\n\t\t\tinputSumm=Math.sin(this.phase);\n\t\t\tlet resultValue = Math.sin(this.phase + inputSumm);\n\t\t\t//let resultValue =  Math.sin(this.phase + 1.3*inputSumm);\n\t\t\tif(this.cntr<500){this.cntr++;console.log('pase',this.phase,'input',inputSumm,'result',resultValue);}\n\t\t\t//resultValue=resultValue*0.1;\n\t\t\tfor (let oo = 0; oo < outputs.length; oo++) {\n\t\t\t\tlet singleOutput = outputs[oo];\n\t\t\t\tfor (let ch = 0; ch < singleOutput.length; ch++) {\n\t\t\t\t\tlet singleChannel = singleOutput[ch];\n\t\t\t\t\tsingleChannel[xx] = resultValue;\n\t\t\t\t}\n\t\t\t}\n\t\t\tthis.phase = this.phase + incrementBySample;\n\t\t\tif (this.phase >= Math.PI * 2) {\n\t\t\t\tthis.phase = this.phase - Math.PI * 2;\n\t\t\t}\n\t\t}\n\t\treturn true;\n\t}\n}\nregisterProcessor(\"sinePhaseModuleID\", PhaseSineAudioWorkletProcessor);\t\t\n\t\t";
 function loadPhaseWorklet(ac, onDone) {
     console.log('loadPhaseWorklet');
     var blob = new Blob([audioworkletcode], { type: 'application/javascript' });
@@ -109,7 +109,7 @@ operator.js:27 Operator.updateFrequency 48000 phaseStep 0.034246706414151555 fre
 function startPaseSynth(ac) {
     console.log('startPaseSynth');
     //let audioContext = new AudioContext();
-    var when = ac.currentTime + 0.2;
+    var when = ac.currentTime; // + 0.2;
     var freq = 261.6255653005986;
     var beepphase = new AudioWorkletNode(ac, 'sinePhaseModuleID');
     var pars = beepphase.parameters;
@@ -119,10 +119,10 @@ function startPaseSynth(ac) {
     beepphase.connect(ac.destination);
     modulatorVolume.connect(beepphase);
     modulatorBeep.connect(modulatorVolume);
-    carrierParam.setValueAtTime(freq, when);
+    carrierParam.value = freq;
     modulatorBeep.frequency.value = freq;
-    var ratio = 16.6658671 / 0.4775835;
-    modulatorVolume.gain.value = 1 / ratio;
+    var ratio = 5; //16.6658671/7.00713483;
+    modulatorVolume.gain.value = ratio;
     modulatorBeep.start(when);
 }
 function testDx7() {

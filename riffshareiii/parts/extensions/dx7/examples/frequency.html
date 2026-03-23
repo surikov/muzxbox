@@ -1,0 +1,26 @@
+<html>
+<button onclick='start();'>frequency modulation</button>
+<script>
+    function start() {
+        let audioContext = new AudioContext();
+        let when = audioContext.currentTime + 0.1;
+
+        let carrier = audioContext.createOscillator();
+        let modulator = audioContext.createOscillator();
+        let level = audioContext.createGain();
+
+        modulator.frequency.value = 4;
+        level.gain.value=3000;
+
+        carrier.connect(audioContext.destination);
+        level.connect(carrier.frequency);
+        modulator.connect(level);
+
+        carrier.start(when);
+        modulator.start(when);
+        carrier.stop(when + 1);
+        modulator.stop(when + 1);
+    }
+</script>
+
+</html>

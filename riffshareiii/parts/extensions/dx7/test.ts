@@ -95,6 +95,7 @@ let doneaudioworkletcode = false;
 let audioworkletcode = `
 class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 	phase = 0;
+	cntr=0;
 	constructor() {
 		super();
 	}
@@ -113,7 +114,7 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 		let outSampleCount = outputs[0][0].length;
 		let frequency = parameters["carrierFrequency"][0];
 		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
-		if(this.phase<5){console.log(sampleRate,incrementBySample);}
+		
 		for (let xx = 0; xx < outSampleCount; xx++) {
 			let inputSumm = 0;
 			for (let ii = 0; ii < inputs.length; ii++) {
@@ -127,8 +128,12 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 					inputSumm = inputSumm + channelSumm / singleInput.length;
 				}
 			}
-			
+			//
+			inputSumm=Math.sin(this.phase);
 			let resultValue = Math.sin(this.phase + inputSumm);
+			//let resultValue =  Math.sin(this.phase + 1.3*inputSumm);
+			if(this.cntr<500){this.cntr++;console.log('pase',this.phase,'input',inputSumm,'result',resultValue);}
+			//resultValue=resultValue*0.1;
 			for (let oo = 0; oo < outputs.length; oo++) {
 				let singleOutput = outputs[oo];
 				for (let ch = 0; ch < singleOutput.length; ch++) {
@@ -137,6 +142,9 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 				}
 			}
 			this.phase = this.phase + incrementBySample;
+			if (this.phase >= Math.PI * 2) {
+				this.phase = this.phase - Math.PI * 2;
+			}
 		}
 		return true;
 	}
@@ -181,7 +189,7 @@ function startPaseSynth(ac: AudioContext) {
 	console.log('startPaseSynth');
 	//let audioContext = new AudioContext();
 
-	let when = ac.currentTime + 0.2;
+	let when = ac.currentTime;// + 0.2;
 	let freq = 261.6255653005986;
 	let beepphase = new AudioWorkletNode(ac, 'sinePhaseModuleID');
 	let pars: any = beepphase.parameters;
@@ -193,10 +201,10 @@ function startPaseSynth(ac: AudioContext) {
 	modulatorVolume.connect(beepphase);
 	modulatorBeep.connect(modulatorVolume);
 
-	carrierParam.setValueAtTime(freq, when);
+	carrierParam.value=freq;
 	modulatorBeep.frequency.value = freq;
-	let ratio=16.6658671/0.4775835;
-	modulatorVolume.gain.value = 1/ratio;
+	let ratio=5;//16.6658671/7.00713483;
+	modulatorVolume.gain.value = ratio;
 
 	modulatorBeep.start(when);
 }
