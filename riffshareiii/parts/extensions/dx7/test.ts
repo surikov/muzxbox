@@ -60,6 +60,7 @@ function testF() {
 	carrierBeep.stop(when + 3);
 	modulatorBeep.stop(when + 3);
 }
+
 function testPh() {
 	let audioContext = new AudioContext();
 	let when = audioContext.currentTime + 0.1;
@@ -201,9 +202,9 @@ function startPaseSynth(ac: AudioContext) {
 	modulatorVolume.connect(beepphase);
 	modulatorBeep.connect(modulatorVolume);
 
-	carrierParam.value=freq;
+	carrierParam.value = freq;
 	modulatorBeep.frequency.value = freq;
-	let ratio=5;//16.6658671/7.00713483;
+	let ratio = 5;//16.6658671/7.00713483;
 	modulatorVolume.gain.value = ratio;
 
 	modulatorBeep.start(when);
