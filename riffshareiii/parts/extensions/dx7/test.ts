@@ -62,34 +62,44 @@ function testF() {
 }
 
 function testPh() {
-	let audioContext = new AudioContext();
-	let when = audioContext.currentTime + 0.1;
-	let tone = 261.6255653005986;
-	let ratio_cm = 16.6658671 / 7.00713483;
+	console.log('test phase');
+	// 1. Setup
+	const audioCtx = new AudioContext();
+	const freq = 440; // Carrier frequency (Hz)
+	let tm=audioCtx.currentTime;
 
-	let carrierBeep = audioContext.createOscillator();
-	let modulatorBeep = audioContext.createOscillator();
-	let modulatorVolume = audioContext.createGain();
-	let phaseDelay = audioContext.createDelay();
-	let toneShift = 1 / (Math.PI * tone);
-	console.log('toneShift', toneShift / 3, toneShift, toneShift * 3);
+	// 2. Carrier Oscillator
+	const carrier = audioCtx.createOscillator();
+	carrier.frequency.value = freq;
 
-	phaseDelay.delayTime.value = toneShift;
-	carrierBeep.frequency.value = tone;
-	modulatorBeep.frequency.value = tone * 2;
-	modulatorVolume.gain.value = toneShift * ratio_cm;
+	// 3. Modulator Oscillator (usually same frequency for simple PM)
+	const modulator = audioCtx.createOscillator();
+	modulator.frequency.value = freq;
 
-	phaseDelay.connect(audioContext.destination);
-	carrierBeep.connect(phaseDelay);
-	modulatorVolume.connect(phaseDelay.delayTime);
-	modulatorBeep.connect(modulatorVolume);
+	// 4. Modulator Gain (Depth control)
+	const modGain = audioCtx.createGain();
+	// Gain value determines depth: 1/(2*pi*freq) is a good starting point
+	modGain.gain.value =4* 1 / (2 * Math.PI * freq);
+	//modGain.gain.setValueAtTime(0,tm);
+	//modGain.gain.linearRampToValueAtTime(2* 1 / (2 * Math.PI * freq),tm+0.5);
+	//modGain.gain.linearRampToValueAtTime(0,tm+1);
 
-	carrierBeep.start(when);
-	modulatorBeep.start(when + 1);
-	//modulatorVolume.gain.setValueAtTime(tone, when + 1);
+	// 5. Delay Node (The "Phase" Shifter)
+	const delayNode = audioCtx.createDelay();
+	// Set base delay to create a nominal 0 or 180 phase shift
+	delayNode.delayTime.value = 0.5 / freq;
 
-	carrierBeep.stop(when + 3);
-	modulatorBeep.stop(when + 3);
+	// 6. Connections
+	modulator.connect(modGain);
+	modGain.connect(delayNode.delayTime); // Modulate delay time
+	carrier.connect(delayNode);
+	delayNode.connect(audioCtx.destination);
+
+	modulator.start(tm);
+	carrier.start(tm);
+
+	modulator.stop(tm+1);
+	carrier.stop(tm+1);
 }
 //let beepphase: AudioWorkletNode | null = null;
 let doneaudioworkletcode = false;

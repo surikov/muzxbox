@@ -1,108 +1,32 @@
 <html>
 <button onclick='start();'>phase modulation</button>
 <script>
-	let phaseWorkletSource = `
-class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
-	phase = 0;
-	cntr = 0;
-	constructor() {
-		super();
-	}
-	static get parameterDescriptors() {
-		return [
-			{ name: "carrierFrequency", automationRate: "a-rate" }
-			, { name: "modulationLevel", automationRate: "a-rate" }
-		];
-	}
-	readSample(inputs, xx) {
-		let inputSumm = 0;
-		for (let ii = 0; ii < inputs.length; ii++) {
-			let singleInput = inputs[ii];
-			let channelCount = singleInput.length;
-			if (channelCount) {
-				let channelSumm = 0;
-				for (let ch = 0; ch < singleInput.length; ch++) {
-					let singleChannel = singleInput[ch];
-					channelSumm = channelSumm + singleChannel[xx];
-				}
-				inputSumm = inputSumm + channelSumm / channelCount;
-			}
-		}
-		return inputSumm;
-	}
-	writeSample(outputs, xx, value) {
-		for (let oo = 0; oo < outputs.length; oo++) {
-			let singleOutput = outputs[oo];
-			for (let ch = 0; ch < singleOutput.length; ch++) {
-				let singleChannel = singleOutput[ch];
-				singleChannel[xx] = value;
-			}
-		}
-	}
-	process(inputs, outputs, parameters) {
-		let outSampleCount = outputs[0][0].length;
-		let frequency = parameters["carrierFrequency"][0];
-		let level = parameters["modulationLevel"][0];
-		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
-
-		for (let xx = 0; xx < outSampleCount; xx++) {
-			let inputSumm = this.readSample(inputs, xx);
-			let resultValue = Math.sin(this.phase + level * inputSumm);
-			this.writeSample(outputs, xx, resultValue);
-			this.phase = this.phase + incrementBySample;
-			if (this.phase >= Math.PI * 2) {
-				this.phase = this.phase - Math.PI * 2;
-			}
-		}
-		return true;
-	}
-}
-registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
-`;
-	function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
-		let blob = new Blob([audioworkletcode], { type: 'application/javascript' });
-		let reader = new FileReader();
-		reader.onloadend = function () {
-			let blobURL = reader.result;
-			audioContext.audioWorklet.addModule(blobURL)
-				.then((vv) => {
-					onDone();
-				});
-		}
-		reader.readAsDataURL(blob);
-	}
 	function start() {
 		let audioContext = new AudioContext();
-		loadAudioWorkletCode(phaseWorkletSource, audioContext, () => {
-			playSound(audioContext);
-		});
-	}
-	function playSound(audioContext) {
 		let when = audioContext.currentTime + 0.1;
+		let carierFrequency = 440;
 
-		let carrier = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
+		let carrier = audioContext.createOscillator();
 		let modulatorBeep = audioContext.createOscillator();
-		let volume = audioContext.createGain();
+		let modulationLevel = audioContext.createGain();
+		let phaseDelay = audioContext.createDelay();
 
-		volume.gain.value = 0;
+		carrier.frequency.value = carierFrequency;
+		modulatorBeep.frequency.value = carierFrequency;
+		modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * carierFrequency), when);
+		modulationLevel.gain.linearRampToValueAtTime(4 / (2 * Math.PI * carierFrequency), when + 1);
+		phaseDelay.delayTime.value = 0.5 / carierFrequency;
 
-		let descriptors = carrier.parameters;
-		let carrierFrequency = descriptors.get('carrierFrequency');
-		let modulationLevel = descriptors.get('modulationLevel');
-
-		carrierFrequency.value = 440;
-		modulatorBeep.frequency.value = 440;
-		modulationLevel.setValueAtTime(0, when);
-		modulationLevel.linearRampToValueAtTime(4, when + 0.5);
-		modulationLevel.linearRampToValueAtTime(0, when + 1);
-
-		volume.connect(audioContext.destination);
-		carrier.connect(volume);
-		modulatorBeep.connect(carrier);
+		modulatorBeep.connect(modulationLevel);
+		modulationLevel.connect(phaseDelay.delayTime);
+		carrier.connect(phaseDelay);
+		phaseDelay.connect(audioContext.destination);
 
 		modulatorBeep.start(when);
-		volume.gain.setValueAtTime(1, when);
-		volume.gain.setValueAtTime(0, when + 1);
+		carrier.start(when);
+
+		modulatorBeep.stop(when + 1);
+		carrier.stop(when + 1);
 	}
 </script>
 
