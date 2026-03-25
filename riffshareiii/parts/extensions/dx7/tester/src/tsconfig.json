@@ -24,7 +24,9 @@
 		"types": []
 	},
 	"files": [
-		"algorithms.ts",
+		"../../../../mzxbxapi/musicenginetypes.ts"
+		,"../../../../mzxbxapi/musicenginedeclarations.ts"
+		,"algorithms.ts",
 		"envelopenode.ts",
 		"synth.ts",
 		"beep.ts",

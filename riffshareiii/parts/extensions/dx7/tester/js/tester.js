@@ -683,24 +683,28 @@ class SynthDX7 {
         this.output = this.audioContext.createGain();
         this.output.connect(this.audioContext.destination);
     }
-    test() {
-        console.log('SynthDX7 test');
+    scheduleStrum(preset, when, pitches, slides) {
+        console.log('SynthDX7 schedule');
         let testVox = new VoiceDX7(this.output, this.audioContext);
-        testVox.setupVoice(epiano1preset);
-        testVox.startPlayNote(this.audioContext.currentTime + 0.54321, 2, 12 * 5);
+        testVox.setupVoice(preset);
+        testVox.startPlayNote(when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
     }
 }
-var OCTAVE_1024 = 1.0006771307;
 class BeepDX7 {
     constructor(cntxt) {
+        this.carrier = null;
         this.ready = false;
-        this.ocntxt = cntxt;
-        this.envelopenode = new EnvelopeNode(this.ocntxt);
-        this.outGain = this.ocntxt.createGain();
-        this.envelopenode.envelopeGain.connect(this.outGain);
+        this.oscMode = 0;
+        this.audioContext = cntxt;
+        this.output = this.audioContext.createGain();
+        this.envelope = new EnvelopeNode(this.audioContext);
+        this.envelope.envelopeGain.connect(this.output);
+        this.modulationLevel = this.audioContext.createGain();
+        this.phaseDelay = this.audioContext.createDelay();
+        this.phaseDelay.connect(this.envelope.envelopeGain);
     }
     setupOperator(cfg) {
-        this.envelopenode.setupEnvelope(cfg.rates, cfg.levels);
+        this.envelope.setupEnvelope(cfg.rates, cfg.levels);
         this.ready = true;
         this.oscMode = cfg.oscMode;
         this.freqFine = cfg.freqFine;
@@ -711,11 +715,11 @@ class BeepDX7 {
         this.detune = cfg.detune;
     }
     startOperator(when, duration, note) {
-        console.log('start at', when, 'duration', duration, 'note', note);
-        if (this.osc) {
-            this.osc.disconnect(this.envelopenode.envelopeGain);
+        console.log(this.audioContext.currentTime, 'start at', when, 'duration', duration, 'note', note);
+        if (this.carrier) {
+            this.carrier.disconnect();
         }
-        this.osc = this.ocntxt.createOscillator();
+        var OCTAVE_1024 = 1.0006771307;
         let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
         let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
         let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
@@ -726,30 +730,19 @@ class BeepDX7 {
         }
         else {
         }
-        this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
-        this.osc.connect(this.envelopenode.envelopeGain);
-        this.osc.start(this.ocntxt.currentTime);
-        this.envelopenode.startEnvelope(when, duration);
+        this.phaseDelay.delayTime.value = 0;
+        this.carrier = this.audioContext.createOscillator();
+        this.carrier.frequency.value = opefrequency;
+        this.carrier.connect(this.phaseDelay);
+        this.carrier.start(when);
+        this.envelope.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
         return 440 * Math.pow(2, (note - 69) / 12);
     }
     ;
-    _____________startOperator(level1, rate1, level2, rate2, level3, rate3, level4, rate4, when, duration, pitch, oscMode, freqCoarse, freqFine, detune, volume) {
-        let detuneRatio = Math.pow(OCTAVE_1024, detune);
-        if (freqCoarse == 0)
-            freqCoarse = 0.5;
-        let freqRatio = freqCoarse * (1 + freqFine / 100);
-        let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(pitch);
-        console.log('opefrequency', opefrequency);
-        if (oscMode > 0) {
-            opefrequency = Math.pow(10, freqCoarse % 4) * (1 + (freqFine / 99) * 8.772);
-            ;
-        }
-        this.osc.frequency.setValueAtTime(opefrequency, this.ocntxt.currentTime);
-    }
     connectToOutputNode(outNode) {
-        this.outGain.connect(outNode);
+        this.output.connect(outNode);
     }
     connectToCarrier(opDX7) {
     }
@@ -787,7 +780,7 @@ class VoiceDX7 {
                 this.beeps[ii].startOperator(when, duration, note);
             }
             else {
-                console.log('beep', ii, 'skip');
+                console.log('operator', (1 + ii), 'skip');
             }
         }
     }
@@ -803,7 +796,7 @@ class VoiceDX7 {
             for (let mm = 0; mm < modulators.length; mm++) {
                 let modulatorIdx = modulators[mm];
                 if (modulatorIdx == ii) {
-                    this.beeps[modulatorIdx].connectToSelf;
+                    this.beeps[modulatorIdx].connectToSelf();
                 }
                 else {
                     this.beeps[modulatorIdx].connectToCarrier(carrier);
@@ -814,23 +807,14 @@ class VoiceDX7 {
     }
 }
 let synth;
+let acx;
 function initTester() {
     console.log('initTester');
-    let audioContext = new window.AudioContext();
-    synth = new SynthDX7(audioContext);
+    acx = new window.AudioContext();
+    synth = new SynthDX7(acx);
 }
 function testPlay() {
     console.log('testPlay');
-    synth.test();
+    synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 1.2, delta: 0 }]);
 }
-function testrate99Duration(r99) {
-    let duration = 3 / Math.pow(2, 16 * r99 / 100 - 7);
-    return duration;
-}
-console.log(0, testrate99Duration(0));
-console.log(20, testrate99Duration(20));
-console.log(50, testrate99Duration(50));
-console.log(74, testrate99Duration(74));
-console.log(84, testrate99Duration(84));
-console.log(99, testrate99Duration(99));
 //# sourceMappingURL=tester.js.map
