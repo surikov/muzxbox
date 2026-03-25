@@ -722,17 +722,17 @@ class BeepDX7 {
         var OCTAVE_1024 = 1.0006771307;
         let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
         let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
-        let opefrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
-        console.log('opefrequency', opefrequency);
+        let carierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
+        console.log('carierFrequency', carierFrequency);
         if (this.oscMode > 0) {
-            opefrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
+            carierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
             ;
         }
         else {
         }
-        this.phaseDelay.delayTime.value = 0;
+        this.phaseDelay.delayTime.value = 0.5 / carierFrequency;
         this.carrier = this.audioContext.createOscillator();
-        this.carrier.frequency.value = opefrequency;
+        this.carrier.frequency.value = carierFrequency;
         this.carrier.connect(this.phaseDelay);
         this.carrier.start(when);
         this.envelope.startEnvelope(when, duration);

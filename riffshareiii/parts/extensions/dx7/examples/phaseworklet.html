@@ -80,6 +80,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 	function playSound(audioContext) {
 		let when = audioContext.currentTime + 0.1;
 		let carierFrequency = 440;
+		let maxmodulation = 4;
 
 		let carrier = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
 		let modulatorBeep = audioContext.createOscillator();
@@ -94,7 +95,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 		carrierFrequency.value = carierFrequency;
 		modulatorBeep.frequency.value = carierFrequency;
 		modulationLevel.setValueAtTime(0, when);
-		modulationLevel.linearRampToValueAtTime(4, when + 1);
+		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 1);
 
 		volume.connect(audioContext.destination);
 		carrier.connect(volume);
