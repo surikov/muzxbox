@@ -51,201 +51,74 @@ type DX7OperatorData = {
 	volume: number;
 	oscMode: number;
 	detune: number;
-	rates:number[];
-	levels:number[];
+	rates: number[];
+	levels: number[];
 };
 type DX7PresetData = {
-	name:string;
+	name: string;
 	algorithm: number;
 	operators: DX7OperatorData[];
-	feedback:number;
+	feedback: number;
 };
-let epiano1preset:DX7PresetData = {
-	"algorithm": 5,
-	"feedback": 6,
-	"operators": [
-		{
-			rates: [
-				96,
-				25,
-				25,
-				67
-			],
-			"levels": [
-				99,
-				75,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 0,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 0,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": 3,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 2,
-			"volume": 99,
-			"oscMode": 0,
-			"freqCoarse": 1,
-			"freqFine": 0,
-			//"pan": 0,
-			//"idx": 0,
-			"enabled": true
-		},
-		{
-			"rates": [
-				95,
-				50,
-				35,
-				78
-			],
-			"levels": [
-				99,
-				75,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 0,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 0,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": 0,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 7,
-			"volume": 58,
-			"oscMode": 0,
-			"freqCoarse": 14,
-			"freqFine": 0,
-			//"pan": 25,
-			//"idx": 1,
-			"enabled": false
-		},
-		{
-			rates: [
-				95,
-				20,
-				20,
-				50
-			],
-			"levels": [
-				99,
-				95,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 0,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 0,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": 0,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 2,
-			"volume": 99,
-			"oscMode": 0,
-			"freqCoarse": 1,
-			"freqFine": 0,
-			//"pan": -25,
-			//"idx": 2,
-			"enabled": false
-		},
-		{
-			"rates": [
-				95,
-				29,
-				20,
-				50
-			],
-			"levels": [
-				99,
-				95,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 0,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 0,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": 0,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 6,
-			"volume": 89,
-			"oscMode": 0,
-			"freqCoarse": 1,
-			"freqFine": 0,
-			//"pan": 0,
-			//"idx": 3,
-			"enabled": false
-		},
-		{
-			"rates": [
-				95,
-				20,
-				20,
-				50
-			],
-			"levels": [
-				99,
-				95,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 0,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 0,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": -7,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 0,
-			"volume": 99,
-			"oscMode": 0,
-			"freqCoarse": 1,
-			"freqFine": 0,
-			//"pan": 25,
-			//"idx": 4,
-			"enabled": false
-		},
-		{
-			"rates": [
-				95,
-				29,
-				20,
-				50
-			],
-			"levels": [
-				99,
-				95,
-				0,
-				0
-			],
-			//"keyScaleBreakpoint": 41,
-			//"keyScaleDepthL": 0,
-			//"keyScaleDepthR": 19,
-			//"keyScaleCurveL": 0,
-			//"keyScaleCurveR": 0,
-			//"keyScaleRate": 3,
-			"detune": 7,
-			//"lfoAmpModSens": 0,
-			//"velocitySens": 6,
-			"volume": 79,
-			"oscMode": 0,
-			"freqCoarse": 1,
-			"freqFine": 0,
-			//"pan": -25,
-			//"idx": 5,
-			"enabled": false
-		}
-	],
-	"name": "E.PIANO 1 ",
+let epiano1preset: DX7PresetData = {
+	"algorithm": 5
+	, "feedback": 6
+	, "operators": [{
+		rates: [96, 25, 25, 67],
+		"levels": [99, 75, 0, 0],
+		"detune": 3,
+		"volume": 99,
+		"oscMode": 0,
+		"freqCoarse": 1,
+		"freqFine": 0,
+		"enabled": false
+	}, {
+		"rates": [95, 50, 35, 78],
+		"levels": [99, 75, 0, 0],
+		"detune": 0,
+		"volume": 58,
+		"oscMode": 0,
+		"freqCoarse": 14,
+		"freqFine": 0,
+		"enabled": false
+	}, {
+		rates: [95, 20, 20, 50],
+		"levels": [99, 95, 0, 0],
+		"detune": 0,
+		"volume": 99,
+		"oscMode": 0,
+		"freqCoarse": 1,
+		"freqFine": 0,
+		"enabled": true
+	}, {
+		"rates": [95, 29, 20, 50],
+		"levels": [99, 95, 0, 0],
+		"detune": 0,
+		"volume": 89,
+		"oscMode": 0,
+		"freqCoarse": 1,
+		"freqFine": 0,
+		"enabled": true
+	}, {
+		"rates": [95, 20, 20, 50],
+		"levels": [99, 95, 0, 0],
+		"detune": -7,
+		"volume": 99,
+		"oscMode": 0,
+		"freqCoarse": 1,
+		"freqFine": 0,
+		"enabled": false
+	}, {
+		"rates": [95, 29, 20, 50],
+		"levels": [99, 95, 0, 0],
+		"detune": 7,
+		"volume": 79,
+		"oscMode": 0,
+		"freqCoarse": 1,
+		"freqFine": 0,
+		"enabled": false
+	}]
+	, "name": "E.PIANO 1 ",
 	//"lfoSpeed": 34,
 	//"lfoDelay": 33,
 	//"lfoPitchModDepth": 0,

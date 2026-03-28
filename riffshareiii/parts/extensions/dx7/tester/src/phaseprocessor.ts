@@ -1,7 +1,15 @@
-<html>
-<button onclick='start();'>phase worklet</button>
-<script>
-	let phaseWorkletSource = `
+let skipLoadPhaseWorkletSource = false;
+function loadPhaseWorkletSource(audioContext: AudioContext, onDone: () => void) {
+	if (skipLoadPhaseWorkletSource) {
+		onDone();
+	} else {
+		loadAudioWorkletCode(phaseWorkletSource, audioContext, () => {
+			skipLoadPhaseWorkletSource = true;
+			onDone();
+		});
+	}
+}
+let phaseWorkletSource = `
 class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 	phase = 0;
 	cntr = 0;
@@ -59,52 +67,3 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 }
 registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 `;
-	function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
-		let blob = new Blob([audioworkletcode], { type: 'application/javascript' });
-		let reader = new FileReader();
-		reader.onloadend = function () {
-			let blobURL = reader.result;
-			audioContext.audioWorklet.addModule(blobURL)
-				.then((vv) => {
-					onDone();
-				});
-		}
-		reader.readAsDataURL(blob);
-	}
-	function start() {
-		let audioContext = new AudioContext();
-		loadAudioWorkletCode(phaseWorkletSource, audioContext, () => {
-			playSound(audioContext);
-		});
-	}
-	function playSound(audioContext) {
-		let when = audioContext.currentTime + 0.1;
-		let soundFrequency = 440;
-		let maxmodulation = 4;
-
-		let carrier = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
-		let modulatorBeep = audioContext.createOscillator();
-		let volume = audioContext.createGain();
-
-		volume.gain.value = 0;
-
-		let descriptors = carrier.parameters;
-		let carrierFrequency = descriptors.get('carrierFrequency');
-		let modulationLevel = descriptors.get('modulationLevel');
-
-		carrierFrequency.value = soundFrequency;
-		modulatorBeep.frequency.value = soundFrequency;
-		modulationLevel.setValueAtTime(0, when);
-		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 1);
-
-		volume.connect(audioContext.destination);
-		carrier.connect(volume);
-		modulatorBeep.connect(carrier);
-
-		modulatorBeep.start(when);
-		volume.gain.setValueAtTime(1, when);
-		volume.gain.setValueAtTime(0, when + 1);
-	}
-</script>
-
-</html>

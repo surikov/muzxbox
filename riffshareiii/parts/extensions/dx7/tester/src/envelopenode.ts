@@ -92,7 +92,7 @@ class EnvelopeNode {
 	startEnvelope(when: number, wholeDuration: number) {
 		//this.envelopeGain.gain.setValueAtTime(1, when);
 		//this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
-		console.log('volumes', this.volumes, 'slopes', this.slopes);
+		//console.log('volumes', this.volumes, 'slopes', this.slopes);
 		this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
 		let attackDuration = this.slopes[0] * Math.abs(this.volumes[3] - this.volumes[0]);
 		this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);

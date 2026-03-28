@@ -423,11 +423,9 @@ declare class SynthDX7 {
 }
 declare class BeepDX7 {
     audioContext: AudioContext;
-    modulationLevel: AudioNode;
-    phaseDelay: DelayNode;
+    phaseNode: PhaseNode;
     output: GainNode;
     envelope: EnvelopeNode;
-    carrier: OscillatorNode | null;
     ready: boolean;
     freqCoarse: number;
     freqFine: number;
@@ -450,6 +448,16 @@ declare class VoiceDX7 {
     startPlayNote(when: number, duration: number, note: number): void;
     connectMixOperators(scheme: ConnectionSchemeDX7): void;
 }
+declare let skipLoadPhaseWorkletSource: boolean;
+declare function loadPhaseWorkletSource(audioContext: AudioContext, onDone: () => void): void;
+declare let phaseWorkletSource: string;
+declare class PhaseNode {
+    carrier: AudioWorkletNode;
+    carrierFrequency: AudioParam | undefined;
+    modulationLevel: AudioParam | undefined;
+    constructor(audioContext: AudioContext);
+}
+declare function loadAudioWorkletCode(audioworkletcode: string, audioContext: AudioContext, onDone: () => void): void;
 declare let synth: SynthDX7;
 declare let acx: AudioContext;
 declare function initTester(): void;

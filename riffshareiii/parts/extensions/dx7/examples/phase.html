@@ -4,7 +4,7 @@
 	function start() {
 		let audioContext = new AudioContext();
 		let when = audioContext.currentTime + 0.1;
-		let carierFrequency = 440;
+		let soundFrequency = 440;
 		let maxmodulation = 4;
 
 		let carrier = audioContext.createOscillator();
@@ -12,11 +12,11 @@
 		let modulationLevel = audioContext.createGain();
 		let phaseDelay = audioContext.createDelay();
 
-		carrier.frequency.value = carierFrequency;
-		modulatorBeep.frequency.value = carierFrequency;
-		modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * carierFrequency), when);
-		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * carierFrequency), when + 1);
-		phaseDelay.delayTime.value = 0.5 / carierFrequency;
+		carrier.frequency.value = soundFrequency;
+		modulatorBeep.frequency.value = soundFrequency;
+		modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
+		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 1);
+		phaseDelay.delayTime.value = 0.5 / soundFrequency;
 
 		modulatorBeep.connect(modulationLevel);
 		modulationLevel.connect(phaseDelay.delayTime);

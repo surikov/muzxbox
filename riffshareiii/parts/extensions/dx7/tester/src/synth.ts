@@ -7,12 +7,13 @@ class SynthDX7 {
 		this.output = this.audioContext.createGain();
 		this.output.connect(this.audioContext.destination);
 
-		
-	}
-	scheduleStrum(preset: DX7PresetData, when: number, pitches: number[],  slides: MZXBX_SlideItem[]) {
-		console.log('SynthDX7 schedule');
 
-		
+	}
+	scheduleStrum(preset: DX7PresetData, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
+		console.log('SynthDX7 schedule');
+		if (this.audioContext.state === "suspended") {
+			this.audioContext.resume();
+		}
 
 		let testVox: VoiceDX7 = new VoiceDX7(this.output, this.audioContext);
 		testVox.setupVoice(preset);

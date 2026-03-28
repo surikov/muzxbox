@@ -36,128 +36,61 @@ let matrixConnectionAlgorithmsDX7 = [
 let epiano1preset = {
     "algorithm": 5,
     "feedback": 6,
-    "operators": [
-        {
-            rates: [
-                96,
-                25,
-                25,
-                67
-            ],
-            "levels": [
-                99,
-                75,
-                0,
-                0
-            ],
+    "operators": [{
+            rates: [96, 25, 25, 67],
+            "levels": [99, 75, 0, 0],
             "detune": 3,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": true
-        },
-        {
-            "rates": [
-                95,
-                50,
-                35,
-                78
-            ],
-            "levels": [
-                99,
-                75,
-                0,
-                0
-            ],
+            "enabled": false
+        }, {
+            "rates": [95, 50, 35, 78],
+            "levels": [99, 75, 0, 0],
             "detune": 0,
             "volume": 58,
             "oscMode": 0,
             "freqCoarse": 14,
             "freqFine": 0,
             "enabled": false
-        },
-        {
-            rates: [
-                95,
-                20,
-                20,
-                50
-            ],
-            "levels": [
-                99,
-                95,
-                0,
-                0
-            ],
+        }, {
+            rates: [95, 20, 20, 50],
+            "levels": [99, 95, 0, 0],
             "detune": 0,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
-        },
-        {
-            "rates": [
-                95,
-                29,
-                20,
-                50
-            ],
-            "levels": [
-                99,
-                95,
-                0,
-                0
-            ],
+            "enabled": true
+        }, {
+            "rates": [95, 29, 20, 50],
+            "levels": [99, 95, 0, 0],
             "detune": 0,
             "volume": 89,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
-        },
-        {
-            "rates": [
-                95,
-                20,
-                20,
-                50
-            ],
-            "levels": [
-                99,
-                95,
-                0,
-                0
-            ],
+            "enabled": true
+        }, {
+            "rates": [95, 20, 20, 50],
+            "levels": [99, 95, 0, 0],
             "detune": -7,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
             "enabled": false
-        },
-        {
-            "rates": [
-                95,
-                29,
-                20,
-                50
-            ],
-            "levels": [
-                99,
-                95,
-                0,
-                0
-            ],
+        }, {
+            "rates": [95, 29, 20, 50],
+            "levels": [99, 95, 0, 0],
             "detune": 7,
             "volume": 79,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
             "enabled": false
-        }
-    ],
+        }],
     "name": "E.PIANO 1 ",
 };
 let defaultBrass1test = {
@@ -650,7 +583,6 @@ class EnvelopeNode {
         }
     }
     startEnvelope(when, wholeDuration) {
-        console.log('volumes', this.volumes, 'slopes', this.slopes);
         this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
         let attackDuration = this.slopes[0] * Math.abs(this.volumes[3] - this.volumes[0]);
         this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);
@@ -685,6 +617,9 @@ class SynthDX7 {
     }
     scheduleStrum(preset, when, pitches, slides) {
         console.log('SynthDX7 schedule');
+        if (this.audioContext.state === "suspended") {
+            this.audioContext.resume();
+        }
         let testVox = new VoiceDX7(this.output, this.audioContext);
         testVox.setupVoice(preset);
         testVox.startPlayNote(when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
@@ -692,16 +627,13 @@ class SynthDX7 {
 }
 class BeepDX7 {
     constructor(cntxt) {
-        this.carrier = null;
         this.ready = false;
         this.oscMode = 0;
         this.audioContext = cntxt;
         this.output = this.audioContext.createGain();
         this.envelope = new EnvelopeNode(this.audioContext);
         this.envelope.envelopeGain.connect(this.output);
-        this.modulationLevel = this.audioContext.createGain();
-        this.phaseDelay = this.audioContext.createDelay();
-        this.phaseDelay.connect(this.envelope.envelopeGain);
+        this.phaseNode = new PhaseNode(this.audioContext);
     }
     setupOperator(cfg) {
         this.envelope.setupEnvelope(cfg.rates, cfg.levels);
@@ -715,26 +647,24 @@ class BeepDX7 {
         this.detune = cfg.detune;
     }
     startOperator(when, duration, note) {
-        console.log(this.audioContext.currentTime, 'start at', when, 'duration', duration, 'note', note);
-        if (this.carrier) {
-            this.carrier.disconnect();
-        }
         var OCTAVE_1024 = 1.0006771307;
         let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
         let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
         let carierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
-        console.log('carierFrequency', carierFrequency);
         if (this.oscMode > 0) {
             carierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
             ;
         }
         else {
         }
-        this.phaseDelay.delayTime.value = 0.5 / carierFrequency;
-        this.carrier = this.audioContext.createOscillator();
-        this.carrier.frequency.value = carierFrequency;
-        this.carrier.connect(this.phaseDelay);
-        this.carrier.start(when);
+        console.log('carierFrequency', carierFrequency);
+        if (this.phaseNode.carrierFrequency) {
+            this.phaseNode.carrierFrequency.value = carierFrequency;
+        }
+        if (this.phaseNode.modulationLevel) {
+            this.phaseNode.modulationLevel.value = 4 / 3;
+        }
+        this.phaseNode.carrier.connect(this.envelope.envelopeGain);
         this.envelope.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
@@ -745,6 +675,7 @@ class BeepDX7 {
         this.output.connect(outNode);
     }
     connectToCarrier(opDX7) {
+        this.output.connect(opDX7.phaseNode.carrier);
     }
     connectToSelf() {
     }
@@ -806,15 +737,108 @@ class VoiceDX7 {
         }
     }
 }
+let skipLoadPhaseWorkletSource = false;
+function loadPhaseWorkletSource(audioContext, onDone) {
+    if (skipLoadPhaseWorkletSource) {
+        onDone();
+    }
+    else {
+        loadAudioWorkletCode(phaseWorkletSource, audioContext, () => {
+            skipLoadPhaseWorkletSource = true;
+            onDone();
+        });
+    }
+}
+let phaseWorkletSource = `
+class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
+	phase = 0;
+	cntr = 0;
+	constructor() {
+		super();
+	}
+	static get parameterDescriptors() {
+		return [
+			{ name: "carrierFrequency", automationRate: "a-rate" }
+			, { name: "modulationLevel", automationRate: "a-rate" }
+		];
+	}
+	readSample(inputs, xx) {
+		let inputSumm = 0;
+		for (let ii = 0; ii < inputs.length; ii++) {
+			let singleInput = inputs[ii];
+			let channelCount = singleInput.length;
+			if (channelCount) {
+				let channelSumm = 0;
+				for (let ch = 0; ch < singleInput.length; ch++) {
+					let singleChannel = singleInput[ch];
+					channelSumm = channelSumm + singleChannel[xx];
+				}
+				inputSumm = inputSumm + channelSumm / channelCount;
+			}
+		}
+		return inputSumm;
+	}
+	writeSample(outputs, xx, value) {
+		for (let oo = 0; oo < outputs.length; oo++) {
+			let singleOutput = outputs[oo];
+			for (let ch = 0; ch < singleOutput.length; ch++) {
+				let singleChannel = singleOutput[ch];
+				singleChannel[xx] = value;
+			}
+		}
+	}
+	process(inputs, outputs, parameters) {
+		let outSampleCount = outputs[0][0].length;
+		let frequency = parameters["carrierFrequency"][0];
+		let level = parameters["modulationLevel"][0];
+		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
+
+		for (let xx = 0; xx < outSampleCount; xx++) {
+			let inputSumm = this.readSample(inputs, xx);
+			let resultValue = Math.sin(this.phase + level * inputSumm);
+			this.writeSample(outputs, xx, resultValue);
+			this.phase = this.phase + incrementBySample;
+			if (this.phase >= Math.PI * 2) {
+				this.phase = this.phase - Math.PI * 2;
+			}
+		}
+		return true;
+	}
+}
+registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
+`;
+class PhaseNode {
+    constructor(audioContext) {
+        this.carrier = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
+        let descriptors = this.carrier.parameters;
+        this.carrierFrequency = descriptors.get('carrierFrequency');
+        this.modulationLevel = descriptors.get('modulationLevel');
+    }
+}
+function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
+    let blob = new Blob([audioworkletcode], { type: 'application/javascript' });
+    let reader = new FileReader();
+    reader.onloadend = function () {
+        let blobURL = reader.result;
+        audioContext.audioWorklet.addModule(blobURL)
+            .then((vv) => {
+            onDone();
+        });
+    };
+    reader.readAsDataURL(blob);
+}
 let synth;
 let acx;
 function initTester() {
     console.log('initTester');
     acx = new window.AudioContext();
-    synth = new SynthDX7(acx);
+    loadPhaseWorkletSource(acx, () => {
+        console.log('skipLoadPhaseWorkletSource', skipLoadPhaseWorkletSource);
+        synth = new SynthDX7(acx);
+    });
 }
 function testPlay() {
     console.log('testPlay');
-    synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 1.2, delta: 0 }]);
+    synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
 }
 //# sourceMappingURL=tester.js.map
