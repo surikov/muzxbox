@@ -60,6 +60,248 @@ type DX7PresetData = {
 	operators: DX7OperatorData[];
 	feedback: number;
 };
+let brass1preset={
+    "algorithm": 22,
+    "feedback": 7,
+    "operators": [
+        {
+            "rates": [
+                72,
+                76,
+                99,
+                71
+            ],
+            "levels": [
+                99,
+                88,
+                96,
+                0
+            ],
+            "keyScaleBreakpoint": 39,
+            "keyScaleDepthL": 0,
+            "keyScaleDepthR": 14,
+            "keyScaleCurveL": 3,
+            "keyScaleCurveR": 3,
+            "keyScaleRate": 0,
+            "detune": 7,
+            "lfoAmpModSens": 0,
+            "velocitySens": 0,
+            "volume": 98,
+            "oscMode": 0,
+            "freqCoarse": 0,
+            "freqFine": 0,
+            "pan": 0,
+            "idx": 0,
+            "enabled": true,
+            "outputLevel": 15.282672,
+            "freqRatio": 0.5,
+            "ampL": 0.7071067811865476,
+            "ampR": 0.7071067811865475,
+            "$$hashKey": "object:718"
+        },
+        {
+            "rates": [
+                62,
+                51,
+                29,
+                71
+            ],
+            "levels": [
+                82,
+                95,
+                96,
+                0
+            ],
+            "keyScaleBreakpoint": 27,
+            "keyScaleDepthL": 0,
+            "keyScaleDepthR": 7,
+            "keyScaleCurveL": 3,
+            "keyScaleCurveR": 1,
+            "keyScaleRate": 0,
+            "detune": 7,
+            "lfoAmpModSens": 0,
+            "velocitySens": 0,
+            "volume": 86,
+            "oscMode": 0,
+            "freqCoarse": 0,
+            "freqFine": 0,
+            "pan": 25,
+            "idx": 1,
+            "enabled": true,
+            "outputLevel": 5.40323913,
+            "freqRatio": 0.5,
+            "ampL": 0.38268343236508984,
+            "ampR": 0.9238795325112867,
+            "$$hashKey": "object:717"
+        },
+        {
+            "rates": [
+                77,
+                76,
+                82,
+                71
+            ],
+            "levels": [
+                99,
+                98,
+                98,
+                0
+            ],
+            "keyScaleBreakpoint": 39,
+            "keyScaleDepthL": 0,
+            "keyScaleDepthR": 0,
+            "keyScaleCurveL": 3,
+            "keyScaleCurveR": 3,
+            "keyScaleRate": 0,
+            "detune": -2,
+            "lfoAmpModSens": 0,
+            "velocitySens": 2,
+            "volume": 99,
+            "oscMode": 0,
+            "freqCoarse": 1,
+            "freqFine": 0,
+            "pan": -25,
+            "idx": 2,
+            "enabled": true,
+            "outputLevel": 16.6658671,
+            "freqRatio": 1,
+            "ampL": 0.9238795325112867,
+            "ampR": 0.3826834323650898,
+            "$$hashKey": "object:716"
+        },
+        {
+            "rates": [
+                77,
+                36,
+                41,
+                71
+            ],
+            "levels": [
+                99,
+                98,
+                98,
+                0
+            ],
+            "keyScaleBreakpoint": 39,
+            "keyScaleDepthL": 0,
+            "keyScaleDepthR": 0,
+            "keyScaleCurveL": 3,
+            "keyScaleCurveR": 3,
+            "keyScaleRate": 0,
+            "detune": 0,
+            "lfoAmpModSens": 0,
+            "velocitySens": 2,
+            "volume": 99,
+            "oscMode": 0,
+            "freqCoarse": 1,
+            "freqFine": 0,
+            "pan": 0,
+            "idx": 3,
+            "enabled": true,
+            "outputLevel": 16.6658671,
+            "freqRatio": 1,
+            "ampL": 0.7071067811865476,
+            "ampR": 0.7071067811865475,
+            "$$hashKey": "object:715"
+        },
+        {
+            "rates": [
+                77,
+                36,
+                41,
+                71
+            ],
+            "levels": [
+                99,
+                98,
+                98,
+                0
+            ],
+            "keyScaleBreakpoint": 39,
+            "keyScaleDepthL": 0,
+            "keyScaleDepthR": 0,
+            "keyScaleCurveL": 3,
+            "keyScaleCurveR": 3,
+            "keyScaleRate": 0,
+            "detune": 1,
+            "lfoAmpModSens": 0,
+            "velocitySens": 2,
+            "volume": 98,
+            "oscMode": 0,
+            "freqCoarse": 1,
+            "freqFine": 0,
+            "pan": 25,
+            "idx": 4,
+            "enabled": true,
+            "outputLevel": 15.282672,
+            "freqRatio": 1,
+            "ampL": 0.38268343236508984,
+            "ampR": 0.9238795325112867,
+            "$$hashKey": "object:714"
+        },
+        {
+            "rates": [
+                49,
+                99,
+                28,
+                68
+            ],
+            "levels": [
+                98,
+                98,
+                91,
+                0
+            ],
+            "keyScaleBreakpoint": 39,
+            "keyScaleDepthL": 54,
+            "keyScaleDepthR": 50,
+            "keyScaleCurveL": 1,
+            "keyScaleCurveR": 1,
+            "keyScaleRate": 4,
+            "detune": 0,
+            "lfoAmpModSens": 0,
+            "velocitySens": 2,
+            "volume": 82,
+            "oscMode": 0,
+            "freqCoarse": 1,
+            "freqFine": 0,
+            "pan": -25,
+            "idx": 5,
+            "enabled": true,
+            "outputLevel": 3.8206667299999997,
+            "freqRatio": 1,
+            "ampL": 0.9238795325112867,
+            "ampR": 0.3826834323650898,
+            "$$hashKey": "object:713"
+        }
+    ],
+    "name": "BRASS   1 ",
+    "lfoSpeed": 37,
+    "lfoDelay": 0,
+    "lfoPitchModDepth": 5,
+    "lfoAmpModDepth": 0,
+    "lfoPitchModSens": 3,
+    "lfoWaveform": 4,
+    "lfoSync": 0,
+    "pitchEnvelope": {
+        "rates": [
+            84,
+            95,
+            95,
+            60
+        ],
+        "levels": [
+            50,
+            50,
+            50,
+            50
+        ]
+    },
+    "controllerModVal": 0,
+    "aftertouchEnabled": 0,
+    "$$hashKey": "object:237",
+    "fbRatio": 1
+};
 let epiano1preset: DX7PresetData = {
 	"algorithm": 5
 	, "feedback": 6
@@ -71,7 +313,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		"rates": [95, 50, 35, 78],
 		"levels": [99, 75, 0, 0],
@@ -107,7 +349,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		"rates": [95, 29, 20, 50],
 		"levels": [99, 95, 0, 0],
@@ -116,7 +358,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}]
 	, "name": "E.PIANO 1 ",
 	//"lfoSpeed": 34,

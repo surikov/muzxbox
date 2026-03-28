@@ -11,11 +11,14 @@ class BeepDX7 {
 	freqCoarse: number;
 	freqFine: number;
 	detune: number;
+	feedback: GainNode;
+
 	oscMode = 0;
 	constructor(cntxt: AudioContext) {
 		this.audioContext = cntxt;
 
 		this.output = this.audioContext.createGain();
+		this.feedback = this.audioContext.createGain();
 
 		this.envelope = new EnvelopeNode(this.audioContext);
 		this.envelope.envelopeGain.connect(this.output);
@@ -29,8 +32,10 @@ class BeepDX7 {
 
 		//this.modulationLevel.connect(this.phaseDelay.delayTime);
 		this.phaseNode = new PhaseNode(this.audioContext);
+
+		this.feedback.connect(this.phaseNode.carrier);
 	}
-	setupOperator(cfg: DX7OperatorData) {
+	setupOperator(cfg: DX7OperatorData, fb: number) {
 		this.envelope.setupEnvelope(cfg.rates, cfg.levels);
 		this.ready = true;
 		this.oscMode = cfg.oscMode;
@@ -40,6 +45,9 @@ class BeepDX7 {
 			this.freqCoarse = 0.5;
 		}
 		this.detune = cfg.detune;
+		this.feedback.gain.value = Math.pow(2, (fb - 7));
+
+
 	}
 	startOperator(when: number, duration: number, note: number) {
 		//console.log(this.audioContext.currentTime, 'start at', when, 'duration', duration, 'note', note);
@@ -66,7 +74,7 @@ class BeepDX7 {
 			this.phaseNode.carrierFrequency.value = carierFrequency;
 		}
 		if (this.phaseNode.modulationLevel) {
-			this.phaseNode.modulationLevel.value = 4/3;
+			this.phaseNode.modulationLevel.value = 4 / 3;
 		}
 		//this.phaseDelay.delayTime.value = 0.5 / carierFrequency;
 		//this.modulationLevel.gain.value = (4/3) / (2 * Math.PI * carierFrequency);
@@ -95,5 +103,6 @@ class BeepDX7 {
 	}
 	connectToSelf() {
 
+		this.output.connect(this.feedback);
 	}
 }

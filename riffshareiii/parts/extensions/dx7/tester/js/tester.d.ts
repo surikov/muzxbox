@@ -317,6 +317,51 @@ type DX7PresetData = {
     operators: DX7OperatorData[];
     feedback: number;
 };
+declare let brass1preset: {
+    algorithm: number;
+    feedback: number;
+    operators: {
+        rates: number[];
+        levels: number[];
+        keyScaleBreakpoint: number;
+        keyScaleDepthL: number;
+        keyScaleDepthR: number;
+        keyScaleCurveL: number;
+        keyScaleCurveR: number;
+        keyScaleRate: number;
+        detune: number;
+        lfoAmpModSens: number;
+        velocitySens: number;
+        volume: number;
+        oscMode: number;
+        freqCoarse: number;
+        freqFine: number;
+        pan: number;
+        idx: number;
+        enabled: boolean;
+        outputLevel: number;
+        freqRatio: number;
+        ampL: number;
+        ampR: number;
+        $$hashKey: string;
+    }[];
+    name: string;
+    lfoSpeed: number;
+    lfoDelay: number;
+    lfoPitchModDepth: number;
+    lfoAmpModDepth: number;
+    lfoPitchModSens: number;
+    lfoWaveform: number;
+    lfoSync: number;
+    pitchEnvelope: {
+        rates: number[];
+        levels: number[];
+    };
+    controllerModVal: number;
+    aftertouchEnabled: number;
+    $$hashKey: string;
+    fbRatio: number;
+};
 declare let epiano1preset: DX7PresetData;
 declare let defaultBrass1test: {
     algorithm: number;
@@ -430,9 +475,10 @@ declare class BeepDX7 {
     freqCoarse: number;
     freqFine: number;
     detune: number;
+    feedback: GainNode;
     oscMode: number;
     constructor(cntxt: AudioContext);
-    setupOperator(cfg: DX7OperatorData): void;
+    setupOperator(cfg: DX7OperatorData, fb: number): void;
     startOperator(when: number, duration: number, note: number): void;
     frequencyFromNoteNumber(note: number): number;
     connectToOutputNode(outNode: AudioNode): void;
