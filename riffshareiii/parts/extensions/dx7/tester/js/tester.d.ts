@@ -445,6 +445,7 @@ declare let _defaultBrass1test: {
     aftertouchEnabled: number;
     fbRatio: number;
 };
+declare var OUTPUT_LEVEL_TABLE: number[];
 declare class EnvelopeNode {
     minTimeDelta: number;
     maxReleaseDelta: number;
@@ -508,3 +509,10 @@ declare let synth: SynthDX7;
 declare let acx: AudioContext;
 declare function initTester(): void;
 declare function testPlay(): void;
+declare function decayIncrementValue(nn: number): number;
+declare function outputlevelArrayValue(nn: number): number;
+declare function targetLevelValue0(nn: number): number;
+declare function targetLevelValue(nn: number): number;
+declare function outputLUTvalue(nn: number): number;
+declare function level99(nn: number): number;
+declare function dumpTest(): void;

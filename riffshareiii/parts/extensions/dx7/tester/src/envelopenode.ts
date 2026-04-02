@@ -21,7 +21,7 @@ console.log(1, ':', fullSlopeDuration(0, 99, 96));
 console.log(2, ':', fullSlopeDuration(96, 75, 25));
 console.log(3, ':', fullSlopeDuration(75, 0, 25));
 */
-/*
+
 var OUTPUT_LEVEL_TABLE = [
 	0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
 	0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
@@ -33,7 +33,7 @@ var OUTPUT_LEVEL_TABLE = [
 	1.063630, 1.159897, 1.264876, 1.379357, 1.504200, 1.640341, 1.788805, 1.950706, 2.127260, 2.319793,
 	2.529752, 2.758714, 3.008399, 3.280683, 3.577610, 3.901411, 4.254519, 4.639586, 5.059505, 5.517429,
 	6.016799, 6.561366, 7.155220, 7.802823, 8.509039, 9.279172, 10.11901, 11.03486, 12.03360, 13.12273
-];*/
+];
 class EnvelopeNode {
 	minTimeDelta: number = 0.005;
 	maxReleaseDelta: number = 0.5;
@@ -49,6 +49,7 @@ class EnvelopeNode {
 		this.down0now();
 	}
 	rate99Duration(r99: number, from: number, to: number) {
+		/*
 		let duration = 3 / Math.pow(2, 16 * r99 / 100 - 7);
 		if (from < to) {
 			//console.log(from,to,'up',r99,duration/2);
@@ -59,8 +60,20 @@ class EnvelopeNode {
 		}
 		//console.log(r99,duration);
 		//return duration;
+		*/
+		let speed = 0.2819 * Math.pow(2, r99 * 0.16);
+		let fullDuration = 99 / speed;
+		let partDuration = fullDuration * (from - to) / 99;
+		if (partDuration > 0) {
+			//
+		} else {
+			partDuration = - partDuration / 3;
+		}
+		console.log(r99, from, to, partDuration);
+		return partDuration;
 	}
 	setupEnvelope(rates: number[], levels: number[]) {
+		//console.log(rates,this.volumes);
 		this.slopes[0] = this.rate99Duration(rates[0], levels[3], levels[0]);
 		this.slopes[1] = this.rate99Duration(rates[1], levels[0], levels[1]);
 		this.slopes[2] = this.rate99Duration(rates[2], levels[1], levels[2]);
@@ -69,6 +82,8 @@ class EnvelopeNode {
 		this.volumes[1] = levels[1] / 100;
 		this.volumes[2] = levels[2] / 100;
 		this.volumes[3] = levels[3] / 100;
+		console.log('levels', levels, this.volumes);
+		console.log('rates', rates, this.slopes);
 	}
 	// Helper to convert DX7 "Rate" (0-99) to seconds
 	// Higher rate = faster speed = shorter time
@@ -94,19 +109,19 @@ class EnvelopeNode {
 		//this.envelopeGain.gain.setValueAtTime(0, when + wholeDuration);
 		//console.log('volumes', this.volumes, 'slopes', this.slopes);
 		this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
-		let attackDuration = this.slopes[0] * Math.abs(this.volumes[3] - this.volumes[0]);
+		let attackDuration = this.slopes[0];
 		this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);
-		let decayDuration = this.slopes[1] * Math.abs(this.volumes[0] - this.volumes[1]);
+		let decayDuration = this.slopes[1];
 		if (attackDuration + decayDuration < wholeDuration) {
 			this.setupSlope(when + attackDuration, decayDuration, this.volumes[0], this.volumes[1]);
-			let sustainDuration = this.slopes[2] * Math.abs(this.volumes[1] - this.volumes[2]);
+			let sustainDuration = this.slopes[2];
 			if (attackDuration + decayDuration + sustainDuration > wholeDuration) {
 				this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
 			}
 		} else {
 			this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
 		}
-		let releaseDuration = this.slopes[3] * Math.abs(this.volumes[2] - this.volumes[3]);
+		let releaseDuration = this.slopes[3];
 		if (releaseDuration > this.maxReleaseDelta) {
 			releaseDuration = this.maxReleaseDelta;
 		}

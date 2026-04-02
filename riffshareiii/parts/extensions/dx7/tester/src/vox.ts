@@ -22,6 +22,7 @@ class VoiceDX7 {
 		this.connectMixOperators(scheme);
 		for (let ii = 0; ii < 6; ii++) {
 			if (presetData.operators[ii].enabled) {
+				console.log('setupOperator',ii );
 				this.beeps[ii].setupOperator(presetData.operators[ii],presetData.feedback);
 			}
 		}
