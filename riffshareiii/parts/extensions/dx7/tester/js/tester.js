@@ -786,81 +786,52 @@ let _defaultBrass1test = {
     aftertouchEnabled: 0,
     fbRatio: 1
 };
-var OUTPUT_LEVEL_TABLE = [
-    0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
-    0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
-    0.013975, 0.015240, 0.016619, 0.018123, 0.019764, 0.021552, 0.023503, 0.025630, 0.027950, 0.030480,
-    0.033238, 0.036247, 0.039527, 0.043105, 0.047006, 0.051261, 0.055900, 0.060960, 0.066477, 0.072494,
-    0.079055, 0.086210, 0.094012, 0.102521, 0.111800, 0.121919, 0.132954, 0.144987, 0.158110, 0.172420,
-    0.188025, 0.205043, 0.223601, 0.243838, 0.265907, 0.289974, 0.316219, 0.344839, 0.376050, 0.410085,
-    0.447201, 0.487676, 0.531815, 0.579948, 0.632438, 0.689679, 0.752100, 0.820171, 0.894403, 0.975353,
-    1.063630, 1.159897, 1.264876, 1.379357, 1.504200, 1.640341, 1.788805, 1.950706, 2.127260, 2.319793,
-    2.529752, 2.758714, 3.008399, 3.280683, 3.577610, 3.901411, 4.254519, 4.639586, 5.059505, 5.517429,
-    6.016799, 6.561366, 7.155220, 7.802823, 8.509039, 9.279172, 10.11901, 11.03486, 12.03360, 13.12273
-];
 class EnvelopeNode {
     constructor(ctx) {
         this.minTimeDelta = 0.005;
         this.maxReleaseDelta = 0.5;
         this.slopes = [];
-        this.volumes = [];
         this.doneTime = 0;
         this.envelopeContext = ctx;
         this.envelopeGain = this.envelopeContext.createGain();
         this.down0now();
     }
-    rate99Duration(r99, from, to) {
-        let speed = 0.2819 * Math.pow(2, r99 * 0.16);
-        let fullDuration = 99 / speed;
-        let partDuration = fullDuration * (from - to) / 99;
-        if (partDuration > 0) {
-        }
-        else {
-            partDuration = -partDuration / 3;
-        }
-        console.log(r99, from, to, partDuration);
-        return partDuration;
+    level99to1value(nn) {
+        let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
+        return rr;
     }
-    setupEnvelope(rates, levels) {
-        this.slopes[0] = this.rate99Duration(rates[0], levels[3], levels[0]);
-        this.slopes[1] = this.rate99Duration(rates[1], levels[0], levels[1]);
-        this.slopes[2] = this.rate99Duration(rates[2], levels[1], levels[2]);
-        this.slopes[3] = this.rate99Duration(rates[3], levels[2], levels[3]);
-        this.volumes[0] = levels[0] / 100;
-        this.volumes[1] = levels[1] / 100;
-        this.volumes[2] = levels[2] / 100;
-        this.volumes[3] = levels[3] / 100;
-        console.log('levels', levels, this.volumes);
-        console.log('rates', rates, this.slopes);
+    slopeDuration(r99, from99, to99) {
+        let speed = Math.pow(2, r99 * 0.16 - 11);
+        let fullDuration = 0.17 / speed;
+        if (from99 < to99) {
+            fullDuration = fullDuration / 2;
+        }
+        let from = this.level99to1value(from99);
+        let to = this.level99to1value(to99);
+        let partLevel = Math.abs(from99 - to99) / 100;
+        let partDuration = fullDuration * partLevel;
+        console.log(r99, speed, 'duration', fullDuration, '/', partDuration, ':', from, '>', to, ':', partLevel);
+        return { duration: partDuration, from: from, to: to };
     }
-    setupSlope(when, duration, from, to) {
-        if (from < to) {
-            this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
-        }
-        else {
-            this.envelopeGain.gain.linearRampToValueAtTime(to, when + duration);
-        }
+    setupEnvelope(rates99, levels99) {
+        this.slopes[0] = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
+        this.slopes[1] = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
+        this.slopes[2] = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
+        this.slopes[3] = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
+        console.log('rates', rates99, 'levels', levels99, 'slopes', this.slopes);
     }
     startEnvelope(when, wholeDuration) {
-        this.envelopeGain.gain.linearRampToValueAtTime(this.volumes[3], when);
-        let attackDuration = this.slopes[0];
-        this.setupSlope(when, attackDuration, this.volumes[3], this.volumes[0]);
-        let decayDuration = this.slopes[1];
-        if (attackDuration + decayDuration < wholeDuration) {
-            this.setupSlope(when + attackDuration, decayDuration, this.volumes[0], this.volumes[1]);
-            let sustainDuration = this.slopes[2];
-            if (attackDuration + decayDuration + sustainDuration > wholeDuration) {
-                this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
-            }
-        }
-        else {
-            this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
-        }
-        let releaseDuration = this.slopes[3];
-        if (releaseDuration > this.maxReleaseDelta) {
-            releaseDuration = this.maxReleaseDelta;
-        }
-        this.envelopeGain.gain.linearRampToValueAtTime(0, when + wholeDuration + releaseDuration);
+        this.envelopeGain.gain.setValueAtTime(this.slopes[0].from, when);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[0].to, when + this.slopes[0].duration);
+        this.envelopeGain.gain.cancelAndHoldAtTime(when + this.slopes[0].duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[1].from, 0.001 + when + this.slopes[0].duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[1].to, when + this.slopes[0].duration + this.slopes[1].duration);
+        this.envelopeGain.gain.cancelAndHoldAtTime(when + this.slopes[0].duration + this.slopes[1].duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[2].from, 0.001 + when + this.slopes[0].duration + this.slopes[1].duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[2].to, when + this.slopes[0].duration + this.slopes[1].duration + this.slopes[2].duration);
+        this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[3].from, 0.001 + when + wholeDuration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[3].to, when + wholeDuration + this.slopes[3].duration);
     }
     down0now() {
         this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
@@ -1105,9 +1076,20 @@ function testPlay() {
     console.log('testPlay');
     synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
 }
+function decayIncrementValue0(nn) {
+    var rate_scaling = 0;
+    let qr = Math.min(63, rate_scaling + ((nn * 41) >> 6));
+    let decayIncrement = Math.pow(2, qr / 4) / 2048;
+    return decayIncrement;
+}
 function decayIncrementValue(nn) {
     let decayIncrement = Math.pow(2, nn * 0.16 - 11);
     return decayIncrement;
+}
+function outputlevelArrayValue0(nn) {
+    let kk = Math.log(nn + 1) * 14;
+    let val = 0.6 * (kk + nn);
+    return Math.round(val);
 }
 function outputlevelArrayValue(nn) {
     let kk = Math.log(nn + 1) * 14;
@@ -1132,13 +1114,33 @@ function outputLUTvalue(nn) {
     return Math.pow(20, (dB / 20));
 }
 function level99(nn) {
-    let rr = Math.pow(2.5, nn / 10 - 7.45) / 10;
+    let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
+    return rr;
+}
+function scale99(n99) {
+    let rr = Math.pow(2, n99 * 0.16 - 11);
     return rr;
 }
 function dumpTest() {
     for (let nn = 0; nn < 100; nn++) {
-        console.log(nn, targetLevelValue0(nn), targetLevelValue(nn), outputLUTvalue(targetLevelValue0(nn)), '/', level99(nn));
+        let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
+        console.log(nn, 'increment', scale99(nn), 'target', targetLevelValue0(nn), ':', (targetLevelValue0(99) / scale99(nn)) / 20000);
     }
+    let levelFrom = 0;
+    let levelTo = 99;
+    let rate = 96;
+    let dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
+    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
+    levelFrom = 99;
+    levelTo = 75;
+    rate = 25;
+    dif = targetLevelValue0(levelFrom) - targetLevelValue0(levelTo);
+    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
+    levelFrom = 0;
+    levelTo = 99;
+    rate = 0;
+    dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
+    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
 }
 dumpTest();
 //# sourceMappingURL=tester.js.map

@@ -445,19 +445,22 @@ declare let _defaultBrass1test: {
     aftertouchEnabled: number;
     fbRatio: number;
 };
-declare var OUTPUT_LEVEL_TABLE: number[];
+type SlopeInfo = {
+    duration: number;
+    from: number;
+    to: number;
+};
 declare class EnvelopeNode {
     minTimeDelta: number;
     maxReleaseDelta: number;
     envelopeContext: AudioContext;
     envelopeGain: GainNode;
-    slopes: number[];
-    volumes: number[];
+    slopes: SlopeInfo[];
     doneTime: number;
     constructor(ctx: AudioContext);
-    rate99Duration(r99: number, from: number, to: number): number;
-    setupEnvelope(rates: number[], levels: number[]): void;
-    setupSlope(when: number, duration: number, from: number, to: number): void;
+    level99to1value(nn: number): number;
+    slopeDuration(r99: number, from99: number, to99: number): SlopeInfo;
+    setupEnvelope(rates99: number[], levels99: number[]): void;
     startEnvelope(when: number, wholeDuration: number): void;
     down0now(): void;
 }
@@ -509,10 +512,13 @@ declare let synth: SynthDX7;
 declare let acx: AudioContext;
 declare function initTester(): void;
 declare function testPlay(): void;
+declare function decayIncrementValue0(nn: number): number;
 declare function decayIncrementValue(nn: number): number;
+declare function outputlevelArrayValue0(nn: number): number;
 declare function outputlevelArrayValue(nn: number): number;
 declare function targetLevelValue0(nn: number): number;
 declare function targetLevelValue(nn: number): number;
 declare function outputLUTvalue(nn: number): number;
 declare function level99(nn: number): number;
+declare function scale99(n99: number): number;
 declare function dumpTest(): void;

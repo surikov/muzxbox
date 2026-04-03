@@ -28,16 +28,21 @@ function testPlay() {
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
 
 }
-/*
+
 function decayIncrementValue0(nn: number): number {
 	var rate_scaling = 0;
 	let qr = Math.min(63, rate_scaling + ((nn * 41) >> 6)); // 5 -> 3; 49 -> 31; 99 -> 63
 	let decayIncrement = Math.pow(2, qr / 4) / 2048;
 	return decayIncrement;
-}*/
+}
 function decayIncrementValue(nn: number): number {
 	let decayIncrement = Math.pow(2, nn * 0.16 - 11);
 	return decayIncrement;
+}
+function outputlevelArrayValue0(nn: number) {
+	let kk = Math.log(nn + 1) * 14;
+	let val = 0.6 * (kk + nn);
+	return Math.round(val);
 }
 function outputlevelArrayValue(nn: number) {
 	let kk = Math.log(nn + 1) * 14;
@@ -69,9 +74,37 @@ function outputLUTvalue(nn: number): number {
 	return Math.pow(20, (dB / 20));
 }
 function level99(nn: number): number {
-	let rr = Math.pow(2.5, nn / 10 - 7.45) / 10;
+	let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
 	return rr;
 }
+function scale99(n99: number) {
+	let rr = Math.pow(2, n99 * 0.16 - 11);
+	return rr;
+}
+/*
+rate/ticks
+99/18
+98/22
+97/22
+96/26
+95/32
+94/32
+93/38
+92/46
+91/46
+90/55
+85/94
+80/160
+75/271
+70/545
+60/1547
+50/4380
+40/14740
+30/41694
+20/140249
+10/396688
+0/1122008 - 24.63s
+*/
 function dumpTest() {
 	//outputLUTvalue(0);
 	for (let nn = 0; nn < 100; nn++) {
@@ -79,8 +112,25 @@ function dumpTest() {
 		//let kk=Math.log(nn+1)*14;
 		//let val=0.6*(kk+nn)*127/99;
 		//y=0.01\cdot1.0965^{x}
+		//let speed = Math.pow(2, nn * 0.16 - 11);
+		let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
+		console.log(nn, 'increment', scale99(nn), 'target', targetLevelValue0(nn),':',(targetLevelValue0(99)/scale99(nn))/20000);
 
-		console.log(nn, targetLevelValue0(nn), targetLevelValue(nn), outputLUTvalue(targetLevelValue0(nn)), '/', level99(nn));
 	}
+	let levelFrom = 0;
+	let levelTo = 99;
+	let rate = 96;
+	let dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
+	console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate))/33000);
+	levelFrom = 99;
+	levelTo = 75;
+	rate = 25;
+	dif = targetLevelValue0(levelFrom) - targetLevelValue0(levelTo);
+	console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration',(dif / scale99(rate))/33000);
+	levelFrom = 0;
+	levelTo = 99;
+	rate = 0;
+	dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
+	console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate))/33000);
 }
 dumpTest();
