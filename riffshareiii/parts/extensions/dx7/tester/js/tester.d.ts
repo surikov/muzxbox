@@ -521,4 +521,7 @@ declare function targetLevelValue(nn: number): number;
 declare function outputLUTvalue(nn: number): number;
 declare function level99(nn: number): number;
 declare function scale99(n99: number): number;
+declare function speedRatio(nn: number): number;
+declare function durationDown(nn: number): number;
+declare function levelRatio(nn: number): number;
 declare function dumpTest(): void;

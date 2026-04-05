@@ -1121,26 +1121,32 @@ function scale99(n99) {
     let rr = Math.pow(2, n99 * 0.16 - 11);
     return rr;
 }
+function speedRatio(nn) {
+    let speed = Math.pow(2, nn * 0.16 - 11);
+    return speed;
+}
+function durationDown(nn) {
+    let ss = speedRatio(nn);
+    return 4590 / ss;
+}
+function levelRatio(nn) {
+    let ratio = Math.log(nn + 1) * 14 + nn;
+    return ratio;
+}
 function dumpTest() {
-    for (let nn = 0; nn < 100; nn++) {
-        let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
-        console.log(nn, 'increment', scale99(nn), 'target', targetLevelValue0(nn), ':', (targetLevelValue0(99) / scale99(nn)) / 20000);
+    for (let nn = 0; nn <= 100; nn++) {
+        console.log(nn, 'speed', speedRatio(nn), 'durationDown', durationDown(nn), 'ratio', levelRatio(nn));
     }
-    let levelFrom = 0;
-    let levelTo = 99;
-    let rate = 96;
-    let dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
-    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
-    levelFrom = 99;
-    levelTo = 75;
-    rate = 25;
-    dif = targetLevelValue0(levelFrom) - targetLevelValue0(levelTo);
-    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
-    levelFrom = 0;
-    levelTo = 99;
-    rate = 0;
-    dif = targetLevelValue0(levelTo) - targetLevelValue0(levelFrom);
-    console.log('increment', scale99(rate), 'start', targetLevelValue0(levelFrom), 'target', targetLevelValue0(levelTo), 'dif', dif, 'duration', (dif / scale99(rate)) / 33000);
+    let rr = 75;
+    let full = durationDown(rr);
+    let rr2 = 50;
+    let full2 = durationDown(rr2);
+    console.log(rr, rr2);
+    for (let ii = 0; ii < 10; ii++) {
+        let vv = (10 - ii) * 10;
+        let part = (levelRatio(vv) - levelRatio(vv - 10)) / levelRatio(100);
+        console.log('' + vv + '-' + (vv - 10), part * full, part * full2);
+    }
 }
 dumpTest();
 //# sourceMappingURL=tester.js.map
