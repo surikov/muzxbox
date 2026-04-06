@@ -286,7 +286,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": true
+            "enabled": false
         }, {
             "rates": [95, 50, 35, 78],
             "levels": [99, 75, 0, 0],
@@ -304,7 +304,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 29, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -313,7 +313,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 20, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -796,22 +796,32 @@ class EnvelopeNode {
         this.envelopeGain = this.envelopeContext.createGain();
         this.down0now();
     }
-    level99to1value(nn) {
-        let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
-        return rr;
+    scale99(nn) {
+        let speed = Math.pow(2, nn * 0.16 - 11);
+        return speed;
+    }
+    durationDown(nn) {
+        let ss = this.scale99(nn);
+        return 0.05 / ss;
+    }
+    durationUp(nn) {
+        return 0.5 * this.durationDown(nn);
+    }
+    levelRatio(nn) {
+        let ratio = Math.log(nn + 1) * 14 + nn;
+        return ratio;
     }
     slopeDuration(r99, from99, to99) {
-        let speed = Math.pow(2, r99 * 0.16 - 11);
-        let fullDuration = 0.17 / speed;
+        let fromRatio = this.levelRatio(from99);
+        let toRatio = this.levelRatio(to99);
+        let fullRatio = this.levelRatio(100);
+        let partDuration = Math.abs(fromRatio - toRatio) / fullRatio;
+        let fullDuration = this.durationDown(r99);
+        console.log(r99, 'partDuration', partDuration, 'fullDuration', fullDuration, 'speed', this.scale99(r99));
         if (from99 < to99) {
-            fullDuration = fullDuration / 2;
+            fullDuration = this.durationUp(r99);
         }
-        let from = this.level99to1value(from99);
-        let to = this.level99to1value(to99);
-        let partLevel = Math.abs(from99 - to99) / 100;
-        let partDuration = fullDuration * partLevel;
-        console.log(r99, speed, 'duration', fullDuration, '/', partDuration, ':', from, '>', to, ':', partLevel);
-        return { duration: partDuration, from: from, to: to };
+        return { duration: partDuration * fullDuration, from: this.scale99(from99) / 32, to: this.scale99(to99) / 32 };
     }
     setupEnvelope(rates99, levels99) {
         this.slopes[0] = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
@@ -878,30 +888,33 @@ class BeepDX7 {
         }
         this.detune = cfg.detune;
         this.feedback.gain.value = Math.pow(2, (fb - 7));
+        this.output.gain.value = cfg.volume / 99;
     }
     startOperator(when, duration, note) {
         var OCTAVE_1024 = 1.0006771307;
         let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
         let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
-        let carierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
+        let carrierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
         if (this.oscMode > 0) {
-            carierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
+            carrierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);
             ;
         }
         else {
         }
-        console.log('carierFrequency', carierFrequency);
+        console.log('carrierFrequency', carrierFrequency);
         if (this.phaseNode.carrierFrequency) {
-            this.phaseNode.carrierFrequency.value = carierFrequency;
+            this.phaseNode.carrierFrequency.value = carrierFrequency;
         }
         if (this.phaseNode.modulationLevel) {
-            this.phaseNode.modulationLevel.value = 4 / 3;
+            this.phaseNode.modulationLevel.value = Math.PI * 2;
         }
         this.phaseNode.carrier.connect(this.envelope.envelopeGain);
         this.envelope.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
-        return 440 * Math.pow(2, (note - 69) / 12);
+        let ff = 440 * Math.pow(2, (note - 69) / 12);
+        console.log('frequencyFromNoteNumber', note, ff);
+        return ff;
     }
     ;
     connectToOutputNode(outNode) {
@@ -1076,77 +1089,7 @@ function testPlay() {
     console.log('testPlay');
     synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
 }
-function decayIncrementValue0(nn) {
-    var rate_scaling = 0;
-    let qr = Math.min(63, rate_scaling + ((nn * 41) >> 6));
-    let decayIncrement = Math.pow(2, qr / 4) / 2048;
-    return decayIncrement;
-}
-function decayIncrementValue(nn) {
-    let decayIncrement = Math.pow(2, nn * 0.16 - 11);
-    return decayIncrement;
-}
-function outputlevelArrayValue0(nn) {
-    let kk = Math.log(nn + 1) * 14;
-    let val = 0.6 * (kk + nn);
-    return Math.round(val);
-}
-function outputlevelArrayValue(nn) {
-    let kk = Math.log(nn + 1) * 14;
-    let val = 0.6 * (kk + nn) * 127 / 99;
-    return Math.round(val);
-}
-function targetLevelValue0(nn) {
-    let targetlevel = Math.max(0, (outputlevelArrayValue(nn) << 5) - 224);
-    return targetlevel;
-}
-function targetLevelValue(nn) {
-    if (nn) {
-        let targetlevel = (outputlevelArrayValue(nn) * 32) - 224;
-        return targetlevel;
-    }
-    else {
-        return 0;
-    }
-}
-function outputLUTvalue(nn) {
-    var dB = (nn - 3824) * 0.0235;
-    return Math.pow(20, (dB / 20));
-}
-function level99(nn) {
-    let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
-    return rr;
-}
-function scale99(n99) {
-    let rr = Math.pow(2, n99 * 0.16 - 11);
-    return rr;
-}
-function speedRatio(nn) {
-    let speed = Math.pow(2, nn * 0.16 - 11);
-    return speed;
-}
-function durationDown(nn) {
-    let ss = speedRatio(nn);
-    return 4590 / ss;
-}
-function levelRatio(nn) {
-    let ratio = Math.log(nn + 1) * 14 + nn;
-    return ratio;
-}
 function dumpTest() {
-    for (let nn = 0; nn <= 100; nn++) {
-        console.log(nn, 'speed', speedRatio(nn), 'durationDown', durationDown(nn), 'ratio', levelRatio(nn));
-    }
-    let rr = 75;
-    let full = durationDown(rr);
-    let rr2 = 50;
-    let full2 = durationDown(rr2);
-    console.log(rr, rr2);
-    for (let ii = 0; ii < 10; ii++) {
-        let vv = (10 - ii) * 10;
-        let part = (levelRatio(vv) - levelRatio(vv - 10)) / levelRatio(100);
-        console.log('' + vv + '-' + (vv - 10), part * full, part * full2);
-    }
 }
 dumpTest();
 //# sourceMappingURL=tester.js.map

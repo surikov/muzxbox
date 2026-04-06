@@ -28,7 +28,7 @@ function testPlay() {
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
 
 }
-
+/*
 function decayIncrementValue0(nn: number): number {
 	var rate_scaling = 0;
 	let qr = Math.min(63, rate_scaling + ((nn * 41) >> 6)); // 5 -> 3; 49 -> 31; 99 -> 63
@@ -62,14 +62,7 @@ function targetLevelValue(nn: number) {
 	}
 }
 function outputLUTvalue(nn: number): number {
-	/*
-	var outputLUT: number[] = [];
-	for (var ii = 0; ii < 4096; ii++) {
-		var dB = (ii - 3824) * 0.0235;
-		outputLUT[ii] = Math.pow(20, (dB / 20));
-	}
-	console.log(outputLUT);
-	*/
+
 	var dB = (nn - 3824) * 0.0235;
 	return Math.pow(20, (dB / 20));
 }
@@ -80,7 +73,7 @@ function level99(nn: number): number {
 function scale99(n99: number) {
 	let rr = Math.pow(2, n99 * 0.16 - 11);
 	return rr;
-}
+}*/
 /*
 rate/ticks
 99/18
@@ -105,23 +98,24 @@ rate/ticks
 10/396688
 0/1122008 - 24.63s
 */
+/*
 function speedRatio(nn: number): number {
 	let speed = Math.pow(2, nn * 0.16 - 11);
 	return speed;
 }
 function durationDown(nn: number): number {
 	let ss = speedRatio(nn);
-	return 4590 / ss;
+	return 0.1 / ss;
 }
 function levelRatio(nn: number): number {
 	let ratio = Math.log(nn + 1) * 14 + nn;
 	return ratio;
-}
+}*/
 function dumpTest() {
-	for (let nn = 0; nn <= 100; nn++) {
+	/*for (let nn = 0; nn <= 100; nn++) {
 		console.log(nn, 'speed', speedRatio(nn), 'durationDown', durationDown(nn), 'ratio', levelRatio(nn));
-	}
-	let rr = 75;
+	}*/
+	/*let rr = 75;
 	let full=durationDown(rr);
 	let rr2 = 50;
 	let full2=durationDown(rr2);
@@ -130,7 +124,7 @@ function dumpTest() {
 		let vv = (10 - ii) * 10 ;
 		let part = (levelRatio(vv) - levelRatio(vv - 10)) / levelRatio(100);
 		console.log(''+vv+'-'+(vv-10),part*full,part*full2);
-	}
+	}*/
 	/*console.log((levelRatio(99) - levelRatio(75)) / levelRatio(100));
 	console.log((levelRatio(75) - levelRatio(50)) / levelRatio(100));
 	console.log((levelRatio(50) - levelRatio(25)) / levelRatio(100));

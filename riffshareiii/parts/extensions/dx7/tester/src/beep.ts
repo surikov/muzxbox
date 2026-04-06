@@ -12,6 +12,7 @@ class BeepDX7 {
 	freqFine: number;
 	detune: number;
 	feedback: GainNode;
+	//volume:number;
 
 	oscMode = 0;
 	constructor(cntxt: AudioContext) {
@@ -47,7 +48,12 @@ class BeepDX7 {
 		this.detune = cfg.detune;
 		this.feedback.gain.value = Math.pow(2, (fb - 7));
 
-
+		this.output.gain.value = cfg.volume / 99;
+		/*if (this.phaseNode.modulationLevel) {
+			let soundFrequency=260;
+			this.phaseNode.modulationLevel.value = 4 / (2 * Math.PI * soundFrequency);
+			
+		}*/
 	}
 	startOperator(when: number, duration: number, note: number) {
 		//console.log(this.audioContext.currentTime, 'start at', when, 'duration', duration, 'note', note);
@@ -62,19 +68,20 @@ class BeepDX7 {
 		var OCTAVE_1024 = 1.0006771307; //Math.exp(Math.log(2)/1024);
 		let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
 		let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
-		let carierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
+		let carrierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
 
 		if (this.oscMode > 0) {
-			carierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);;
+			carrierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);;
 		} else {
 			//
 		}
-		console.log('carierFrequency', carierFrequency);
+		console.log('carrierFrequency', carrierFrequency);
 		if (this.phaseNode.carrierFrequency) {
-			this.phaseNode.carrierFrequency.value = carierFrequency;
+			this.phaseNode.carrierFrequency.value = carrierFrequency;
 		}
 		if (this.phaseNode.modulationLevel) {
-			this.phaseNode.modulationLevel.value = 4 / 3;
+			//this.phaseNode.modulationLevel.value = 4 / 3;
+			this.phaseNode.modulationLevel.value =  Math.PI * 2 ;
 		}
 		//this.phaseDelay.delayTime.value = 0.5 / carierFrequency;
 		//this.modulationLevel.gain.value = (4/3) / (2 * Math.PI * carierFrequency);
@@ -89,7 +96,10 @@ class BeepDX7 {
 		this.envelope.startEnvelope(when, duration);
 	}
 	frequencyFromNoteNumber(note: number) {
-		return 440 * Math.pow(2, (note - 69) / 12);
+
+		let ff = 440 * Math.pow(2, (note - 69) / 12);
+		console.log('frequencyFromNoteNumber', note, ff);
+		return ff;
 	};
 
 	connectToOutputNode(outNode: AudioNode) {

@@ -13,23 +13,50 @@ class EnvelopeNode {
 		this.envelopeGain = this.envelopeContext.createGain();
 		this.down0now();
 	}
-	level99to1value(nn: number) {
+	scale99(nn: number): number {
+		let speed = Math.pow(2, nn * 0.16 - 11);
+		return speed;
+	}
+	durationDown(nn: number): number {
+		let ss = this.scale99(nn);
+		return 0.05 / ss;
+	}
+	durationUp(nn: number): number {
+		return 0.5 * this.durationDown(nn);
+	}
+	levelRatio(nn: number): number {
+		let ratio = Math.log(nn + 1) * 14 + nn;
+		return ratio;
+	}
+	/*level99to1value(nn: number) {
 		let rr = Math.pow(2.55, nn / 10 - 7.45) / 10;
 		return rr;
-	}
+	}*/
 	slopeDuration(r99: number, from99: number, to99: number): SlopeInfo {
-		let speed = Math.pow(2, r99 * 0.16 - 11);
-		let fullDuration = 0.17 / speed;
+		let fromRatio = this.levelRatio(from99);
+		let toRatio = this.levelRatio(to99);
+		let fullRatio = this.levelRatio(100);
+		let partDuration = Math.abs(fromRatio - toRatio) / fullRatio;
+		let fullDuration = this.durationDown(r99);
+		console.log(r99, 'partDuration', partDuration, 'fullDuration', fullDuration, 'speed', this.scale99(r99));
 		if (from99 < to99) {
-			fullDuration = fullDuration / 2;
+			fullDuration = this.durationUp(r99);
 		}
-
-		let from = this.level99to1value(from99);
-		let to = this.level99to1value(to99);
-		let partLevel = Math.abs(from99 - to99) / 100;
-		let partDuration = fullDuration * partLevel;
-		console.log(r99, speed, 'duration', fullDuration, '/', partDuration, ':', from, '>', to, ':', partLevel,);
-		return { duration: partDuration, from: from, to: to };
+		//return { duration: partDuration * fullDuration, from: fromRatio/164, to: toRatio/164 };
+		return { duration: partDuration * fullDuration, from: this.scale99(from99) / 32, to: this.scale99(to99) / 32 };
+		/*
+				let speed = Math.pow(2, r99 * 0.16 - 11);
+				let fullDuration = 0.17 / speed;
+				if (from99 < to99) {
+					fullDuration = fullDuration / 2;
+				}
+				let from = this.level99to1value(from99);
+				let to = this.level99to1value(to99);
+				let partLevel = Math.abs(from99 - to99) / 100;
+				let partDuration = fullDuration * partLevel;
+				console.log(r99, speed, 'duration', fullDuration, '/', partDuration, ':', from, '>', to, ':', partLevel,);
+				return { duration: partDuration, from: from, to: to };
+				*/
 	}
 	setupEnvelope(rates99: number[], levels99: number[]) {
 		this.slopes[0] = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
