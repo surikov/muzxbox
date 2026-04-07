@@ -25,8 +25,8 @@ var outputlevelArray = [0, 5, 9, 13, 17, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39,
 function testPlay() {
 	console.log('testPlay');
 	//synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
-	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
-	synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60+12], [{ duration: 2, delta: 0 }]);
+	synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60+12], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [30], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 2.2, [60], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 4.3, [90], [{ duration: 2, delta: 0 }]);

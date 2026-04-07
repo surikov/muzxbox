@@ -47,7 +47,9 @@ class BeepDX7 {
 		}
 		this.detune = cfg.detune;
 		let fbRatio = Math.pow(2, (fb - 7));
-		this.feedback.gain.value = fbRatio;
+		//this.feedback.gain.value = fbRatio;
+		//this.feedback.gain.value = 0.25;
+		this.feedback.gain.value = fbRatio/3.5;
 
 		this.output.gain.value = 0.2 * cfg.volume / 99;
 		/*if (this.phaseNode.modulationLevel) {

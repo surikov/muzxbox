@@ -95,7 +95,7 @@ let brass1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false,
+            "enabled": true,
         },
         {
             "rates": [
@@ -115,7 +115,7 @@ let brass1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false,
+            "enabled": true,
         },
         {
             "rates": [
@@ -135,7 +135,7 @@ let brass1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false,
+            "enabled": true,
         },
         {
             "rates": [
@@ -155,7 +155,7 @@ let brass1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false,
+            "enabled": true,
         }
     ],
     "name": "BRASS   1 ",
@@ -771,7 +771,7 @@ class BeepDX7 {
         }
         this.detune = cfg.detune;
         let fbRatio = Math.pow(2, (fb - 7));
-        this.feedback.gain.value = fbRatio;
+        this.feedback.gain.value = fbRatio / 3.5;
         this.output.gain.value = 0.2 * cfg.volume / 99;
     }
     startOperator(when, duration, note) {
@@ -970,7 +970,7 @@ function initTester() {
 }
 function testPlay() {
     console.log('testPlay');
-    synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60 + 12], [{ duration: 2, delta: 0 }]);
+    synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
 }
 function speedRatio(nn) {
     let speed = Math.pow(2, nn * 0.16 - 11);
