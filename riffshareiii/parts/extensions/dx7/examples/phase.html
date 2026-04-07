@@ -11,22 +11,27 @@
 		let modulatorBeep = audioContext.createOscillator();
 		let modulationLevel = audioContext.createGain();
 		let phaseDelay = audioContext.createDelay();
+		let delayShift = audioContext.createConstantSource();
 
 		carrier.frequency.value = soundFrequency;
 		modulatorBeep.frequency.value = soundFrequency;
 		modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
 		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 1);
-		phaseDelay.delayTime.value = 0.5 / soundFrequency;
+		//phaseDelay.delayTime.value = 0.5 / soundFrequency;
+		delayShift.offset.value = 0.5 / soundFrequency;
 
 		modulatorBeep.connect(modulationLevel);
 		modulationLevel.connect(phaseDelay.delayTime);
+		delayShift.connect(phaseDelay.delayTime);
 		carrier.connect(phaseDelay);
 		phaseDelay.connect(audioContext.destination);
 
 		modulatorBeep.start(when);
+		delayShift.start(when);
 		carrier.start(when);
 
 		modulatorBeep.stop(when + 1);
+		delayShift.stop(when + 1);
 		carrier.stop(when + 1);
 	}
 </script>
