@@ -24,9 +24,12 @@ var outputlevelArray = [0, 5, 9, 13, 17, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39,
 ];*/
 function testPlay() {
 	console.log('testPlay');
-	synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
-	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
-
+	//synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
+	synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60+12], [{ duration: 2, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [30], [{ duration: 2, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 2.2, [60], [{ duration: 2, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 4.3, [90], [{ duration: 2, delta: 0 }]);
 }
 /*
 function decayIncrementValue0(nn: number): number {
@@ -98,11 +101,12 @@ rate/ticks
 10/396688
 0/1122008 - 24.63s
 */
-/*
+
 function speedRatio(nn: number): number {
 	let speed = Math.pow(2, nn * 0.16 - 11);
 	return speed;
 }
+/*
 function durationDown(nn: number): number {
 	let ss = speedRatio(nn);
 	return 0.1 / ss;
@@ -112,9 +116,9 @@ function levelRatio(nn: number): number {
 	return ratio;
 }*/
 function dumpTest() {
-	/*for (let nn = 0; nn <= 100; nn++) {
-		console.log(nn, 'speed', speedRatio(nn), 'durationDown', durationDown(nn), 'ratio', levelRatio(nn));
-	}*/
+	for (let nn = 0; nn <= 100; nn++) {
+		//console.log(nn, 'durationDown', 0.12/speedRatio(nn));
+	}
 	/*let rr = 75;
 	let full=durationDown(rr);
 	let rr2 = 50;

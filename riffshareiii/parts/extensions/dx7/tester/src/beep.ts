@@ -46,9 +46,10 @@ class BeepDX7 {
 			this.freqCoarse = 0.5;
 		}
 		this.detune = cfg.detune;
-		this.feedback.gain.value = Math.pow(2, (fb - 7));
+		let fbRatio = Math.pow(2, (fb - 7));
+		this.feedback.gain.value = fbRatio;
 
-		this.output.gain.value = cfg.volume / 99;
+		this.output.gain.value = 0.2 * cfg.volume / 99;
 		/*if (this.phaseNode.modulationLevel) {
 			let soundFrequency=260;
 			this.phaseNode.modulationLevel.value = 4 / (2 * Math.PI * soundFrequency);
@@ -69,19 +70,25 @@ class BeepDX7 {
 		let detuneRatio = Math.pow(OCTAVE_1024, this.detune);
 		let freqRatio = this.freqCoarse * (1 + this.freqFine / 100);
 		let carrierFrequency = detuneRatio * freqRatio * this.frequencyFromNoteNumber(note);
-
+		//carrierFrequency=2616.2556530059865;
 		if (this.oscMode > 0) {
 			carrierFrequency = Math.pow(10, this.freqCoarse % 4) * (1 + (this.freqFine / 99) * 8.772);;
 		} else {
 			//
 		}
-		console.log('carrierFrequency', carrierFrequency);
+		console.log('carrierFrequency', this.detune, this.freqCoarse + '|' + this.freqFine + '=' + freqRatio, note, carrierFrequency);
 		if (this.phaseNode.carrierFrequency) {
 			this.phaseNode.carrierFrequency.value = carrierFrequency;
 		}
 		if (this.phaseNode.modulationLevel) {
 			//this.phaseNode.modulationLevel.value = 4 / 3;
-			this.phaseNode.modulationLevel.value =  Math.PI * 2 ;
+			//this.phaseNode.modulationLevel.value = Math.PI * 2;
+			//this.phaseNode.modulationLevel.value =  Math.PI * 3 ;
+			//this.phaseNode.modulationLevel.value =  Math.PI *1.7 ;
+			//this.phaseNode.modulationLevel.value = Math.PI * 2;
+
+			//brass1
+			this.phaseNode.modulationLevel.value = 38;
 		}
 		//this.phaseDelay.delayTime.value = 0.5 / carierFrequency;
 		//this.modulationLevel.gain.value = (4/3) / (2 * Math.PI * carierFrequency);
@@ -98,7 +105,7 @@ class BeepDX7 {
 	frequencyFromNoteNumber(note: number) {
 
 		let ff = 440 * Math.pow(2, (note - 69) / 12);
-		console.log('frequencyFromNoteNumber', note, ff);
+		//console.log('frequencyFromNoteNumber', note, ff);
 		return ff;
 	};
 

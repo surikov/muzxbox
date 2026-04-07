@@ -50,27 +50,12 @@ let brass1preset = {
                 96,
                 0
             ],
-            "keyScaleBreakpoint": 39,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 14,
-            "keyScaleCurveL": 3,
-            "keyScaleCurveR": 3,
-            "keyScaleRate": 0,
             "detune": 7,
-            "lfoAmpModSens": 0,
-            "velocitySens": 0,
             "volume": 98,
             "oscMode": 0,
             "freqCoarse": 0,
             "freqFine": 0,
-            "pan": 0,
-            "idx": 0,
             "enabled": true,
-            "outputLevel": 15.282672,
-            "freqRatio": 0.5,
-            "ampL": 0.7071067811865476,
-            "ampR": 0.7071067811865475,
-            "$$hashKey": "object:718"
         },
         {
             "rates": [
@@ -85,27 +70,12 @@ let brass1preset = {
                 96,
                 0
             ],
-            "keyScaleBreakpoint": 27,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 7,
-            "keyScaleCurveL": 3,
-            "keyScaleCurveR": 1,
-            "keyScaleRate": 0,
             "detune": 7,
-            "lfoAmpModSens": 0,
-            "velocitySens": 0,
             "volume": 86,
             "oscMode": 0,
             "freqCoarse": 0,
             "freqFine": 0,
-            "pan": 25,
-            "idx": 1,
             "enabled": true,
-            "outputLevel": 5.40323913,
-            "freqRatio": 0.5,
-            "ampL": 0.38268343236508984,
-            "ampR": 0.9238795325112867,
-            "$$hashKey": "object:717"
         },
         {
             "rates": [
@@ -120,27 +90,12 @@ let brass1preset = {
                 98,
                 0
             ],
-            "keyScaleBreakpoint": 39,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 3,
-            "keyScaleCurveR": 3,
-            "keyScaleRate": 0,
             "detune": -2,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": -25,
-            "idx": 2,
-            "enabled": true,
-            "outputLevel": 16.6658671,
-            "freqRatio": 1,
-            "ampL": 0.9238795325112867,
-            "ampR": 0.3826834323650898,
-            "$$hashKey": "object:716"
+            "enabled": false,
         },
         {
             "rates": [
@@ -155,27 +110,12 @@ let brass1preset = {
                 98,
                 0
             ],
-            "keyScaleBreakpoint": 39,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 3,
-            "keyScaleCurveR": 3,
-            "keyScaleRate": 0,
             "detune": 0,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 99,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": 0,
-            "idx": 3,
-            "enabled": true,
-            "outputLevel": 16.6658671,
-            "freqRatio": 1,
-            "ampL": 0.7071067811865476,
-            "ampR": 0.7071067811865475,
-            "$$hashKey": "object:715"
+            "enabled": false,
         },
         {
             "rates": [
@@ -190,27 +130,12 @@ let brass1preset = {
                 98,
                 0
             ],
-            "keyScaleBreakpoint": 39,
-            "keyScaleDepthL": 0,
-            "keyScaleDepthR": 0,
-            "keyScaleCurveL": 3,
-            "keyScaleCurveR": 3,
-            "keyScaleRate": 0,
             "detune": 1,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 98,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": 25,
-            "idx": 4,
-            "enabled": true,
-            "outputLevel": 15.282672,
-            "freqRatio": 1,
-            "ampL": 0.38268343236508984,
-            "ampR": 0.9238795325112867,
-            "$$hashKey": "object:714"
+            "enabled": false,
         },
         {
             "rates": [
@@ -225,55 +150,15 @@ let brass1preset = {
                 91,
                 0
             ],
-            "keyScaleBreakpoint": 39,
-            "keyScaleDepthL": 54,
-            "keyScaleDepthR": 50,
-            "keyScaleCurveL": 1,
-            "keyScaleCurveR": 1,
-            "keyScaleRate": 4,
             "detune": 0,
-            "lfoAmpModSens": 0,
-            "velocitySens": 2,
             "volume": 82,
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "pan": -25,
-            "idx": 5,
-            "enabled": true,
-            "outputLevel": 3.8206667299999997,
-            "freqRatio": 1,
-            "ampL": 0.9238795325112867,
-            "ampR": 0.3826834323650898,
-            "$$hashKey": "object:713"
+            "enabled": false,
         }
     ],
     "name": "BRASS   1 ",
-    "lfoSpeed": 37,
-    "lfoDelay": 0,
-    "lfoPitchModDepth": 5,
-    "lfoAmpModDepth": 0,
-    "lfoPitchModSens": 3,
-    "lfoWaveform": 4,
-    "lfoSync": 0,
-    "pitchEnvelope": {
-        "rates": [
-            84,
-            95,
-            95,
-            60
-        ],
-        "levels": [
-            50,
-            50,
-            50,
-            50
-        ]
-    },
-    "controllerModVal": 0,
-    "aftertouchEnabled": 0,
-    "$$hashKey": "object:237",
-    "fbRatio": 1
 };
 let epiano1preset = {
     "algorithm": 5,
@@ -286,7 +171,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 50, 35, 78],
             "levels": [99, 75, 0, 0],
@@ -304,7 +189,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": true
+            "enabled": false
         }, {
             "rates": [95, 29, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -313,7 +198,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": true
+            "enabled": false
         }, {
             "rates": [95, 20, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -790,7 +675,6 @@ class EnvelopeNode {
     constructor(ctx) {
         this.minTimeDelta = 0.005;
         this.maxReleaseDelta = 0.5;
-        this.slopes = [];
         this.doneTime = 0;
         this.envelopeContext = ctx;
         this.envelopeGain = this.envelopeContext.createGain();
@@ -802,10 +686,10 @@ class EnvelopeNode {
     }
     durationDown(nn) {
         let ss = this.scale99(nn);
-        return 0.05 / ss;
+        return 0.12 / ss;
     }
     durationUp(nn) {
-        return 0.5 * this.durationDown(nn);
+        return 0.25 * this.durationDown(nn);
     }
     levelRatio(nn) {
         let ratio = Math.log(nn + 1) * 14 + nn;
@@ -817,31 +701,30 @@ class EnvelopeNode {
         let fullRatio = this.levelRatio(100);
         let partDuration = Math.abs(fromRatio - toRatio) / fullRatio;
         let fullDuration = this.durationDown(r99);
-        console.log(r99, 'partDuration', partDuration, 'fullDuration', fullDuration, 'speed', this.scale99(r99));
         if (from99 < to99) {
             fullDuration = this.durationUp(r99);
         }
         return { duration: partDuration * fullDuration, from: this.scale99(from99) / 32, to: this.scale99(to99) / 32 };
     }
     setupEnvelope(rates99, levels99) {
-        this.slopes[0] = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
-        this.slopes[1] = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
-        this.slopes[2] = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
-        this.slopes[3] = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
-        console.log('rates', rates99, 'levels', levels99, 'slopes', this.slopes);
+        this.attack = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
+        this.decay = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
+        this.sustain = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
+        this.release = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
+        console.log('rates', rates99, 'levels', levels99);
+        console.log('attack', this.attack);
+        console.log('decay', this.decay);
+        console.log('sustain', this.sustain);
+        console.log('release', this.release);
     }
     startEnvelope(when, wholeDuration) {
-        this.envelopeGain.gain.setValueAtTime(this.slopes[0].from, when);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[0].to, when + this.slopes[0].duration);
-        this.envelopeGain.gain.cancelAndHoldAtTime(when + this.slopes[0].duration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[1].from, 0.001 + when + this.slopes[0].duration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[1].to, when + this.slopes[0].duration + this.slopes[1].duration);
-        this.envelopeGain.gain.cancelAndHoldAtTime(when + this.slopes[0].duration + this.slopes[1].duration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[2].from, 0.001 + when + this.slopes[0].duration + this.slopes[1].duration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[2].to, when + this.slopes[0].duration + this.slopes[1].duration + this.slopes[2].duration);
+        this.envelopeGain.gain.setValueAtTime(this.attack.from, when);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.attack.to, when + this.attack.duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.decay.to, when + this.attack.duration + this.decay.duration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.sustain.to, when + this.attack.duration + this.decay.duration + this.sustain.duration);
         this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[3].from, 0.001 + when + wholeDuration);
-        this.envelopeGain.gain.linearRampToValueAtTime(this.slopes[3].to, when + wholeDuration + this.slopes[3].duration);
+        this.envelopeGain.gain.exponentialRampToValueAtTime(this.release.from, 0.003 + when + wholeDuration);
+        this.envelopeGain.gain.linearRampToValueAtTime(this.release.to, 0.003 + when + wholeDuration + this.release.duration);
     }
     down0now() {
         this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
@@ -887,8 +770,9 @@ class BeepDX7 {
             this.freqCoarse = 0.5;
         }
         this.detune = cfg.detune;
-        this.feedback.gain.value = Math.pow(2, (fb - 7));
-        this.output.gain.value = cfg.volume / 99;
+        let fbRatio = Math.pow(2, (fb - 7));
+        this.feedback.gain.value = fbRatio;
+        this.output.gain.value = 0.2 * cfg.volume / 99;
     }
     startOperator(when, duration, note) {
         var OCTAVE_1024 = 1.0006771307;
@@ -901,19 +785,18 @@ class BeepDX7 {
         }
         else {
         }
-        console.log('carrierFrequency', carrierFrequency);
+        console.log('carrierFrequency', this.detune, this.freqCoarse + '|' + this.freqFine + '=' + freqRatio, note, carrierFrequency);
         if (this.phaseNode.carrierFrequency) {
             this.phaseNode.carrierFrequency.value = carrierFrequency;
         }
         if (this.phaseNode.modulationLevel) {
-            this.phaseNode.modulationLevel.value = Math.PI * 2;
+            this.phaseNode.modulationLevel.value = 38;
         }
         this.phaseNode.carrier.connect(this.envelope.envelopeGain);
         this.envelope.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
         let ff = 440 * Math.pow(2, (note - 69) / 12);
-        console.log('frequencyFromNoteNumber', note, ff);
         return ff;
     }
     ;
@@ -1087,9 +970,15 @@ function initTester() {
 }
 function testPlay() {
     console.log('testPlay');
-    synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
+    synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60 + 12], [{ duration: 2, delta: 0 }]);
+}
+function speedRatio(nn) {
+    let speed = Math.pow(2, nn * 0.16 - 11);
+    return speed;
 }
 function dumpTest() {
+    for (let nn = 0; nn <= 100; nn++) {
+    }
 }
 dumpTest();
 //# sourceMappingURL=tester.js.map
