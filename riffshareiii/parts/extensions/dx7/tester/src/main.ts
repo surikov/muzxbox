@@ -1,11 +1,27 @@
-let synth: SynthDX7;
+let synthPiano: SynthDX7;
+let synthBrass: SynthDX7;
 let acx: AudioContext;
 function initTester() {
 	console.log('initTester');
 	acx = new window.AudioContext();
 	loadPhaseWorkletSource(acx, () => {
 		console.log('skipLoadPhaseWorkletSource', skipLoadPhaseWorkletSource);
-		synth = new SynthDX7(acx);
+
+		//epiano1preset.operators[3].volume = 85;//85 0.18946457081379972 - 89 0.29524816535738263 - 89 0.3298769776932236
+
+
+/*
+		epiano1preset.operators[0].enabled = false;
+		epiano1preset.operators[1].enabled = false;
+		epiano1preset.operators[2].enabled = false;
+		epiano1preset.operators[3].enabled = false;
+		epiano1preset.operators[4].enabled = false;
+		epiano1preset.operators[5].enabled = false;
+*/
+		synthPiano = new SynthDX7(acx);
+		synthPiano.resetPreset(epiano1preset);
+		synthBrass = new SynthDX7(acx);
+		synthBrass.resetPreset(brass1preset);
 	});
 }
 
@@ -22,10 +38,19 @@ var outputlevelArray = [0, 5, 9, 13, 17, 20, 23, 25, 27, 29, 31, 33, 35, 37, 39,
 	100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114,
 	115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127
 ];*/
-function testPlay() {
-	console.log('testPlay');
+function testPlay(isPiano: boolean, nn: number) {
+	console.log('testPlay', isPiano, nn);
+	//let preset: DX7PresetData;
+	if (isPiano) {
+		synthPiano.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+		//preset = epiano1preset;
+	} else {
+		//preset = brass1preset;
+		synthBrass.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+	}
+
 	//synth.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [60], [{ duration: 12.3, delta: 0 }]);
-	synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
+	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60+12], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [30], [{ duration: 2, delta: 0 }]);
 	//synth.scheduleStrum(brass1preset, acx.currentTime + 2.2, [60], [{ duration: 2, delta: 0 }]);

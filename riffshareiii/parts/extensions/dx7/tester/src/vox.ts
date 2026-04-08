@@ -22,7 +22,7 @@ class VoiceDX7 {
 		this.connectMixOperators(scheme);
 		for (let ii = 0; ii < 6; ii++) {
 			if (presetData.operators[ii].enabled) {
-				console.log('setupOperator',ii );
+				console.log('setupVoice, operator',ii );
 				this.beeps[ii].setupOperator(presetData.operators[ii],presetData.feedback);
 			}
 		}
@@ -43,7 +43,7 @@ class VoiceDX7 {
 		for (let ii = 0; ii < scheme.outputMix.length; ii++) {
 			let outIdx = scheme.outputMix[ii];
 			this.beeps[outIdx].connectToOutputNode(this.voxoutput);
-			console.log('' + (1 + outIdx) + ' -> out');
+			//console.log('' + (1 + outIdx) + ' -> out');
 		}
 		for (let ii = 0; ii < scheme.modulationMatrix.length; ii++) {
 			let carrier = this.beeps[ii];
@@ -55,7 +55,7 @@ class VoiceDX7 {
 				} else {
 					this.beeps[modulatorIdx].connectToCarrier(carrier);
 				}
-				console.log('' + (modulatorIdx + 1) + ' -> ' + (ii + 1));
+				//console.log('' + (modulatorIdx + 1) + ' -> ' + (ii + 1));
 			}
 		}
 	}

@@ -180,7 +180,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 14,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             rates: [95, 20, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -189,7 +189,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 29, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -198,7 +198,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 20, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -207,7 +207,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }, {
             "rates": [95, 29, 20, 50],
             "levels": [99, 95, 0, 0],
@@ -216,7 +216,7 @@ let epiano1preset = {
             "oscMode": 0,
             "freqCoarse": 1,
             "freqFine": 0,
-            "enabled": false
+            "enabled": true
         }],
     "name": "E.PIANO 1 ",
 };
@@ -686,10 +686,10 @@ class EnvelopeNode {
     }
     durationDown(nn) {
         let ss = this.scale99(nn);
-        return 0.12 / ss;
+        return 0.095 / ss;
     }
     durationUp(nn) {
-        return 0.25 * this.durationDown(nn);
+        return this.durationDown(nn) / 4;
     }
     levelRatio(nn) {
         let ratio = Math.log(nn + 1) * 14 + nn;
@@ -711,11 +711,6 @@ class EnvelopeNode {
         this.decay = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
         this.sustain = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
         this.release = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
-        console.log('rates', rates99, 'levels', levels99);
-        console.log('attack', this.attack);
-        console.log('decay', this.decay);
-        console.log('sustain', this.sustain);
-        console.log('release', this.release);
     }
     startEnvelope(when, wholeDuration) {
         this.envelopeGain.gain.setValueAtTime(this.attack.from, when);
@@ -738,13 +733,16 @@ class SynthDX7 {
         this.output = this.audioContext.createGain();
         this.output.connect(this.audioContext.destination);
     }
-    scheduleStrum(preset, when, pitches, slides) {
+    resetPreset(newpreset) {
+        this.preset = newpreset;
+    }
+    scheduleStrum(when, pitches, slides) {
         console.log('SynthDX7 schedule');
         if (this.audioContext.state === "suspended") {
             this.audioContext.resume();
         }
         let testVox = new VoiceDX7(this.output, this.audioContext);
-        testVox.setupVoice(preset);
+        testVox.setupVoice(this.preset);
         testVox.startPlayNote(when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
     }
 }
@@ -754,11 +752,15 @@ class BeepDX7 {
         this.oscMode = 0;
         this.audioContext = cntxt;
         this.output = this.audioContext.createGain();
-        this.feedback = this.audioContext.createGain();
+        this.input = this.audioContext.createGain();
         this.envelope = new EnvelopeNode(this.audioContext);
         this.envelope.envelopeGain.connect(this.output);
         this.phaseNode = new PhaseNode(this.audioContext);
-        this.feedback.connect(this.phaseNode.carrier);
+        this.input.connect(this.phaseNode.carrier);
+    }
+    scale99(nn) {
+        let speed = Math.pow(2, nn * 0.16 - 11);
+        return speed;
     }
     setupOperator(cfg, fb) {
         this.envelope.setupEnvelope(cfg.rates, cfg.levels);
@@ -771,8 +773,8 @@ class BeepDX7 {
         }
         this.detune = cfg.detune;
         let fbRatio = Math.pow(2, (fb - 7));
-        this.feedback.gain.value = fbRatio / 3.5;
-        this.output.gain.value = 0.2 * cfg.volume / 99;
+        this.output.gain.value = this.scale99(cfg.volume) / 32;
+        console.log('setupOperator', cfg.volume, '->', this.output.gain.value, cfg.volume);
     }
     startOperator(when, duration, note) {
         var OCTAVE_1024 = 1.0006771307;
@@ -785,7 +787,6 @@ class BeepDX7 {
         }
         else {
         }
-        console.log('carrierFrequency', this.detune, this.freqCoarse + '|' + this.freqFine + '=' + freqRatio, note, carrierFrequency);
         if (this.phaseNode.carrierFrequency) {
             this.phaseNode.carrierFrequency.value = carrierFrequency;
         }
@@ -802,12 +803,12 @@ class BeepDX7 {
     ;
     connectToOutputNode(outNode) {
         this.output.connect(outNode);
+        this.output.gain.value = 0.25;
     }
     connectToCarrier(opDX7) {
-        this.output.connect(opDX7.phaseNode.carrier);
+        this.output.connect(opDX7.input);
     }
     connectToSelf() {
-        this.output.connect(this.feedback);
     }
 }
 class VoiceDX7 {
@@ -830,7 +831,7 @@ class VoiceDX7 {
         this.connectMixOperators(scheme);
         for (let ii = 0; ii < 6; ii++) {
             if (presetData.operators[ii].enabled) {
-                console.log('setupOperator', ii);
+                console.log('setupVoice, operator', ii);
                 this.beeps[ii].setupOperator(presetData.operators[ii], presetData.feedback);
             }
         }
@@ -850,7 +851,6 @@ class VoiceDX7 {
         for (let ii = 0; ii < scheme.outputMix.length; ii++) {
             let outIdx = scheme.outputMix[ii];
             this.beeps[outIdx].connectToOutputNode(this.voxoutput);
-            console.log('' + (1 + outIdx) + ' -> out');
         }
         for (let ii = 0; ii < scheme.modulationMatrix.length; ii++) {
             let carrier = this.beeps[ii];
@@ -863,7 +863,6 @@ class VoiceDX7 {
                 else {
                     this.beeps[modulatorIdx].connectToCarrier(carrier);
                 }
-                console.log('' + (modulatorIdx + 1) + ' -> ' + (ii + 1));
             }
         }
     }
@@ -958,19 +957,28 @@ function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
     };
     reader.readAsDataURL(blob);
 }
-let synth;
+let synthPiano;
+let synthBrass;
 let acx;
 function initTester() {
     console.log('initTester');
     acx = new window.AudioContext();
     loadPhaseWorkletSource(acx, () => {
         console.log('skipLoadPhaseWorkletSource', skipLoadPhaseWorkletSource);
-        synth = new SynthDX7(acx);
+        synthPiano = new SynthDX7(acx);
+        synthPiano.resetPreset(epiano1preset);
+        synthBrass = new SynthDX7(acx);
+        synthBrass.resetPreset(brass1preset);
     });
 }
-function testPlay() {
-    console.log('testPlay');
-    synth.scheduleStrum(brass1preset, acx.currentTime + 0.1, [60], [{ duration: 2, delta: 0 }]);
+function testPlay(isPiano, nn) {
+    console.log('testPlay', isPiano, nn);
+    if (isPiano) {
+        synthPiano.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+    }
+    else {
+        synthBrass.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+    }
 }
 function speedRatio(nn) {
     let speed = Math.pow(2, nn * 0.16 - 11);

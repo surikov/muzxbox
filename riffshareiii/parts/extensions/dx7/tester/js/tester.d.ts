@@ -429,8 +429,10 @@ declare class EnvelopeNode {
 declare class SynthDX7 {
     audioContext: AudioContext;
     output: GainNode;
+    preset: DX7PresetData;
     constructor(audioContext: AudioContext);
-    scheduleStrum(preset: DX7PresetData, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
+    resetPreset(newpreset: DX7PresetData): void;
+    scheduleStrum(when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
 }
 declare class BeepDX7 {
     audioContext: AudioContext;
@@ -441,9 +443,10 @@ declare class BeepDX7 {
     freqCoarse: number;
     freqFine: number;
     detune: number;
-    feedback: GainNode;
+    input: GainNode;
     oscMode: number;
     constructor(cntxt: AudioContext);
+    scale99(nn: number): number;
     setupOperator(cfg: DX7OperatorData, fb: number): void;
     startOperator(when: number, duration: number, note: number): void;
     frequencyFromNoteNumber(note: number): number;
@@ -470,9 +473,10 @@ declare class PhaseNode {
     constructor(audioContext: AudioContext);
 }
 declare function loadAudioWorkletCode(audioworkletcode: string, audioContext: AudioContext, onDone: () => void): void;
-declare let synth: SynthDX7;
+declare let synthPiano: SynthDX7;
+declare let synthBrass: SynthDX7;
 declare let acx: AudioContext;
 declare function initTester(): void;
-declare function testPlay(): void;
+declare function testPlay(isPiano: boolean, nn: number): void;
 declare function speedRatio(nn: number): number;
 declare function dumpTest(): void;

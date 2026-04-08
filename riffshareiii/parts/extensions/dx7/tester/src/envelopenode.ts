@@ -25,10 +25,10 @@ class EnvelopeNode {
 	}
 	durationDown(nn: number): number {
 		let ss = this.scale99(nn);
-		return 0.12 / ss;
+		return 0.095 / ss;
 	}
 	durationUp(nn: number): number {
-		return 0.25 * this.durationDown(nn);
+		return  this.durationDown(nn)/4;
 	}
 	levelRatio(nn: number): number {
 		let ratio = Math.log(nn + 1) * 14 + nn;
@@ -69,11 +69,13 @@ class EnvelopeNode {
 		this.decay = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
 		this.sustain = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
 		this.release = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
+		/*
 		console.log('rates', rates99, 'levels', levels99);
 		console.log('attack', this.attack);
 		console.log('decay', this.decay);
 		console.log('sustain', this.sustain);
 		console.log('release', this.release);
+		*/
 	}
 	startEnvelope(when: number, wholeDuration: number) {
 		this.envelopeGain.gain.setValueAtTime(this.attack.from, when);

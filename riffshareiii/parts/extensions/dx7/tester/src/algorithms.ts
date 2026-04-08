@@ -323,7 +323,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 14,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		rates: [95, 20, 20, 50],
 		"levels": [99, 95, 0, 0],
@@ -332,7 +332,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		"rates": [95, 29, 20, 50],
 		"levels": [99, 95, 0, 0],
@@ -341,7 +341,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		"rates": [95, 20, 20, 50],
 		"levels": [99, 95, 0, 0],
@@ -350,7 +350,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}, {
 		"rates": [95, 29, 20, 50],
 		"levels": [99, 95, 0, 0],
@@ -359,7 +359,7 @@ let epiano1preset: DX7PresetData = {
 		"oscMode": 0,
 		"freqCoarse": 1,
 		"freqFine": 0,
-		"enabled": false
+		"enabled": true
 	}]
 	, "name": "E.PIANO 1 ",
 	//"lfoSpeed": 34,

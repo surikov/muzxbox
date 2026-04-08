@@ -6,7 +6,22 @@
 
 <body>
     <p>
-        <button onclick='testPlay();'>testPlay</button>
+        <button onclick='testPlay(true,60);'>piano 60</button>
+		<button onclick='testPlay(true,63);'>piano 63</button>
+		<button onclick='testPlay(true,67);'>piano 67</button>
+		<br/>
+		<button onclick='testPlay(true,48);'>piano 48</button>
+		<button onclick='testPlay(true,51);'>piano 51</button>
+		<button onclick='testPlay(true,55);'>piano 55</button>
+	</p>
+	<p>
+		<button onclick='testPlay(false,60);'>brass 60</button>
+		<button onclick='testPlay(false,63);'>brass 63</button>
+		<button onclick='testPlay(false,67);'>brass 67</button>
+		<br/>
+		<button onclick='testPlay(false,48);'>brass 48</button>
+		<button onclick='testPlay(false,51);'>brass 51</button>
+		<button onclick='testPlay(false,55);'>brass 55</button>
     </p>
     <script>
         initTester();

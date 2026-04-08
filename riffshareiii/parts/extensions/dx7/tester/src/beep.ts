@@ -5,22 +5,24 @@ class BeepDX7 {
 	//phaseDelay: DelayNode;
 	phaseNode: PhaseNode;
 	output: GainNode;
+	//modulators: GainNode[] = [];
 	envelope: EnvelopeNode;
 	//carrier: OscillatorNode | null = null;
 	ready = false;
 	freqCoarse: number;
 	freqFine: number;
 	detune: number;
-	feedback: GainNode;
+	//feedback: GainNode;
 	//volume:number;
-
+	input: GainNode;
 	oscMode = 0;
 	constructor(cntxt: AudioContext) {
 		this.audioContext = cntxt;
 
 		this.output = this.audioContext.createGain();
-		this.feedback = this.audioContext.createGain();
-
+		//this.modulators = [];//this.audioContext.createGain();
+		//this.feedback = this.audioContext.createGain();
+		this.input = this.audioContext.createGain();
 		this.envelope = new EnvelopeNode(this.audioContext);
 		this.envelope.envelopeGain.connect(this.output);
 
@@ -34,7 +36,12 @@ class BeepDX7 {
 		//this.modulationLevel.connect(this.phaseDelay.delayTime);
 		this.phaseNode = new PhaseNode(this.audioContext);
 
-		this.feedback.connect(this.phaseNode.carrier);
+		//this.feedback.connect(this.phaseNode.carrier);
+		this.input.connect(this.phaseNode.carrier);
+	}
+	scale99(nn: number): number {
+		let speed = Math.pow(2, nn * 0.16 - 11);
+		return speed;
 	}
 	setupOperator(cfg: DX7OperatorData, fb: number) {
 		this.envelope.setupEnvelope(cfg.rates, cfg.levels);
@@ -49,9 +56,14 @@ class BeepDX7 {
 		let fbRatio = Math.pow(2, (fb - 7));
 		//this.feedback.gain.value = fbRatio;
 		//this.feedback.gain.value = 0.25;
-		this.feedback.gain.value = fbRatio/3.5;
+		//this.feedback.gain.value = fbRatio / 3.5;
 
-		this.output.gain.value = 0.2 * cfg.volume / 99;
+		//this.output.gain.value = 0.2 * cfg.volume / 99;
+		this.output.gain.value = this.scale99(cfg.volume) / 32;
+		//this.output.gain.value = this.scale99(cfg.volume) / this.scale99(99) ;
+		//this.input.gain.value = 0.1;
+		//this.input.gain.value = 0.99;
+		console.log('setupOperator', cfg.volume, '->', this.output.gain.value, cfg.volume);
 		/*if (this.phaseNode.modulationLevel) {
 			let soundFrequency=260;
 			this.phaseNode.modulationLevel.value = 4 / (2 * Math.PI * soundFrequency);
@@ -78,7 +90,7 @@ class BeepDX7 {
 		} else {
 			//
 		}
-		console.log('carrierFrequency', this.detune, this.freqCoarse + '|' + this.freqFine + '=' + freqRatio, note, carrierFrequency);
+		//console.log('carrierFrequency', this.detune, this.freqCoarse + '|' + this.freqFine + '=' + freqRatio, note, carrierFrequency);
 		if (this.phaseNode.carrierFrequency) {
 			this.phaseNode.carrierFrequency.value = carrierFrequency;
 		}
@@ -118,10 +130,19 @@ class BeepDX7 {
 	connectToCarrier(opDX7: BeepDX7) {
 		//this.output.connect(opDX7.modulationLevel);
 		//opDX7.output.connect(this.modulationLevel);
-		this.output.connect(opDX7.phaseNode.carrier);
+		//this.output.connect(opDX7.phaseNode.carrier);
+		this.output.connect(opDX7.input);
+		//console.log('connectToCarrier',this.output.gain.value);
+		/*
+		let modulation: GainNode = this.audioContext.createGain();
+		modulation.gain.value=0.009;
+		this.envelope.envelopeGain.connect(modulation);
+		modulation.connect(opDX7.phaseNode.carrier);
+		this.modulators.push(modulation);
+		*/
 	}
 	connectToSelf() {
 
-		this.output.connect(this.feedback);
+		//this.output.connect(this.feedback);
 	}
 }
