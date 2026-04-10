@@ -1,3 +1,5 @@
+//https://github.com/asb2m10/dexed/blob/master/Source/DXComponents.cpp
+
 let synthPiano: SynthDX7;
 let synthBrass: SynthDX7;
 let acx: AudioContext;
