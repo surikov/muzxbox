@@ -1047,6 +1047,60 @@ function initTester() {
         synthBrass.resetPreset(brass1preset);
     });
 }
+let customPresets;
+var selectedPresetData = null;
+function loadPresetNum(ii) {
+    console.log('loadPresetNum', ii, customPresets[ii].name);
+    selectedPresetData = customPresets[ii];
+}
+function loadSysexFile(fileList) {
+    let numFiles = fileList.length;
+    console.log(fileList[0]);
+    let reader = new FileReader();
+    reader.onload = () => {
+        let result = reader.result;
+        console.log(fileList[0].name);
+        customPresets = [];
+        for (let ii = 0; ii < 32; ii++) {
+            let one = parseSysexFile(result, ii);
+            console.log(ii, one);
+            customPresets.push(one);
+        }
+    };
+    reader.onerror = (error) => {
+        console.log('error', error);
+    };
+    reader.readAsText(fileList[0]);
+}
+function parseSysexFile(bankData, patchId) {
+    var dataStart = 128 * patchId + 6;
+    var dataEnd = dataStart + 128;
+    var voiceData = bankData.substring(dataStart, dataEnd);
+    var operators = [];
+    for (var i = 5; i >= 0; --i) {
+        var oscStart = (5 - i) * 17;
+        var oscEnd = oscStart + 17;
+        var oscData = voiceData.substring(oscStart, oscEnd);
+        var operator = {
+            rates: [oscData.charCodeAt(0), oscData.charCodeAt(1), oscData.charCodeAt(2), oscData.charCodeAt(3)],
+            levels: [oscData.charCodeAt(4), oscData.charCodeAt(5), oscData.charCodeAt(6), oscData.charCodeAt(7)],
+            detune: Math.floor(oscData.charCodeAt(12) >> 3) - 7,
+            volume: oscData.charCodeAt(14),
+            oscMode: oscData.charCodeAt(15) & 1,
+            freqCoarse: Math.floor(oscData.charCodeAt(15) >> 1),
+            freqFine: oscData.charCodeAt(16),
+            enabled: true
+        };
+        operators.push(operator);
+    }
+    let preset = {
+        algorithm: voiceData.charCodeAt(110) + 1,
+        feedback: voiceData.charCodeAt(111) & 7,
+        operators: operators,
+        name: voiceData.substring(118, 128),
+    };
+    return preset;
+}
 function testPlay(isPiano, nn) {
     console.log('testPlay', isPiano, nn);
     if (isPiano) {
@@ -1054,6 +1108,18 @@ function testPlay(isPiano, nn) {
     }
     else {
         synthBrass.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+    }
+}
+function customPlay(isPiano, nn) {
+    if (selectedPresetData) {
+        console.log('customPlay', nn);
+        let cusPres;
+        cusPres = new SynthDX7(acx);
+        cusPres.resetPreset(selectedPresetData);
+        cusPres.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 4.3, delta: 0 }]);
+    }
+    else {
+        console.log('no data', nn);
     }
 }
 function speedRatio(nn) {
