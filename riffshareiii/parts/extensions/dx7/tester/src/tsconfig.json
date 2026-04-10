@@ -31,6 +31,7 @@
 		"synth.ts",
 		"beep.ts",
 		"vox.ts",
+		"testb.ts",
 		"phaseprocessor.ts",
 		"phasenode.ts",
 		"audioworkletloader.ts",

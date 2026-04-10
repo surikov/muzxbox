@@ -10,14 +10,14 @@ function initTester() {
 		//epiano1preset.operators[3].volume = 85;//85 0.18946457081379972 - 89 0.29524816535738263 - 89 0.3298769776932236
 
 
-/*
-		epiano1preset.operators[0].enabled = false;
-		epiano1preset.operators[1].enabled = false;
-		epiano1preset.operators[2].enabled = false;
-		epiano1preset.operators[3].enabled = false;
-		epiano1preset.operators[4].enabled = false;
-		epiano1preset.operators[5].enabled = false;
-*/
+
+		//epiano1preset.operators[0].enabled = false;
+		//epiano1preset.operators[1].enabled = false;//0.9
+		//epiano1preset.operators[2].enabled = false;
+		//epiano1preset.operators[3].enabled = false;//0.6
+		//epiano1preset.operators[4].enabled = false;
+		//epiano1preset.operators[5].enabled = false;
+
 		synthPiano = new SynthDX7(acx);
 		synthPiano.resetPreset(epiano1preset);
 		synthBrass = new SynthDX7(acx);
@@ -140,10 +140,103 @@ function levelRatio(nn: number): number {
 	let ratio = Math.log(nn + 1) * 14 + nn;
 	return ratio;
 }*/
+function rate2(nn: number): number {
+	let ss = Math.pow(2, nn * 0.16 - 11);
+	return ss;
+}
+function level2(nn: number): number {
+	let ratio = Math.log(nn + 1) * 14 + nn;
+	return ratio;
+}
+function test2(rr) {
+	return Math.pow(2, rr * 0.16 - 11);
+}
+function test5889(kk: number) {
+	let a58 = ((99 - 58) * kk / 1000) * test2(58) / test2(99);
+	let a89 = ((99 - 89) * kk / 1000) * + test2(89) / test2(99);
+	console.log(kk, a58, a89, a89 / a58);
+
+}
+function bezier99(nn: number) {
+	let t = nn;
+	//let p0 = { x: 0, y: 0 };//start
+	let p1 = { x: 0.95, y: 0.1 };//start handler
+	let p2 = { x: 0.9, y: 0.7 };//end handler
+	//let p3 = { x: 1, y: 1 };//end
+
+	let cX = 3 * p1.x;
+	let bX = 3 * (p2.x - p1.x) - cX;
+	let aX = 1 - cX - bX;
+
+	let cY = 3 * p1.y;
+	let bY = 3 * (p2.y - p1.y) - cY;
+	let aY = 1 - cY - bY;
+
+	let x = (aX * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t);
+	let y = (aY * Math.pow(t, 3)) + (bY * Math.pow(t, 2)) + (cY * t);
+
+	return { x: x, y: y };
+
+}
+function bezierO(nn: number) {
+	let t = nn;
+	let p0 = { x: 10, y: 10 };//start
+	let p1 = { x: 50, y: 100 };//start handler
+	let p2 = { x: 150, y: 200 };//end handler
+	let p3 = { x: 200, y: 75 };//end
+
+	let cX = 3 * (p1.x - p0.x);
+	let bX = 3 * (p2.x - p1.x) - cX;
+	let aX = p3.x - p0.x - cX - bX;
+
+	let cY = 3 * (p1.y - p0.y);
+	let bY = 3 * (p2.y - p1.y) - cY;
+	let aY = p3.y - p0.y - cY - bY;
+
+	let x = (aX * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t) + p0.x;
+	let y = (aY * Math.pow(t, 3)) + (bY * Math.pow(t, 2)) + (cY * t) + p0.y;
+
+	return { x: x, y: y };
+
+}
+var OUTPUT_LEVEL_TABLE = [
+	0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
+	0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
+	0.013975, 0.015240, 0.016619, 0.018123, 0.019764, 0.021552, 0.023503, 0.025630, 0.027950, 0.030480,
+	0.033238, 0.036247, 0.039527, 0.043105, 0.047006, 0.051261, 0.055900, 0.060960, 0.066477, 0.072494,
+	0.079055, 0.086210, 0.094012, 0.102521, 0.111800, 0.121919, 0.132954, 0.144987, 0.158110, 0.172420,
+	0.188025, 0.205043, 0.223601, 0.243838, 0.265907, 0.289974, 0.316219, 0.344839, 0.376050, 0.410085,
+	0.447201, 0.487676, 0.531815, 0.579948, 0.632438, 0.689679, 0.752100, 0.820171, 0.894403, 0.975353,
+	1.063630, 1.159897, 1.264876, 1.379357, 1.504200, 1.640341, 1.788805, 1.950706, 2.127260, 2.319793,
+	2.529752, 2.758714, 3.008399, 3.280683, 3.577610, 3.901411, 4.254519, 4.639586, 5.059505, 5.517429,
+	6.016799, 6.561366, 7.155220, 7.802823, 8.509039, 9.279172, 10.11901, 11.03486, 12.03360, 13.12273
+];
+function scaleA(nn: number): number {
+	return Math.pow(2, nn * 0.16 - 11);
+}
+function scaleB(nn: number): number {
+	return Math.pow(2, nn * 0.126 );
+}
+function scaleC(nn: number): number {
+	return Math.pow(2, nn * 0.125 );
+}
 function dumpTest() {
-	for (let nn = 0; nn <= 100; nn++) {
-		//console.log(nn, 'durationDown', 0.12/speedRatio(nn));
+
+	for (let ii = 0; ii < 100; ii++) {
+
+		console.log('n' + ii, Math.floor(10000 * OUTPUT_LEVEL_TABLE[ii] / OUTPUT_LEVEL_TABLE[99])
+			, ':', Math.floor(10000 * scaleA(ii) / scaleA(99))
+			, ' - ', Math.floor(10000 * scaleB(ii))
+			, '/', Math.floor(10000 * scaleC(ii) / scaleC(99))
+
+		);
 	}
+	console.log(OUTPUT_LEVEL_TABLE[89] / OUTPUT_LEVEL_TABLE[58]
+		, ':', scaleA(89) / scaleA(58)
+		, ' - ', scaleB(89) / scaleB(58)
+		, '/', scaleC(89) / scaleC(58)
+	);
+	//console.log((rate2(89) / rate2(99)) / (rate2(58) / rate2(99)),'	',bezier99(ii));
 	/*let rr = 75;
 	let full=durationDown(rr);
 	let rr2 = 50;

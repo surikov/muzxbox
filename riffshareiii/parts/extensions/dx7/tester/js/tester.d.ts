@@ -437,16 +437,18 @@ declare class SynthDX7 {
 declare class BeepDX7 {
     audioContext: AudioContext;
     phaseNode: PhaseNode;
-    output: GainNode;
+    destination: GainNode;
+    modulate: GainNode;
     envelope: EnvelopeNode;
     ready: boolean;
     freqCoarse: number;
     freqFine: number;
     detune: number;
+    feedback: GainNode;
     input: GainNode;
     oscMode: number;
     constructor(cntxt: AudioContext);
-    scale99(nn: number): number;
+    volume99scale(nn: number): number;
     setupOperator(cfg: DX7OperatorData, fb: number): void;
     startOperator(when: number, duration: number, note: number): void;
     frequencyFromNoteNumber(note: number): number;
@@ -463,6 +465,9 @@ declare class VoiceDX7 {
     startPlayNote(when: number, duration: number, note: number): void;
     connectMixOperators(scheme: ConnectionSchemeDX7): void;
 }
+declare function _Y(t: number, ay: number, by: number, cy: number): number;
+declare function _x2t(xx: number, aa: number, bb: number, cc: number, dd: number): number;
+declare function yBezier(xx: number, mX1: number, mY1: number, mX2: number, mY2: number): number;
 declare let skipLoadPhaseWorkletSource: boolean;
 declare function loadPhaseWorkletSource(audioContext: AudioContext, onDone: () => void): void;
 declare let phaseWorkletSource: string;
@@ -479,4 +484,20 @@ declare let acx: AudioContext;
 declare function initTester(): void;
 declare function testPlay(isPiano: boolean, nn: number): void;
 declare function speedRatio(nn: number): number;
+declare function rate2(nn: number): number;
+declare function level2(nn: number): number;
+declare function test2(rr: any): number;
+declare function test5889(kk: number): void;
+declare function bezier99(nn: number): {
+    x: number;
+    y: number;
+};
+declare function bezierO(nn: number): {
+    x: number;
+    y: number;
+};
+declare var OUTPUT_LEVEL_TABLE: number[];
+declare function scaleA(nn: number): number;
+declare function scaleB(nn: number): number;
+declare function scaleC(nn: number): number;
 declare function dumpTest(): void;
