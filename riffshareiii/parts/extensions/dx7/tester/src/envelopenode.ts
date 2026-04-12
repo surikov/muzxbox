@@ -24,11 +24,13 @@ class EnvelopeNode {
 		return speed;
 	}
 	durationDown(nn: number): number {
-		let ss = this.scale99(nn);
-		return 0.095 / ss;
+		//let ss = this.scale99(nn);
+		//return 0.095 / ss;
+		return 0.008+318*Math.pow(2, (99-nn) * 0.16) / Math.pow(2, 99 * 0.16);
 	}
 	durationUp(nn: number): number {
-		return  this.durationDown(nn)/4;
+		//return  this.durationDown(nn)/4;
+		return 0.003+38*Math.pow(2, (99-nn) * 0.16) / Math.pow(2, 99 * 0.16);
 	}
 	levelRatio(nn: number): number {
 		let ratio = Math.log(nn + 1) * 14 + nn;
@@ -48,8 +50,15 @@ class EnvelopeNode {
 		if (from99 < to99) {
 			fullDuration = this.durationUp(r99);
 		}
+		let slope = {
+			duration: partDuration * fullDuration
+			, from: this.scale99(from99) / 32
+			, to: this.scale99(to99) / 32
+		};
+		console.log('slopeDuration', r99, from99, to99, slope, fullDuration, partDuration);
+		return slope;
 		//return { duration: partDuration * fullDuration, from: fromRatio/164, to: toRatio/164 };
-		return { duration: partDuration * fullDuration, from: this.scale99(from99) / 32, to: this.scale99(to99) / 32 };
+
 		/*
 				let speed = Math.pow(2, r99 * 0.16 - 11);
 				let fullDuration = 0.17 / speed;

@@ -66,7 +66,7 @@ class BeepDX7 {
 		}
 		this.detune = cfg.detune;
 		let fbRatio = Math.pow(2, (fb - 7));
-		console.log(fb, fbRatio);
+		//console.log(fb, fbRatio);
 		//this.feedback.gain.value = fbRatio;
 		//this.feedback.gain.value = 0.25;
 		//this.feedback.gain.value = fbRatio / 3.5;
@@ -78,7 +78,7 @@ class BeepDX7 {
 		this.modulate.gain.value = this.volume99scale(cfg.volume);//2.2;
 		//this.input.gain.value = 0.1;
 		//this.input.gain.value = 0.99;
-		console.log('setupOperator', cfg.volume, '->', this.modulate.gain.value, cfg.volume);
+		//console.log('setupOperator', cfg.volume, '->', this.modulate.gain.value, cfg.volume);
 		/*if (this.phaseNode.modulationLevel) {
 			let soundFrequency=260;
 			this.phaseNode.modulationLevel.value = 4 / (2 * Math.PI * soundFrequency);

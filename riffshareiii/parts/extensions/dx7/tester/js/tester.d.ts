@@ -480,6 +480,7 @@ declare class PhaseNode {
 declare function loadAudioWorkletCode(audioworkletcode: string, audioContext: AudioContext, onDone: () => void): void;
 declare let synthPiano: SynthDX7;
 declare let synthBrass: SynthDX7;
+declare let cusPres: SynthDX7;
 declare let acx: AudioContext;
 declare function initTester(): void;
 declare let customPresets: DX7PresetData[];
@@ -503,7 +504,16 @@ declare function bezierO(nn: number): {
     y: number;
 };
 declare var OUTPUT_LEVEL_TABLE: number[];
+declare let EG_rate_rise_duration: number[];
+declare let EG_rate_decay_duration: number[];
+declare let EG_rate_rise_percent: number[];
+declare let EG_rate_decay_percent: number[];
 declare function scaleA(nn: number): number;
 declare function scaleB(nn: number): number;
-declare function scaleC(nn: number): number;
+declare function scaleVolume(nn: number): number;
+declare function scaleRise1(nn: number): number;
+declare function scaleRise2(nn: number): number;
+declare function scaleRise(nn: number): number;
+declare function volume127(nn: number): number;
+declare function getDexedDuration(p_rate: number, p_level_l: number, p_level_r: number): number;
 declare function dumpTest(): void;
