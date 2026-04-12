@@ -423,34 +423,32 @@ declare class EnvelopeNode {
     levelRatio(nn: number): number;
     slopeDuration(r99: number, from99: number, to99: number): SlopeInfo;
     setupEnvelope(rates99: number[], levels99: number[]): void;
-    startEnvelope(when: number, wholeDuration: number): void;
+    startEnvelope(when: number, wholeDuration: number): number;
     down0now(): void;
 }
 declare class SynthDX7 {
     audioContext: AudioContext;
     output: GainNode;
-    preset: DX7PresetData;
+    cache: VoiceDX7[];
     constructor(audioContext: AudioContext);
-    resetPreset(newpreset: DX7PresetData): void;
-    scheduleStrum(when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
+    takeVox(): VoiceDX7;
+    scheduleStrum(preset: DX7PresetData, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
 }
 declare class BeepDX7 {
     audioContext: AudioContext;
     phaseNode: PhaseNode;
-    destination: GainNode;
-    modulate: GainNode;
+    output: GainNode;
     envelope: EnvelopeNode;
     ready: boolean;
     freqCoarse: number;
     freqFine: number;
     detune: number;
     feedback: GainNode;
-    input: GainNode;
     oscMode: number;
     constructor(cntxt: AudioContext);
     volume99scale(nn: number): number;
     setupOperator(cfg: DX7OperatorData, fb: number): void;
-    startOperator(when: number, duration: number, note: number): void;
+    startOperator(when: number, duration: number, note: number): number;
     frequencyFromNoteNumber(note: number): number;
     connectToOutputNode(outNode: AudioNode): void;
     connectToCarrier(opDX7: BeepDX7): void;
@@ -460,6 +458,7 @@ declare class VoiceDX7 {
     beeps: BeepDX7[];
     voxoutput: GainNode;
     voContext: AudioContext;
+    locktime: number;
     constructor(destination: AudioNode, aContext: AudioContext);
     setupVoice(presetData: DX7PresetData): void;
     startPlayNote(when: number, duration: number, note: number): void;
@@ -478,10 +477,8 @@ declare class PhaseNode {
     constructor(audioContext: AudioContext);
 }
 declare function loadAudioWorkletCode(audioworkletcode: string, audioContext: AudioContext, onDone: () => void): void;
-declare let synthPiano: SynthDX7;
-declare let synthBrass: SynthDX7;
-declare let cusPres: SynthDX7;
 declare let acx: AudioContext;
+declare let synthDx7: SynthDX7;
 declare function initTester(): void;
 declare let customPresets: DX7PresetData[];
 declare var selectedPresetData: DX7PresetData | null;
@@ -490,30 +487,3 @@ declare function loadSysexFile(fileList: FileList): void;
 declare function parseSysexFile(bankData: string, patchId: number): DX7PresetData;
 declare function testPlay(isPiano: boolean, nn: number): void;
 declare function customPlay(isPiano: boolean, nn: number): void;
-declare function speedRatio(nn: number): number;
-declare function rate2(nn: number): number;
-declare function level2(nn: number): number;
-declare function test2(rr: any): number;
-declare function test5889(kk: number): void;
-declare function bezier99(nn: number): {
-    x: number;
-    y: number;
-};
-declare function bezierO(nn: number): {
-    x: number;
-    y: number;
-};
-declare var OUTPUT_LEVEL_TABLE: number[];
-declare let EG_rate_rise_duration: number[];
-declare let EG_rate_decay_duration: number[];
-declare let EG_rate_rise_percent: number[];
-declare let EG_rate_decay_percent: number[];
-declare function scaleA(nn: number): number;
-declare function scaleB(nn: number): number;
-declare function scaleVolume(nn: number): number;
-declare function scaleRise1(nn: number): number;
-declare function scaleRise2(nn: number): number;
-declare function scaleRise(nn: number): number;
-declare function volume127(nn: number): number;
-declare function getDexedDuration(p_rate: number, p_level_l: number, p_level_r: number): number;
-declare function dumpTest(): void;

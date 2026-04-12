@@ -3,10 +3,12 @@ class VoiceDX7 {
 	beeps: BeepDX7[];
 	voxoutput: GainNode;
 	voContext: AudioContext;
+	locktime = 0;
 	constructor(destination: AudioNode, aContext: AudioContext) {
 		this.voContext = aContext;
 		this.voxoutput = this.voContext.createGain();
 		this.voxoutput.connect(destination);
+		this.voxoutput.gain.value=0.25;
 		this.beeps = [];
 		this.beeps[0] = new BeepDX7(this.voContext);
 		this.beeps[1] = new BeepDX7(this.voContext);
@@ -16,14 +18,14 @@ class VoiceDX7 {
 		this.beeps[5] = new BeepDX7(this.voContext);
 	}
 	setupVoice(presetData: DX7PresetData) {
-		console.log('setupVoice', presetData);
+		//console.log('setupVoice', presetData);
 		let algIdx = presetData.algorithm - 1;
 		let scheme: ConnectionSchemeDX7 = matrixConnectionAlgorithmsDX7[algIdx];
 		this.connectMixOperators(scheme);
 		for (let ii = 0; ii < 6; ii++) {
 			if (presetData.operators[ii].enabled) {
 				//console.log('setupVoice, operator',ii );
-				this.beeps[ii].setupOperator(presetData.operators[ii],presetData.feedback);
+				this.beeps[ii].setupOperator(presetData.operators[ii], presetData.feedback);
 			}
 		}
 	}
@@ -31,13 +33,16 @@ class VoiceDX7 {
 		console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
 		for (let ii = 0; ii < this.beeps.length; ii++) {
 			if (this.beeps[ii].ready) {
-				this.beeps[ii].startOperator(when, duration, note);
+				let olock = this.beeps[ii].startOperator(when, duration, note);
+				if (this.locktime < olock) {
+					this.locktime = olock;
+				}
 			} else {
 				console.log('operator', (1 + ii), 'skip');
 			}
 		}
 
-		
+
 	}
 	connectMixOperators(scheme: ConnectionSchemeDX7) {
 		for (let ii = 0; ii < scheme.outputMix.length; ii++) {

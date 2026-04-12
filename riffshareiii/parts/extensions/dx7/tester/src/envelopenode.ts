@@ -26,11 +26,11 @@ class EnvelopeNode {
 	durationDown(nn: number): number {
 		//let ss = this.scale99(nn);
 		//return 0.095 / ss;
-		return 0.008+318*Math.pow(2, (99-nn) * 0.16) / Math.pow(2, 99 * 0.16);
+		return 0.008 + 318 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
 	}
 	durationUp(nn: number): number {
 		//return  this.durationDown(nn)/4;
-		return 0.003+38*Math.pow(2, (99-nn) * 0.16) / Math.pow(2, 99 * 0.16);
+		return 0.003 + 38 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
 	}
 	levelRatio(nn: number): number {
 		let ratio = Math.log(nn + 1) * 14 + nn;
@@ -55,38 +55,17 @@ class EnvelopeNode {
 			, from: this.scale99(from99) / 32
 			, to: this.scale99(to99) / 32
 		};
-		console.log('slopeDuration', r99, from99, to99, slope, fullDuration, partDuration);
+		//console.log('slopeDuration', r99, from99, to99, slope, fullDuration, partDuration);
 		return slope;
-		//return { duration: partDuration * fullDuration, from: fromRatio/164, to: toRatio/164 };
-
-		/*
-				let speed = Math.pow(2, r99 * 0.16 - 11);
-				let fullDuration = 0.17 / speed;
-				if (from99 < to99) {
-					fullDuration = fullDuration / 2;
-				}
-				let from = this.level99to1value(from99);
-				let to = this.level99to1value(to99);
-				let partLevel = Math.abs(from99 - to99) / 100;
-				let partDuration = fullDuration * partLevel;
-				console.log(r99, speed, 'duration', fullDuration, '/', partDuration, ':', from, '>', to, ':', partLevel,);
-				return { duration: partDuration, from: from, to: to };
-				*/
 	}
 	setupEnvelope(rates99: number[], levels99: number[]) {
 		this.attack = this.slopeDuration(rates99[0], levels99[3], levels99[0]);
 		this.decay = this.slopeDuration(rates99[1], levels99[0], levels99[1]);
 		this.sustain = this.slopeDuration(rates99[2], levels99[1], levels99[2]);
 		this.release = this.slopeDuration(rates99[3], levels99[2], levels99[3]);
-		/*
-		console.log('rates', rates99, 'levels', levels99);
-		console.log('attack', this.attack);
-		console.log('decay', this.decay);
-		console.log('sustain', this.sustain);
-		console.log('release', this.release);
-		*/
+
 	}
-	startEnvelope(when: number, wholeDuration: number) {
+	startEnvelope(when: number, wholeDuration: number): number {
 		this.envelopeGain.gain.setValueAtTime(this.attack.from, when);
 		this.envelopeGain.gain.linearRampToValueAtTime(this.attack.to, when + this.attack.duration);
 		this.envelopeGain.gain.linearRampToValueAtTime(this.decay.to, when + this.attack.duration + this.decay.duration);
@@ -94,6 +73,7 @@ class EnvelopeNode {
 		this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
 		this.envelopeGain.gain.exponentialRampToValueAtTime(this.release.from, 0.003 + when + wholeDuration);
 		this.envelopeGain.gain.linearRampToValueAtTime(this.release.to, 0.003 + when + wholeDuration + this.release.duration);
+		return 0.003 + when + wholeDuration + this.release.duration;
 	}
 	down0now() {
 		this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);

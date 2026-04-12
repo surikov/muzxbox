@@ -708,7 +708,6 @@ class EnvelopeNode {
             from: this.scale99(from99) / 32,
             to: this.scale99(to99) / 32
         };
-        console.log('slopeDuration', r99, from99, to99, slope, fullDuration, partDuration);
         return slope;
     }
     setupEnvelope(rates99, levels99) {
@@ -725,6 +724,7 @@ class EnvelopeNode {
         this.envelopeGain.gain.cancelAndHoldAtTime(when + wholeDuration);
         this.envelopeGain.gain.exponentialRampToValueAtTime(this.release.from, 0.003 + when + wholeDuration);
         this.envelopeGain.gain.linearRampToValueAtTime(this.release.to, 0.003 + when + wholeDuration + this.release.duration);
+        return 0.003 + when + wholeDuration + this.release.duration;
     }
     down0now() {
         this.envelopeGain.gain.cancelScheduledValues(this.envelopeContext.currentTime);
@@ -733,21 +733,30 @@ class EnvelopeNode {
 }
 class SynthDX7 {
     constructor(audioContext) {
+        this.cache = [];
         console.log('new SynthDX7');
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
         this.output.connect(this.audioContext.destination);
     }
-    resetPreset(newpreset) {
-        this.preset = newpreset;
+    takeVox() {
+        for (let ii = 0; ii < this.cache.length; ii++) {
+            if (this.cache[ii].locktime < this.audioContext.currentTime) {
+                console.log('found vox', ii);
+                return this.cache[ii];
+            }
+        }
+        console.log('new vox', this.cache.length + 1);
+        let vx = new VoiceDX7(this.output, this.audioContext);
+        this.cache.push(vx);
+        return vx;
     }
-    scheduleStrum(when, pitches, slides) {
-        console.log('SynthDX7 schedule');
+    scheduleStrum(preset, when, pitches, slides) {
         if (this.audioContext.state === "suspended") {
             this.audioContext.resume();
         }
-        let testVox = new VoiceDX7(this.output, this.audioContext);
-        testVox.setupVoice(this.preset);
+        let testVox = this.takeVox();
+        testVox.setupVoice(preset);
         testVox.startPlayNote(when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
     }
 }
@@ -756,17 +765,13 @@ class BeepDX7 {
         this.ready = false;
         this.oscMode = 0;
         this.audioContext = cntxt;
-        this.destination = this.audioContext.createGain();
-        this.modulate = this.audioContext.createGain();
+        this.output = this.audioContext.createGain();
         this.feedback = this.audioContext.createGain();
-        this.input = this.audioContext.createGain();
         this.envelope = new EnvelopeNode(this.audioContext);
         this.phaseNode = new PhaseNode(this.audioContext);
         this.feedback.connect(this.phaseNode.carrier);
-        this.input.connect(this.phaseNode.carrier);
         this.phaseNode.carrier.connect(this.envelope.envelopeGain);
-        this.envelope.envelopeGain.connect(this.destination);
-        this.envelope.envelopeGain.connect(this.modulate);
+        this.envelope.envelopeGain.connect(this.output);
     }
     volume99scale(nn) {
         return Math.pow(2, nn * 0.125) / Math.pow(2, 99 * 0.125);
@@ -783,8 +788,7 @@ class BeepDX7 {
         this.detune = cfg.detune;
         let fbRatio = Math.pow(2, (fb - 7));
         this.feedback.gain.value = fbRatio * 0.6;
-        this.destination.gain.value = 1 / 6;
-        this.modulate.gain.value = this.volume99scale(cfg.volume);
+        this.output.gain.value = this.volume99scale(cfg.volume);
     }
     startOperator(when, duration, note) {
         var OCTAVE_1024 = 1.0006771307;
@@ -803,7 +807,7 @@ class BeepDX7 {
         if (this.phaseNode.modulationLevel) {
             this.phaseNode.modulationLevel.value = 14;
         }
-        this.envelope.startEnvelope(when, duration);
+        return this.envelope.startEnvelope(when, duration);
     }
     frequencyFromNoteNumber(note) {
         let ff = 440 * Math.pow(2, (note - 69) / 12);
@@ -811,20 +815,22 @@ class BeepDX7 {
     }
     ;
     connectToOutputNode(outNode) {
-        this.destination.connect(outNode);
+        this.output.connect(outNode);
     }
     connectToCarrier(opDX7) {
-        this.modulate.connect(opDX7.input);
+        this.output.connect(opDX7.phaseNode.carrier);
     }
     connectToSelf() {
-        this.modulate.connect(this.feedback);
+        this.output.connect(this.feedback);
     }
 }
 class VoiceDX7 {
     constructor(destination, aContext) {
+        this.locktime = 0;
         this.voContext = aContext;
         this.voxoutput = this.voContext.createGain();
         this.voxoutput.connect(destination);
+        this.voxoutput.gain.value = 0.25;
         this.beeps = [];
         this.beeps[0] = new BeepDX7(this.voContext);
         this.beeps[1] = new BeepDX7(this.voContext);
@@ -834,7 +840,6 @@ class VoiceDX7 {
         this.beeps[5] = new BeepDX7(this.voContext);
     }
     setupVoice(presetData) {
-        console.log('setupVoice', presetData);
         let algIdx = presetData.algorithm - 1;
         let scheme = matrixConnectionAlgorithmsDX7[algIdx];
         this.connectMixOperators(scheme);
@@ -848,7 +853,10 @@ class VoiceDX7 {
         console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
         for (let ii = 0; ii < this.beeps.length; ii++) {
             if (this.beeps[ii].ready) {
-                this.beeps[ii].startOperator(when, duration, note);
+                let olock = this.beeps[ii].startOperator(when, duration, note);
+                if (this.locktime < olock) {
+                    this.locktime = olock;
+                }
             }
             else {
                 console.log('operator', (1 + ii), 'skip');
@@ -1035,19 +1043,14 @@ function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
     };
     reader.readAsDataURL(blob);
 }
-let synthPiano;
-let synthBrass;
-let cusPres;
 let acx;
+let synthDx7;
 function initTester() {
     console.log('initTester');
     acx = new window.AudioContext();
     loadPhaseWorkletSource(acx, () => {
         console.log('skipLoadPhaseWorkletSource', skipLoadPhaseWorkletSource);
-        synthPiano = new SynthDX7(acx);
-        synthPiano.resetPreset(epiano1preset);
-        synthBrass = new SynthDX7(acx);
-        synthBrass.resetPreset(brass1preset);
+        synthDx7 = new SynthDX7(acx);
     });
 }
 let customPresets;
@@ -1055,8 +1058,6 @@ var selectedPresetData = null;
 function loadPresetNum(ii) {
     console.log('loadPresetNum', ii, customPresets[ii].name);
     selectedPresetData = customPresets[ii];
-    cusPres = new SynthDX7(acx);
-    cusPres.resetPreset(selectedPresetData);
 }
 function loadSysexFile(fileList) {
     let numFiles = fileList.length;
@@ -1107,229 +1108,19 @@ function parseSysexFile(bankData, patchId) {
     return preset;
 }
 function testPlay(isPiano, nn) {
-    console.log('testPlay', isPiano, nn);
     if (isPiano) {
-        synthPiano.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
+        synthDx7.scheduleStrum(epiano1preset, acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
     }
     else {
-        synthBrass.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
+        synthDx7.scheduleStrum(brass1preset, acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
     }
 }
 function customPlay(isPiano, nn) {
     if (selectedPresetData) {
-        console.log('customPlay', nn);
-        cusPres.scheduleStrum(acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
+        synthDx7.scheduleStrum(selectedPresetData, acx.currentTime + 0.1, [nn], [{ duration: 2.1, delta: 0 }]);
     }
     else {
         console.log('no data', nn);
     }
 }
-function speedRatio(nn) {
-    let speed = Math.pow(2, nn * 0.16 - 11);
-    return speed;
-}
-function rate2(nn) {
-    let ss = Math.pow(2, nn * 0.16 - 11);
-    return ss;
-}
-function level2(nn) {
-    let ratio = Math.log(nn + 1) * 14 + nn;
-    return ratio;
-}
-function test2(rr) {
-    return Math.pow(2, rr * 0.16 - 11);
-}
-function test5889(kk) {
-    let a58 = ((99 - 58) * kk / 1000) * test2(58) / test2(99);
-    let a89 = ((99 - 89) * kk / 1000) * +test2(89) / test2(99);
-    console.log(kk, a58, a89, a89 / a58);
-}
-function bezier99(nn) {
-    let t = nn;
-    let p1 = { x: 0.95, y: 0.1 };
-    let p2 = { x: 0.9, y: 0.7 };
-    let cX = 3 * p1.x;
-    let bX = 3 * (p2.x - p1.x) - cX;
-    let aX = 1 - cX - bX;
-    let cY = 3 * p1.y;
-    let bY = 3 * (p2.y - p1.y) - cY;
-    let aY = 1 - cY - bY;
-    let x = (aX * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t);
-    let y = (aY * Math.pow(t, 3)) + (bY * Math.pow(t, 2)) + (cY * t);
-    return { x: x, y: y };
-}
-function bezierO(nn) {
-    let t = nn;
-    let p0 = { x: 10, y: 10 };
-    let p1 = { x: 50, y: 100 };
-    let p2 = { x: 150, y: 200 };
-    let p3 = { x: 200, y: 75 };
-    let cX = 3 * (p1.x - p0.x);
-    let bX = 3 * (p2.x - p1.x) - cX;
-    let aX = p3.x - p0.x - cX - bX;
-    let cY = 3 * (p1.y - p0.y);
-    let bY = 3 * (p2.y - p1.y) - cY;
-    let aY = p3.y - p0.y - cY - bY;
-    let x = (aX * Math.pow(t, 3)) + (bX * Math.pow(t, 2)) + (cX * t) + p0.x;
-    let y = (aY * Math.pow(t, 3)) + (bY * Math.pow(t, 2)) + (cY * t) + p0.y;
-    return { x: x, y: y };
-}
-var OUTPUT_LEVEL_TABLE = [
-    0.000000, 0.000337, 0.000476, 0.000674, 0.000952, 0.001235, 0.001602, 0.001905, 0.002265, 0.002694,
-    0.003204, 0.003810, 0.004531, 0.005388, 0.006408, 0.007620, 0.008310, 0.009062, 0.010776, 0.011752,
-    0.013975, 0.015240, 0.016619, 0.018123, 0.019764, 0.021552, 0.023503, 0.025630, 0.027950, 0.030480,
-    0.033238, 0.036247, 0.039527, 0.043105, 0.047006, 0.051261, 0.055900, 0.060960, 0.066477, 0.072494,
-    0.079055, 0.086210, 0.094012, 0.102521, 0.111800, 0.121919, 0.132954, 0.144987, 0.158110, 0.172420,
-    0.188025, 0.205043, 0.223601, 0.243838, 0.265907, 0.289974, 0.316219, 0.344839, 0.376050, 0.410085,
-    0.447201, 0.487676, 0.531815, 0.579948, 0.632438, 0.689679, 0.752100, 0.820171, 0.894403, 0.975353,
-    1.063630, 1.159897, 1.264876, 1.379357, 1.504200, 1.640341, 1.788805, 1.950706, 2.127260, 2.319793,
-    2.529752, 2.758714, 3.008399, 3.280683, 3.577610, 3.901411, 4.254519, 4.639586, 5.059505, 5.517429,
-    6.016799, 6.561366, 7.155220, 7.802823, 8.509039, 9.279172, 10.11901, 11.03486, 12.03360, 13.12273
-];
-let EG_rate_rise_duration = [
-    38.00000, 34.96000, 31.92000, 28.88000, 25.84000,
-    22.80000, 20.64000, 18.48000, 16.32000, 14.16000,
-    12.00000, 11.10000, 10.20000, 9.30000, 8.40000,
-    7.50000, 6.96000, 6.42000, 5.88000, 5.34000,
-    4.80000, 4.38000, 3.96000, 3.54000, 3.12000,
-    2.70000, 2.52000, 2.34000, 2.16000, 1.98000,
-    1.80000, 1.70000, 1.60000, 1.50000, 1.40000,
-    1.30000, 1.22962, 1.15925, 1.08887, 1.01850,
-    0.94813, 0.87775, 0.80737, 0.73700, 0.69633,
-    0.65567, 0.61500, 0.57833, 0.54167, 0.50500,
-    0.47300, 0.44100, 0.40900, 0.37967, 0.35033,
-    0.32100, 0.28083, 0.24067, 0.20050, 0.16033,
-    0.12017, 0.08000, 0.07583, 0.07167, 0.06750,
-    0.06333, 0.05917, 0.05500, 0.04350, 0.03200,
-    0.02933, 0.02667, 0.02400, 0.02200, 0.02000,
-    0.01800, 0.01667, 0.01533, 0.01400, 0.01300,
-    0.01200, 0.01100, 0.01000, 0.00900, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00767, 0.00733,
-    0.00700, 0.00633, 0.00567, 0.00500, 0.00433,
-    0.00367, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300, 0.00300, 0.00300,
-    0.00300, 0.00300, 0.00300
-];
-let EG_rate_decay_duration = [
-    318.00000, 283.75000, 249.50000, 215.25000, 181.00000,
-    167.80000, 154.60001, 141.39999, 128.20000, 115.00000,
-    104.60000, 94.20000, 83.80000, 73.40000, 63.00000,
-    58.34000, 53.68000, 49.02000, 44.36000, 39.70000,
-    35.76000, 31.82000, 27.88000, 23.94000, 20.00000,
-    18.24000, 16.48000, 14.72000, 12.96000, 11.20000,
-    10.36000, 9.52000, 8.68000, 7.84000, 7.00000,
-    6.83250, 6.66500, 6.49750, 6.33000, 6.16250,
-    5.99500, 5.82750, 5.66000, 5.10000, 4.54000,
-    3.98000, 3.64833, 3.31667, 2.98500, 2.65333,
-    2.32167, 1.99000, 1.77333, 1.55667, 1.34000,
-    1.22333, 1.10667, 0.99000, 0.89667, 0.80333,
-    0.71000, 0.65000, 0.59000, 0.53000, 0.47000,
-    0.41000, 0.32333, 0.23667, 0.15000, 0.12700,
-    0.10400, 0.08100, 0.07667, 0.07233, 0.06800,
-    0.06100, 0.05400, 0.04700, 0.04367, 0.04033,
-    0.03700, 0.03300, 0.02900, 0.02500, 0.02333,
-    0.02167, 0.02000, 0.01767, 0.01533, 0.01300,
-    0.01133, 0.00967, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800, 0.00800, 0.00800,
-    0.00800, 0.00800, 0.00800
-];
-let EG_rate_rise_percent = [
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00501, 0.01001, 0.01500,
-    0.02000, 0.02800, 0.03600, 0.04400, 0.05200,
-    0.06000, 0.06800, 0.07600, 0.08400, 0.09200,
-    0.10000, 0.10800, 0.11600, 0.12400, 0.13200,
-    0.14000, 0.15000, 0.16000, 0.17000, 0.18000,
-    0.19000, 0.20000, 0.21000, 0.22000, 0.23000,
-    0.24000, 0.25100, 0.26200, 0.27300, 0.28400,
-    0.29500, 0.30600, 0.31700, 0.32800, 0.33900,
-    0.35000, 0.36500, 0.38000, 0.39500, 0.41000,
-    0.42500, 0.44000, 0.45500, 0.47000, 0.48500,
-    0.50000, 0.52000, 0.54000, 0.56000, 0.58000,
-    0.60000, 0.62000, 0.64000, 0.66000, 0.68000,
-    0.70000, 0.73200, 0.76400, 0.79600, 0.82800,
-    0.86000, 0.89500, 0.93000, 0.96500, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000
-];
-let EG_rate_decay_percent = [
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00001, 0.00001, 0.00001,
-    0.00001, 0.00001, 0.00501, 0.01001, 0.01500,
-    0.02000, 0.02800, 0.03600, 0.04400, 0.05200,
-    0.06000, 0.06800, 0.07600, 0.08400, 0.09200,
-    0.10000, 0.10800, 0.11600, 0.12400, 0.13200,
-    0.14000, 0.15000, 0.16000, 0.17000, 0.18000,
-    0.19000, 0.20000, 0.21000, 0.22000, 0.23000,
-    0.24000, 0.25100, 0.26200, 0.27300, 0.28400,
-    0.29500, 0.30600, 0.31700, 0.32800, 0.33900,
-    0.35000, 0.36500, 0.38000, 0.39500, 0.41000,
-    0.42500, 0.44000, 0.45500, 0.47000, 0.48500,
-    0.50000, 0.52000, 0.54000, 0.56000, 0.58000,
-    0.60000, 0.62000, 0.64000, 0.66000, 0.68000,
-    0.70000, 0.73200, 0.76400, 0.79600, 0.82800,
-    0.86000, 0.89500, 0.93000, 0.96500, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000, 1.00000, 1.00000,
-    1.00000, 1.00000, 1.00000
-];
-function scaleA(nn) {
-    return Math.pow(2, nn * 0.16 - 11);
-}
-function scaleB(nn) {
-    return Math.pow(2, nn * 0.126);
-}
-function scaleVolume(nn) {
-    return Math.pow(2, nn / 8);
-}
-function scaleRise1(nn) {
-    return Math.pow(2, nn * 0.15);
-}
-function scaleRise2(nn) {
-    return Math.pow(2, nn * 0.155);
-}
-function scaleRise(nn) {
-    return Math.pow(2, nn * 0.14) / Math.pow(2, 127 * 0.14);
-}
-function volume127(nn) {
-    return nn;
-}
-function getDexedDuration(p_rate, p_level_l, p_level_r) {
-    let duration_table = (p_level_r > p_level_l) ? EG_rate_rise_duration : EG_rate_decay_duration;
-    let duration = duration_table[p_rate];
-    let percent_table = (p_level_r > p_level_l) ? EG_rate_rise_percent : EG_rate_decay_percent;
-    duration = duration * Math.abs(percent_table[p_level_r] - percent_table[p_level_l]);
-    return duration;
-}
-function dumpTest() {
-    for (let ii = 0; ii < 128; ii++) {
-        console.log(ii, EG_rate_rise_duration[ii], 0.003 + 38 * Math.pow(2, (127 - ii) * 0.16) / Math.pow(2, 127 * 0.16));
-    }
-}
-dumpTest();
 //# sourceMappingURL=tester.js.map
