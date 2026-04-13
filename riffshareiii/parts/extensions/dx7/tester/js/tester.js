@@ -839,7 +839,14 @@ class VoiceDX7 {
         this.beeps[4] = new BeepDX7(this.voContext);
         this.beeps[5] = new BeepDX7(this.voContext);
     }
+    disconnectAll() {
+        for (let ii = 0; ii < 6; ii++) {
+            this.beeps[ii].feedback.disconnect();
+            this.beeps[ii].output.disconnect();
+        }
+    }
     setupVoice(presetData) {
+        this.disconnectAll();
         let algIdx = presetData.algorithm - 1;
         let scheme = matrixConnectionAlgorithmsDX7[algIdx];
         this.connectMixOperators(scheme);

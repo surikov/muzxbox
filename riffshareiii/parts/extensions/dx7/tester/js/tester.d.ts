@@ -460,6 +460,7 @@ declare class VoiceDX7 {
     voContext: AudioContext;
     locktime: number;
     constructor(destination: AudioNode, aContext: AudioContext);
+    disconnectAll(): void;
     setupVoice(presetData: DX7PresetData): void;
     startPlayNote(when: number, duration: number, note: number): void;
     connectMixOperators(scheme: ConnectionSchemeDX7): void;
