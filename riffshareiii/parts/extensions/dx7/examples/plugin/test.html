@@ -1,0 +1,77 @@
+<html>
+
+<head>
+	<script src='dx7tester.js'></script>
+</head>
+
+<body>
+	<p>
+		<button onclick='tester.testPlay(true,60);'>piano 60</button>
+		<button onclick='tester.testPlay(true,63);'>piano 63</button>
+		<button onclick='tester.testPlay(true,67);'>piano 67</button>
+		<br />
+		<button onclick='tester.testPlay(true,48);'>piano 48</button>
+		<button onclick='tester.testPlay(true,51);'>piano 51</button>
+		<button onclick='tester.testPlay(true,55);'>piano 55</button>
+	</p>
+	<p>
+		<button onclick='tester.testPlay(false,60);'>brass 60</button>
+		<button onclick='tester.testPlay(false,63);'>brass 63</button>
+		<button onclick='tester.testPlay(false,67);'>brass 67</button>
+		<br />
+		<button onclick='tester.testPlay(false,48);'>brass 48</button>
+		<button onclick='tester.testPlay(false,51);'>brass 51</button>
+		<button onclick='tester.testPlay(false,55);'>brass 55</button>
+	</p>
+
+	<p>
+		<button onclick='tester.customPlay(false,60);'> 60</button>
+		<button onclick='tester.customPlay(false,63);'> 63</button>
+		<button onclick='tester.customPlay(false,67);'> 67</button>
+		<br />
+		<button onclick='tester.customPlay(false,48);'> 48</button>
+		<button onclick='tester.customPlay(false,51);'> 51</button>
+		<button onclick='tester.customPlay(false,55);'> 55</button>
+	</p>
+
+	<p>
+		<input type="file" onchange="tester.loadSysexFile(this.files);" />
+		<button onclick="tester.loadPresetNum(0);">0</button>
+		<button onclick="tester.loadPresetNum(1);">1</button>
+		<button onclick="tester.loadPresetNum(2);">2</button>
+		<button onclick="tester.loadPresetNum(3);">3</button>
+		<button onclick="tester.loadPresetNum(4);">4</button>
+		<button onclick="tester.loadPresetNum(5);">5</button>
+		<button onclick="tester.loadPresetNum(6);">6</button>
+		<button onclick="tester.loadPresetNum(7);">7</button>
+		<button onclick="tester.loadPresetNum(8);">8</button>
+		<button onclick="tester.loadPresetNum(9);">9</button>
+
+		<button onclick="tester.loadPresetNum(10);">10</button>
+		<button onclick="tester.loadPresetNum(11);">11</button>
+		<button onclick="tester.loadPresetNum(12);">12</button>
+		<button onclick="tester.loadPresetNum(13);">13</button>
+		<button onclick="tester.loadPresetNum(14);">14</button>
+		<button onclick="tester.loadPresetNum(15);">15</button>
+		<button onclick="tester.loadPresetNum(16);">16</button>
+		<button onclick="tester.loadPresetNum(17);">17</button>
+		<button onclick="tester.loadPresetNum(18);">18</button>
+		<button onclick="tester.loadPresetNum(19);">19</button>
+
+		<button onclick="tester.loadPresetNum(20);">20</button>
+		<button onclick="tester.loadPresetNum(21);">21</button>
+		<button onclick="tester.loadPresetNum(22);">22</button>
+		<button onclick="tester.loadPresetNum(23);">23</button>
+		<button onclick="tester.loadPresetNum(24);">24</button>
+		<button onclick="tester.loadPresetNum(25);">25</button>
+		<button onclick="tester.loadPresetNum(26);">26</button>
+		<button onclick="tester.loadPresetNum(27);">27</button>
+		<button onclick="tester.loadPresetNum(28);">28</button>
+		<button onclick="tester.loadPresetNum(29);">29</button>
+
+		<button onclick="tester.loadPresetNum(30);">30</button>
+		<button onclick="tester.loadPresetNum(31);">31</button>
+	</p>
+</body>
+
+</html>

@@ -45,7 +45,8 @@ function loadSysexFile(fileList: FileList) {
 	reader.onerror = (error) => {
 		console.log('error', error)
 	};
-	reader.readAsText(fileList[0]);
+	let file=fileList[0];
+	reader.readAsText(file);
 
 }
 function parseSysexFile(bankData: string, patchId: number): DX7PresetData {
