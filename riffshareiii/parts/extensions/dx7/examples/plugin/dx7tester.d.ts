@@ -305,6 +305,8 @@ type DX7OperatorData = {
     detune_7_7: number;
     rates0_99: number[];
     levels0_99: number[];
+    lfoAmpModSens_3_3: number;
+    velocitySens0_7: number;
 };
 type DX7PresetData = {
     name: string;
@@ -370,7 +372,8 @@ declare class DX7Operator {
     audioContext: AudioContext;
     output: GainNode;
     feedback: GainNode;
-    phaseShift: DelayNode;
+    phaseDelay: DelayNode;
+    waveShift: ConstantSourceNode;
     carrier: OscillatorNode;
     modulation: GainNode;
     envelope: GainNode;

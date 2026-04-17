@@ -23,7 +23,7 @@ class DX7Test {
 		if (this.synth) {
 			if (this.selectedPreset) {
 				//console.log('play', nn, this.selectedPreset);
-//this.selectedPreset.operators[2].volume = 0.001;
+				//this.selectedPreset.operators[2].volume = 0.001;
 				this.selectedPreset.operators[2].enabled = false;
 				this.selectedPreset.operators[3].enabled = false;
 				this.selectedPreset.operators[4].enabled = false;
@@ -43,4 +43,44 @@ class DX7Test {
 	}
 }
 var tester = new DX7Test();
+////////////////////////////////////////////////////////
+/*
+function durationUp(nn: number): number {
+	//return  this.durationDown(nn)/4;
+	return 0.0001 + 38 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+}*/
+/*
+let loader: DX7Loader = new DX7Loader();
+for (let ii = 0; ii < 100; ii++) {
+	//console.log(ii,loader.durationUp(ii));
+}
 
+console.log(99, 0.0004, loader.durationUp(99));
+console.log(98, 0.00047, loader.durationUp(98));
+console.log(97, 0.00047, loader.durationUp(97));
+console.log(96, 0.00056, loader.durationUp(96));
+console.log(96, 0.00068, loader.durationUp(95));
+console.log(95, 0.00068, loader.durationUp(94));
+console.log(93, 0.00081, loader.durationUp(93));
+console.log(92, 0.00098, loader.durationUp(92));
+console.log(91, 0.00098, loader.durationUp(91));
+console.log(90, 0.0011, loader.durationUp(90));
+console.log(89, 0.0011, loader.durationUp(89));
+console.log(88, 0.0013, loader.durationUp(88));
+console.log(80, 0.0033, loader.durationUp(80));
+console.log(70, 0.0113, loader.durationUp(70));
+console.log(60, 0.0322, loader.durationUp(60));
+console.log(50, 0.0912, loader.durationUp(50));
+console.log(40, 0.0371, loader.durationUp(40));
+console.log(30, 0.8686, loader.durationUp(30));
+console.log(20, 2.92, loader.durationUp(20));
+console.log(10, 8.264, loader.durationUp(10));
+
+console.log(99, 0.0033, loader.durationDown(99));
+console.log(89, 0.0088, loader.durationDown(89));
+console.log(79, 0.02868, loader.durationDown(79));
+console.log(69, 0.0803, loader.durationDown(69));
+console.log(59, 0.2695, loader.durationDown(59));
+console.log(49, 0.7615, loader.durationDown(49));
+console.log(19, 20.48, loader.durationDown(19));
+*/

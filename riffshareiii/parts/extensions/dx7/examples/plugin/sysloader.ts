@@ -8,6 +8,8 @@ type DX7OperatorData = {
 	detune_7_7: number;
 	rates0_99: number[];
 	levels0_99: number[];
+	lfoAmpModSens_3_3: number;
+	velocitySens0_7: number;
 };
 type DX7PresetData = {
 	name: string;
@@ -85,36 +87,41 @@ class DX7Loader {
 		{ outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }         //32 e.organ 1
 	];
 	scale99(nn: number): number {
-		let speed = Math.pow(2, nn * 0.16 - 11);
+		let speed = Math.pow(2, nn * 0.16);
 		return speed;
 	}
 	durationDown(nn: number): number {
 		//let ss = this.scale99(nn);
 		//return 0.095 / ss;
-		return 0.008 + 318 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+		//return 318 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16)//+0.008;
+		return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16)//+0.008;
 	}
 	durationUp(nn: number): number {
 		//return  this.durationDown(nn)/4;
-		return 0.0003 + 38 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+		//return 38 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16) //+0.0001;
+		return 24.9 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16) //+0.0001;
 	}
 	levelRatio(nn: number): number {
+		return nn / 99;
 		let ratio = Math.log(nn + 1) * 14 + nn;
 		return ratio;
 	}
 	slopeDuration(r99: number, from99: number, to99: number): SynthSlope {
-		let fromRatio = this.levelRatio(from99);
-		let toRatio = this.levelRatio(to99);
-		let fullRatio = this.levelRatio(100);
-		let partDuration = Math.abs(fromRatio - toRatio) / fullRatio;
+		//let fromRatio = this.levelRatio(from99);
+		//let toRatio = this.levelRatio(to99);
+		//let fullRatio = this.levelRatio(99);
+		let partDuration = Math.abs(this.levelRatio(from99) - this.levelRatio(to99)) / this.levelRatio(99);
 		let fullDuration = this.durationDown(r99);
-		//console.log(r99, 'partDuration', partDuration, 'fullDuration', fullDuration, 'speed', this.scale99(r99));
+
 		if (from99 < to99) {
 			fullDuration = this.durationUp(r99);
 		}
+		//console.log(r99, 'partDuration', partDuration, 'fullDuration', fullDuration, '/', this.durationUp(r99), 'speed', this.scale99(r99));
+
 		let slope = {
 			duration: partDuration * fullDuration
-			, from: this.scale99(from99) / 32
-			, to: this.scale99(to99) / 32
+			, from: this.scale99(from99) / this.scale99(99)
+			, to: this.scale99(to99) / this.scale99(99)
 		};
 		//if(dump)console.log('slopeDuration', r99, 'from',from99,'to', to99, slope, fullDuration,'/', partDuration);
 		return slope;
@@ -204,6 +211,8 @@ class DX7Loader {
 				, freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1)
 				, freqFine0_99: oscData.charCodeAt(16)
 				, enabled: true
+				, lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3
+				, velocitySens0_7: oscData.charCodeAt(13) >> 2
 			};
 			operators.splice(0, 0, operator);
 		}

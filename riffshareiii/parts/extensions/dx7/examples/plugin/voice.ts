@@ -52,10 +52,10 @@ class DX7Voice {
 				if (this.locktime < time) {
 					this.locktime = time;
 				}
-				console.log(ii, 'startPlayFrequency', frequency);
+				//console.log(ii, 'startPlayFrequency', frequency);
 			}
 		}
 		this.connectOperators(preset);
-		console.log('startPlayNote', note, 'when', when, 'lock', this.locktime);
+		//console.log('startPlayNote', note, 'when', when, 'lock', this.locktime);
 	}
 }

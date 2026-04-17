@@ -42,12 +42,12 @@ class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
 	process(inputs, outputs, parameters) {
 		let outSampleCount = outputs[0][0].length;
 		let frequency = parameters["carrierFrequency"][0];
-		let level = parameters["modulationLevel"][0];
+		let modulationLevel = parameters["modulationLevel"][0];
 		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
 
 		for (let xx = 0; xx < outSampleCount; xx++) {
 			let inputSumm = this.readSample(inputs, xx);
-			let resultValue = Math.sin(this.phase + level * inputSumm);
+			let resultValue = Math.sin(this.phase + modulationLevel * inputSumm);
 			this.writeSample(outputs, xx, resultValue);
 			this.phase = this.phase + incrementBySample;
 			if (this.phase >= Math.PI * 2) {
@@ -95,7 +95,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 		carrierFrequency.value = soundFrequency;
 		modulatorBeep.frequency.value = soundFrequency;
 		modulationLevel.setValueAtTime(0, when);
-		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 1);
+		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 3);
 
 		volume.connect(audioContext.destination);
 		carrier.connect(volume);
@@ -103,7 +103,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 
 		modulatorBeep.start(when);
 		volume.gain.setValueAtTime(1, when);
-		volume.gain.setValueAtTime(0, when + 1);
+		volume.gain.setValueAtTime(0, when + 3);
 	}
 </script>
 

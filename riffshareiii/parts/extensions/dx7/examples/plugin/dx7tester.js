@@ -37,32 +37,30 @@ class DX7Loader {
         ];
     }
     scale99(nn) {
-        let speed = Math.pow(2, nn * 0.16 - 11);
+        let speed = Math.pow(2, nn * 0.16);
         return speed;
     }
     durationDown(nn) {
-        return 0.008 + 318 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+        return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
     }
     durationUp(nn) {
-        return 0.0003 + 38 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+        return 24.9 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
     }
     levelRatio(nn) {
+        return nn / 99;
         let ratio = Math.log(nn + 1) * 14 + nn;
         return ratio;
     }
     slopeDuration(r99, from99, to99) {
-        let fromRatio = this.levelRatio(from99);
-        let toRatio = this.levelRatio(to99);
-        let fullRatio = this.levelRatio(100);
-        let partDuration = Math.abs(fromRatio - toRatio) / fullRatio;
+        let partDuration = Math.abs(this.levelRatio(from99) - this.levelRatio(to99)) / this.levelRatio(99);
         let fullDuration = this.durationDown(r99);
         if (from99 < to99) {
             fullDuration = this.durationUp(r99);
         }
         let slope = {
             duration: partDuration * fullDuration,
-            from: this.scale99(from99) / 32,
-            to: this.scale99(to99) / 32
+            from: this.scale99(from99) / this.scale99(99),
+            to: this.scale99(to99) / this.scale99(99)
         };
         return slope;
     }
@@ -138,7 +136,9 @@ class DX7Loader {
                 constMode0_1: oscData.charCodeAt(15) & 1,
                 freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1),
                 freqFine0_99: oscData.charCodeAt(16),
-                enabled: true
+                enabled: true,
+                lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3,
+                velocitySens0_7: oscData.charCodeAt(13) >> 2
             };
             operators.splice(0, 0, operator);
         }
@@ -227,11 +227,9 @@ class DX7Voice {
                 if (this.locktime < time) {
                     this.locktime = time;
                 }
-                console.log(ii, 'startPlayFrequency', frequency);
             }
         }
         this.connectOperators(preset);
-        console.log('startPlayNote', note, 'when', when, 'lock', this.locktime);
     }
 }
 class DX7Operator {
@@ -241,20 +239,38 @@ class DX7Operator {
         this.modulation = this.audioContext.createGain();
         this.feedback = this.audioContext.createGain();
         this.envelope = this.audioContext.createGain();
-        this.phaseShift = this.audioContext.createDelay();
+        this.phaseDelay = this.audioContext.createDelay();
         this.carrier = this.audioContext.createOscillator();
-        this.carrier.connect(this.phaseShift);
-        this.modulation.connect(this.phaseShift.delayTime);
-        this.phaseShift.connect(this.envelope);
+        this.waveShift = this.audioContext.createConstantSource();
+        this.carrier.connect(this.phaseDelay);
+        this.modulation.connect(this.phaseDelay.delayTime);
+        this.waveShift.connect(this.phaseDelay.delayTime);
+        this.phaseDelay.connect(this.envelope);
         this.envelope.connect(this.output);
         this.output.gain.value = 0;
-        this.phaseShift.delayTime.value = 0;
+        this.phaseDelay.delayTime.value = 0;
         this.carrier.start(this.audioContext.currentTime);
+        this.waveShift.start(this.audioContext.currentTime);
     }
     startPlayFrequency(info, when, duration, frequency) {
         this.carrier.frequency.value = frequency;
-        this.modulation.gain.value = 1 / frequency;
+        this.modulation.gain.value = 2 / frequency;
+        this.waveShift.offset.value = 0 / frequency;
         this.output.gain.value = info.volume;
+        this.envelope.gain.setValueAtTime(info.attack.from, when);
+        this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
+        this.envelope.gain.linearRampToValueAtTime(info.decay.to, when + info.attack.duration + info.decay.duration);
+        this.envelope.gain.linearRampToValueAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration + info.sustain.duration);
+        this.envelope.gain.cancelAndHoldAtTime(when + duration);
+        this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
+        if (info.release.duration > 3 || info.release.to > 0) {
+            this.envelope.gain.cancelAndHoldAtTime(when + duration + info.release.duration + 3);
+            this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + info.release.duration + 3);
+            return 0.003 + when + duration + info.release.duration + 3;
+        }
+        else {
+            return 0.003 + when + duration + info.release.duration;
+        }
         return 5;
     }
 }

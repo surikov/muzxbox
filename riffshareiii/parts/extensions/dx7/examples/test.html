@@ -1,0 +1,56 @@
+<html>
+<button onclick='start();'>test</button>
+<script>
+	function start() {
+		//50;2.71
+		//110;2.71
+		//261.6255653005986;2.662
+		//440;2.70
+		//659.25;2.75
+		//1000;2.725
+		//Math.E
+
+		let audioContext = new AudioContext();
+		let when = audioContext.currentTime + 0.1;
+		let soundFrequency = 1000;//50;//659.25;//440;//261.6255653005986;
+		
+		let minmodulation = 2.7;//2.662;
+		let maxmodulation = 2.8;//2.662;
+
+		let carrier = audioContext.createOscillator();
+		let modulatorBeep = audioContext.createOscillator();
+		let modulationLevel = audioContext.createGain();
+		let phaseDelay = audioContext.createDelay();
+		let waveShift = audioContext.createConstantSource();
+
+		carrier.frequency.value = soundFrequency;
+		modulatorBeep.frequency.value = soundFrequency;
+		//modulationLevel.gain.setValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when);
+		//modulationLevel.gain.setValueAtTime(4 / soundFrequency, when);-semiequal
+		modulationLevel.gain.setValueAtTime(minmodulation / soundFrequency, when);
+		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / soundFrequency, when + 3);
+		//modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
+		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
+		//phaseDelay.delayTime.value = 0.5 / soundFrequency;
+		//phaseDelay.delayTime.value = 1 / soundFrequency;
+		//delayShift.offset.value = maxmodulation*1 / soundFrequency;
+		waveShift.offset.setValueAtTime(2 * minmodulation / soundFrequency, when);
+		waveShift.offset.linearRampToValueAtTime(2 * maxmodulation / soundFrequency, when + 3);
+
+		modulatorBeep.connect(modulationLevel);
+		modulationLevel.connect(phaseDelay.delayTime);
+		waveShift.connect(phaseDelay.delayTime);
+		carrier.connect(phaseDelay);
+		phaseDelay.connect(audioContext.destination);
+
+		modulatorBeep.start(audioContext.currentTime);
+		waveShift.start(audioContext.currentTime);
+		carrier.start(when);
+
+		modulatorBeep.stop(when + 3);
+		waveShift.stop(when + 3);
+		carrier.stop(when + 3);
+	}
+</script>
+
+</html>
