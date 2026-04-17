@@ -44,6 +44,7 @@ for(let ii=0;ii<6;ii++){
 				let olock = this.beeps[ii].startOperator(when, duration, note);
 				if (this.locktime < olock) {
 					this.locktime = olock;
+					console.log('locktime',this.locktime);
 				}
 			} else {
 				console.log('operator', (1 + ii), 'skip');

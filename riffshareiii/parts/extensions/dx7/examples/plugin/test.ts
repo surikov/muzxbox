@@ -24,10 +24,11 @@ class DX7Test {
 			if (this.selectedPreset) {
 				//console.log('play', nn, this.selectedPreset);
 				//this.selectedPreset.operators[2].volume = 0.001;
-				this.selectedPreset.operators[2].enabled = false;
-				this.selectedPreset.operators[3].enabled = false;
-				this.selectedPreset.operators[4].enabled = false;
-				this.selectedPreset.operators[5].enabled = false;
+				//this.selectedPreset.operators[2].enabled = false;
+				//this.selectedPreset.operators[3].enabled = false;
+				//this.selectedPreset.operators[4].enabled = false;
+				//this.selectedPreset.operators[5].enabled = false;
+
 				this.synth.scheduleStrum(this.selectedPreset, this.synth.audioContext.currentTime + 0.321, [nn], [{ duration: 2.1, delta: 0 }]);
 			}
 		}
@@ -84,3 +85,7 @@ console.log(59, 0.2695, loader.durationDown(59));
 console.log(49, 0.7615, loader.durationDown(49));
 console.log(19, 20.48, loader.durationDown(19));
 */
+/*
+for (let ii = 0; ii <= 7; ii++) {
+	console.log(ii, Math.pow(2, (ii - 7)));
+}*/

@@ -67,7 +67,7 @@ class DX7Loader {
     convertDX7data(fileName, dx7data) {
         let preset = {
             label: dx7data.name.trim() + '/' + fileName.trim(),
-            connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm0_31],
+            connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32 - 1],
             operators: [],
             feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) * 0.6
         };
@@ -143,7 +143,7 @@ class DX7Loader {
             operators.splice(0, 0, operator);
         }
         let preset = {
-            algorithm0_31: voiceData.charCodeAt(110) + 1,
+            algorithm1_32: voiceData.charCodeAt(110) + 1,
             feedback0_7: voiceData.charCodeAt(111) & 7,
             operators: operators,
             name: voiceData.substring(118, 128),
@@ -165,7 +165,7 @@ class DX7Synthesizer {
                 return this.cache[ii];
             }
         }
-        console.log('new vox', this.cache.length + 1);
+        console.log('new vox', this.audioContext.currentTime, this.cache);
         let vx = new DX7Voice(this.audioContext, this.output);
         this.cache.push(vx);
         return vx;
@@ -201,7 +201,6 @@ class DX7Voice {
             for (let mm = 0; mm < modulatorIds.length; mm++) {
                 let id = modulatorIds[mm];
                 if (id == ii) {
-                    this.operators[id].feedback.gain.value = preset.feedbackRatio;
                     this.operators[id].output.connect(this.operators[id].feedback);
                 }
                 else {
@@ -223,9 +222,10 @@ class DX7Voice {
                     let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
                     frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
                 }
-                let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency);
+                let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
                 if (this.locktime < time) {
                     this.locktime = time;
+                    console.log(ii, 'locktime', time, 'when', when, 'now', this.audioContext.currentTime);
                 }
             }
         }
@@ -244,6 +244,7 @@ class DX7Operator {
         this.waveShift = this.audioContext.createConstantSource();
         this.carrier.connect(this.phaseDelay);
         this.modulation.connect(this.phaseDelay.delayTime);
+        this.feedback.connect(this.phaseDelay.delayTime);
         this.waveShift.connect(this.phaseDelay.delayTime);
         this.phaseDelay.connect(this.envelope);
         this.envelope.connect(this.output);
@@ -252,10 +253,11 @@ class DX7Operator {
         this.carrier.start(this.audioContext.currentTime);
         this.waveShift.start(this.audioContext.currentTime);
     }
-    startPlayFrequency(info, when, duration, frequency) {
+    startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
         this.carrier.frequency.value = frequency;
-        this.modulation.gain.value = 2 / frequency;
-        this.waveShift.offset.value = 0 / frequency;
+        this.modulation.gain.value = Math.PI / frequency;
+        this.waveShift.offset.value = 2 * Math.PI / frequency;
+        this.feedback.gain.value = 0.66 * feedbackRatio * Math.PI / frequency;
         this.output.gain.value = info.volume;
         this.envelope.gain.setValueAtTime(info.attack.from, when);
         this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
@@ -264,9 +266,9 @@ class DX7Operator {
         this.envelope.gain.cancelAndHoldAtTime(when + duration);
         this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
         if (info.release.duration > 3 || info.release.to > 0) {
-            this.envelope.gain.cancelAndHoldAtTime(when + duration + info.release.duration + 3);
-            this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + info.release.duration + 3);
-            return 0.003 + when + duration + info.release.duration + 3;
+            this.envelope.gain.cancelAndHoldAtTime(when + duration + 3);
+            this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + 3);
+            return 0.003 + when + duration + 3;
         }
         else {
             return 0.003 + when + duration + info.release.duration;
@@ -297,10 +299,6 @@ class DX7Test {
         }
         if (this.synth) {
             if (this.selectedPreset) {
-                this.selectedPreset.operators[2].enabled = false;
-                this.selectedPreset.operators[3].enabled = false;
-                this.selectedPreset.operators[4].enabled = false;
-                this.selectedPreset.operators[5].enabled = false;
                 this.synth.scheduleStrum(this.selectedPreset, this.synth.audioContext.currentTime + 0.321, [nn], [{ duration: 2.1, delta: 0 }]);
             }
         }

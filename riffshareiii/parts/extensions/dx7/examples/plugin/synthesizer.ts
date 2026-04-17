@@ -13,8 +13,8 @@ class DX7Synthesizer {
 				return this.cache[ii];
 			}
 		}
-		console.log('new vox', this.cache.length + 1);
-		let vx: DX7Voice = new DX7Voice(this.audioContext,this.output);
+		console.log('new vox', this.audioContext.currentTime, this.cache);
+		let vx: DX7Voice = new DX7Voice(this.audioContext, this.output);
 		this.cache.push(vx);
 		return vx;
 	}

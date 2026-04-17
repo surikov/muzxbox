@@ -27,7 +27,7 @@ class DX7Voice {
 			for (let mm = 0; mm < modulatorIds.length; mm++) {
 				let id = modulatorIds[mm];
 				if (id == ii) {
-					this.operators[id].feedback.gain.value = preset.feedbackRatio;
+					//this.operators[id].feedback.gain.value = preset.feedbackRatio*Math.PI / frequency;
 					this.operators[id].output.connect(this.operators[id].feedback);
 				} else {
 					this.operators[id].output.connect(carrier.modulation);
@@ -48,11 +48,12 @@ class DX7Voice {
 					let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
 					frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
 				}
-				let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency);
+				let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
 				if (this.locktime < time) {
 					this.locktime = time;
+					console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);
 				}
-				//console.log(ii, 'startPlayFrequency', frequency);
+				
 			}
 		}
 		this.connectOperators(preset);

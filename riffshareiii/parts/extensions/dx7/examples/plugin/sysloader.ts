@@ -13,7 +13,7 @@ type DX7OperatorData = {
 };
 type DX7PresetData = {
 	name: string;
-	algorithm0_31: number;
+	algorithm1_32: number;
 	operators: DX7OperatorData[];
 	feedback0_7: number;
 };
@@ -129,7 +129,7 @@ class DX7Loader {
 	convertDX7data(fileName: string, dx7data: DX7PresetData): SynthPreset {
 		let preset: SynthPreset = {
 			label: dx7data.name.trim() + '/' + fileName.trim()
-			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm0_31]
+			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32-1]
 			, operators: []
 			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) * 0.6
 		};
@@ -217,7 +217,7 @@ class DX7Loader {
 			operators.splice(0, 0, operator);
 		}
 		let preset: DX7PresetData = {
-			algorithm0_31: voiceData.charCodeAt(110) + 1,
+			algorithm1_32: voiceData.charCodeAt(110) + 1,
 			feedback0_7: voiceData.charCodeAt(111) & 7,
 			operators: operators,
 			name: voiceData.substring(118, 128),

@@ -20,6 +20,7 @@ class DX7Operator {
 
 		this.carrier.connect(this.phaseDelay);
 		this.modulation.connect(this.phaseDelay.delayTime);
+		this.feedback.connect(this.phaseDelay.delayTime);
 		this.waveShift.connect(this.phaseDelay.delayTime);
 		this.phaseDelay.connect(this.envelope);
 		this.envelope.connect(this.output);
@@ -30,10 +31,11 @@ class DX7Operator {
 		this.carrier.start(this.audioContext.currentTime);
 		this.waveShift.start(this.audioContext.currentTime);
 	}
-	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number): number {
+	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): number {
 		this.carrier.frequency.value = frequency;
-		this.modulation.gain.value = 2 / frequency;//17 / (2 * Math.PI * frequency);
-		this.waveShift.offset.value = 0 / frequency;
+		this.modulation.gain.value = Math.PI / frequency;//17 / (2 * Math.PI * frequency);
+		this.waveShift.offset.value = 2 * Math.PI / frequency;
+		this.feedback.gain.value = 0.66 * feedbackRatio * Math.PI / frequency;
 		this.output.gain.value = info.volume;
 		this.envelope.gain.setValueAtTime(info.attack.from, when);
 		this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
@@ -42,9 +44,9 @@ class DX7Operator {
 		this.envelope.gain.cancelAndHoldAtTime(when + duration);
 		this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
 		if (info.release.duration > 3 || info.release.to > 0) {
-			this.envelope.gain.cancelAndHoldAtTime(when + duration + info.release.duration + 3);
-			this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + info.release.duration + 3);
-			return 0.003 + when + duration + info.release.duration + 3;
+			this.envelope.gain.cancelAndHoldAtTime(when + duration + 3);
+			this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + 3);
+			return 0.003 + when + duration + 3;
 		} else {
 			return 0.003 + when + duration + info.release.duration;
 		}
