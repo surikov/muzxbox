@@ -253,7 +253,7 @@ class DX7Operator {
         this.waveShift.start(this.audioContext.currentTime);
     }
     startPlayFrequency(info, targettime, duration, frequency, feedbackRatio) {
-        let when = targettime - 2 * Math.PI / frequency;
+        let when = targettime;
         this.carrier.frequency.value = frequency;
         this.modulation.gain.value = Math.PI / frequency;
         this.waveShift.offset.value = 2 * Math.PI / frequency;
