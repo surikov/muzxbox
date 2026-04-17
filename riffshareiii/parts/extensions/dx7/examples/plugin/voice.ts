@@ -17,7 +17,7 @@ class DX7Voice {
 			, new DX7Operator(this.audioContext)
 		];
 	}
-	connectOperators(preset: SynthPreset) {
+	reConnectOperators(preset: SynthPreset) {
 		for (let ii = 0; ii < 6; ii++) {
 			this.operators[ii].output.disconnect();
 		}
@@ -40,6 +40,7 @@ class DX7Voice {
 		}
 	}
 	startPlayNote(preset: SynthPreset, when: number, duration: number, note: number) {
+		this.reConnectOperators(preset);
 		for (let ii = 0; ii < 6; ii++) {
 			if (preset.operators[ii].enabled) {
 				let frequency = preset.operators[ii].constantFrequency;
@@ -51,12 +52,12 @@ class DX7Voice {
 				let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
 				if (this.locktime < time) {
 					this.locktime = time;
-					console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);
+					//console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);
 				}
 				
 			}
 		}
-		this.connectOperators(preset);
+		
 		//console.log('startPlayNote', note, 'when', when, 'lock', this.locktime);
 	}
 }

@@ -365,7 +365,7 @@ declare class DX7Voice {
     audioContext: AudioContext;
     output: GainNode;
     constructor(audioContext: AudioContext, to: AudioNode);
-    connectOperators(preset: SynthPreset): void;
+    reConnectOperators(preset: SynthPreset): void;
     startPlayNote(preset: SynthPreset, when: number, duration: number, note: number): void;
 }
 declare class DX7Operator {
@@ -378,7 +378,7 @@ declare class DX7Operator {
     modulation: GainNode;
     envelope: GainNode;
     constructor(cntxt: AudioContext);
-    startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): number;
+    startPlayFrequency(info: OperatorInfo, targettime: number, duration: number, frequency: number, feedbackRatio: number): number;
 }
 declare class DX7Test {
     synth: DX7Synthesizer | null;
