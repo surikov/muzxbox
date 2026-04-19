@@ -8,8 +8,8 @@ type DX7OperatorData = {
 	detune_7_7: number;
 	rates0_99: number[];
 	levels0_99: number[];
-	lfoAmpModSens_3_3: number;
-	velocitySens0_7: number;
+	//lfoAmpModSens_3_3: number;
+	//velocitySens0_7: number;
 };
 type DX7PresetData = {
 	name: string;
@@ -129,9 +129,9 @@ class DX7Loader {
 	convertDX7data(fileName: string, dx7data: DX7PresetData): SynthPreset {
 		let preset: SynthPreset = {
 			label: dx7data.name.trim() + '/' + fileName.trim()
-			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32-1]
+			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32 - 1]
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) * 0.6
+			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) *2
 		};
 		for (let ii = 0; ii < 6; ii++) {
 			let data = dx7data.operators[ii];
@@ -139,9 +139,10 @@ class DX7Loader {
 				constantFrequency: 0
 				, frequencyRatio: 0
 				, enabled: data.enabled
-				, volume: Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125)
+				, volume: 0 //Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125)
 				, detune: data.detune_7_7
-				, attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0])
+				//, attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0])
+				, attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0])
 				, decay: this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1])
 				, sustain: this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2])
 				, release: this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3])
@@ -150,7 +151,9 @@ class DX7Loader {
 				operator.release.duration = 0.003
 			}
 			if (data.constMode0_1 > 0) {
+				operator.volume = 1 / 14;
 				operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
+				//op.freqFixed = Math.pow(10, op.freqCoarse % 4) * (1 + (op.freqFine / 99) * 8.772);
 			} else {
 				/*var OCTAVE_1024 = 1.0006771307; //Math.exp(Math.log(2)/1024);
 				let detuneRatio = Math.pow(OCTAVE_1024, data.detune_7_7);
@@ -161,6 +164,7 @@ class DX7Loader {
 					operator.frequencyRatio = detuneRatio * 0.5;
 				}*/
 				//operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
+				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125);
 				if (data.freqCoarse0_31) {
 					operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
 				} else {
@@ -211,8 +215,8 @@ class DX7Loader {
 				, freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1)
 				, freqFine0_99: oscData.charCodeAt(16)
 				, enabled: true
-				, lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3
-				, velocitySens0_7: oscData.charCodeAt(13) >> 2
+				//, lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3
+				//, velocitySens0_7: oscData.charCodeAt(13) >> 2
 			};
 			operators.splice(0, 0, operator);
 		}

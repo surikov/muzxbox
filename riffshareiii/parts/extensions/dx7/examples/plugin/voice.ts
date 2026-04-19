@@ -7,7 +7,7 @@ class DX7Voice {
 		this.audioContext = audioContext;
 		this.output = this.audioContext.createGain();
 		this.output.connect(to);
-		this.output.gain.value = 0.125;
+		this.output.gain.value = 0.25;//0.125;
 		this.operators = [
 			new DX7Operator(this.audioContext)
 			, new DX7Operator(this.audioContext)
@@ -26,17 +26,22 @@ class DX7Voice {
 			let modulatorIds = preset.connectionsInfo.modulationMatrix[ii];
 			for (let mm = 0; mm < modulatorIds.length; mm++) {
 				let id = modulatorIds[mm];
+				let modulator = this.operators[id];
 				if (id == ii) {
 					//this.operators[id].feedback.gain.value = preset.feedbackRatio*Math.PI / frequency;
-					this.operators[id].output.connect(this.operators[id].feedback);
+					modulator.envelope.connect(modulator.feedback);
+					//console.log((1 + id), '<>');
 				} else {
-					this.operators[id].output.connect(carrier.modulation);
+					modulator.envelope.connect(carrier.modulation);
+					//console.log((1 + id), '>', (1 + ii));
 				}
 			}
-			for (let ii = 0; ii < preset.connectionsInfo.outputMix.length; ii++) {
-				let outIdx = preset.connectionsInfo.outputMix[ii];
-				this.operators[outIdx].output.connect(this.output);
-			}
+
+		}
+		for (let ii = 0; ii < preset.connectionsInfo.outputMix.length; ii++) {
+			let outIdx = preset.connectionsInfo.outputMix[ii];
+			this.operators[outIdx].output.connect(this.output);
+			//console.log((1 + outIdx), 'out');
 		}
 	}
 	startPlayNote(preset: SynthPreset, when: number, duration: number, note: number) {
@@ -49,15 +54,16 @@ class DX7Voice {
 					let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
 					frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
 				}
+				//console.log(ii, 'startPlayFrequency', frequency);
 				let time = this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
 				if (this.locktime < time) {
 					this.locktime = time;
 					//console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);
 				}
-				
+
 			}
 		}
-		
-		//console.log('startPlayNote', note, 'when', when, 'lock', this.locktime);
+
+		//console.log('startPlayNote', note, 'when', when, preset);
 	}
 }

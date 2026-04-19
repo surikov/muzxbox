@@ -9,11 +9,11 @@ class DX7Synthesizer {
 	takeVox(): DX7Voice {
 		for (let ii = 0; ii < this.cache.length; ii++) {
 			if (this.cache[ii].locktime < this.audioContext.currentTime) {
-				console.log('found vox', ii);
+				//console.log('found vox', ii);
 				return this.cache[ii];
 			}
 		}
-		console.log('new vox', this.audioContext.currentTime, this.cache);
+		//console.log('new vox', this.audioContext.currentTime, this.cache);
 		let vx: DX7Voice = new DX7Voice(this.audioContext, this.output);
 		this.cache.push(vx);
 		return vx;

@@ -3,7 +3,151 @@ class DX7Test {
 	selectedPreset: SynthPreset | null = null;
 	parsed: SynthPreset[] | null = null;
 	constructor() {
+		let test: DX7PresetData = 
+		{
+    "algorithm1_32": 5,
+    "feedback0_7": 7,//6,
+    "operators": [
+        {
+            "rates0_99": [
+                96,
+                25,
+                25,
+                67
+            ],
+            "levels0_99": [
+                99,
+                75,
+                0,
+                0
+            ],
+            "detune_7_7": 3,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true
+        },
+        {
+            "rates0_99": [
+                95,
+                50,
+                35,
+                78
+            ],
+            "levels0_99": [
+                99,
+                75,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 58,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 14,
+            "freqFine0_99": 0,
+            "enabled": true
+        },
+        {
+            "rates0_99": [
+                95,
+                20,
+                20,
+                50
+            ],
+            "levels0_99": [
+                99,
+                95,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true
+        },
+        {
+            "rates0_99": [
+                95,
+                29,
+                20,
+                50
+            ],
+            "levels0_99": [
+                99,
+                95,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 89,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true
+        },
+        {
+            "rates0_99": [
+                99,//95,
+                99,//20,
+                99,//20,
+                99//50
+            ],
+            "levels0_99": [
+                99,
+                99,//95,
+                99,//0,
+                99//0
+            ],
+            "detune_7_7": 0,//-7,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true
+        },
+        {
+            "rates0_99": [
+                99,//95,
+                99,//29,
+                99,//20,
+                99//50
+            ],
+            "levels0_99": [
+                99,
+                99,//95,
+                99,//0,
+                99//0
+            ],
+            "detune_7_7": 0,//7,
+            "volumeLevel0_99": 99,//79,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true
+        }
+    ],
+    "name": "E.PIANO 1 "
+}
+		;
+		let loader: DX7Loader = new DX7Loader();
+		this.selectedPreset = loader.convertDX7data('test', test);
+		console.log(test,this.selectedPreset);
 
+		this.selectedPreset.operators[0].enabled=false;
+		this.selectedPreset.operators[1].enabled=false;
+		this.selectedPreset.operators[2].enabled=false;
+		this.selectedPreset.operators[3].enabled=false;
+		//this.selectedPreset.operators[4].enabled=false;
+		//this.selectedPreset.operators[5].enabled=false;
+
+		//this.selectedPreset.operators[5].volume=0.05;
+
+		//this.selectedPreset.operators[3].constantFrequency=977;
+		//this.selectedPreset.operators[2].constantFrequency=605;
+		//this.selectedPreset.feedbackRatio=0.1;
 	}
 	loadSysexFile(fileList: FileList) {
 		console.log('loadSysexFile', fileList);
@@ -85,7 +229,8 @@ console.log(59, 0.2695, loader.durationDown(59));
 console.log(49, 0.7615, loader.durationDown(49));
 console.log(19, 20.48, loader.durationDown(19));
 */
-/*
+
 for (let ii = 0; ii <= 7; ii++) {
 	console.log(ii, Math.pow(2, (ii - 7)));
-}*/
+}
+console.log(Math.pow(10, 10 % 4) * (1 + (99 / 99) * 8.772));

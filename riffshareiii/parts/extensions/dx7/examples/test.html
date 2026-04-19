@@ -11,45 +11,75 @@
 		//Math.E
 
 		let audioContext = new AudioContext();
-		let when = audioContext.currentTime + 0.1;
-		let soundFrequency = 1000;//50;//659.25;//440;//261.6255653005986;
-		
-		let minmodulation = 2.7;//2.662;
-		let maxmodulation = 2.8;//2.662;
+		let when = audioContext.currentTime + 0.21;
+		let carrierFrequency = 605;//261.6255653005986;//50;//659.25;//440;//261.6255653005986;
+		let mudulationFrequency = 977;//261.6255653005986;//440;//50;//659.25;//440;//261.6255653005986;
+		let modulationRatio = Math.E;
+
+		//let minmodulation = 2.7;//2.662;
+		//let maxmodulation = 2.8;//2.662;
 
 		let carrier = audioContext.createOscillator();
 		let modulatorBeep = audioContext.createOscillator();
 		let modulationLevel = audioContext.createGain();
+		let envelope = audioContext.createGain();
+		let modulatorVolume = audioContext.createGain();
 		let phaseDelay = audioContext.createDelay();
 		let waveShift = audioContext.createConstantSource();
 
-		carrier.frequency.value = soundFrequency;
-		modulatorBeep.frequency.value = soundFrequency;
+		//let noiseWave = audioContext.createOscillator();
+		//let noiseEnvelope = audioContext.createGain();
+
+		let leftSplitter = audioContext.createChannelSplitter(2);
+		let rightSplitter = audioContext.createChannelSplitter(2);
+		let merger = audioContext.createChannelMerger(2);
+
+		carrier.frequency.value = carrierFrequency;
+		modulatorBeep.frequency.value = mudulationFrequency;
+		modulatorVolume.gain.value = 1/14;
 		//modulationLevel.gain.setValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when);
 		//modulationLevel.gain.setValueAtTime(4 / soundFrequency, when);-semiequal
-		modulationLevel.gain.setValueAtTime(minmodulation / soundFrequency, when);
-		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / soundFrequency, when + 3);
+		modulationLevel.gain.setValueAtTime(modulationRatio / carrierFrequency, when);
+		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / soundFrequency, when + 3);
 		//modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
 		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
 		//phaseDelay.delayTime.value = 0.5 / soundFrequency;
 		//phaseDelay.delayTime.value = 1 / soundFrequency;
 		//delayShift.offset.value = maxmodulation*1 / soundFrequency;
-		waveShift.offset.setValueAtTime(2 * minmodulation / soundFrequency, when);
-		waveShift.offset.linearRampToValueAtTime(2 * maxmodulation / soundFrequency, when + 3);
+		waveShift.offset.setValueAtTime(2 * modulationRatio / carrierFrequency, when);
+		//waveShift.offset.linearRampToValueAtTime(2 * maxmodulation / soundFrequency, when + 3);
 
-		modulatorBeep.connect(modulationLevel);
+		//noiseWave.frequency.value = 2000;
+
+		modulatorBeep.connect(modulatorVolume);
+		modulatorVolume.connect(modulationLevel);
 		modulationLevel.connect(phaseDelay.delayTime);
 		waveShift.connect(phaseDelay.delayTime);
 		carrier.connect(phaseDelay);
-		phaseDelay.connect(audioContext.destination);
+		phaseDelay.connect(envelope);
+		envelope.connect(leftSplitter);
+		leftSplitter.connect(merger, 0,1);
+		rightSplitter.connect(merger, 0,0);
+		merger.connect(audioContext.destination);
+		//noiseWave.connect(noiseEnvelope);
+		//noiseEnvelope.connect(rightSplitter);
+
+		envelope.gain.setValueAtTime(0, audioContext.currentTime);
+		//noiseEnvelope.gain.setValueAtTime(0, audioContext.currentTime);
 
 		modulatorBeep.start(audioContext.currentTime);
 		waveShift.start(audioContext.currentTime);
-		carrier.start(when);
+		carrier.start(audioContext.currentTime);
+		//noiseWave.start(audioContext.currentTime);
 
-		modulatorBeep.stop(when + 3);
-		waveShift.stop(when + 3);
-		carrier.stop(when + 3);
+		//modulatorBeep.stop(when + 2);
+		//waveShift.stop(when + 2);
+		//carrier.stop(when + 2);
+
+		envelope.gain.setValueAtTime(1, when);
+		envelope.gain.setValueAtTime(0, when + 1);
+		//noiseEnvelope.gain.setValueAtTime(1, when);
+		//noiseEnvelope.gain.setValueAtTime(0, when + 1);
 	}
 </script>
 

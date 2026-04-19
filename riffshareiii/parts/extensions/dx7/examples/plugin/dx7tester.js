@@ -69,7 +69,7 @@ class DX7Loader {
             label: dx7data.name.trim() + '/' + fileName.trim(),
             connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32 - 1],
             operators: [],
-            feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) * 0.6
+            feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) * 2
         };
         for (let ii = 0; ii < 6; ii++) {
             let data = dx7data.operators[ii];
@@ -77,9 +77,9 @@ class DX7Loader {
                 constantFrequency: 0,
                 frequencyRatio: 0,
                 enabled: data.enabled,
-                volume: Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125),
+                volume: 0,
                 detune: data.detune_7_7,
-                attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]),
+                attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0]),
                 decay: this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]),
                 sustain: this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2]),
                 release: this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3])
@@ -88,9 +88,11 @@ class DX7Loader {
                 operator.release.duration = 0.003;
             }
             if (data.constMode0_1 > 0) {
+                operator.volume = 1 / 14;
                 operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
             }
             else {
+                operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125);
                 if (data.freqCoarse0_31) {
                     operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
                 }
@@ -136,9 +138,7 @@ class DX7Loader {
                 constMode0_1: oscData.charCodeAt(15) & 1,
                 freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1),
                 freqFine0_99: oscData.charCodeAt(16),
-                enabled: true,
-                lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3,
-                velocitySens0_7: oscData.charCodeAt(13) >> 2
+                enabled: true
             };
             operators.splice(0, 0, operator);
         }
@@ -161,11 +161,9 @@ class DX7Synthesizer {
     takeVox() {
         for (let ii = 0; ii < this.cache.length; ii++) {
             if (this.cache[ii].locktime < this.audioContext.currentTime) {
-                console.log('found vox', ii);
                 return this.cache[ii];
             }
         }
-        console.log('new vox', this.audioContext.currentTime, this.cache);
         let vx = new DX7Voice(this.audioContext, this.output);
         this.cache.push(vx);
         return vx;
@@ -181,7 +179,7 @@ class DX7Voice {
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
         this.output.connect(to);
-        this.output.gain.value = 0.125;
+        this.output.gain.value = 0.25;
         this.operators = [
             new DX7Operator(this.audioContext),
             new DX7Operator(this.audioContext),
@@ -200,17 +198,18 @@ class DX7Voice {
             let modulatorIds = preset.connectionsInfo.modulationMatrix[ii];
             for (let mm = 0; mm < modulatorIds.length; mm++) {
                 let id = modulatorIds[mm];
+                let modulator = this.operators[id];
                 if (id == ii) {
-                    this.operators[id].output.connect(this.operators[id].feedback);
+                    modulator.envelope.connect(modulator.feedback);
                 }
                 else {
-                    this.operators[id].output.connect(carrier.modulation);
+                    modulator.envelope.connect(carrier.modulation);
                 }
             }
-            for (let ii = 0; ii < preset.connectionsInfo.outputMix.length; ii++) {
-                let outIdx = preset.connectionsInfo.outputMix[ii];
-                this.operators[outIdx].output.connect(this.output);
-            }
+        }
+        for (let ii = 0; ii < preset.connectionsInfo.outputMix.length; ii++) {
+            let outIdx = preset.connectionsInfo.outputMix[ii];
+            this.operators[outIdx].output.connect(this.output);
         }
     }
     startPlayNote(preset, when, duration, note) {
@@ -243,21 +242,22 @@ class DX7Operator {
         this.waveShift = this.audioContext.createConstantSource();
         this.carrier.connect(this.phaseDelay);
         this.modulation.connect(this.phaseDelay.delayTime);
-        this.feedback.connect(this.phaseDelay.delayTime);
+        this.feedback.connect(this.modulation);
         this.waveShift.connect(this.phaseDelay.delayTime);
         this.phaseDelay.connect(this.envelope);
         this.envelope.connect(this.output);
         this.output.gain.value = 0;
         this.phaseDelay.delayTime.value = 0;
+        this.envelope.gain.value = 0;
         this.carrier.start(this.audioContext.currentTime);
         this.waveShift.start(this.audioContext.currentTime);
     }
-    startPlayFrequency(info, targettime, duration, frequency, feedbackRatio) {
-        let when = targettime;
+    startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
+        let modulationRatio = 0.125 / frequency;
         this.carrier.frequency.value = frequency;
-        this.modulation.gain.value = Math.PI / frequency;
-        this.waveShift.offset.value = 2 * Math.PI / frequency;
-        this.feedback.gain.value = 0.66 * feedbackRatio * Math.PI / frequency;
+        this.modulation.gain.value = modulationRatio;
+        this.waveShift.offset.value = 2 * modulationRatio;
+        this.feedback.gain.value = feedbackRatio;
         this.output.gain.value = info.volume;
         this.envelope.gain.setValueAtTime(info.attack.from, when);
         this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
@@ -273,7 +273,6 @@ class DX7Operator {
         else {
             return 0.003 + when + duration + info.release.duration;
         }
-        return 5;
     }
 }
 class DX7Test {
@@ -281,6 +280,140 @@ class DX7Test {
         this.synth = null;
         this.selectedPreset = null;
         this.parsed = null;
+        let test = {
+            "algorithm1_32": 5,
+            "feedback0_7": 7,
+            "operators": [
+                {
+                    "rates0_99": [
+                        96,
+                        25,
+                        25,
+                        67
+                    ],
+                    "levels0_99": [
+                        99,
+                        75,
+                        0,
+                        0
+                    ],
+                    "detune_7_7": 3,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                },
+                {
+                    "rates0_99": [
+                        95,
+                        50,
+                        35,
+                        78
+                    ],
+                    "levels0_99": [
+                        99,
+                        75,
+                        0,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 58,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 14,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                },
+                {
+                    "rates0_99": [
+                        95,
+                        20,
+                        20,
+                        50
+                    ],
+                    "levels0_99": [
+                        99,
+                        95,
+                        0,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                },
+                {
+                    "rates0_99": [
+                        95,
+                        29,
+                        20,
+                        50
+                    ],
+                    "levels0_99": [
+                        99,
+                        95,
+                        0,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 89,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                },
+                {
+                    "rates0_99": [
+                        99,
+                        99,
+                        99,
+                        99
+                    ],
+                    "levels0_99": [
+                        99,
+                        99,
+                        99,
+                        99
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                },
+                {
+                    "rates0_99": [
+                        99,
+                        99,
+                        99,
+                        99
+                    ],
+                    "levels0_99": [
+                        99,
+                        99,
+                        99,
+                        99
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 0,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 0,
+                    "enabled": true
+                }
+            ],
+            "name": "E.PIANO 1 "
+        };
+        let loader = new DX7Loader();
+        this.selectedPreset = loader.convertDX7data('test', test);
+        console.log(test, this.selectedPreset);
+        this.selectedPreset.operators[0].enabled = false;
+        this.selectedPreset.operators[1].enabled = false;
+        this.selectedPreset.operators[2].enabled = false;
+        this.selectedPreset.operators[3].enabled = false;
     }
     loadSysexFile(fileList) {
         console.log('loadSysexFile', fileList);
@@ -314,4 +447,8 @@ class DX7Test {
     }
 }
 var tester = new DX7Test();
+for (let ii = 0; ii <= 7; ii++) {
+    console.log(ii, Math.pow(2, (ii - 7)));
+}
+console.log(Math.pow(10, 10 % 4) * (1 + (99 / 99) * 8.772));
 //# sourceMappingURL=dx7tester.js.map
