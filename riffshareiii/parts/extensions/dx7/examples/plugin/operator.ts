@@ -15,10 +15,8 @@ class DX7Operator {
 		this.feedback = this.audioContext.createGain();
 		this.envelope = this.audioContext.createGain();
 		this.phaseDelay = this.audioContext.createDelay();
-		this.carrier = this.audioContext.createOscillator();
 		this.waveShift = this.audioContext.createConstantSource();
 
-		this.carrier.connect(this.phaseDelay);
 		this.modulation.connect(this.phaseDelay.delayTime);
 		this.feedback.connect(this.modulation);
 		this.waveShift.connect(this.phaseDelay.delayTime);
@@ -29,36 +27,34 @@ class DX7Operator {
 		this.phaseDelay.delayTime.value = 0;
 		this.envelope.gain.value = 0;
 
-		this.carrier.start(this.audioContext.currentTime);
 		this.waveShift.start(this.audioContext.currentTime);
 	}
-	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): number {
-		//let when = targettime;//-2 * Math.PI / frequency;
-		//this.envelope.gain.cancelAndHoldAtTime(this.audioContext.currentTime);
-		//this.envelope.gain.setValueAtTime(0, this.audioContext.currentTime);
-		let modulationRatio = 0.125 / frequency;
-		this.carrier.frequency.value = frequency;
-		this.modulation.gain.value = modulationRatio;//Math.E / frequency;//17 / (2 * Math.PI * frequency);
-		this.waveShift.offset.value = 2 * modulationRatio;//Math.E / frequency;
-		this.feedback.gain.value = feedbackRatio;
-		this.output.gain.value = info.volume;
-
-		//this.envelope.gain.setValueAtTime(1, when);
-
+	restartCarrier(when: number) {
+		if (this.carrier) {
+			this.carrier.stop();
+			this.carrier.disconnect();
+		}
+		this.carrier = this.audioContext.createOscillator();
+		this.carrier.connect(this.phaseDelay);
+		this.carrier.start(when);
+	}
+	restartEnvelope(info: OperatorInfo, when: number, duration: number) {
 		this.envelope.gain.setValueAtTime(info.attack.from, when);
 		this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
 		this.envelope.gain.linearRampToValueAtTime(info.decay.to, when + info.attack.duration + info.decay.duration);
 		this.envelope.gain.linearRampToValueAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration + info.sustain.duration);
 		this.envelope.gain.cancelAndHoldAtTime(when + duration);
+		this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
 		this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
-
-		if (info.release.duration > 3 || info.release.to > 0) {
-			this.envelope.gain.cancelAndHoldAtTime(when + duration + 3);
-			this.envelope.gain.linearRampToValueAtTime(0, 0.003 + when + duration + 3);
-			return 0.003 + when + duration + 3;
-		} else {
-			return 0.003 + when + duration + info.release.duration;
-		}
-		//return 5;
+	}
+	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
+		this.restartCarrier(when);
+		this.restartEnvelope(info, when, duration);
+		let modulationRatio = Math.E / frequency;
+		this.carrier.frequency.value = frequency;
+		this.modulation.gain.value = modulationRatio;
+		this.waveShift.offset.value = 2 * modulationRatio;
+		this.feedback.gain.value = feedbackRatio*modulationRatio;
+		this.output.gain.value = info.volume;
 	}
 }

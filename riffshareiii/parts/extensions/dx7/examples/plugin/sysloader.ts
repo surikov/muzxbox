@@ -9,7 +9,7 @@ type DX7OperatorData = {
 	rates0_99: number[];
 	levels0_99: number[];
 	//lfoAmpModSens_3_3: number;
-	//velocitySens0_7: number;
+	velocitySens0_7: number;
 };
 type DX7PresetData = {
 	name: string;
@@ -131,7 +131,7 @@ class DX7Loader {
 			label: dx7data.name.trim() + '/' + fileName.trim()
 			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32 - 1]
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) *2
+			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) //* 0.01 //0.4
 		};
 		for (let ii = 0; ii < 6; ii++) {
 			let data = dx7data.operators[ii];
@@ -141,17 +141,25 @@ class DX7Loader {
 				, enabled: data.enabled
 				, volume: 0 //Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125)
 				, detune: data.detune_7_7
-				//, attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0])
-				, attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0])
+				, attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0])
+				//, attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0])
 				, decay: this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1])
 				, sustain: this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2])
 				, release: this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3])
 			};
-			if (operator.release.duration < 0.003) {
-				operator.release.duration = 0.003
+			operator.attack.from = 0;
+			operator.release.to = 0;
+			operator.release.duration = Math.max(0.003, operator.release.duration);
+			operator.release.duration = Math.min(3, operator.release.duration);
+			/*if (operator.release.duration < 0.003) {
+				operator.release.duration = 0.003;
 			}
+			if (operator.release.duration > 3) {
+				operator.release.duration = 3;
+			}*/
 			if (data.constMode0_1 > 0) {
-				operator.volume = 1 / 14;
+				operator.volume = 1 / 7;
+				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2*data.velocitySens0_7 / 7);
 				operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 				//op.freqFixed = Math.pow(10, op.freqCoarse % 4) * (1 + (op.freqFine / 99) * 8.772);
 			} else {
@@ -164,11 +172,13 @@ class DX7Loader {
 					operator.frequencyRatio = detuneRatio * 0.5;
 				}*/
 				//operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
-				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125);
+				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125);
+				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * 0.5;//(1 + data.velocitySens0_7 / 7);
+				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				if (data.freqCoarse0_31) {
 					operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
 				} else {
-					operator.frequencyRatio = 0.5;
+					operator.frequencyRatio = 0.5 * (1 + data.freqFine0_99 / 100);;//0.5;
 				}
 			}
 			preset.operators.push(operator);
@@ -216,7 +226,7 @@ class DX7Loader {
 				, freqFine0_99: oscData.charCodeAt(16)
 				, enabled: true
 				//, lfoAmpModSens_3_3: oscData.charCodeAt(13) & 3
-				//, velocitySens0_7: oscData.charCodeAt(13) >> 2
+				, velocitySens0_7: oscData.charCodeAt(13) >> 2
 			};
 			operators.splice(0, 0, operator);
 		}

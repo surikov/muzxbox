@@ -305,6 +305,7 @@ type DX7OperatorData = {
     detune_7_7: number;
     rates0_99: number[];
     levels0_99: number[];
+    velocitySens0_7: number;
 };
 type DX7PresetData = {
     name: string;
@@ -376,7 +377,9 @@ declare class DX7Operator {
     modulation: GainNode;
     envelope: GainNode;
     constructor(cntxt: AudioContext);
-    startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): number;
+    restartCarrier(when: number): void;
+    restartEnvelope(info: OperatorInfo, when: number, duration: number): void;
+    startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
 }
 declare class DX7Test {
     synth: DX7Synthesizer | null;
