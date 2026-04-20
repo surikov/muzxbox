@@ -64,13 +64,13 @@ class DX7Operator {
 		//this.envelope.gain.setTargetAtTime(info.release.to, when, info.release.duration * 0.1);
 	}*/
 	resetEnvelope(info: OperatorInfo, when: number, duration: number) {
-		this.envelope.gain.setValueAtTime(info.attack.from, when);
-		this.envelope.gain.setTargetAtTime(info.attack.to, when, info.attack.duration * 0.1);
-		this.envelope.gain.setTargetAtTime(info.decay.to, when + info.attack.duration, info.decay.duration * 0.1);
-		this.envelope.gain.setTargetAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
+		this.envelope.gain.setValueAtTime(0, when);
+		this.envelope.gain.setTargetAtTime(info.attack.value, when, info.attack.duration * 0.1);
+		this.envelope.gain.setTargetAtTime(info.decay.value, when + info.attack.duration, info.decay.duration * 0.1);
+		this.envelope.gain.setTargetAtTime(info.sustain.value, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
 		this.envelope.gain.cancelAndHoldAtTime(when + duration);
-		this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
-		this.envelope.gain.setTargetAtTime(info.release.to, when + duration, info.release.duration * 0.1);
+		this.envelope.gain.setTargetAtTime(info.sustain.value, when + duration, 0.5);
+		this.envelope.gain.setTargetAtTime(0, when + duration, info.release * 0.1);
 	}
 	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
 		this.resetCarrier(when);

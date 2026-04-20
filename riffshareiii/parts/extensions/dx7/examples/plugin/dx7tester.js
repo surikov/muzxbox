@@ -71,21 +71,23 @@ class DX7Loader {
         };
         for (let ii = 0; ii < 6; ii++) {
             let data = dx7data.operators[ii];
+            let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
+            let decaySlope = this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]);
+            let sustainSlope = this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2]);
+            let releaseSlope = this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3]);
             let operator = {
                 constantFrequency: 0,
                 frequencyRatio: 0,
                 enabled: data.enabled,
                 volume: 0,
                 detune: data.detune_7_7,
-                attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]),
-                decay: this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]),
-                sustain: this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2]),
-                release: this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3])
+                attack: { value: attackSlope.to, duration: attackSlope.duration },
+                decay: { value: decaySlope.to, duration: decaySlope.duration },
+                sustain: { value: sustainSlope.to, duration: sustainSlope.duration },
+                release: releaseSlope.duration
             };
-            operator.attack.from = 0;
-            operator.release.to = 0;
-            operator.release.duration = Math.max(0.003, operator.release.duration);
-            operator.release.duration = Math.min(3, operator.release.duration);
+            operator.release = Math.max(0.003, operator.release);
+            operator.release = Math.min(3, operator.release);
             if (data.constMode0_1 > 0) {
                 operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
                 operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
@@ -225,7 +227,7 @@ class DX7Voice {
                 }
                 console.log(ii, 'startPlayFrequency', frequency);
                 this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
-                let otime = when + duration + preset.operators[ii].release.duration;
+                let otime = when + duration + preset.operators[ii].release;
                 if (this.locktime < otime) {
                     this.locktime = otime;
                 }
@@ -263,13 +265,13 @@ class DX7Operator {
         this.carrier.start(when);
     }
     resetEnvelope(info, when, duration) {
-        this.envelope.gain.setValueAtTime(info.attack.from, when);
-        this.envelope.gain.setTargetAtTime(info.attack.to, when, info.attack.duration * 0.1);
-        this.envelope.gain.setTargetAtTime(info.decay.to, when + info.attack.duration, info.decay.duration * 0.1);
-        this.envelope.gain.setTargetAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
+        this.envelope.gain.setValueAtTime(0, when);
+        this.envelope.gain.setTargetAtTime(info.attack.value, when, info.attack.duration * 0.1);
+        this.envelope.gain.setTargetAtTime(info.decay.value, when + info.attack.duration, info.decay.duration * 0.1);
+        this.envelope.gain.setTargetAtTime(info.sustain.value, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
         this.envelope.gain.cancelAndHoldAtTime(when + duration);
-        this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
-        this.envelope.gain.setTargetAtTime(info.release.to, when + duration, info.release.duration * 0.1);
+        this.envelope.gain.setTargetAtTime(info.sustain.value, when + duration, 0.5);
+        this.envelope.gain.setTargetAtTime(0, when + duration, info.release * 0.1);
     }
     startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
         this.resetCarrier(when);
@@ -420,6 +422,8 @@ class DX7Test {
             ],
             "name": "SNR.BLAST "
         };
+        test.operators[4].enabled = false;
+        test.operators[5].enabled = false;
         let loader = new DX7Loader();
         this.selectedPreset = loader.convertDX7data('test', test);
         console.log('dx7preset', test);

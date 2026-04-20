@@ -317,10 +317,14 @@ type ConnectionSchemeDX7 = {
     outputMix: number[];
     modulationMatrix: (number[])[];
 };
-type SynthSlope = {
+type SlopeInfo = {
     from: number;
     to: number;
     duration: number;
+};
+type SynthSlope = {
+    duration: number;
+    value: number;
 };
 type OperatorInfo = {
     constantFrequency: number;
@@ -331,7 +335,7 @@ type OperatorInfo = {
     attack: SynthSlope;
     decay: SynthSlope;
     sustain: SynthSlope;
-    release: SynthSlope;
+    release: number;
 };
 type SynthPreset = {
     label: string;
@@ -345,7 +349,7 @@ declare class DX7Loader {
     durationDown(nn: number): number;
     durationUp(nn: number): number;
     levelRatio(nn: number): number;
-    slopeDuration(r99: number, from99: number, to99: number): SynthSlope;
+    slopeDuration(r99: number, from99: number, to99: number): SlopeInfo;
     convertDX7data(fileName: string, dx7data: DX7PresetData): SynthPreset;
     parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
     parseSysexData(bankData: string, patchId: number): DX7PresetData;

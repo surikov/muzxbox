@@ -57,7 +57,7 @@ class DX7Voice {
 				}
 				console.log(ii, 'startPlayFrequency', frequency);
 				this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
-				let otime = when + duration + preset.operators[ii].release.duration;
+				let otime = when + duration + preset.operators[ii].release;
 				if (this.locktime < otime) {
 					this.locktime = otime;
 					//console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);

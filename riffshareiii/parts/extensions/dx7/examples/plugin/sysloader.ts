@@ -21,10 +21,14 @@ type ConnectionSchemeDX7 = {
 	outputMix: number[]
 	, modulationMatrix: (number[])[]
 };
-type SynthSlope = {
+type SlopeInfo = {
 	from: number;
 	to: number;
 	duration: number;
+};
+type SynthSlope = {
+	duration: number;
+	value: number;
 };
 type OperatorInfo = {
 	constantFrequency: number;
@@ -35,7 +39,7 @@ type OperatorInfo = {
 	attack: SynthSlope;
 	decay: SynthSlope;
 	sustain: SynthSlope;
-	release: SynthSlope;
+	release: number;
 };
 type SynthPreset = {
 	label: string;
@@ -107,7 +111,7 @@ class DX7Loader {
 		//let ratio = Math.log(nn + 1) * 14 + nn;
 		//return ratio;
 	}
-	slopeDuration(r99: number, from99: number, to99: number): SynthSlope {
+	slopeDuration(r99: number, from99: number, to99: number): SlopeInfo {
 		//let fromRatio = this.levelRatio(from99);
 		//let toRatio = this.levelRatio(to99);
 		//let fullRatio = this.levelRatio(99);
@@ -136,22 +140,26 @@ class DX7Loader {
 		};
 		for (let ii = 0; ii < 6; ii++) {
 			let data = dx7data.operators[ii];
+			let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
+			let decaySlope = this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]);
+			let sustainSlope = this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2])
+			let releaseSlope = this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3]);
 			let operator: OperatorInfo = {
 				constantFrequency: 0
 				, frequencyRatio: 0
 				, enabled: data.enabled
 				, volume: 0 //Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125)
 				, detune: data.detune_7_7
-				, attack: this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0])
+				, attack: { value: attackSlope.to, duration: attackSlope.duration }
 				//, attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0])
-				, decay: this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1])
-				, sustain: this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2])
-				, release: this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3])
+				, decay: { value: decaySlope.to, duration: decaySlope.duration }
+				, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
+				, release: releaseSlope.duration
 			};
-			operator.attack.from = 0;
-			operator.release.to = 0;
-			operator.release.duration = Math.max(0.003, operator.release.duration);
-			operator.release.duration = Math.min(3, operator.release.duration);
+			//operator.attack.from = 0;
+			//operator.release.to = 0;
+			operator.release = Math.max(0.003, operator.release);
+			operator.release = Math.min(3, operator.release);
 			/*if (operator.release.duration < 0.003) {
 				operator.release.duration = 0.003;
 			}
