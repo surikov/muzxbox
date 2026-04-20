@@ -377,8 +377,8 @@ declare class DX7Operator {
     modulation: GainNode;
     envelope: GainNode;
     constructor(cntxt: AudioContext);
-    restartCarrier(when: number): void;
-    restartEnvelope(info: OperatorInfo, when: number, duration: number): void;
+    resetCarrier(when: number): void;
+    resetEnvelope(info: OperatorInfo, when: number, duration: number): void;
     startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
 }
 declare class DX7Test {

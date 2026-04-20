@@ -48,8 +48,6 @@ class DX7Loader {
     }
     levelRatio(nn) {
         return nn / 99;
-        let ratio = Math.log(nn + 1) * 14 + nn;
-        return ratio;
     }
     slopeDuration(r99, from99, to99) {
         let partDuration = Math.abs(this.levelRatio(from99) - this.levelRatio(to99)) / this.levelRatio(99);
@@ -89,7 +87,7 @@ class DX7Loader {
             operator.release.duration = Math.max(0.003, operator.release.duration);
             operator.release.duration = Math.min(3, operator.release.duration);
             if (data.constMode0_1 > 0) {
-                operator.volume = 1 / 7;
+                operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
                 operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
             }
             else {
@@ -182,7 +180,7 @@ class DX7Voice {
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
         this.output.connect(to);
-        this.output.gain.value = 0.25;
+        this.output.gain.value = 0.33;
         this.operators = [
             new DX7Operator(this.audioContext),
             new DX7Operator(this.audioContext),
@@ -225,6 +223,7 @@ class DX7Voice {
                     let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
                     frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
                 }
+                console.log(ii, 'startPlayFrequency', frequency);
                 this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
                 let otime = when + duration + preset.operators[ii].release.duration;
                 if (this.locktime < otime) {
@@ -232,6 +231,7 @@ class DX7Voice {
                 }
             }
         }
+        console.log('startPlayNote', note, 'when', when, preset);
     }
 }
 class DX7Operator {
@@ -253,7 +253,7 @@ class DX7Operator {
         this.envelope.gain.value = 0;
         this.waveShift.start(this.audioContext.currentTime);
     }
-    restartCarrier(when) {
+    resetCarrier(when) {
         if (this.carrier) {
             this.carrier.stop();
             this.carrier.disconnect();
@@ -262,18 +262,18 @@ class DX7Operator {
         this.carrier.connect(this.phaseDelay);
         this.carrier.start(when);
     }
-    restartEnvelope(info, when, duration) {
+    resetEnvelope(info, when, duration) {
         this.envelope.gain.setValueAtTime(info.attack.from, when);
-        this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
-        this.envelope.gain.linearRampToValueAtTime(info.decay.to, when + info.attack.duration + info.decay.duration);
-        this.envelope.gain.linearRampToValueAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration + info.sustain.duration);
+        this.envelope.gain.setTargetAtTime(info.attack.to, when, info.attack.duration * 0.1);
+        this.envelope.gain.setTargetAtTime(info.decay.to, when + info.attack.duration, info.decay.duration * 0.1);
+        this.envelope.gain.setTargetAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
         this.envelope.gain.cancelAndHoldAtTime(when + duration);
         this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
-        this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
+        this.envelope.gain.setTargetAtTime(info.release.to, when + duration, info.release.duration * 0.1);
     }
     startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
-        this.restartCarrier(when);
-        this.restartEnvelope(info, when, duration);
+        this.resetCarrier(when);
+        this.resetEnvelope(info, when, duration);
         let modulationRatio = Math.E / frequency;
         this.carrier.frequency.value = frequency;
         this.modulation.gain.value = modulationRatio;
@@ -288,57 +288,15 @@ class DX7Test {
         this.selectedPreset = null;
         this.parsed = null;
         let test = {
-            "algorithm1_32": 5,
-            "feedback0_7": 7,
+            "algorithm1_32": 17,
+            "feedback0_7": 5,
             "operators": [
                 {
                     "rates0_99": [
-                        65,
-                        24,
-                        19,
-                        57
-                    ],
-                    "levels0_99": [
-                        99,
-                        85,
-                        85,
-                        0
-                    ],
-                    "detune_7_7": 0,
-                    "volumeLevel0_99": 99,
-                    "constMode0_1": 0,
-                    "freqCoarse0_31": 1,
-                    "freqFine0_99": 64,
-                    "enabled": true,
-                    "velocitySens0_7": 0
-                },
-                {
-                    "rates0_99": [
-                        39,
-                        13,
-                        12,
-                        72
-                    ],
-                    "levels0_99": [
-                        99,
-                        61,
-                        66,
-                        0
-                    ],
-                    "detune_7_7": 0,
-                    "volumeLevel0_99": 72,
-                    "constMode0_1": 0,
-                    "freqCoarse0_31": 3,
-                    "freqFine0_99": 1,
-                    "enabled": true,
-                    "velocitySens0_7": 0
-                },
-                {
-                    "rates0_99": [
-                        98,
-                        29,
-                        28,
-                        33
+                        87,
+                        42,
+                        14,
+                        54
                     ],
                     "levels0_99": [
                         99,
@@ -346,84 +304,122 @@ class DX7Test {
                         0,
                         0
                     ],
-                    "detune_7_7": 2,
+                    "detune_7_7": 0,
                     "volumeLevel0_99": 99,
                     "constMode0_1": 1,
-                    "freqCoarse0_31": 22,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 67,
+                    "enabled": true,
+                    "velocitySens0_7": 0
+                },
+                {
+                    "rates0_99": [
+                        99,
+                        14,
+                        14,
+                        19
+                    ],
+                    "levels0_99": [
+                        90,
+                        90,
+                        90,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 78,
+                    "constMode0_1": 1,
+                    "freqCoarse0_31": 2,
+                    "freqFine0_99": 45,
+                    "enabled": true,
+                    "velocitySens0_7": 0
+                },
+                {
+                    "rates0_99": [
+                        87,
+                        20,
+                        55,
+                        19
+                    ],
+                    "levels0_99": [
+                        92,
+                        92,
+                        92,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 79,
+                    "constMode0_1": 1,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 53,
+                    "enabled": true,
+                    "velocitySens0_7": 0
+                },
+                {
+                    "rates0_99": [
+                        93,
+                        67,
+                        67,
+                        20
+                    ],
+                    "levels0_99": [
+                        99,
+                        60,
+                        62,
+                        0
+                    ],
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 1,
+                    "freqCoarse0_31": 1,
                     "freqFine0_99": 57,
                     "enabled": true,
                     "velocitySens0_7": 0
                 },
                 {
                     "rates0_99": [
-                        98,
-                        29,
-                        28,
-                        27
+                        99,
+                        69,
+                        58,
+                        82
                     ],
                     "levels0_99": [
                         99,
-                        0,
-                        0,
-                        0
-                    ],
-                    "detune_7_7": -2,
-                    "volumeLevel0_99": 89,
-                    "constMode0_1": 1,
-                    "freqCoarse0_31": 10,
-                    "freqFine0_99": 99,
-                    "enabled": true,
-                    "velocitySens0_7": 0
-                },
-                {
-                    "rates0_99": [
-                        42,
-                        17,
-                        25,
-                        53
-                    ],
-                    "levels0_99": [
-                        99,
-                        99,
+                        57,
                         99,
                         99
                     ],
-                    "detune_7_7": 3,
-                    "volumeLevel0_99": 83,
-                    "constMode0_1": 0,
-                    "freqCoarse0_31": 9,
-                    "freqFine0_99": 0,
+                    "detune_7_7": 0,
+                    "volumeLevel0_99": 99,
+                    "constMode0_1": 1,
+                    "freqCoarse0_31": 2,
+                    "freqFine0_99": 29,
                     "enabled": true,
                     "velocitySens0_7": 0
                 },
                 {
                     "rates0_99": [
-                        49,
-                        17,
-                        25,
-                        53
+                        99,
+                        61,
+                        60,
+                        19
                     ],
                     "levels0_99": [
-                        99,
-                        99,
-                        99,
-                        98
+                        90,
+                        81,
+                        33,
+                        0
                     ],
                     "detune_7_7": 0,
                     "volumeLevel0_99": 99,
-                    "constMode0_1": 0,
-                    "freqCoarse0_31": 5,
-                    "freqFine0_99": 0,
+                    "constMode0_1": 1,
+                    "freqCoarse0_31": 1,
+                    "freqFine0_99": 78,
                     "enabled": true,
                     "velocitySens0_7": 0
                 }
             ],
-            "name": "TRAIN     "
+            "name": "SNR.BLAST "
         };
-        test.operators[0].enabled = false;
-        test.operators[1].enabled = false;
-        test.operators[2].enabled = false;
-        test.operators[3].enabled = false;
         let loader = new DX7Loader();
         this.selectedPreset = loader.convertDX7data('test', test);
         console.log('dx7preset', test);

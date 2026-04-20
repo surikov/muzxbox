@@ -94,6 +94,7 @@ class DX7Loader {
 		//let ss = this.scale99(nn);
 		//return 0.095 / ss;
 		//return 318 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16)//+0.008;
+		//return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16)//+0.008;
 		return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16)//+0.008;
 	}
 	durationUp(nn: number): number {
@@ -103,8 +104,8 @@ class DX7Loader {
 	}
 	levelRatio(nn: number): number {
 		return nn / 99;
-		let ratio = Math.log(nn + 1) * 14 + nn;
-		return ratio;
+		//let ratio = Math.log(nn + 1) * 14 + nn;
+		//return ratio;
 	}
 	slopeDuration(r99: number, from99: number, to99: number): SynthSlope {
 		//let fromRatio = this.levelRatio(from99);
@@ -158,7 +159,8 @@ class DX7Loader {
 				operator.release.duration = 3;
 			}*/
 			if (data.constMode0_1 > 0) {
-				operator.volume = 1 / 7;
+				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				//operator.volume = 1 / 7;
 				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2*data.velocitySens0_7 / 7);
 				operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 				//op.freqFixed = Math.pow(10, op.freqCoarse % 4) * (1 + (op.freqFine / 99) * 8.772);

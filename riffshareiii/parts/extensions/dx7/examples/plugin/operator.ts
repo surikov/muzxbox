@@ -29,7 +29,7 @@ class DX7Operator {
 
 		this.waveShift.start(this.audioContext.currentTime);
 	}
-	restartCarrier(when: number) {
+	resetCarrier(when: number) {
 		if (this.carrier) {
 			this.carrier.stop();
 			this.carrier.disconnect();
@@ -38,23 +38,48 @@ class DX7Operator {
 		this.carrier.connect(this.phaseDelay);
 		this.carrier.start(when);
 	}
-	restartEnvelope(info: OperatorInfo, when: number, duration: number) {
+	//rampVolume(from: number, to: number, when: number, duration: number) {
+	/*
+	this.envelope.gain.linearRampToValueAtTime(from + (to - from) * 0.75, when + duration * 0.2);
+	this.envelope.gain.linearRampToValueAtTime(from + (to - from) * 0.95, when + duration * 0.5);
+	this.envelope.gain.linearRampToValueAtTime(to, when + duration);
+	*/
+	//this.envelope.gain.setTargetAtTime(to, when, duration * 0.1);
+	//}
+	/*resetEnvelope2(info: OperatorInfo, when: number, duration: number) {
 		this.envelope.gain.setValueAtTime(info.attack.from, when);
-		this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
-		this.envelope.gain.linearRampToValueAtTime(info.decay.to, when + info.attack.duration + info.decay.duration);
-		this.envelope.gain.linearRampToValueAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration + info.sustain.duration);
+		//this.envelope.gain.linearRampToValueAtTime(info.attack.to, when + info.attack.duration);
+		this.rampVolume(info.attack.from, info.attack.to, when, info.attack.duration);
+		//this.envelope.gain.setTargetAtTime(info.attack.to, when, info.attack.duration * 0.1);
+		//this.envelope.gain.linearRampToValueAtTime(info.decay.to, when + info.attack.duration + info.decay.duration);
+		this.rampVolume(info.decay.from, info.decay.to, when + info.attack.duration, info.decay.duration);
+		//this.envelope.gain.setTargetAtTime(info.decay.to, when, info.decay.duration * 0.1);
+		//this.envelope.gain.linearRampToValueAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration + info.sustain.duration);
+		this.rampVolume(info.sustain.from, info.sustain.to, when + info.attack.duration + info.decay.duration, info.sustain.duration);
+		//this.envelope.gain.setTargetAtTime(info.sustain.to, when, info.sustain.duration * 0.1);
 		this.envelope.gain.cancelAndHoldAtTime(when + duration);
 		this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
-		this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
+		//this.envelope.gain.linearRampToValueAtTime(info.release.to, when + duration + info.release.duration);
+		this.rampVolume(info.release.from, info.release.to, when + duration, info.release.duration);
+		//this.envelope.gain.setTargetAtTime(info.release.to, when, info.release.duration * 0.1);
+	}*/
+	resetEnvelope(info: OperatorInfo, when: number, duration: number) {
+		this.envelope.gain.setValueAtTime(info.attack.from, when);
+		this.envelope.gain.setTargetAtTime(info.attack.to, when, info.attack.duration * 0.1);
+		this.envelope.gain.setTargetAtTime(info.decay.to, when + info.attack.duration, info.decay.duration * 0.1);
+		this.envelope.gain.setTargetAtTime(info.sustain.to, when + info.attack.duration + info.decay.duration, info.sustain.duration * 0.1);
+		this.envelope.gain.cancelAndHoldAtTime(when + duration);
+		this.envelope.gain.setTargetAtTime(info.release.from, when + duration, 0.5);
+		this.envelope.gain.setTargetAtTime(info.release.to, when + duration, info.release.duration * 0.1);
 	}
 	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
-		this.restartCarrier(when);
-		this.restartEnvelope(info, when, duration);
+		this.resetCarrier(when);
+		this.resetEnvelope(info, when, duration);
 		let modulationRatio = Math.E / frequency;
 		this.carrier.frequency.value = frequency;
 		this.modulation.gain.value = modulationRatio;
 		this.waveShift.offset.value = 2 * modulationRatio;
-		this.feedback.gain.value = feedbackRatio*modulationRatio;
+		this.feedback.gain.value = feedbackRatio * modulationRatio;
 		this.output.gain.value = info.volume;
 	}
 }

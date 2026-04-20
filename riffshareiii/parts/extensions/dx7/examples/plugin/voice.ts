@@ -7,7 +7,7 @@ class DX7Voice {
 		this.audioContext = audioContext;
 		this.output = this.audioContext.createGain();
 		this.output.connect(to);
-		this.output.gain.value = 0.25;//0.125;
+		this.output.gain.value = 0.33;//0.25;//0.125;
 		this.operators = [
 			new DX7Operator(this.audioContext)
 			, new DX7Operator(this.audioContext)
@@ -55,7 +55,7 @@ class DX7Voice {
 					let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
 					frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
 				}
-				//console.log(ii, 'startPlayFrequency', frequency);
+				console.log(ii, 'startPlayFrequency', frequency);
 				this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
 				let otime = when + duration + preset.operators[ii].release.duration;
 				if (this.locktime < otime) {
@@ -66,6 +66,6 @@ class DX7Voice {
 			}
 		}
 
-		//console.log('startPlayNote', note, 'when', when, preset);
+		console.log('startPlayNote', note, 'when', when, preset);
 	}
 }

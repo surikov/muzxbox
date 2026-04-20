@@ -3,166 +3,167 @@ class DX7Test {
 	selectedPreset: SynthPreset | null = null;
 	parsed: SynthPreset[] | null = null;
 	constructor() {
-		let test: DX7PresetData = 
+		let test: DX7PresetData =
 		{
-    "algorithm1_32": 5,
-    "feedback0_7": 7,
-    "operators": [
-        {
-            "rates0_99": [
-                65,
-                24,
-                19,
-                57
-            ],
-            "levels0_99": [
-                99,
-                85,
-                85,
-                0
-            ],
-            "detune_7_7": 0,
-            "volumeLevel0_99": 99,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 1,
-            "freqFine0_99": 64,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                39,
-                13,
-                12,
-                72
-            ],
-            "levels0_99": [
-                99,
-                61,
-                66,
-                0
-            ],
-            "detune_7_7": 0,
-            "volumeLevel0_99": 72,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 3,
-            "freqFine0_99": 1,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                98,
-                29,
-                28,
-                33
-            ],
-            "levels0_99": [
-                99,
-                0,
-                0,
-                0
-            ],
-            "detune_7_7": 2,
-            "volumeLevel0_99": 99,
-            "constMode0_1": 1,
-            "freqCoarse0_31": 22,
-            "freqFine0_99": 57,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                98,
-                29,
-                28,
-                27
-            ],
-            "levels0_99": [
-                99,
-                0,
-                0,
-                0
-            ],
-            "detune_7_7": -2,
-            "volumeLevel0_99": 89,
-            "constMode0_1": 1,
-            "freqCoarse0_31": 10,
-            "freqFine0_99": 99,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                42,
-                17,
-                25,
-                53
-            ],
-            "levels0_99": [
-                99,
-                99,
-                99,
-                99
-            ],
-            "detune_7_7": 3,
-            "volumeLevel0_99": 83,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 9,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                49,
-                17,
-                25,
-                53
-            ],
-            "levels0_99": [
-                99,
-                99,
-                99,
-                98
-            ],
-            "detune_7_7": 0,
-            "volumeLevel0_99": 99,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 5,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
-        }
-    ],
-    "name": "TRAIN     "
-}
-		;
-		test.operators[0].enabled=false;
-		test.operators[1].enabled=false;
-		test.operators[2].enabled=false;
-		test.operators[3].enabled=false;
-		//test.operators[4].enabled=false;
-		//test.operators[5].enabled=false;
+			"algorithm1_32": 17,
+			"feedback0_7": 5,
+			"operators": [
+				{
+					"rates0_99": [
+						87,
+						42,
+						14,
+						54
+					],
+					"levels0_99": [
+						99,
+						0,
+						0,
+						0
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 99,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 1,
+					"freqFine0_99": 67,
+					"enabled": true,
+					"velocitySens0_7": 0
+				},
+				{
+					"rates0_99": [
+						99,
+						14,
+						14,
+						19
+					],
+					"levels0_99": [
+						90,
+						90,
+						90,
+						0
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 78,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 2,
+					"freqFine0_99": 45,
+					"enabled": true,
+					"velocitySens0_7": 0
+				},
+				{
+					"rates0_99": [
+						87,
+						20,
+						55,
+						19
+					],
+					"levels0_99": [
+						92,
+						92,
+						92,
+						0
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 79,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 1,
+					"freqFine0_99": 53,
+					"enabled": true,
+					"velocitySens0_7": 0
+				},
+				{
+					"rates0_99": [
+						93,
+						67,
+						67,
+						20
+					],
+					"levels0_99": [
+						99,
+						60,
+						62,
+						0
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 99,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 1,
+					"freqFine0_99": 57,
+					"enabled": true,
+					"velocitySens0_7": 0
+				},
+				{
+					"rates0_99": [
+						99,
+						69,
+						58,
+						82
+					],
+					"levels0_99": [
+						99,
+						57,
+						99,
+						99
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 99,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 2,
+					"freqFine0_99": 29,
+					"enabled": true,
+					"velocitySens0_7": 0
+				},
+				{
+					"rates0_99": [
+						99,
+						61,
+						60,
+						19
+					],
+					"levels0_99": [
+						90,
+						81,
+						33,
+						0
+					],
+					"detune_7_7": 0,
+					"volumeLevel0_99": 99,
+					"constMode0_1": 1,
+					"freqCoarse0_31": 1,
+					"freqFine0_99": 78,
+					"enabled": true,
+					"velocitySens0_7": 0
+				}
+			],
+			"name": "SNR.BLAST "
+		}
+			;
+		
+		//test.operators[0].enabled=false;
+		//test.operators[1].enabled=false;
+		//test.operators[2].enabled=false;
+		//test.operators[3].enabled=false;
+		test.operators[4].enabled=false;
+		test.operators[5].enabled=false;
 
 		//test.feedback0_7
-/*
-		test.operators[2].rates0_99=[99,99,99,99];
-		test.operators[2].levels0_99=[99,99,99,0];
-		test.operators[3].rates0_99=[99,99,99,99];
-		test.operators[3].levels0_99=[99,99,99,0];
-
-		test.operators[2].volumeLevel0_99=99;
-		test.operators[3].volumeLevel0_99=99;
-*/
+		/*
+				test.operators[2].rates0_99=[99,99,99,99];
+				test.operators[2].levels0_99=[99,99,99,0];
+				test.operators[3].rates0_99=[99,99,99,99];
+				test.operators[3].levels0_99=[99,99,99,0];
+		
+				test.operators[2].volumeLevel0_99=99;
+				test.operators[3].volumeLevel0_99=99;
+		*/
 		let loader: DX7Loader = new DX7Loader();
 		this.selectedPreset = loader.convertDX7data('test', test);
-		console.log('dx7preset',test);
-		console.log('synthpreset',this.selectedPreset);
+		console.log('dx7preset', test);
+		console.log('synthpreset', this.selectedPreset);
 
 
 
-		
+
 
 	}
 	loadSysexFile(fileList: FileList) {
