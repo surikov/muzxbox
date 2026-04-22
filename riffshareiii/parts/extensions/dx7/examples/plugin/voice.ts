@@ -55,7 +55,7 @@ class DX7Voice {
 					let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
 					frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
 				}
-				console.log(ii, 'startPlayFrequency', frequency);
+				//console.log(ii, 'startPlayFrequency', frequency);
 				this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
 				let otime = when + duration + preset.operators[ii].release;
 				if (this.locktime < otime) {

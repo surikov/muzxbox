@@ -312,15 +312,17 @@ type DX7PresetData = {
     algorithm1_32: number;
     operators: DX7OperatorData[];
     feedback0_7: number;
+    lfoSpeed: number;
+    lfoDelay: number;
+    lfoPitchModDepth0_99: number;
+    lfoAmpModDepth0_99: number;
+    lfoPitchModSens: number;
+    lfoWaveform: number;
+    lfoSync: number;
 };
 type ConnectionSchemeDX7 = {
     outputMix: number[];
     modulationMatrix: (number[])[];
-};
-type SlopeInfo = {
-    from: number;
-    to: number;
-    duration: number;
 };
 type SynthSlope = {
     duration: number;
@@ -349,9 +351,14 @@ declare class DX7Loader {
     durationDown(nn: number): number;
     durationUp(nn: number): number;
     levelRatio(nn: number): number;
-    slopeDuration(r99: number, from99: number, to99: number): SlopeInfo;
-    convertDX7data(fileName: string, dx7data: DX7PresetData): SynthPreset;
+    slopeDuration(r99: number, from99: number, to99: number): {
+        from: number;
+        to: number;
+        duration: number;
+    };
+    convertDX7data(fileName: string, dx7preset: DX7PresetData): SynthPreset;
     parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
+    pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number): DX7PresetData;
 }
 declare class DX7Synthesizer {
@@ -376,13 +383,17 @@ declare class DX7Operator {
     output: GainNode;
     feedback: GainNode;
     phaseDelay: DelayNode;
-    waveShift: ConstantSourceNode;
+    compensateNegativeDelay: ConstantSourceNode;
     carrier: OscillatorNode;
     modulation: GainNode;
     envelope: GainNode;
     constructor(cntxt: AudioContext);
+    setupNodes(): void;
+    connectNodes(): void;
+    createNodes(): void;
     resetCarrier(when: number): void;
     resetEnvelope(info: OperatorInfo, when: number, duration: number): void;
+    resetFrequency(frequency: number, feedbackRatio: number): void;
     startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
 }
 declare class DX7Test {

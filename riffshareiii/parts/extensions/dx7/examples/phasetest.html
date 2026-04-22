@@ -1,0 +1,64 @@
+<html>
+<button onclick='start();'>test</button>
+<script>
+	function start() {
+		//99 1
+		//88 0.3855527063519852
+		//77 0.14865088937534013
+		//66 0.05731275270029195
+		let audioContext = new AudioContext();
+		let when = audioContext.currentTime + 0.1;
+		let carrierFrequency = 261.6255653005986;
+		let modulatorFrequency = 261.6255653005986;
+		//let maxmodulation = 4;
+		let modulationRatio = Math.PI / carrierFrequency;
+
+		let carrier = audioContext.createOscillator();
+		let modulatorBeep = audioContext.createOscillator();
+		let modulationLevel = audioContext.createGain();
+		let beepVolume = audioContext.createGain();
+		let phaseDelay = audioContext.createDelay();
+		let delayShift = audioContext.createConstantSource();
+		let output = audioContext.createGain();
+
+		carrier.frequency.value = carrierFrequency;
+		modulatorBeep.frequency.value = modulatorFrequency;
+		output.gain.setValueAtTime(0.99, when);
+
+		beepVolume.gain.setValueAtTime(1, when);
+		beepVolume.gain.setValueAtTime(0.3855527063519852, when + 0.5);
+		beepVolume.gain.setValueAtTime(0.14865088937534013, when + 1);
+		beepVolume.gain.setValueAtTime(0.05731275270029195, when + 1.5);
+		//beepVolume.gain.setValueAtTime(0, when);
+		//beepVolume.gain.setValueAtTime(0.25, when + 1);
+		//beepVolume.gain.setValueAtTime(0.5, when + 2);
+		//beepVolume.gain.linearRampToValueAtTime(0.5, when + 3);
+
+		modulationLevel.gain.setValueAtTime(modulationRatio, when);
+		//modulationLevel.gain.setValueAtTime(0, when);
+		//modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
+		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
+		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
+		//phaseDelay.delayTime.value = 0.5 / soundFrequency;
+		//delayShift.offset.value = 0.5 / soundFrequency;
+		delayShift.offset.value = 1 * modulationRatio;
+
+		modulatorBeep.connect(beepVolume);
+		beepVolume.connect(modulationLevel);
+		modulationLevel.connect(phaseDelay.delayTime);
+		delayShift.connect(phaseDelay.delayTime);
+		carrier.connect(phaseDelay);
+		phaseDelay.connect(output);
+		output.connect(audioContext.destination);
+
+		modulatorBeep.start(when);
+		delayShift.start(when);
+		carrier.start(when);
+
+		modulatorBeep.stop(when + 2);
+		delayShift.stop(when + 2);
+		carrier.stop(when + 2);
+	}
+</script>
+
+</html>

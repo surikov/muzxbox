@@ -16,16 +16,24 @@ type DX7PresetData = {
 	algorithm1_32: number;
 	operators: DX7OperatorData[];
 	feedback0_7: number;
+
+	lfoSpeed: number;
+	lfoDelay: number;
+	lfoPitchModDepth0_99: number;
+	lfoAmpModDepth0_99: number;
+	lfoPitchModSens: number;
+	lfoWaveform: number;
+	lfoSync: number;
 };
 type ConnectionSchemeDX7 = {
 	outputMix: number[]
 	, modulationMatrix: (number[])[]
-};
+};/*
 type SlopeInfo = {
 	from: number;
 	to: number;
 	duration: number;
-};
+};*/
 type SynthSlope = {
 	duration: number;
 	value: number;
@@ -111,7 +119,11 @@ class DX7Loader {
 		//let ratio = Math.log(nn + 1) * 14 + nn;
 		//return ratio;
 	}
-	slopeDuration(r99: number, from99: number, to99: number): SlopeInfo {
+	slopeDuration(r99: number, from99: number, to99: number): {
+		from: number;
+		to: number;
+		duration: number;
+	} {
 		//let fromRatio = this.levelRatio(from99);
 		//let toRatio = this.levelRatio(to99);
 		//let fullRatio = this.levelRatio(99);
@@ -131,15 +143,19 @@ class DX7Loader {
 		//if(dump)console.log('slopeDuration', r99, 'from',from99,'to', to99, slope, fullDuration,'/', partDuration);
 		return slope;
 	}
-	convertDX7data(fileName: string, dx7data: DX7PresetData): SynthPreset {
+	convertDX7data(fileName: string, dx7preset: DX7PresetData): SynthPreset {
 		let preset: SynthPreset = {
-			label: dx7data.name.trim() + '/' + fileName.trim()
-			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7data.algorithm1_32 - 1]
+			label: dx7preset.name.trim() + '/' + fileName.trim()
+			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7data.feedback0_7 - 7)) //* 0.01 //0.4
+			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
 		};
+		let ls = dx7preset.lfoSpeed / 6 + 0.5;
+		if (dx7preset.lfoSpeed > 65) {
+			ls = 10 + (dx7preset.lfoSpeed - 66) / 1;
+		}
 		for (let ii = 0; ii < 6; ii++) {
-			let data = dx7data.operators[ii];
+			let data = dx7preset.operators[ii];
 			let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
 			let decaySlope = this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]);
 			let sustainSlope = this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2])
@@ -148,52 +164,34 @@ class DX7Loader {
 				constantFrequency: 0
 				, frequencyRatio: 0
 				, enabled: data.enabled
-				, volume: 0 //Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125)
+				, volume: 0
 				, detune: data.detune_7_7
 				, attack: { value: attackSlope.to, duration: attackSlope.duration }
-				//, attack: this.slopeDuration(data.rates0_99[0], 0, data.levels0_99[0])
 				, decay: { value: decaySlope.to, duration: decaySlope.duration }
 				, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
 				, release: releaseSlope.duration
 			};
-			//operator.attack.from = 0;
-			//operator.release.to = 0;
 			operator.release = Math.max(0.003, operator.release);
 			operator.release = Math.min(3, operator.release);
-			/*if (operator.release.duration < 0.003) {
-				operator.release.duration = 0.003;
-			}
-			if (operator.release.duration > 3) {
-				operator.release.duration = 3;
-			}*/
+			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
+			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
 			if (data.constMode0_1 > 0) {
-				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
-				//operator.volume = 1 / 7;
-				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2*data.velocitySens0_7 / 7);
-				operator.constantFrequency = Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
-				//op.freqFixed = Math.pow(10, op.freqCoarse % 4) * (1 + (op.freqFine / 99) * 8.772);
+				operator.volume = 0.5 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
-				/*var OCTAVE_1024 = 1.0006771307; //Math.exp(Math.log(2)/1024);
-				let detuneRatio = Math.pow(OCTAVE_1024, data.detune_7_7);
-				let freqRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
-				if (freqRatio) {
-					operator.frequencyRatio = detuneRatio * freqRatio;
-				} else {
-					operator.frequencyRatio = detuneRatio * 0.5;
-				}*/
-				//operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
-				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125);
-				//operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * 0.5;//(1 + data.velocitySens0_7 / 7);
 				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				let coarse = 0.5;
 				if (data.freqCoarse0_31) {
-					operator.frequencyRatio = data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
-				} else {
-					operator.frequencyRatio = 0.5 * (1 + data.freqFine0_99 / 100);;//0.5;
-				}
+					coarse = data.freqCoarse0_31
+					//operator.frequencyRatio = freqRatio * data.freqCoarse0_31 * (1 + data.freqFine0_99 / 100);
+				} //else {
+				//	operator.frequencyRatio = freqRatio * 0.5 * (1 + data.freqFine0_99 / 100);//0.5;
+				//}
+				operator.frequencyRatio = freqRatio * coarse * (1 + data.freqFine0_99 / 100);
 			}
+			operator.volume = operator.volume * (1 + dx7preset.lfoAmpModDepth0_99 / 99);
 			preset.operators.push(operator);
 		}
-		//if(dump)console.log('preset',preset);
 		return preset;
 	}
 	parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void) {
@@ -216,6 +214,13 @@ class DX7Loader {
 			console.log('error', error)
 		};
 		reader.readAsText(from);
+	}
+	pow2x(x01: number, minx: number, maxx: number, yratio: number): number {
+		if (x01) {
+			return yratio * Math.pow(2, x01 * (maxx - minx) + minx);
+		} else {
+			return 0;
+		}
 	}
 	parseSysexData(bankData: string, patchId: number): DX7PresetData {
 		var dataStart = 128 * patchId + 6;
@@ -245,6 +250,14 @@ class DX7Loader {
 			feedback0_7: voiceData.charCodeAt(111) & 7,
 			operators: operators,
 			name: voiceData.substring(118, 128),
+
+			lfoSpeed: voiceData.charCodeAt(112),
+			lfoDelay: voiceData.charCodeAt(113),
+			lfoPitchModDepth0_99: voiceData.charCodeAt(114),
+			lfoAmpModDepth0_99: voiceData.charCodeAt(115),//
+			lfoPitchModSens: voiceData.charCodeAt(116) >> 4,
+			lfoWaveform: Math.floor(voiceData.charCodeAt(116) >> 1) & 7,
+			lfoSync: voiceData.charCodeAt(116) & 1,
 		};
 		console.log('parseSysexData', patchId, preset);
 		return preset;
