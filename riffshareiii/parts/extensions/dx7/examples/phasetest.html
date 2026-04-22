@@ -10,8 +10,10 @@
 		let when = audioContext.currentTime + 0.1;
 		let carrierFrequency = 261.6255653005986;
 		let modulatorFrequency = 261.6255653005986;
+		 carrierFrequency = 440;
+		 modulatorFrequency = 440;
 		//let maxmodulation = 4;
-		let modulationRatio = Math.PI / carrierFrequency;
+		//let modulationRatio = 2 / carrierFrequency;
 
 		let carrier = audioContext.createOscillator();
 		let modulatorBeep = audioContext.createOscillator();
@@ -34,14 +36,17 @@
 		//beepVolume.gain.setValueAtTime(0.5, when + 2);
 		//beepVolume.gain.linearRampToValueAtTime(0.5, when + 3);
 
-		modulationLevel.gain.setValueAtTime(modulationRatio, when);
+		//modulationLevel.gain.setValueAtTime(modulationRatio, when);
+		modulationLevel.gain.setValueAtTime(2.8 / carrierFrequency, when);
+		//modulationLevel.gain.linearRampToValueAtTime(3 / carrierFrequency, when + 2);
 		//modulationLevel.gain.setValueAtTime(0, when);
 		//modulationLevel.gain.setValueAtTime(0 / (2 * Math.PI * soundFrequency), when);
 		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
 		//modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 3);
 		//phaseDelay.delayTime.value = 0.5 / soundFrequency;
 		//delayShift.offset.value = 0.5 / soundFrequency;
-		delayShift.offset.value = 1 * modulationRatio;
+		//delayShift.offset.value = 2 * modulationRatio;
+		delayShift.offset.value = 3 / carrierFrequency;
 
 		modulatorBeep.connect(beepVolume);
 		beepVolume.connect(modulationLevel);
