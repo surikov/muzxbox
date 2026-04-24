@@ -75,9 +75,18 @@ class DX7Operator {
 	resetFrequency(frequency: number, feedbackRatio: number) {
 		//let modulationRatio = Math.E / frequency;
 		this.carrier.frequency.value = frequency;
+		
 		this.modulationLevel.gain.value = 2.8 / frequency;//2.8 / frequency;//modulationRatio;
 		this.compensateNegativeDelay.offset.value = 3 / frequency;//2 * modulationRatio;
-		this.feedbackLevel.gain.value = 0.17 * feedbackRatio;
+
+		//this.modulationLevel.gain.value = 7 / frequency;//2.8 / frequency;//modulationRatio;
+		//this.compensateNegativeDelay.offset.value = 8/ frequency;//2 * modulationRatio;
+
+		//this.feedbackLevel.gain.value = 0.16 * feedbackRatio;
+		//this.feedbackLevel.gain.value = 1.2 * feedbackRatio;
+		//this.feedbackLevel.gain.value = 1.7;
+		//this.feedbackLevel.gain.value = 0.41;
+		this.feedbackLevel.gain.value = 0.4;
 	}
 	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
 		this.resetCarrier(when);

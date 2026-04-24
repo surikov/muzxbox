@@ -171,7 +171,7 @@ class DX7Loader {
 				, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
 				, release: releaseSlope.duration
 			};
-			operator.release = Math.max(0.003, operator.release);
+			operator.release = Math.max(0.005, operator.release);
 			operator.release = Math.min(3, operator.release);
 			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
 			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
