@@ -1,0 +1,63 @@
+<html>
+<button onclick='start();'>test</button>
+<script>
+	function start() {
+		let audioContext = new AudioContext();
+		let when = audioContext.currentTime + 0.1;
+		let carrierFrequency =261.6255653005986;
+
+		let carrier = audioContext.createOscillator();
+
+		let modulator = carrier;
+		//let modulator = audioContext.createOscillator();
+		//modulator.frequency.value = carrierFrequency;
+
+		let modulationLevel = audioContext.createGain();
+		let feedbackLevel = audioContext.createGain();
+		let phaseDelay = audioContext.createDelay();
+		let delayShift = audioContext.createConstantSource();
+		let output = audioContext.createGain();
+
+		carrier.frequency.value = carrierFrequency;
+		output.gain.setValueAtTime(0.5, when);
+
+		feedbackLevel.gain.setValueAtTime(0.17, when);
+		//feedbackLevel.gain.linearRampToValueAtTime(0.5/ carrierFrequency, when + 1);
+		//feedbackLevel.gain.setValueAtTime(0.5/ carrierFrequency, when);
+		//feedbackLevel.gain.linearRampToValueAtTime(0.5/ carrierFrequency, when + 1);
+		//feedbackRatio.gain.setValueAtTime(0.066, when);
+		//feedbackRatio.gain.setValueAtTime(0.2 / carrierFrequency, when);
+		//feedbackRatio.gain.linearRampToValueAtTime(0.012/ carrierFrequency, when + 1);
+
+		//modulationLevel.gain.setValueAtTime(2.8 / carrierFrequency, when);
+		modulationLevel.gain.setValueAtTime(2.8 / carrierFrequency, when);
+		delayShift.offset.value = 3 / carrierFrequency;
+		//delayShift.offset.setValueAtTime(2.0 / carrierFrequency, when);
+		//delayShift.offset.linearRampToValueAtTime(6.0 / carrierFrequency, when);
+
+
+		//feedbackLevel.connect(phaseDelay.delayTime);
+		feedbackLevel.connect(modulationLevel);
+		modulationLevel.connect(phaseDelay.delayTime);
+		delayShift.connect(phaseDelay.delayTime);
+		carrier.connect(phaseDelay);
+		phaseDelay.connect(output);
+
+		output.connect(audioContext.destination);
+
+		//output.connect(feedbackRatio);
+		output.connect(feedbackLevel);
+
+		
+
+		delayShift.start(when);
+		carrier.start(when);
+		//modulator.start(when);
+
+		delayShift.stop(when + 1);
+		carrier.stop(when + 1);
+		//modulator.stop(when + 1);
+	}
+</script>
+
+</html>

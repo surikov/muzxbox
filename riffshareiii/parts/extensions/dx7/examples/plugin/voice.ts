@@ -7,7 +7,7 @@ class DX7Voice {
 		this.audioContext = audioContext;
 		this.output = this.audioContext.createGain();
 		this.output.connect(to);
-		this.output.gain.value = 0.33;//0.25;//0.125;
+		this.output.gain.value = 0.125;//0.33;//0.25;//0.125;
 		this.operators = [
 			new DX7Operator(this.audioContext)
 			, new DX7Operator(this.audioContext)
@@ -30,10 +30,10 @@ class DX7Voice {
 				if (id == ii) {
 					//this.operators[id].feedback.gain.value = preset.feedbackRatio*Math.PI / frequency;
 					//modulator.envelope.connect(modulator.feedback);
-					modulator.output.connect(modulator.feedback);
+					modulator.output.connect(modulator.feedbackLevel);
 					//console.log((1 + id), '<>');
 				} else {
-					modulator.output.connect(carrier.modulation);
+					modulator.output.connect(carrier.modulationLevel);
 					//console.log((1 + id), '>', (1 + ii));
 				}
 			}

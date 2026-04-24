@@ -381,18 +381,18 @@ declare class DX7Voice {
 declare class DX7Operator {
     audioContext: AudioContext;
     output: GainNode;
-    feedback: GainNode;
+    feedbackLevel: GainNode;
     phaseDelay: DelayNode;
     compensateNegativeDelay: ConstantSourceNode;
     carrier: OscillatorNode;
-    modulation: GainNode;
+    modulationLevel: GainNode;
     envelope: GainNode;
     constructor(cntxt: AudioContext);
     setupNodes(): void;
     connectNodes(): void;
     createNodes(): void;
     resetCarrier(when: number): void;
-    resetEnvelope(info: OperatorInfo, when: number, duration: number): void;
+    resetEnvelope(attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number): void;
     resetFrequency(frequency: number, feedbackRatio: number): void;
     startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
 }

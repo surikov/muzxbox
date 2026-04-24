@@ -148,7 +148,7 @@ class DX7Loader {
 			label: dx7preset.name.trim() + '/' + fileName.trim()
 			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
+			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))*0.35 //* 0.01 //0.4
 		};
 		let ls = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {

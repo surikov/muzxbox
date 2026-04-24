@@ -5,158 +5,159 @@ class DX7Test {
 	constructor() {
 		let test: DX7PresetData =
 		{
-			"algorithm1_32": 22,
-			"feedback0_7": 7,
-			"operators": [
-				{
-					"rates0_99": [
-						72,
-						76,
-						99,
-						71
-					],
-					"levels0_99": [
-						99,
-						88,
-						96,
-						0
-					],
-					"detune_7_7": 7,
-					"volumeLevel0_99": 98,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 0,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 0
-				},
-				{
-					"rates0_99": [
-						62,
-						51,
-						29,
-						71
-					],
-					"levels0_99": [
-						82,
-						95,
-						96,
-						0
-					],
-					"detune_7_7": 7,
-					"volumeLevel0_99": 86,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 0,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 0
-				},
-				{
-					"rates0_99": [
-						77,
-						76,
-						82,
-						71
-					],
-					"levels0_99": [
-						99,
-						98,
-						98,
-						0
-					],
-					"detune_7_7": -2,
-					"volumeLevel0_99": 99,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 1,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 2
-				},
-				{
-					"rates0_99": [
-						77,
-						36,
-						41,
-						71
-					],
-					"levels0_99": [
-						99,
-						98,
-						98,
-						0
-					],
-					"detune_7_7": 0,
-					"volumeLevel0_99": 99,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 1,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 2
-				},
-				{
-					"rates0_99": [
-						77,
-						36,
-						41,
-						71
-					],
-					"levels0_99": [
-						99,
-						98,
-						98,
-						0
-					],
-					"detune_7_7": 1,
-					"volumeLevel0_99": 98,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 1,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 2
-				},
-				{
-					"rates0_99": [
-						49,
-						99,
-						28,
-						68
-					],
-					"levels0_99": [
-						98,
-						98,
-						91,
-						0
-					],
-					"detune_7_7": 0,
-					"volumeLevel0_99": 82,
-					"constMode0_1": 0,
-					"freqCoarse0_31": 1,
-					"freqFine0_99": 0,
-					"enabled": true,
-					"velocitySens0_7": 2
-				}
-			],
-			"name": "BRASS   1 ",
-			"lfoSpeed": 37,
-			"lfoDelay": 0,
-			"lfoPitchModDepth0_99": 5,
-			"lfoAmpModDepth0_99": 0,
-			"lfoPitchModSens": 3,
-			"lfoWaveform": 4,
-			"lfoSync": 0
-		}
+    "algorithm1_32": 15,
+    "feedback0_7": 5,
+    "operators": [
+        {
+            "rates0_99": [
+                99,
+                40,
+                33,
+                38
+            ],
+            "levels0_99": [
+                99,
+                92,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                19,
+                20,
+                9
+            ],
+            "levels0_99": [
+                99,
+                87,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 64,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 70,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                99,
+                30,
+                35,
+                42
+            ],
+            "levels0_99": [
+                99,
+                92,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 3
+        },
+        {
+            "rates0_99": [
+                99,
+                44,
+                50,
+                21
+            ],
+            "levels0_99": [
+                91,
+                82,
+                0,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                99,
+                40,
+                38,
+                0
+            ],
+            "levels0_99": [
+                91,
+                82,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 64,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 4,
+            "freqFine0_99": 33,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                49,
+                28,
+                12
+            ],
+            "levels0_99": [
+                91,
+                82,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 49,
+            "constMode0_1": 1,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 60,
+            "enabled": true,
+            "velocitySens0_7": 0
+        }
+    ],
+    "name": "STEEL DRUM",
+    "lfoSpeed": 25,
+    "lfoDelay": 0,
+    "lfoPitchModDepth0_99": 10,
+    "lfoAmpModDepth0_99": 99,
+    "lfoPitchModSens": 2,
+    "lfoWaveform": 4,
+    "lfoSync": 0
+}
 			;
 
-		test.operators[0].enabled = false;
-		test.operators[1].enabled = false;
-		test.operators[2].enabled = false;
-		test.operators[3].enabled = false;
+		//test.operators[0].enabled = false;
+		//test.operators[1].enabled = false;
+		//test.operators[2].enabled = false;
+		//test.operators[3].enabled = false;
 		//test.operators[4].enabled = false;
 		//test.operators[5].enabled = false;
-
-		test.operators[5].rates0_99[0] = 1;
-		test.operators[5].levels0_99[0] = 99;
-		//test.operators[5].volumeLevel0_99=0;
-
+/*
+		test.operators[4].rates0_99 = [99, 99, 99, 99];
+		test.operators[4].levels0_99 = [99, 99, 99, 0];
+		test.operators[5].rates0_99 = [99, 99, 99, 99];
+		test.operators[5].levels0_99 = [99, 99, 99, 0];
+*/
 		//test.feedback0_7
 		/*
 				test.operators[2].rates0_99=[99,99,99,99];
@@ -201,7 +202,7 @@ class DX7Test {
 				//this.selectedPreset.operators[4].enabled = false;
 				//this.selectedPreset.operators[5].enabled = false;
 
-				this.synth.scheduleStrum(this.selectedPreset, this.synth.audioContext.currentTime + 0.321, [nn], [{ duration: 4.3, delta: 0 }]);
+				this.synth.scheduleStrum(this.selectedPreset, this.synth.audioContext.currentTime + 0.321, [nn], [{ duration: 1.2, delta: 0 }]);
 			}
 		}
 	}
@@ -323,7 +324,9 @@ for (let ii = 0; ii < LFO_PITCH_MOD_TABLE.length; ii++) {
 	console.log(ii, LFO_PITCH_MOD_TABLE[ii], mod3(ii / 7), pow2x(ii / 7, -4.5, 2, 1 / 4));
 }
 */
+/*
 console.log(99, Math.pow(2, 99 * 0.125) / Math.pow(2, 99 * 0.125));
 console.log(88, Math.pow(2, 88 * 0.125) / Math.pow(2, 99 * 0.125));
 console.log(77, Math.pow(2, 77 * 0.125) / Math.pow(2, 99 * 0.125));
 console.log(66, Math.pow(2, 66 * 0.125) / Math.pow(2, 99 * 0.125));
+*/
