@@ -38,7 +38,7 @@ for(let ii=0;ii<6;ii++){
 		}
 	}
 	startPlayNote(when: number, duration: number, note: number) {
-		console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
+		//console.log('startPlayNote', when, 'duration', duration, 'note', note, 'now time', this.voContext.currentTime);
 		for (let ii = 0; ii < this.beeps.length; ii++) {
 			if (this.beeps[ii].ready) {
 				let olock = this.beeps[ii].startOperator(when, duration, note);

@@ -44,7 +44,35 @@ class DX7Operator {
 		this.carrier.start(when);
 	}
 	resetEnvelope(attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number) {
+
 		this.envelope.gain.setValueAtTime(0, when);
+		this.envelope.gain.setValueCurveAtTime(attack.values, when, attack.duration);
+		this.envelope.gain.setValueCurveAtTime(decay.values, when + attack.duration, decay.duration);
+		this.envelope.gain.setValueCurveAtTime(sustain.values, when + attack.duration + decay.duration, sustain.duration);
+		/*
+		this.envelope.gain.setValueCurveAtTime([0
+			, 0.025 * attack.value
+			, 0.05 * attack.value
+			, 0.2 * attack.value
+			, 0.35 * attack.value
+			, attack.value], when, attack.duration);
+		this.envelope.gain.setValueCurveAtTime([attack.value
+			, attack.value - 0.65 * (attack.value - decay.value)
+			, attack.value - 0.8 * (attack.value - decay.value)
+			, attack.value - 0.95 * (attack.value - decay.value)
+			, attack.value - 0.975 * (attack.value - decay.value)
+			, decay.value], when + attack.duration, decay.duration);
+		this.envelope.gain.setValueCurveAtTime([decay.value
+			, decay.value - 0.65 * (decay.value - sustain.value)
+			, decay.value - 0.8 * (decay.value - sustain.value)
+			, decay.value - 0.95 * (decay.value - sustain.value)
+			, decay.value - 0.975 * (decay.value - sustain.value)
+			, sustain.value], when + attack.duration + decay.duration, sustain.duration);
+			*/
+		this.envelope.gain.cancelAndHoldAtTime(when + duration);
+		this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
+
+		/*
 
 		this.envelope.gain.linearRampToValueAtTime(attack.value * 0.05, when + attack.duration / 2);
 		this.envelope.gain.linearRampToValueAtTime(attack.value * 0.3, when + attack.duration * 4 / 5);
@@ -61,6 +89,7 @@ class DX7Operator {
 		this.envelope.gain.cancelAndHoldAtTime(when + duration);
 		this.envelope.gain.setValueAtTime(sustain.value, when + duration);
 		this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
+		*/
 
 		/*
 		this.envelope.gain.setTargetAtTime(attack.value, when + attack.duration, attack.duration * 0.9);
@@ -75,8 +104,8 @@ class DX7Operator {
 	resetFrequency(frequency: number, feedbackRatio: number) {
 		//let modulationRatio = Math.E / frequency;
 		this.carrier.frequency.value = frequency;
-		
-		this.modulationLevel.gain.value = 2.8 / frequency;//2.8 / frequency;//modulationRatio;
+
+		this.modulationLevel.gain.value = 2.99 / frequency;//2.8 / frequency;//modulationRatio;
 		this.compensateNegativeDelay.offset.value = 3 / frequency;//2 * modulationRatio;
 
 		//this.modulationLevel.gain.value = 7 / frequency;//2.8 / frequency;//modulationRatio;
@@ -86,7 +115,7 @@ class DX7Operator {
 		//this.feedbackLevel.gain.value = 1.2 * feedbackRatio;
 		//this.feedbackLevel.gain.value = 1.7;
 		//this.feedbackLevel.gain.value = 0.41;
-		this.feedbackLevel.gain.value = 0.4;
+		this.feedbackLevel.gain.value = 0.4*feedbackRatio;
 	}
 	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
 		this.resetCarrier(when);

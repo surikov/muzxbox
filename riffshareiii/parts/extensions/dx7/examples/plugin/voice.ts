@@ -66,6 +66,6 @@ class DX7Voice {
 			}
 		}
 
-		console.log('startPlayNote', note, 'when', when, preset);
+		//console.log('startPlayNote', note, 'when', when, preset);
 	}
 }

@@ -326,7 +326,7 @@ type ConnectionSchemeDX7 = {
 };
 type SynthSlope = {
     duration: number;
-    value: number;
+    values: number[];
 };
 type OperatorInfo = {
     constantFrequency: number;

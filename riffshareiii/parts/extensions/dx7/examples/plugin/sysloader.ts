@@ -36,7 +36,8 @@ type SlopeInfo = {
 };*/
 type SynthSlope = {
 	duration: number;
-	value: number;
+	//value: number;
+	values: number[];
 };
 type OperatorInfo = {
 	constantFrequency: number;
@@ -148,7 +149,7 @@ class DX7Loader {
 			label: dx7preset.name.trim() + '/' + fileName.trim()
 			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))*0.35 //* 0.01 //0.4
+			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7)) * 0.35 //* 0.01 //0.4
 		};
 		let ls = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {
@@ -166,17 +167,48 @@ class DX7Loader {
 				, enabled: data.enabled
 				, volume: 0
 				, detune: data.detune_7_7
-				, attack: { value: attackSlope.to, duration: attackSlope.duration }
-				, decay: { value: decaySlope.to, duration: decaySlope.duration }
-				, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
+				//, attack: { value: attackSlope.to, duration: attackSlope.duration }
+				, attack: {
+					values: [0
+						, 0.025 * attackSlope.to
+						, 0.05 * attackSlope.to
+						, 0.2 * attackSlope.to
+						, 0.35 * attackSlope.to
+						, attackSlope.to]
+					, duration: attackSlope.duration
+				}
+				//, decay: { value: decaySlope.to, duration: decaySlope.duration }
+				, decay: {
+					values: [attackSlope.to
+						, attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to)
+						, attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to)
+						, attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to)
+						, attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to)
+						, decaySlope.to]
+					, duration: decaySlope.duration
+				}
+				//, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
+				, sustain: {
+					values: [decaySlope.to
+						, decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to)
+						, decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to)
+						, decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to)
+						, decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to)
+						, sustainSlope.to]
+					, duration: sustainSlope.duration
+				}
 				, release: releaseSlope.duration
 			};
+			operator.attack.duration = Math.max(0.0001, operator.attack.duration);
+			operator.decay.duration = Math.max(0.0001, operator.decay.duration);
+			operator.sustain.duration = Math.max(0.0001, operator.sustain.duration);
 			operator.release = Math.max(0.005, operator.release);
 			operator.release = Math.min(3, operator.release);
+
 			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
 			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
 			if (data.constMode0_1 > 0) {
-				operator.volume = 0.5 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume =  Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
 				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);

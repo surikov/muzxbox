@@ -5,23 +5,107 @@ class DX7Test {
 	constructor() {
 		let test: DX7PresetData =
 		{
-    "algorithm1_32": 18,
-    "feedback0_7": 7,
+    "algorithm1_32": 5,
+    "feedback0_7": 6,
     "operators": [
         {
             "rates0_99": [
+                96,
+                25,
+                25,
+                67
+            ],
+            "levels0_99": [
                 99,
+                75,
                 0,
-                12,
-                70
+                0
+            ],
+            "detune_7_7": 3,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                95,
+                50,
+                35,
+                78
+            ],
+            "levels0_99": [
+                99,
+                75,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 58,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 14,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 7
+        },
+        {
+            "rates0_99": [
+                95,
+                20,
+                20,
+                50
             ],
             "levels0_99": [
                 99,
                 95,
-                95,
+                0,
                 0
             ],
-            "detune_7_7": 1,
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                95,
+                29,
+                20,
+                50
+            ],
+            "levels0_99": [
+                99,
+                95,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 89,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 6
+        },
+        {
+            "rates0_99": [
+                95,
+                20,
+                20,
+                50
+            ],
+            "levels0_99": [
+                99,
+                95,
+                0,
+                0
+            ],
+            "detune_7_7": -7,
             "volumeLevel0_99": 99,
             "constMode0_1": 0,
             "freqCoarse0_31": 1,
@@ -31,123 +115,39 @@ class DX7Test {
         },
         {
             "rates0_99": [
+                95,
+                29,
+                20,
+                50
+            ],
+            "levels0_99": [
                 99,
                 95,
                 0,
                 0
             ],
-            "levels0_99": [
-                99,
-                96,
-                89,
-                0
-            ],
-            "detune_7_7": -1,
-            "volumeLevel0_99": 71,
+            "detune_7_7": 7,
+            "volumeLevel0_99": 79,
             "constMode0_1": 0,
             "freqCoarse0_31": 1,
             "freqFine0_99": 0,
             "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                99,
-                87,
-                0,
-                0
-            ],
-            "levels0_99": [
-                93,
-                90,
-                0,
-                0
-            ],
-            "detune_7_7": 0,
-            "volumeLevel0_99": 82,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 1,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                99,
-                92,
-                28,
-                60
-            ],
-            "levels0_99": [
-                99,
-                90,
-                0,
-                0
-            ],
-            "detune_7_7": 2,
-            "volumeLevel0_99": 71,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 2,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                99,
-                99,
-                97,
-                0
-            ],
-            "levels0_99": [
-                99,
-                65,
-                60,
-                0
-            ],
-            "detune_7_7": -2,
-            "volumeLevel0_99": 43,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 3,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
-        },
-        {
-            "rates0_99": [
-                99,
-                70,
-                60,
-                0
-            ],
-            "levels0_99": [
-                99,
-                99,
-                97,
-                0
-            ],
-            "detune_7_7": 0,
-            "volumeLevel0_99": 47,
-            "constMode0_1": 0,
-            "freqCoarse0_31": 17,
-            "freqFine0_99": 0,
-            "enabled": true,
-            "velocitySens0_7": 0
+            "velocitySens0_7": 6
         }
     ],
-    "name": "SYN-LEAD 1",
-    "lfoSpeed": 37,
-    "lfoDelay": 42,
+    "name": "E.PIANO 1 ",
+    "lfoSpeed": 34,
+    "lfoDelay": 33,
     "lfoPitchModDepth0_99": 0,
-    "lfoAmpModDepth0_99": 99,
-    "lfoPitchModSens": 4,
+    "lfoAmpModDepth0_99": 0,
+    "lfoPitchModSens": 3,
     "lfoWaveform": 4,
     "lfoSync": 0
 }
 			;
 
 		//test.operators[0].enabled = false;
-		test.operators[1].enabled = false;
+		//test.operators[1].enabled = false;
 		test.operators[2].enabled = false;
 		test.operators[3].enabled = false;
 		test.operators[4].enabled = false;

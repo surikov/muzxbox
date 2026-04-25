@@ -4,13 +4,11 @@
 	function start() {
 		let audioContext = new AudioContext();
 		let when = audioContext.currentTime + 0.1;
-		let carrierFrequency =261.6255653005986;
+		let carrierFrequency = 1261.6255653005986;
+		let duration = 2.7;
+		let volAttack = 1;
 
 		let carrier = audioContext.createOscillator();
-
-		//let modulator = carrier;
-		//let modulator = audioContext.createOscillator();
-		//modulator.frequency.value = carrierFrequency;
 
 		let modulationLevel = audioContext.createGain();
 		let feedbackLevel = audioContext.createGain();
@@ -19,44 +17,41 @@
 		let output = audioContext.createGain();
 
 		carrier.frequency.value = carrierFrequency;
-		output.gain.setValueAtTime(0.5, when);
+		//output.gain.setValueAtTime(0.5, when);
+		output.gain.setValueAtTime(0.0, audioContext.currentTime);
+		output.gain.setValueAtTime(0.0, when);
+		output.gain.setValueCurveAtTime([0, 0.025, 0.05, 0.2, 0.35, 1], when, 1);
+		output.gain.setValueCurveAtTime([1, 0.35, 0.2, 0.05, 0.025, 0], when + 1, 5);
+		output.gain.cancelAndHoldAtTime(when + duration);
+		output.gain.linearRampToValueAtTime(0,  when + duration + 0.1);
 
+
+		let feedbackRatio = 1;
 		feedbackLevel.gain.setValueAtTime(0.17, when);
-		//feedbackLevel.gain.linearRampToValueAtTime(0.5/ carrierFrequency, when + 1);
-		//feedbackLevel.gain.setValueAtTime(0.5/ carrierFrequency, when);
-		//feedbackLevel.gain.linearRampToValueAtTime(0.5/ carrierFrequency, when + 1);
-		//feedbackRatio.gain.setValueAtTime(0.066, when);
-		//feedbackRatio.gain.setValueAtTime(0.2 / carrierFrequency, when);
-		//feedbackRatio.gain.linearRampToValueAtTime(0.012/ carrierFrequency, when + 1);
+		//feedbackLevel.gain.setValueAtTime(feedbackRatio*2.8 / carrierFrequency, when);
 
-		//modulationLevel.gain.setValueAtTime(2.8 / carrierFrequency, when);
+		//feedbackLevel.gain.linearRampToValueAtTime(0.2, when + 1);
+
 		modulationLevel.gain.setValueAtTime(2.8 / carrierFrequency, when);
+		//delayShift.offset.value = 3 / carrierFrequency;
 		delayShift.offset.value = 3 / carrierFrequency;
-		//delayShift.offset.setValueAtTime(2.0 / carrierFrequency, when);
-		//delayShift.offset.linearRampToValueAtTime(6.0 / carrierFrequency, when);
-
 
 		//feedbackLevel.connect(phaseDelay.delayTime);
 		feedbackLevel.connect(modulationLevel);
 		modulationLevel.connect(phaseDelay.delayTime);
 		delayShift.connect(phaseDelay.delayTime);
-		carrier.connect(phaseDelay);
+		//carrier.connect(phaseDelay);
+		carrier.connect(output);
 		phaseDelay.connect(output);
 
 		output.connect(audioContext.destination);
-
-		//output.connect(feedbackRatio);
 		output.connect(feedbackLevel);
-
-		
 
 		delayShift.start(when);
 		carrier.start(when);
-		//modulator.start(when);
 
-		delayShift.stop(when + 1);
-		carrier.stop(when + 1);
-		//modulator.stop(when + 1);
+		delayShift.stop(when + 2*duration);
+		carrier.stop(when + 2*duration);
 	}
 </script>
 
