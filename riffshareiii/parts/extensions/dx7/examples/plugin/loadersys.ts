@@ -154,7 +154,7 @@ class DX7Loader {
 			//, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, mixID: dx7preset.algorithm1_32
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7)) * 0.35 //* 0.01 //0.4
+			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
 		};
 		let ls = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {
@@ -215,10 +215,10 @@ class DX7Loader {
 			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
 			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
 			if (data.constMode0_1 > 0) {
-				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume = 0.05 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
-				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume =       Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				let coarse = 0.5;
 				if (data.freqCoarse0_31) {
 					coarse = data.freqCoarse0_31

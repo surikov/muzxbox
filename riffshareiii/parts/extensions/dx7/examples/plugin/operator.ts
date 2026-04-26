@@ -18,6 +18,7 @@ class DX7Operator {
 		this.phaseDelay.delayTime.value = 0;
 		this.envelope.gain.value = 0;
 		this.compensateNegativeDelay.start(this.audioContext.currentTime);
+		this.carrier.start(this.audioContext.currentTime);
 	}
 	connectNodes() {
 		this.envelope.connect(this.output);
@@ -25,7 +26,7 @@ class DX7Operator {
 		this.modulationLevel.connect(this.phaseDelay.delayTime);
 		this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
 		this.feedbackLevel.connect(this.modulationLevel);
-
+		this.carrier.connect(this.phaseDelay);
 
 	}
 	createNodes() {
@@ -35,8 +36,9 @@ class DX7Operator {
 		this.envelope = this.audioContext.createGain();
 		this.phaseDelay = this.audioContext.createDelay();
 		this.compensateNegativeDelay = this.audioContext.createConstantSource();
+		this.carrier = this.audioContext.createOscillator();
 	}
-	resetCarrier(when: number) {
+	rresetCarrier(when: number) {
 		/*
 		if (this.carrier) {
 			this.carrier.stop();
@@ -46,13 +48,7 @@ class DX7Operator {
 		this.carrier.connect(this.phaseDelay);
 		this.carrier.start(when);
 		*/
-		if (this.carrier) {
-			//
-		} else {
-			this.carrier = this.audioContext.createOscillator();
-			this.carrier.connect(this.phaseDelay);
-			this.carrier.start(when);
-		}
+
 	}
 	//resetEnvelope(attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number) {
 	resetEnvelope(edata: EnvelopeInfo, when: number, duration: number) {
@@ -67,11 +63,12 @@ class DX7Operator {
 		this.carrier.frequency.linearRampToValueAtTime(frequency, when);
 		this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
 		this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);//2 * modulationRatio;
-		this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
+		//this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
+		this.feedbackLevel.gain.linearRampToValueAtTime(0.05 * feedbackRatio, when);
 	}
 	startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number) {
 		//console.log('startPlayFrequency', frequency, feedbackRatio, info.volume);
-		this.resetCarrier(when);
+		//this.resetCarrier(when);
 		//this.resetEnvelope(info.attack, info.decay, info.sustain, info.release, when, duration);
 		this.resetEnvelope(info.envelope, when, duration);
 		this.resetFrequency(when, frequency, feedbackRatio);

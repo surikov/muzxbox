@@ -5,19 +5,36 @@ class DX7Synthesizer {
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
     }
-    takeVox(mixID) {
+    recheckCache() {
         for (let ii = 0; ii < this.cache.length; ii++) {
-            if (this.cache[ii].locktime < this.audioContext.currentTime && mixID == this.cache[ii].mixID) {
+            if (this.cache[ii].locktime < this.audioContext.currentTime) {
+                this.cache[ii].disonnectOperators();
+                this.cache[ii].mixID = 0;
+            }
+        }
+    }
+    takeVox(mid) {
+        for (let ii = 0; ii < this.cache.length; ii++) {
+            if (this.cache[ii].locktime < this.audioContext.currentTime && mid == this.cache[ii].mixID) {
                 return this.cache[ii];
             }
         }
-        let vx = new DX7Voice(mixID, this.audioContext, this.output);
+        for (let ii = 0; ii < this.cache.length; ii++) {
+            if (this.cache[ii].locktime < this.audioContext.currentTime && this.cache[ii].mixID == 0) {
+                this.cache[ii].mixID = mid;
+                this.cache[ii].connectOperators();
+                return this.cache[ii];
+            }
+        }
+        let vx = new DX7Voice(mid, this.audioContext, this.output);
         this.cache.push(vx);
         return vx;
     }
     scheduleStrum(preset, when, pitches, slides) {
-        let vox = this.takeVox(preset.mixID);
-        vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
+        for (let ii = 0; ii < pitches.length; ii++) {
+            let vox = this.takeVox(preset.mixID);
+            vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);
+        }
     }
 }
 class DX7Loader {
@@ -52,7 +69,7 @@ class DX7Loader {
             label: dx7preset.name.trim() + '/' + fileName.trim(),
             mixID: dx7preset.algorithm1_32,
             operators: [],
-            feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7)) * 0.35
+            feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))
         };
         let ls = dx7preset.lfoSpeed / 6 + 0.5;
         if (dx7preset.lfoSpeed > 65) {
@@ -108,7 +125,7 @@ class DX7Loader {
             operator.envelope.release = Math.min(3, operator.envelope.release);
             let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
             if (data.constMode0_1 > 0) {
-                operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+                operator.volume = 0.05 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
                 operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
             }
             else {
@@ -236,11 +253,11 @@ class DX7Voice {
         ];
         this.connectOperators();
     }
-    reConnectOperators() {
+    disonnectOperators() {
         for (let ii = 0; ii < 6; ii++) {
             this.operators[ii].output.disconnect();
         }
-        this.connectOperators();
+        this.mixID = 0;
     }
     connectOperators() {
         let mix = this.matrixConnectionAlgorithmsDX7[this.mixID - 1];
@@ -293,6 +310,7 @@ class DX7Operator {
         this.phaseDelay.delayTime.value = 0;
         this.envelope.gain.value = 0;
         this.compensateNegativeDelay.start(this.audioContext.currentTime);
+        this.carrier.start(this.audioContext.currentTime);
     }
     connectNodes() {
         this.envelope.connect(this.output);
@@ -300,6 +318,7 @@ class DX7Operator {
         this.modulationLevel.connect(this.phaseDelay.delayTime);
         this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
         this.feedbackLevel.connect(this.modulationLevel);
+        this.carrier.connect(this.phaseDelay);
     }
     createNodes() {
         this.output = this.audioContext.createGain();
@@ -308,15 +327,9 @@ class DX7Operator {
         this.envelope = this.audioContext.createGain();
         this.phaseDelay = this.audioContext.createDelay();
         this.compensateNegativeDelay = this.audioContext.createConstantSource();
+        this.carrier = this.audioContext.createOscillator();
     }
-    resetCarrier(when) {
-        if (this.carrier) {
-        }
-        else {
-            this.carrier = this.audioContext.createOscillator();
-            this.carrier.connect(this.phaseDelay);
-            this.carrier.start(when);
-        }
+    rresetCarrier(when) {
     }
     resetEnvelope(edata, when, duration) {
         this.envelope.gain.setValueAtTime(0, when);
@@ -330,10 +343,9 @@ class DX7Operator {
         this.carrier.frequency.linearRampToValueAtTime(frequency, when);
         this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
         this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);
-        this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
+        this.feedbackLevel.gain.linearRampToValueAtTime(0.05 * feedbackRatio, when);
     }
     startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
-        this.resetCarrier(when);
         this.resetEnvelope(info.envelope, when, duration);
         this.resetFrequency(when, frequency, feedbackRatio);
         this.output.gain.value = info.volume;
@@ -519,7 +531,7 @@ class DX7Test {
             this.synth = new DX7Synthesizer(ac);
             this.synth.output.connect(ac.destination);
         }
-        let C = 0, Cs = 1, D = 3, Ds = 4, E = 5, F = 6, Fs = 7, G = 8, Gs = 9, A = 10, As = 11;
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
         let tempo = 120;
         let n4 = 60 / tempo;
         let n16 = n4 / 4;
@@ -531,6 +543,7 @@ class DX7Test {
         let o5 = 60;
         if (this.synth) {
             if (this.selectedPreset) {
+                this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
@@ -545,18 +558,19 @@ class DX7Test {
                 this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 1 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 2 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 3 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 4 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 5 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 6 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 7 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 8 * n8, [F + o3], [{ duration: n2, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 0 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 1 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 2 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 3 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 4 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 5 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 6 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 7 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 8 * n8, [F + o4, A + o4, C + o5], [{ duration: n2, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 12 * n8, [G + o4, B + o4, D + o5], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 14 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 15 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 16 * n8, [A + o4, C + o5, E + o5], [{ duration: n1, delta: 0 }]);
             }
         }
     }

@@ -20,15 +20,16 @@ class DX7Voice {
 		];
 		this.connectOperators();
 	}
-	reConnectOperators() {
+	disonnectOperators() {
 		for (let ii = 0; ii < 6; ii++) {
 			this.operators[ii].output.disconnect();
 		}
-		this.connectOperators();
+		//this.connectOperators();
+		this.mixID = 0;
 	}
 	connectOperators() {
 		//console.log(this.mixID, this.matrixConnectionAlgorithmsDX7[this.mixID]);
-		let mix=this.matrixConnectionAlgorithmsDX7[this.mixID-1];
+		let mix = this.matrixConnectionAlgorithmsDX7[this.mixID - 1];
 		for (let cid = 0; cid < mix.modulationMatrix.length; cid++) {
 			let carrier = this.operators[cid];
 			let modulatorIds = mix.modulationMatrix[cid];
@@ -63,7 +64,7 @@ class DX7Voice {
 				}
 				//console.log(ii, 'startPlayFrequency', frequency);
 				this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
-				let otime = when + duration + preset.operators[ii].envelope.release+0.01;
+				let otime = when + duration + preset.operators[ii].envelope.release + 0.01;
 				if (this.locktime < otime) {
 					this.locktime = otime;
 					//console.log(ii, 'locktime', time,'when',when,'now',this.audioContext.currentTime);

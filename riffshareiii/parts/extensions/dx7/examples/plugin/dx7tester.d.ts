@@ -301,7 +301,8 @@ declare class DX7Synthesizer {
     audioContext: AudioContext;
     output: GainNode;
     constructor(audioContext: AudioContext);
-    takeVox(mixID: number): DX7Voice;
+    recheckCache(): void;
+    takeVox(mid: number): DX7Voice;
     scheduleStrum(preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
 }
 type DX7OperatorData = {
@@ -374,7 +375,7 @@ declare class DX7Voice {
     output: GainNode;
     mixID: number;
     constructor(mixID: number, audioContext: AudioContext, to: AudioNode);
-    reConnectOperators(): void;
+    disonnectOperators(): void;
     connectOperators(): void;
     startPlayNote(preset: SynthPreset, when: number, duration: number, note: number): void;
     matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[];
@@ -392,7 +393,7 @@ declare class DX7Operator {
     setupNodes(): void;
     connectNodes(): void;
     createNodes(): void;
-    resetCarrier(when: number): void;
+    rresetCarrier(when: number): void;
     resetEnvelope(edata: EnvelopeInfo, when: number, duration: number): void;
     resetFrequency(when: number, frequency: number, feedbackRatio: number): void;
     startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
