@@ -1,41 +1,26 @@
 "use strict";
-class DX7Loader {
-    constructor() {
-        this.matrixConnectionAlgorithmsDX7 = [
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] },
-            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] },
-            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] },
-            { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] },
-            { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] },
-            { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] },
-            { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] },
-            { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }
-        ];
+class DX7Synthesizer {
+    constructor(audioContext) {
+        this.cache = [];
+        this.audioContext = audioContext;
+        this.output = this.audioContext.createGain();
     }
+    takeVox(mixID) {
+        for (let ii = 0; ii < this.cache.length; ii++) {
+            if (this.cache[ii].locktime < this.audioContext.currentTime && mixID == this.cache[ii].mixID) {
+                return this.cache[ii];
+            }
+        }
+        let vx = new DX7Voice(mixID, this.audioContext, this.output);
+        this.cache.push(vx);
+        return vx;
+    }
+    scheduleStrum(preset, when, pitches, slides) {
+        let vox = this.takeVox(preset.mixID);
+        vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
+    }
+}
+class DX7Loader {
     scale99(nn) {
         let speed = Math.pow(2, nn * 0.16);
         return speed;
@@ -65,7 +50,7 @@ class DX7Loader {
     convertDX7data(fileName, dx7preset) {
         let preset = {
             label: dx7preset.name.trim() + '/' + fileName.trim(),
-            connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1],
+            mixID: dx7preset.algorithm1_32,
             operators: [],
             feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7)) * 0.35
         };
@@ -85,40 +70,42 @@ class DX7Loader {
                 enabled: data.enabled,
                 volume: 0,
                 detune: data.detune_7_7,
-                attack: {
-                    values: [0,
-                        0.025 * attackSlope.to,
-                        0.05 * attackSlope.to,
-                        0.2 * attackSlope.to,
-                        0.35 * attackSlope.to,
-                        attackSlope.to],
-                    duration: attackSlope.duration
-                },
-                decay: {
-                    values: [attackSlope.to,
-                        attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to),
-                        attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to),
-                        attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to),
-                        attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to),
-                        decaySlope.to],
-                    duration: decaySlope.duration
-                },
-                sustain: {
-                    values: [decaySlope.to,
-                        decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to),
-                        decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to),
-                        decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to),
-                        decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to),
-                        sustainSlope.to],
-                    duration: sustainSlope.duration
-                },
-                release: releaseSlope.duration
+                envelope: {
+                    attack: {
+                        values: [0,
+                            0.025 * attackSlope.to,
+                            0.05 * attackSlope.to,
+                            0.2 * attackSlope.to,
+                            0.35 * attackSlope.to,
+                            attackSlope.to],
+                        duration: attackSlope.duration
+                    },
+                    decay: {
+                        values: [attackSlope.to,
+                            attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to),
+                            decaySlope.to],
+                        duration: decaySlope.duration
+                    },
+                    sustain: {
+                        values: [decaySlope.to,
+                            decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to),
+                            sustainSlope.to],
+                        duration: sustainSlope.duration
+                    },
+                    release: releaseSlope.duration
+                }
             };
-            operator.attack.duration = Math.max(0.0001, operator.attack.duration);
-            operator.decay.duration = Math.max(0.0001, operator.decay.duration);
-            operator.sustain.duration = Math.max(0.0001, operator.sustain.duration);
-            operator.release = Math.max(0.005, operator.release);
-            operator.release = Math.min(3, operator.release);
+            operator.envelope.attack.duration = Math.max(0.0001, operator.envelope.attack.duration);
+            operator.envelope.decay.duration = Math.max(0.0001, operator.envelope.decay.duration);
+            operator.envelope.sustain.duration = Math.max(0.0001, operator.envelope.sustain.duration);
+            operator.envelope.release = Math.max(0.005, operator.envelope.release);
+            operator.envelope.release = Math.min(3, operator.envelope.release);
             let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
             if (data.constMode0_1 > 0) {
                 operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
@@ -190,41 +177,51 @@ class DX7Loader {
             operators: operators,
             name: voiceData.substring(118, 128),
             lfoSpeed: voiceData.charCodeAt(112),
-            lfoDelay: voiceData.charCodeAt(113),
             lfoPitchModDepth0_99: voiceData.charCodeAt(114),
             lfoAmpModDepth0_99: voiceData.charCodeAt(115),
-            lfoPitchModSens: voiceData.charCodeAt(116) >> 4,
-            lfoWaveform: Math.floor(voiceData.charCodeAt(116) >> 1) & 7,
-            lfoSync: voiceData.charCodeAt(116) & 1,
         };
         console.log('parseSysexData', patchId, preset);
         return preset;
     }
 }
-class DX7Synthesizer {
-    constructor(audioContext) {
-        this.cache = [];
-        this.audioContext = audioContext;
-        this.output = this.audioContext.createGain();
-    }
-    takeVox() {
-        for (let ii = 0; ii < this.cache.length; ii++) {
-            if (this.cache[ii].locktime < this.audioContext.currentTime) {
-                return this.cache[ii];
-            }
-        }
-        let vx = new DX7Voice(this.audioContext, this.output);
-        this.cache.push(vx);
-        return vx;
-    }
-    scheduleStrum(preset, when, pitches, slides) {
-        let vox = this.takeVox();
-        vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[0]);
-    }
-}
 class DX7Voice {
-    constructor(audioContext, to) {
+    constructor(mixID, audioContext, to) {
         this.locktime = 0;
+        this.matrixConnectionAlgorithmsDX7 = [
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] },
+            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] },
+            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] },
+            { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] },
+            { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] },
+            { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] },
+            { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] },
+            { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] },
+            { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] },
+            { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },
+            { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }
+        ];
+        this.mixID = mixID;
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
         this.output.connect(to);
@@ -237,32 +234,36 @@ class DX7Voice {
             new DX7Operator(this.audioContext),
             new DX7Operator(this.audioContext)
         ];
+        this.connectOperators();
     }
-    reConnectOperators(preset) {
+    reConnectOperators() {
         for (let ii = 0; ii < 6; ii++) {
             this.operators[ii].output.disconnect();
         }
-        for (let ii = 0; ii < preset.connectionsInfo.modulationMatrix.length; ii++) {
-            let carrier = this.operators[ii];
-            let modulatorIds = preset.connectionsInfo.modulationMatrix[ii];
+        this.connectOperators();
+    }
+    connectOperators() {
+        let mix = this.matrixConnectionAlgorithmsDX7[this.mixID - 1];
+        for (let cid = 0; cid < mix.modulationMatrix.length; cid++) {
+            let carrier = this.operators[cid];
+            let modulatorIds = mix.modulationMatrix[cid];
             for (let mm = 0; mm < modulatorIds.length; mm++) {
-                let id = modulatorIds[mm];
-                let modulator = this.operators[id];
-                if (id == ii) {
-                    modulator.output.connect(modulator.feedbackLevel);
+                let mid = modulatorIds[mm];
+                let modulator = this.operators[mid];
+                if (mid == cid) {
+                    modulator.output.connect(carrier.feedbackLevel);
                 }
                 else {
                     modulator.output.connect(carrier.modulationLevel);
                 }
             }
         }
-        for (let ii = 0; ii < preset.connectionsInfo.outputMix.length; ii++) {
-            let outIdx = preset.connectionsInfo.outputMix[ii];
+        for (let ii = 0; ii < mix.outputMix.length; ii++) {
+            let outIdx = mix.outputMix[ii];
             this.operators[outIdx].output.connect(this.output);
         }
     }
     startPlayNote(preset, when, duration, note) {
-        this.reConnectOperators(preset);
         for (let ii = 0; ii < 6; ii++) {
             if (preset.operators[ii].enabled) {
                 let frequency = preset.operators[ii].constantFrequency;
@@ -272,7 +273,7 @@ class DX7Voice {
                     frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
                 }
                 this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
-                let otime = when + duration + preset.operators[ii].release;
+                let otime = when + duration + preset.operators[ii].envelope.release + 0.01;
                 if (this.locktime < otime) {
                     this.locktime = otime;
                 }
@@ -294,11 +295,11 @@ class DX7Operator {
         this.compensateNegativeDelay.start(this.audioContext.currentTime);
     }
     connectNodes() {
-        this.modulationLevel.connect(this.phaseDelay.delayTime);
-        this.feedbackLevel.connect(this.modulationLevel);
-        this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
-        this.phaseDelay.connect(this.envelope);
         this.envelope.connect(this.output);
+        this.phaseDelay.connect(this.envelope);
+        this.modulationLevel.connect(this.phaseDelay.delayTime);
+        this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+        this.feedbackLevel.connect(this.modulationLevel);
     }
     createNodes() {
         this.output = this.audioContext.createGain();
@@ -310,31 +311,31 @@ class DX7Operator {
     }
     resetCarrier(when) {
         if (this.carrier) {
-            this.carrier.stop();
-            this.carrier.disconnect();
         }
-        this.carrier = this.audioContext.createOscillator();
-        this.carrier.connect(this.phaseDelay);
-        this.carrier.start(when);
+        else {
+            this.carrier = this.audioContext.createOscillator();
+            this.carrier.connect(this.phaseDelay);
+            this.carrier.start(when);
+        }
     }
-    resetEnvelope(attack, decay, sustain, release, when, duration) {
+    resetEnvelope(edata, when, duration) {
         this.envelope.gain.setValueAtTime(0, when);
-        this.envelope.gain.setValueCurveAtTime(attack.values, when, attack.duration);
-        this.envelope.gain.setValueCurveAtTime(decay.values, when + attack.duration, decay.duration);
-        this.envelope.gain.setValueCurveAtTime(sustain.values, when + attack.duration + decay.duration, sustain.duration);
+        this.envelope.gain.setValueCurveAtTime(edata.attack.values, when, edata.attack.duration);
+        this.envelope.gain.setValueCurveAtTime(edata.decay.values, when + edata.attack.duration, edata.decay.duration);
+        this.envelope.gain.setValueCurveAtTime(edata.sustain.values, when + edata.attack.duration + edata.decay.duration, edata.sustain.duration);
         this.envelope.gain.cancelAndHoldAtTime(when + duration);
-        this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
+        this.envelope.gain.linearRampToValueAtTime(0, when + duration + edata.release);
     }
-    resetFrequency(frequency, feedbackRatio) {
-        this.carrier.frequency.value = frequency;
-        this.modulationLevel.gain.value = 2.99 / frequency;
-        this.compensateNegativeDelay.offset.value = 3 / frequency;
-        this.feedbackLevel.gain.value = 0.4 * feedbackRatio;
+    resetFrequency(when, frequency, feedbackRatio) {
+        this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+        this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
+        this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);
+        this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
     }
     startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
         this.resetCarrier(when);
-        this.resetEnvelope(info.attack, info.decay, info.sustain, info.release, when, duration);
-        this.resetFrequency(frequency, feedbackRatio);
+        this.resetEnvelope(info.envelope, when, duration);
+        this.resetFrequency(when, frequency, feedbackRatio);
         this.output.gain.value = info.volume;
     }
 }
@@ -365,7 +366,7 @@ class DX7Test {
                     "constMode0_1": 0,
                     "freqCoarse0_31": 1,
                     "freqFine0_99": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "velocitySens0_7": 2
                 },
                 {
@@ -386,7 +387,7 @@ class DX7Test {
                     "constMode0_1": 0,
                     "freqCoarse0_31": 14,
                     "freqFine0_99": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "velocitySens0_7": 7
                 },
                 {
@@ -407,7 +408,7 @@ class DX7Test {
                     "constMode0_1": 0,
                     "freqCoarse0_31": 1,
                     "freqFine0_99": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "velocitySens0_7": 2
                 },
                 {
@@ -428,7 +429,7 @@ class DX7Test {
                     "constMode0_1": 0,
                     "freqCoarse0_31": 1,
                     "freqFine0_99": 0,
-                    "enabled": true,
+                    "enabled": false,
                     "velocitySens0_7": 6
                 },
                 {
@@ -476,17 +477,16 @@ class DX7Test {
             ],
             "name": "E.PIANO 1 ",
             "lfoSpeed": 34,
-            "lfoDelay": 33,
             "lfoPitchModDepth0_99": 0,
             "lfoAmpModDepth0_99": 0,
-            "lfoPitchModSens": 3,
-            "lfoWaveform": 4,
-            "lfoSync": 0
         };
+        test.operators[0].enabled = false;
+        test.operators[1].enabled = false;
         test.operators[2].enabled = false;
         test.operators[3].enabled = false;
-        test.operators[4].enabled = false;
-        test.operators[5].enabled = false;
+        test.operators[4].detune_7_7 = 0;
+        test.operators[5].detune_7_7 = 0;
+        test.feedback0_7 = 0;
         let loader = new DX7Loader();
         this.selectedPreset = loader.convertDX7data('test', test);
         console.log('dx7preset', test);
@@ -510,6 +510,53 @@ class DX7Test {
         if (this.synth) {
             if (this.selectedPreset) {
                 this.synth.scheduleStrum(this.selectedPreset, this.synth.audioContext.currentTime + 0.321, [nn], [{ duration: 1.2, delta: 0 }]);
+            }
+        }
+    }
+    playTestBass() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 3, Ds = 4, E = 5, F = 6, Fs = 7, G = 8, Gs = 9, A = 10, As = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [F + o3], [{ duration: n2, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 1 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 2 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 3 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 4 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 5 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 6 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 7 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 8 * n8, [F + o3], [{ duration: n2, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + n1 * 2 + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
             }
         }
     }

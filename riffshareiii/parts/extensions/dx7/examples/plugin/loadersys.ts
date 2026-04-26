@@ -18,12 +18,12 @@ type DX7PresetData = {
 	feedback0_7: number;
 
 	lfoSpeed: number;
-	lfoDelay: number;
+	//lfoDelay: number;
 	lfoPitchModDepth0_99: number;
 	lfoAmpModDepth0_99: number;
-	lfoPitchModSens: number;
-	lfoWaveform: number;
-	lfoSync: number;
+	//lfoPitchModSens: number;
+	//lfoWaveform: number;
+	//lfoSync: number;
 };
 type ConnectionSchemeDX7 = {
 	outputMix: number[]
@@ -39,26 +39,30 @@ type SynthSlope = {
 	//value: number;
 	values: number[];
 };
+type EnvelopeInfo = {
+	attack: SynthSlope;
+	decay: SynthSlope;
+	sustain: SynthSlope;
+	release: number;
+};
 type OperatorInfo = {
 	constantFrequency: number;
 	frequencyRatio: number;
 	detune: number;
 	enabled: boolean;
 	volume: number;
-	attack: SynthSlope;
-	decay: SynthSlope;
-	sustain: SynthSlope;
-	release: number;
+	envelope: EnvelopeInfo;
 };
 type SynthPreset = {
 	label: string;
-	connectionsInfo: ConnectionSchemeDX7;
+	//connectionsInfo: ConnectionSchemeDX7;
+	mixID: number;
 	operators: OperatorInfo[];
 	feedbackRatio: number;
 };
 
 class DX7Loader {
-	matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[] = [
+	/*matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[] = [
 		//stacking
 		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },    //1
 		{ outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },    //2
@@ -98,7 +102,7 @@ class DX7Loader {
 		{ outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },      //30
 		{ outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },       //31
 		{ outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }         //32 e.organ 1
-	];
+	];*/
 	scale99(nn: number): number {
 		let speed = Math.pow(2, nn * 0.16);
 		return speed;
@@ -147,7 +151,8 @@ class DX7Loader {
 	convertDX7data(fileName: string, dx7preset: DX7PresetData): SynthPreset {
 		let preset: SynthPreset = {
 			label: dx7preset.name.trim() + '/' + fileName.trim()
-			, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
+			//, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
+			, mixID: dx7preset.algorithm1_32
 			, operators: []
 			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7)) * 0.35 //* 0.01 //0.4
 		};
@@ -167,48 +172,50 @@ class DX7Loader {
 				, enabled: data.enabled
 				, volume: 0
 				, detune: data.detune_7_7
-				//, attack: { value: attackSlope.to, duration: attackSlope.duration }
-				, attack: {
-					values: [0
-						, 0.025 * attackSlope.to
-						, 0.05 * attackSlope.to
-						, 0.2 * attackSlope.to
-						, 0.35 * attackSlope.to
-						, attackSlope.to]
-					, duration: attackSlope.duration
+				, envelope: {
+					//, attack: { value: attackSlope.to, duration: attackSlope.duration }
+					attack: {
+						values: [0
+							, 0.025 * attackSlope.to
+							, 0.05 * attackSlope.to
+							, 0.2 * attackSlope.to
+							, 0.35 * attackSlope.to
+							, attackSlope.to]
+						, duration: attackSlope.duration
+					}
+					//, decay: { value: decaySlope.to, duration: decaySlope.duration }
+					, decay: {
+						values: [attackSlope.to
+							, attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to)
+							, attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to)
+							, attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to)
+							, attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to)
+							, decaySlope.to]
+						, duration: decaySlope.duration
+					}
+					//, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
+					, sustain: {
+						values: [decaySlope.to
+							, decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to)
+							, decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to)
+							, decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to)
+							, decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to)
+							, sustainSlope.to]
+						, duration: sustainSlope.duration
+					}
+					, release: releaseSlope.duration
 				}
-				//, decay: { value: decaySlope.to, duration: decaySlope.duration }
-				, decay: {
-					values: [attackSlope.to
-						, attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to)
-						, attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to)
-						, attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to)
-						, attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to)
-						, decaySlope.to]
-					, duration: decaySlope.duration
-				}
-				//, sustain: { value: sustainSlope.to, duration: sustainSlope.duration }
-				, sustain: {
-					values: [decaySlope.to
-						, decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to)
-						, decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to)
-						, decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to)
-						, decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to)
-						, sustainSlope.to]
-					, duration: sustainSlope.duration
-				}
-				, release: releaseSlope.duration
 			};
-			operator.attack.duration = Math.max(0.0001, operator.attack.duration);
-			operator.decay.duration = Math.max(0.0001, operator.decay.duration);
-			operator.sustain.duration = Math.max(0.0001, operator.sustain.duration);
-			operator.release = Math.max(0.005, operator.release);
-			operator.release = Math.min(3, operator.release);
+			operator.envelope.attack.duration = Math.max(0.0001, operator.envelope.attack.duration);
+			operator.envelope.decay.duration = Math.max(0.0001, operator.envelope.decay.duration);
+			operator.envelope.sustain.duration = Math.max(0.0001, operator.envelope.sustain.duration);
+			operator.envelope.release = Math.max(0.005, operator.envelope.release);
+			operator.envelope.release = Math.min(3, operator.envelope.release);
 
 			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
 			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
 			if (data.constMode0_1 > 0) {
-				operator.volume =  Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
 				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
@@ -284,12 +291,12 @@ class DX7Loader {
 			name: voiceData.substring(118, 128),
 
 			lfoSpeed: voiceData.charCodeAt(112),
-			lfoDelay: voiceData.charCodeAt(113),
+			//lfoDelay: voiceData.charCodeAt(113),
 			lfoPitchModDepth0_99: voiceData.charCodeAt(114),
 			lfoAmpModDepth0_99: voiceData.charCodeAt(115),//
-			lfoPitchModSens: voiceData.charCodeAt(116) >> 4,
-			lfoWaveform: Math.floor(voiceData.charCodeAt(116) >> 1) & 7,
-			lfoSync: voiceData.charCodeAt(116) & 1,
+			//lfoPitchModSens: voiceData.charCodeAt(116) >> 4,
+			//lfoWaveform: Math.floor(voiceData.charCodeAt(116) >> 1) & 7,
+			//lfoSync: voiceData.charCodeAt(116) & 1,
 		};
 		console.log('parseSysexData', patchId, preset);
 		return preset;

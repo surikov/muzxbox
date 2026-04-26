@@ -26,9 +26,9 @@
 	"files": [
 		"../../../../mzxbxapi/musicenginetypes.ts",
 		"../../../../mzxbxapi/musicenginedeclarations.ts",
-		"sysloader.ts",
+		
 		"synthesizer.ts",
-		"sysloader.ts",
+		"loadersys.ts",
 		"voice.ts",
 		"operator.ts",
 		"test.ts"

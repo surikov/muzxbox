@@ -296,6 +296,14 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare class DX7Synthesizer {
+    cache: DX7Voice[];
+    audioContext: AudioContext;
+    output: GainNode;
+    constructor(audioContext: AudioContext);
+    takeVox(mixID: number): DX7Voice;
+    scheduleStrum(preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
+}
 type DX7OperatorData = {
     enabled: boolean;
     freqFine0_99: number;
@@ -313,12 +321,8 @@ type DX7PresetData = {
     operators: DX7OperatorData[];
     feedback0_7: number;
     lfoSpeed: number;
-    lfoDelay: number;
     lfoPitchModDepth0_99: number;
     lfoAmpModDepth0_99: number;
-    lfoPitchModSens: number;
-    lfoWaveform: number;
-    lfoSync: number;
 };
 type ConnectionSchemeDX7 = {
     outputMix: number[];
@@ -328,25 +332,27 @@ type SynthSlope = {
     duration: number;
     values: number[];
 };
+type EnvelopeInfo = {
+    attack: SynthSlope;
+    decay: SynthSlope;
+    sustain: SynthSlope;
+    release: number;
+};
 type OperatorInfo = {
     constantFrequency: number;
     frequencyRatio: number;
     detune: number;
     enabled: boolean;
     volume: number;
-    attack: SynthSlope;
-    decay: SynthSlope;
-    sustain: SynthSlope;
-    release: number;
+    envelope: EnvelopeInfo;
 };
 type SynthPreset = {
     label: string;
-    connectionsInfo: ConnectionSchemeDX7;
+    mixID: number;
     operators: OperatorInfo[];
     feedbackRatio: number;
 };
 declare class DX7Loader {
-    matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[];
     scale99(nn: number): number;
     durationDown(nn: number): number;
     durationUp(nn: number): number;
@@ -361,22 +367,17 @@ declare class DX7Loader {
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number): DX7PresetData;
 }
-declare class DX7Synthesizer {
-    cache: DX7Voice[];
-    audioContext: AudioContext;
-    output: GainNode;
-    constructor(audioContext: AudioContext);
-    takeVox(): DX7Voice;
-    scheduleStrum(preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
-}
 declare class DX7Voice {
     operators: DX7Operator[];
     locktime: number;
     audioContext: AudioContext;
     output: GainNode;
-    constructor(audioContext: AudioContext, to: AudioNode);
-    reConnectOperators(preset: SynthPreset): void;
+    mixID: number;
+    constructor(mixID: number, audioContext: AudioContext, to: AudioNode);
+    reConnectOperators(): void;
+    connectOperators(): void;
     startPlayNote(preset: SynthPreset, when: number, duration: number, note: number): void;
+    matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[];
 }
 declare class DX7Operator {
     audioContext: AudioContext;
@@ -392,8 +393,8 @@ declare class DX7Operator {
     connectNodes(): void;
     createNodes(): void;
     resetCarrier(when: number): void;
-    resetEnvelope(attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number): void;
-    resetFrequency(frequency: number, feedbackRatio: number): void;
+    resetEnvelope(edata: EnvelopeInfo, when: number, duration: number): void;
+    resetFrequency(when: number, frequency: number, feedbackRatio: number): void;
     startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
 }
 declare class DX7Test {
@@ -403,6 +404,7 @@ declare class DX7Test {
     constructor();
     loadSysexFile(fileList: FileList): void;
     testPlay(isPiano: boolean, nn: number): void;
+    playTestBass(): void;
     customPlay(isPiano: boolean, nn: number): void;
     loadPresetNum(nn: number): void;
 }
