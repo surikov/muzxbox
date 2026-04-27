@@ -296,6 +296,7 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
+declare let libDX7list: DX7PresetData[];
 declare class DX7Synthesizer {
     cache: DX7Voice[];
     audioContext: AudioContext;
@@ -364,11 +365,12 @@ declare class DX7Loader {
         to: number;
         duration: number;
     };
-    convertDX7data(fileName: string, dx7preset: DX7PresetData): SynthPreset;
+    convertDX7data(dx7preset: DX7PresetData): SynthPreset;
     parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
-    parseSysexData(bankData: string, patchId: number): DX7PresetData;
+    parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
 }
+declare let matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[];
 declare class DX7Voice {
     operators: DX7Operator[];
     locktime: number;
@@ -379,7 +381,6 @@ declare class DX7Voice {
     disonnectOperators(): void;
     connectOperators(): void;
     startPlayNote(preset: SynthPreset, when: number, duration: number, note: number): void;
-    matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[];
 }
 declare class DX7Operator {
     audioContext: AudioContext;
@@ -404,6 +405,7 @@ declare class DX7Test {
     selectedPreset: SynthPreset | null;
     parsed: SynthPreset[] | null;
     constructor();
+    renderLibList(): void;
     loadSysexFile(fileList: FileList): void;
     testPlay(isPiano: boolean, nn: number): void;
     playTestSuBass(): void;

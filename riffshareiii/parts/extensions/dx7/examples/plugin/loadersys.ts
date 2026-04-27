@@ -150,14 +150,16 @@ class DX7Loader {
 		//if(dump)console.log('slopeDuration', r99, 'from',from99,'to', to99, slope, fullDuration,'/', partDuration);
 		return slope;
 	}
-	convertDX7data(fileName: string, dx7preset: DX7PresetData): SynthPreset {
+	convertDX7data(dx7preset: DX7PresetData): SynthPreset {
+		let modlev = 2.8;
 		let preset: SynthPreset = {
-			label: dx7preset.name.trim() + '/' + fileName.trim()
+			//label: dx7preset.name.trim() + '/' + fileName.trim()
+			label: dx7preset.name
 			//, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, mixID: dx7preset.algorithm1_32
 			, operators: []
-			, feedbackRatio: 0.075 * 2.8 * Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
-			, modulationRatio: 2.8
+			, feedbackRatio: 0.075 * modlev * Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
+			, modulationRatio: modlev
 		};
 		/*let lfospeedval = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {
@@ -218,7 +220,7 @@ class DX7Loader {
 			//let pitchModDepthRatio = 1+this.pow2x(dx7preset.lfoPitchModDepth0_99 / 99, -4.5, 2, 1 / 4);
 			let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
 			if (data.constMode0_1 > 0) {
-				operator.volume = 0.05 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume = 0.51 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
 				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
@@ -244,8 +246,8 @@ class DX7Loader {
 			//console.log(from.name);
 			//let customPresets: DX7PresetData[] = [];
 			for (let ii = 0; ii < 32; ii++) {
-				let one: DX7PresetData = this.parseSysexData(result, ii);
-				let preset: SynthPreset = this.convertDX7data(from.name, one);
+				let one: DX7PresetData = this.parseSysexData(result, ii, from.name);
+				let preset: SynthPreset = this.convertDX7data(one);
 				//console.log(ii, preset);
 				all.push(preset);
 			}
@@ -264,7 +266,7 @@ class DX7Loader {
 			return 0;
 		}
 	}
-	parseSysexData(bankData: string, patchId: number): DX7PresetData {
+	parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData {
 		var dataStart = 128 * patchId + 6;
 		var dataEnd = dataStart + 128;
 		var voiceData = bankData.substring(dataStart, dataEnd);
@@ -291,7 +293,7 @@ class DX7Loader {
 			algorithm1_32: voiceData.charCodeAt(110) + 1,
 			feedback0_7: voiceData.charCodeAt(111) & 7,
 			operators: operators,
-			name: voiceData.substring(118, 128),
+			name: voiceData.substring(118, 128).trim() + '/' + filename,
 
 			//lfoSpeed: voiceData.charCodeAt(112),
 			//lfoDelay: voiceData.charCodeAt(113),
