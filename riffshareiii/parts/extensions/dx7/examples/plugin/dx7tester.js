@@ -5,15 +5,18 @@ class DX7Synthesizer {
         this.audioContext = audioContext;
         this.output = this.audioContext.createGain();
     }
-    recheckCache() {
-        for (let ii = 0; ii < this.cache.length; ii++) {
-            if (this.cache[ii].locktime < this.audioContext.currentTime) {
-                this.cache[ii].disonnectOperators();
-                this.cache[ii].mixID = 0;
+    checkCache() {
+        if (this.cache.length > 25) {
+            for (let ii = 0; ii < this.cache.length; ii++) {
+                if (this.cache[ii].locktime < this.audioContext.currentTime) {
+                    this.cache[ii].disonnectOperators();
+                    this.cache[ii].mixID = 0;
+                }
             }
         }
     }
     takeVox(mid) {
+        this.checkCache();
         for (let ii = 0; ii < this.cache.length; ii++) {
             if (this.cache[ii].locktime < this.audioContext.currentTime && mid == this.cache[ii].mixID) {
                 return this.cache[ii];
@@ -342,7 +345,7 @@ class DX7Operator {
     resetFrequency(when, frequency, modulationRatio, feedbackRatio) {
         this.carrier.frequency.linearRampToValueAtTime(frequency, when);
         this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-        this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);
+        this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
         this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
     }
     startPlayFrequency(info, when, duration, frequency, modulationRatio, feedbackRatio) {
@@ -543,7 +546,6 @@ class DX7Test {
         let o5 = 60;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
@@ -580,7 +582,6 @@ class DX7Test {
         let o5 = 60;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
@@ -618,7 +619,6 @@ class DX7Test {
         let o6 = 73;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o4], [{ duration: n4, delta: 0 }]);
@@ -657,7 +657,6 @@ class DX7Test {
         let o6 = 73;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n16, [A + o6], [{ duration: n16, delta: 0 }]);

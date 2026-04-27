@@ -301,7 +301,7 @@ declare class DX7Synthesizer {
     audioContext: AudioContext;
     output: GainNode;
     constructor(audioContext: AudioContext);
-    recheckCache(): void;
+    checkCache(): void;
     takeVox(mid: number): DX7Voice;
     scheduleStrum(preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]): void;
 }

@@ -6,16 +6,19 @@ class DX7Synthesizer {
 		this.audioContext = audioContext;
 		this.output = this.audioContext.createGain();
 	}
-	recheckCache() {
-		for (let ii = 0; ii < this.cache.length; ii++) {
-			if (this.cache[ii].locktime < this.audioContext.currentTime) {
-				this.cache[ii].disonnectOperators();
-				this.cache[ii].mixID = 0;
-				//console.log('free',ii);
+	checkCache() {
+		if (this.cache.length > 25) {
+			for (let ii = 0; ii < this.cache.length; ii++) {
+				if (this.cache[ii].locktime < this.audioContext.currentTime) {
+					this.cache[ii].disonnectOperators();
+					this.cache[ii].mixID = 0;
+					//console.log('free',ii);
+				}
 			}
 		}
 	}
 	takeVox(mid: number): DX7Voice {
+		this.checkCache();
 		for (let ii = 0; ii < this.cache.length; ii++) {
 			if (this.cache[ii].locktime < this.audioContext.currentTime && mid == this.cache[ii].mixID) {
 				//console.log('found vox', ii);

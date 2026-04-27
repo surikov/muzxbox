@@ -230,7 +230,7 @@ class DX7Test {
         let o5 = 60;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
+                //this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
@@ -269,7 +269,7 @@ class DX7Test {
         let o5 = 60;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
+                //this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
@@ -324,7 +324,7 @@ class DX7Test {
 		let o6 = 73;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
+               // this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o4], [{ duration: n4, delta: 0 }]);
@@ -364,7 +364,7 @@ class DX7Test {
 		let o6 = 73;
         if (this.synth) {
             if (this.selectedPreset) {
-                this.synth.recheckCache();
+               // this.synth.recheckCache();
                 let tt = this.synth.audioContext.currentTime + 0.2;
                 let pp = this.selectedPreset;
                 this.synth.scheduleStrum(pp, tt + 0 * n16, [A + o6], [{ duration: n16, delta: 0 }]);

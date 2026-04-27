@@ -64,7 +64,7 @@ class DX7Operator {
 		this.carrier.frequency.linearRampToValueAtTime(frequency, when);
 		//this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
 		this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-		this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);//2 * modulationRatio;
+		this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);//2 * modulationRatio;
 		//this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
 		//this.feedbackLevel.gain.linearRampToValueAtTime(0.05 * feedbackRatio, when);
 		this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
