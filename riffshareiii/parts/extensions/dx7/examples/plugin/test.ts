@@ -136,7 +136,7 @@ class DX7Test {
                 }
             ],
             "name": "E.PIANO 1 ",
-            "lfoSpeed": 34,
+            //"lfoSpeed": 34,
             //"lfoDelay": 33,
             "lfoPitchModDepth0_99": 0,
             "lfoAmpModDepth0_99": 0,
@@ -210,6 +210,46 @@ class DX7Test {
             }
         }
     }
+	 playTestSuBass() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+		 let o2 = 24;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [F + o2], [{ duration: n2, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o2], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o2], [{ duration: n2, delta: 0 }]);
+
+            }
+        }
+    }
     playTestBass() {
         if (!(this.synth)) {
             let ac = new AudioContext();
@@ -244,7 +284,8 @@ class DX7Test {
                 this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-
+				this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o3], [{ duration: n2, delta: 0 }]);
+/*
                 this.synth.scheduleStrum(pp, tt + n1 * 2 + 0 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + n1 * 2 + 1 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + n1 * 2 + 2 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
@@ -259,6 +300,88 @@ class DX7Test {
                 this.synth.scheduleStrum(pp, tt + n1 * 2 + 15 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
                 
                 this.synth.scheduleStrum(pp, tt + n1 * 2 + 16 * n8, [A + o4, C + o5, E + o5], [{ duration: n1, delta: 0 }]);
+				*/
+            }
+        }
+    }
+	 playTestChords() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+		let o6 = 73;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o4], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n8, [A + o5, C + o6, E + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n8, [E + o4], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n8, [A + o5, C + o6, E + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [E + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [F + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [A + o5, C + o6, E + o6], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 13 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o5, C + o6, E + o6], [{ duration: n4, delta: 0 }]);
+            }
+        }
+    }
+	playTestMelody() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+		let o6 = 73;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n16, [A + o6], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 1 * n16, [G + o6], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 2 * n16, [E + o6], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 3 * n16, [C + o6], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 4 * n16, [A + o5], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 5 * n16, [G + o5], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 6 * n16, [E + o5], [{ duration: n16, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 7 * n16, [C + o5], [{ duration: n16, delta: 0 }]);
+
+				this.synth.scheduleStrum(pp, tt + 4 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 5 * n8, [C + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 6 * n8, [G + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 7 * n8, [E + o6], [{ duration: n8, delta: 0 }]);
+				this.synth.scheduleStrum(pp, tt + 8 * n8, [A + o6], [{ duration: n2, delta: 0 }]);
+
             }
         }
     }

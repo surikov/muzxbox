@@ -17,7 +17,7 @@ type DX7PresetData = {
 	operators: DX7OperatorData[];
 	feedback0_7: number;
 
-	lfoSpeed: number;
+	//lfoSpeed: number;
 	//lfoDelay: number;
 	lfoPitchModDepth0_99: number;
 	lfoAmpModDepth0_99: number;
@@ -28,6 +28,7 @@ type DX7PresetData = {
 type ConnectionSchemeDX7 = {
 	outputMix: number[]
 	, modulationMatrix: (number[])[]
+	, feedbackMatrix: (number[])[]
 };/*
 type SlopeInfo = {
 	from: number;
@@ -59,6 +60,7 @@ type SynthPreset = {
 	mixID: number;
 	operators: OperatorInfo[];
 	feedbackRatio: number;
+	modulationRatio: number;
 };
 
 class DX7Loader {
@@ -154,12 +156,13 @@ class DX7Loader {
 			//, connectionsInfo: this.matrixConnectionAlgorithmsDX7[dx7preset.algorithm1_32 - 1]
 			, mixID: dx7preset.algorithm1_32
 			, operators: []
-			, feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
+			, feedbackRatio: 0.075 * 2.8 * Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
+			, modulationRatio: 2.8
 		};
-		let ls = dx7preset.lfoSpeed / 6 + 0.5;
+		/*let lfospeedval = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {
-			ls = 10 + (dx7preset.lfoSpeed - 66) / 1;
-		}
+			lfospeedval = 10 + (dx7preset.lfoSpeed - 66) / 1;
+		}*/
 		for (let ii = 0; ii < 6; ii++) {
 			let data = dx7preset.operators[ii];
 			let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
@@ -218,7 +221,7 @@ class DX7Loader {
 				operator.volume = 0.05 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
 			} else {
-				operator.volume =       Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+				operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
 				let coarse = 0.5;
 				if (data.freqCoarse0_31) {
 					coarse = data.freqCoarse0_31
@@ -290,7 +293,7 @@ class DX7Loader {
 			operators: operators,
 			name: voiceData.substring(118, 128),
 
-			lfoSpeed: voiceData.charCodeAt(112),
+			//lfoSpeed: voiceData.charCodeAt(112),
 			//lfoDelay: voiceData.charCodeAt(113),
 			lfoPitchModDepth0_99: voiceData.charCodeAt(114),
 			lfoAmpModDepth0_99: voiceData.charCodeAt(115),//

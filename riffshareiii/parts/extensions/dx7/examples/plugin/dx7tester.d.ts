@@ -321,13 +321,13 @@ type DX7PresetData = {
     algorithm1_32: number;
     operators: DX7OperatorData[];
     feedback0_7: number;
-    lfoSpeed: number;
     lfoPitchModDepth0_99: number;
     lfoAmpModDepth0_99: number;
 };
 type ConnectionSchemeDX7 = {
     outputMix: number[];
     modulationMatrix: (number[])[];
+    feedbackMatrix: (number[])[];
 };
 type SynthSlope = {
     duration: number;
@@ -352,6 +352,7 @@ type SynthPreset = {
     mixID: number;
     operators: OperatorInfo[];
     feedbackRatio: number;
+    modulationRatio: number;
 };
 declare class DX7Loader {
     scale99(nn: number): number;
@@ -395,8 +396,8 @@ declare class DX7Operator {
     createNodes(): void;
     rresetCarrier(when: number): void;
     resetEnvelope(edata: EnvelopeInfo, when: number, duration: number): void;
-    resetFrequency(when: number, frequency: number, feedbackRatio: number): void;
-    startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, feedbackRatio: number): void;
+    resetFrequency(when: number, frequency: number, modulationRatio: number, feedbackRatio: number): void;
+    startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, modulationRatio: number, feedbackRatio: number): void;
 }
 declare class DX7Test {
     synth: DX7Synthesizer | null;
@@ -405,7 +406,10 @@ declare class DX7Test {
     constructor();
     loadSysexFile(fileList: FileList): void;
     testPlay(isPiano: boolean, nn: number): void;
+    playTestSuBass(): void;
     playTestBass(): void;
+    playTestChords(): void;
+    playTestMelody(): void;
     customPlay(isPiano: boolean, nn: number): void;
     loadPresetNum(nn: number): void;
 }

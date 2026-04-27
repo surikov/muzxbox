@@ -69,12 +69,9 @@ class DX7Loader {
             label: dx7preset.name.trim() + '/' + fileName.trim(),
             mixID: dx7preset.algorithm1_32,
             operators: [],
-            feedbackRatio: Math.pow(2, (dx7preset.feedback0_7 - 7))
+            feedbackRatio: 0.075 * 2.8 * Math.pow(2, (dx7preset.feedback0_7 - 7)),
+            modulationRatio: 2.8
         };
-        let ls = dx7preset.lfoSpeed / 6 + 0.5;
-        if (dx7preset.lfoSpeed > 65) {
-            ls = 10 + (dx7preset.lfoSpeed - 66) / 1;
-        }
         for (let ii = 0; ii < 6; ii++) {
             let data = dx7preset.operators[ii];
             let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
@@ -193,7 +190,6 @@ class DX7Loader {
             feedback0_7: voiceData.charCodeAt(111) & 7,
             operators: operators,
             name: voiceData.substring(118, 128),
-            lfoSpeed: voiceData.charCodeAt(112),
             lfoPitchModDepth0_99: voiceData.charCodeAt(114),
             lfoAmpModDepth0_99: voiceData.charCodeAt(115),
         };
@@ -205,38 +201,38 @@ class DX7Voice {
     constructor(mixID, audioContext, to) {
         this.locktime = 0;
         this.matrixConnectionAlgorithmsDX7 = [
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4], [5], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [5]] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], [3]] },
-            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [5]] },
-            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], [4]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [3], [5], []] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4], [], [5], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3, 4, 5], [], [], []] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], [5]] },
-            { outputMix: [0, 2], modulationMatrix: [[1], [1], [3], [4, 5], [], []] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], [5]] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 4], [1], [3], [], [5], []] },
-            { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [4], [5], []] },
-            { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [2], [5], [5], []] },
-            { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], [5]] },
-            { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], [5]] },
-            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [2], [4, 5], [], []] },
-            { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [4], []] },
-            { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], [5]] },
-            { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [4], []] },
-            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], [5]] },
-            { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], [5]] }
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [3]] },
+            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [4]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [3], [], []] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },
+            { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [1], [], [], [], []] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [1], [], [], [], []] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
+            { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [], [5], []], feedbackMatrix: [[], [], [], [4], [], []] },
+            { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },
+            { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [], [5], [5], []], feedbackMatrix: [[], [], [2], [], [], []] },
+            { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },
+            { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] },
+            { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] },
+            { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
+            { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
         ];
         this.mixID = mixID;
         this.audioContext = audioContext;
@@ -267,12 +263,16 @@ class DX7Voice {
             for (let mm = 0; mm < modulatorIds.length; mm++) {
                 let mid = modulatorIds[mm];
                 let modulator = this.operators[mid];
-                if (mid == cid) {
-                    modulator.output.connect(carrier.feedbackLevel);
-                }
-                else {
-                    modulator.output.connect(carrier.modulationLevel);
-                }
+                modulator.output.connect(carrier.modulationLevel);
+            }
+        }
+        for (let cid = 0; cid < mix.feedbackMatrix.length; cid++) {
+            let carrier = this.operators[cid];
+            let fbIds = mix.modulationMatrix[cid];
+            for (let ff = 0; ff < fbIds.length; ff++) {
+                let fid = fbIds[ff];
+                let fbmodulator = this.operators[fid];
+                fbmodulator.output.connect(carrier.feedbackLevel);
             }
         }
         for (let ii = 0; ii < mix.outputMix.length; ii++) {
@@ -289,7 +289,7 @@ class DX7Voice {
                     let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
                     frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
                 }
-                this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.feedbackRatio);
+                this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
                 let otime = when + duration + preset.operators[ii].envelope.release + 0.01;
                 if (this.locktime < otime) {
                     this.locktime = otime;
@@ -317,7 +317,7 @@ class DX7Operator {
         this.phaseDelay.connect(this.envelope);
         this.modulationLevel.connect(this.phaseDelay.delayTime);
         this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
-        this.feedbackLevel.connect(this.modulationLevel);
+        this.feedbackLevel.connect(this.phaseDelay.delayTime);
         this.carrier.connect(this.phaseDelay);
     }
     createNodes() {
@@ -339,15 +339,15 @@ class DX7Operator {
         this.envelope.gain.cancelAndHoldAtTime(when + duration);
         this.envelope.gain.linearRampToValueAtTime(0, when + duration + edata.release);
     }
-    resetFrequency(when, frequency, feedbackRatio) {
+    resetFrequency(when, frequency, modulationRatio, feedbackRatio) {
         this.carrier.frequency.linearRampToValueAtTime(frequency, when);
-        this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
+        this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
         this.compensateNegativeDelay.offset.linearRampToValueAtTime(3 / frequency, when);
-        this.feedbackLevel.gain.linearRampToValueAtTime(0.05 * feedbackRatio, when);
+        this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
     }
-    startPlayFrequency(info, when, duration, frequency, feedbackRatio) {
+    startPlayFrequency(info, when, duration, frequency, modulationRatio, feedbackRatio) {
         this.resetEnvelope(info.envelope, when, duration);
-        this.resetFrequency(when, frequency, feedbackRatio);
+        this.resetFrequency(when, frequency, modulationRatio, feedbackRatio);
         this.output.gain.value = info.volume;
     }
 }
@@ -488,7 +488,6 @@ class DX7Test {
                 }
             ],
             "name": "E.PIANO 1 ",
-            "lfoSpeed": 34,
             "lfoPitchModDepth0_99": 0,
             "lfoAmpModDepth0_99": 0,
         };
@@ -525,6 +524,44 @@ class DX7Test {
             }
         }
     }
+    playTestSuBass() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o2 = 24;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n8, [A + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n8, [A + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [F + o2], [{ duration: n2, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o2], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o2], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o2], [{ duration: n2, delta: 0 }]);
+            }
+        }
+    }
     playTestBass() {
         if (!(this.synth)) {
             let ac = new AudioContext();
@@ -558,19 +595,84 @@ class DX7Test {
                 this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o3], [{ duration: n4, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o3], [{ duration: n8, delta: 0 }]);
                 this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 0 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 1 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 2 * n8, [A + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 3 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 4 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 5 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 6 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 7 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 8 * n8, [F + o4, A + o4, C + o5], [{ duration: n2, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 12 * n8, [G + o4, B + o4, D + o5], [{ duration: n4, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 14 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 15 * n8, [G + o5], [{ duration: n8, delta: 0 }]);
-                this.synth.scheduleStrum(pp, tt + n1 * 2 + 16 * n8, [A + o4, C + o5, E + o5], [{ duration: n1, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o3], [{ duration: n2, delta: 0 }]);
+            }
+        }
+    }
+    playTestChords() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+        let o6 = 73;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n8, [A + o4], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n8, [A + o5, C + o6, E + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n8, [E + o4], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n8, [A + o5, C + o6, E + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [E + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [F + o3], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [G + o4], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [A + o5, C + o6, E + o6], [{ duration: n4, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 12 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 13 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 14 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 15 * n8, [G + o5, B + o5, D + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 16 * n8, [A + o5, C + o6, E + o6], [{ duration: n4, delta: 0 }]);
+            }
+        }
+    }
+    playTestMelody() {
+        if (!(this.synth)) {
+            let ac = new AudioContext();
+            this.synth = new DX7Synthesizer(ac);
+            this.synth.output.connect(ac.destination);
+        }
+        let C = 0, Cs = 1, D = 2, Ds = 3, E = 4, F = 5, Fs = 6, G = 7, Gs = 8, A = 9, As = 10, B = 11;
+        let tempo = 120;
+        let n4 = 60 / tempo;
+        let n16 = n4 / 4;
+        let n8 = n4 / 2;
+        let n2 = n4 * 2;
+        let n1 = n4 * 4;
+        let o3 = 36;
+        let o4 = 48;
+        let o5 = 60;
+        let o6 = 73;
+        if (this.synth) {
+            if (this.selectedPreset) {
+                this.synth.recheckCache();
+                let tt = this.synth.audioContext.currentTime + 0.2;
+                let pp = this.selectedPreset;
+                this.synth.scheduleStrum(pp, tt + 0 * n16, [A + o6], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 1 * n16, [G + o6], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 2 * n16, [E + o6], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 3 * n16, [C + o6], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n16, [A + o5], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n16, [G + o5], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n16, [E + o5], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n16, [C + o5], [{ duration: n16, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 4 * n8, [A + o5], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 5 * n8, [C + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 6 * n8, [G + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 7 * n8, [E + o6], [{ duration: n8, delta: 0 }]);
+                this.synth.scheduleStrum(pp, tt + 8 * n8, [A + o6], [{ duration: n2, delta: 0 }]);
             }
         }
     }
