@@ -64,6 +64,14 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
+        "label": "MIDI.RU Archive",
+        "purpose": "Action",
+        "kind": "midiarchive1",
+        "ui": "https://mzxbox.ru/midiruplugin/midiru.php",
+        "evaluate": "",
+        "script": ""
+    },
+    {
         "label": "Publish & Share",
         "purpose": "Action",
         "kind": "sharemzxbox1",

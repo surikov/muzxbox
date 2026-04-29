@@ -6,7 +6,7 @@ let libDX7list: DX7PresetData[] = [
 , { "algorithm1_32": 5, "feedback0_7": 6, "operators": [ { "rates0_99": [ 96, 25, 25, 67 ], "levels0_99": [ 99, 75, 0, 0 ], "detune_7_7": 3, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 95, 50, 35, 78 ], "levels0_99": [ 99, 75, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 58, "constMode0_1": 0, "freqCoarse0_31": 14, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 95, 20, 20, 50 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 95, 29, 20, 50 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 89, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 6 }, { "rates0_99": [ 95, 20, 20, 50 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": -7, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 95, 29, 20, 50 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 6 } ], "name": "E.PIANO 1/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 8, "feedback0_7": 7, "operators": [ { "rates0_99": [ 74, 85, 27, 70 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 91, 25, 39, 60 ], "levels0_99": [ 99, 86, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 93, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 78, 87, 22, 75 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 81, 87, 22, 75 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 89, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 81, 87, 22, 75 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 99, 57, 99, 75 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 57, "constMode0_1": 0, "freqCoarse0_31": 12, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 6 } ], "name": "GUITAR 1/ROM1A.SYX", "lfoPitchModDepth0_99": 1, "lfoAmpModDepth0_99": 3 }
 , { "algorithm1_32": 16, "feedback0_7": 7, "operators": [ { "rates0_99": [ 95, 62, 17, 58 ], "levels0_99": [ 99, 95, 32, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 20, 0, 0 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 80, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 88, 96, 32, 30 ], "levels0_99": [ 79, 65, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 90, 42, 7, 55 ], "levels0_99": [ 90, 30, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 93, "constMode0_1": 0, "freqCoarse0_31": 5, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 99, 0, 0, 0 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 62, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 94, 56, 24, 55 ], "levels0_99": [ 93, 28, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 85, "constMode0_1": 0, "freqCoarse0_31": 9, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 } ], "name": "BASS 1/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
-, { "algorithm1_32": 17, "feedback0_7": 7, "operators": [ { "rates0_99": [ 75, 37, 18, 63 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 28, 37, 42, 50 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 80, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 3, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 73, 25, 32, 30 ], "levels0_99": [ 97, 78, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 68, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 80, 39, 28, 53 ], "levels0_99": [ 93, 57, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 51, 0, 0 ], "levels0_99": [ 99, 74, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 75, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 25, 50, 24, 55 ], "levels0_99": [ 96, 97, 0, 0 ], "detune_7_7": 1, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 } ], "name": "BASS 2/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
+//, { "algorithm1_32": 17, "feedback0_7": 7, "operators": [ { "rates0_99": [ 75, 37, 18, 63 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 28, 37, 42, 50 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 80, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 3, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 73, 25, 32, 30 ], "levels0_99": [ 97, 78, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 68, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 80, 39, 28, 53 ], "levels0_99": [ 93, 57, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 51, 0, 0 ], "levels0_99": [ 99, 74, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 75, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 25, 50, 24, 55 ], "levels0_99": [ 96, 97, 0, 0 ], "detune_7_7": 1, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 } ], "name": "BASS 2/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 32, "feedback0_7": 0, "operators": [ { "rates0_99": [ 99, 80, 22, 90 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": -2, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 20, 22, 90 ], "levels0_99": [ 99, 99, 97, 0 ], "detune_7_7": -6, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 80, 54, 82 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 4, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 80, 22, 90 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 5, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 80, 22, 90 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 2, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 54, 22, 90 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 } ], "name": "E.ORGAN 1/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 19, "feedback0_7": 7, "operators": [ { "rates0_99": [ 45, 25, 25, 36 ], "levels0_99": [ 99, 99, 98, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 97, 62, 47 ], "levels0_99": [ 99, 99, 90, 0 ], "detune_7_7": 0, "volumeLevel0_99": 90, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 97, 62, 47 ], "levels0_99": [ 99, 99, 90, 0 ], "detune_7_7": 0, "volumeLevel0_99": 75, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 61, 25, 25, 50 ], "levels0_99": [ 99, 99, 97, 0 ], "detune_7_7": 0, "volumeLevel0_99": 88, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 61, 25, 25, 61 ], "levels0_99": [ 99, 99, 93, 0 ], "detune_7_7": 0, "volumeLevel0_99": 97, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 72, 25, 25, 70 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 0, "volumeLevel0_99": 76, "constMode0_1": 0, "freqCoarse0_31": 10, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 } ], "name": "PIPES 1/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 5, "feedback0_7": 1, "operators": [ { "rates0_99": [ 95, 28, 27, 47 ], "levels0_99": [ 99, 90, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 89, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 95, 72, 71, 99 ], "levels0_99": [ 99, 97, 91, 98 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 95, 28, 27, 47 ], "levels0_99": [ 99, 90, 0, 0 ], "detune_7_7": -1, "volumeLevel0_99": 85, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 95, 72, 71, 99 ], "levels0_99": [ 99, 97, 91, 98 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 95, 28, 27, 47 ], "levels0_99": [ 99, 90, 0, 0 ], "detune_7_7": -1, "volumeLevel0_99": 83, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 95, 72, 71, 99 ], "levels0_99": [ 99, 97, 91, 98 ], "detune_7_7": 0, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 6, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 } ], "name": "HARPSICH 1/ROM1A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
@@ -28,7 +28,7 @@ let libDX7list: DX7PresetData[] = [
 , { "algorithm1_32": 6, "feedback0_7": 0, "operators": [ { "rates0_99": [ 60, 25, 25, 71 ], "levels0_99": [ 99, 99, 98, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 97, 62, 54 ], "levels0_99": [ 99, 99, 90, 0 ], "detune_7_7": 0, "volumeLevel0_99": 88, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 57, 97, 62, 54 ], "levels0_99": [ 99, 99, 90, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 99, 25, 50 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 0, "volumeLevel0_99": 77, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 66, 99, 99, 51 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 0, "volumeLevel0_99": 86, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 99, 99, 45 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 0, "volumeLevel0_99": 84, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 } ], "name": "PIPES 4/ROM1B.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 3, "feedback0_7": 7, "operators": [ { "rates0_99": [ 94, 44, 35, 34 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 92, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 99, 39, 33, 16 ], "levels0_99": [ 99, 83, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 89, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 94, 28, 30, 33 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 94, 44, 35, 34 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 91, 37, 29, 29 ], "levels0_99": [ 99, 90, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 91, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 82, 53, 37, 48 ], "levels0_99": [ 99, 81, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 81, "constMode0_1": 0, "freqCoarse0_31": 6, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 } ], "name": "GUITAR 6/ROM1B.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 16 }
 , { "algorithm1_32": 3, "feedback0_7": 6, "operators": [ { "rates0_99": [ 95, 32, 45, 31 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 5, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 95, 46, 99, 12 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": -2, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 95, 50, 44, 10 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": -6, "volumeLevel0_99": 62, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 95, 32, 49, 33 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": -4, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 95, 35, 99, 28 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 4, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 95, 46, 28, 24 ], "levels0_99": [ 94, 79, 0, 0 ], "detune_7_7": -7, "volumeLevel0_99": 90, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 6 } ], "name": "HARP 2/ROM1B.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
-, { "algorithm1_32": 17, "feedback0_7": 7, "operators": [ { "rates0_99": [ 84, 29, 28, 76 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 80, 39, 28, 54 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 72, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 84, 29, 28, 76 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 60, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 94, 68, 24, 55 ], "levels0_99": [ 96, 76, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 97, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 0, 0, 0 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 28, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 94, 56, 24, 55 ], "levels0_99": [ 96, 78, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 } ], "name": "BASS 4/ROM1B.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
+//, { "algorithm1_32": 17, "feedback0_7": 7, "operators": [ { "rates0_99": [ 84, 29, 28, 76 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 80, 39, 28, 54 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 72, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 84, 29, 28, 76 ], "levels0_99": [ 99, 89, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 60, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 94, 68, 24, 55 ], "levels0_99": [ 96, 76, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 97, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 0, 0, 0 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 28, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 94, 56, 24, 55 ], "levels0_99": [ 96, 78, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 } ], "name": "BASS 4/ROM1B.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 17, "feedback0_7": 5, "operators": [ { "rates0_99": [ 65, 0, 12, 70 ], "levels0_99": [ 99, 90, 97, 0 ], "detune_7_7": 1, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 95, 95, 0, 0 ], "levels0_99": [ 99, 96, 89, 0 ], "detune_7_7": -1, "volumeLevel0_99": 68, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 98, 87, 0, 0 ], "levels0_99": [ 87, 86, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 92, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 95, 92, 28, 60 ], "levels0_99": [ 99, 90, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 59, "constMode0_1": 0, "freqCoarse0_31": 6, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 85, 70, 97, 0 ], "levels0_99": [ 99, 65, 60, 0 ], "detune_7_7": -2, "volumeLevel0_99": 54, "constMode0_1": 0, "freqCoarse0_31": 8, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 73, 70, 60, 0 ], "levels0_99": [ 99, 99, 97, 0 ], "detune_7_7": 0, "volumeLevel0_99": 47, "constMode0_1": 0, "freqCoarse0_31": 10, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 } ], "name": "CLARINET/ROM2A.SYX", "lfoPitchModDepth0_99": 7, "lfoAmpModDepth0_99": 99 }
 , { "algorithm1_32": 2, "feedback0_7": 7, "operators": [ { "rates0_99": [ 56, 33, 40, 47 ], "levels0_99": [ 99, 87, 89, 0 ], "detune_7_7": 3, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 79, 68, 62, 40 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": -2, "volumeLevel0_99": 78, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 48, 33, 40, 47 ], "levels0_99": [ 99, 87, 89, 0 ], "detune_7_7": 3, "volumeLevel0_99": 96, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 79, 68, 62, 40 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 0, "volumeLevel0_99": 73, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 46, 60, 40, 40 ], "levels0_99": [ 87, 87, 93, 0 ], "detune_7_7": 0, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 94, 31, 98, 20 ], "levels0_99": [ 98, 1, 78, 0 ], "detune_7_7": -3, "volumeLevel0_99": 68, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 1 } ], "name": "STRINGS 7/ROM2A.SYX", "lfoPitchModDepth0_99": 15, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 2, "feedback0_7": 7, "operators": [ { "rates0_99": [ 62, 70, 20, 54 ], "levels0_99": [ 99, 97, 95, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 53, 46, 60, 53 ], "levels0_99": [ 98, 95, 95, 0 ], "detune_7_7": -7, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 62, 70, 20, 54 ], "levels0_99": [ 99, 92, 84, 0 ], "detune_7_7": 4, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 53, 13, 60, 53 ], "levels0_99": [ 98, 80, 85, 0 ], "detune_7_7": -2, "volumeLevel0_99": 84, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 53, 13, 60, 53 ], "levels0_99": [ 98, 80, 85, 0 ], "detune_7_7": 0, "volumeLevel0_99": 57, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 53, 13, 60, 53 ], "levels0_99": [ 98, 80, 85, 0 ], "detune_7_7": 2, "volumeLevel0_99": 92, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 50, "enabled": true, "velocitySens0_7": 0 } ], "name": "BRASS 5/ROM2A.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 71 }
@@ -85,7 +85,7 @@ let libDX7list: DX7PresetData[] = [
 , { "algorithm1_32": 5, "feedback0_7": 3, "operators": [ { "rates0_99": [ 99, 54, 20, 85 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 99, 54, 20, 85 ], "levels0_99": [ 99, 18, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 63, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 54, 20, 85 ], "levels0_99": [ 99, 7, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 54, 20, 85 ], "levels0_99": [ 89, 49, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 9, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 80, 30, 20, 65 ], "levels0_99": [ 99, 80, 65, 0 ], "detune_7_7": 0, "volumeLevel0_99": 75, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 64, 35, 20, 30 ], "levels0_99": [ 99, 18, 17, 0 ], "detune_7_7": 0, "volumeLevel0_99": 85, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 } ], "name": "3-SPLIT/FORRICK.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 //, { "algorithm1_32": 8, "feedback0_7": 7, "operators": [ { "rates0_99": [ 95, 62, 28, 58 ], "levels0_99": [ 99, 60, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 20, 0, 0 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 80, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 6, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 98, 36, 44, 56 ], "levels0_99": [ 99, 99, 0, 0 ], "detune_7_7": 2, "volumeLevel0_99": 91, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 30, 20, 54 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": -2, "volumeLevel0_99": 78, "constMode0_1": 0, "freqCoarse0_31": 5, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 77, 26, 48 ], "levels0_99": [ 99, 98, 0, 0 ], "detune_7_7": 3, "volumeLevel0_99": 75, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 85, 43, 71 ], "levels0_99": [ 99, 77, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 15, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 } ], "name": "BANJO/GUITAR1.SYX", "lfoPitchModDepth0_99": 1, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 10, "feedback0_7": 4, "operators": [ { "rates0_99": [ 99, 25, 10, 50 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 63, 0, 25, 0 ], "levels0_99": [ 99, 75, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 86, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 90, 46, 32, 32 ], "levels0_99": [ 99, 44, 37, 91 ], "detune_7_7": 1, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 5, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 99, 47, 68, 64 ], "levels0_99": [ 99, 34, 0, 0 ], "detune_7_7": -1, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 90, 71, 33, 31 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 94, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 78, 71, 58, 36 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 1, "volumeLevel0_99": 78, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 } ], "name": "GUITAR 4/GUITAR1.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
-, { "algorithm1_32": 10, "feedback0_7": 7, "operators": [ { "rates0_99": [ 99, 25, 10, 55 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 63, 0, 25, 0 ], "levels0_99": [ 99, 75, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 90, 46, 25, 25 ], "levels0_99": [ 99, 83, 37, 91 ], "detune_7_7": 1, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 7, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 47, 68, 64 ], "levels0_99": [ 99, 34, 0, 0 ], "detune_7_7": -1, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 90, 71, 33, 31 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 92, 74, 58, 36 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 1, "volumeLevel0_99": 95, "constMode0_1": 0, "freqCoarse0_31": 9, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 } ], "name": "GUITAR 6/GUITAR1.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
+//, { "algorithm1_32": 10, "feedback0_7": 7, "operators": [ { "rates0_99": [ 99, 25, 10, 55 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 63, 0, 25, 0 ], "levels0_99": [ 99, 75, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 87, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 90, 46, 25, 25 ], "levels0_99": [ 99, 83, 37, 91 ], "detune_7_7": 1, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 7, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 47, 68, 64 ], "levels0_99": [ 99, 34, 0, 0 ], "detune_7_7": -1, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 90, 71, 33, 31 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 92, 74, 58, 36 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 1, "volumeLevel0_99": 95, "constMode0_1": 0, "freqCoarse0_31": 9, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 } ], "name": "GUITAR 6/GUITAR1.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 5, "feedback0_7": 7, "operators": [ { "rates0_99": [ 99, 45, 27, 51 ], "levels0_99": [ 99, 99, 0, 0 ], "detune_7_7": 6, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 99, 58, 18, 36 ], "levels0_99": [ 99, 93, 0, 0 ], "detune_7_7": 6, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 99, 62, 24, 50 ], "levels0_99": [ 99, 99, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 99, 45, 6, 50 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": -4, "volumeLevel0_99": 96, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 99, 60, 65, 46 ], "levels0_99": [ 99, 95, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 96, "constMode0_1": 0, "freqCoarse0_31": 13, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [ 99, 99, 76, 59 ], "levels0_99": [ 99, 99, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 96, "constMode0_1": 0, "freqCoarse0_31": 31, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 } ], "name": "PIANOMRMBA/ORTEGA1.SYX", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 19, "feedback0_7": 6, "operators": [ { "rates0_99": [ 66, 25, 30, 30 ], "levels0_99": [ 99, 94, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 69, 46, 99, 12 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": -4, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 95, 50, 44, 10 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 10, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 95, 33, 49, 33 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": -2, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 95, 36, 99, 28 ], "levels0_99": [ 99, 70, 0, 0 ], "detune_7_7": 5, "volumeLevel0_99": 79, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 95, 49, 28, 24 ], "levels0_99": [ 94, 79, 0, 0 ], "detune_7_7": 7, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 15, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 } ], "name": "SliverAple/SynprezFM_19.syx", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 5, "feedback0_7": 0, "operators": [ { "rates0_99": [ 62, 69, 15, 69 ], "levels0_99": [ 23, 97, 79, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 62, 69, 15, 69 ], "levels0_99": [ 23, 97, 76, 0 ], "detune_7_7": 0, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 43, 69, 15, 69 ], "levels0_99": [ 99, 97, 75, 0 ], "detune_7_7": -7, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 1, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 62, 69, 15, 69 ], "levels0_99": [ 23, 97, 79, 0 ], "detune_7_7": 3, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 62, 69, 15, 69 ], "levels0_99": [ 23, 97, 75, 0 ], "detune_7_7": 7, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 69, 15, 69 ], "levels0_99": [ 23, 97, 75, 0 ], "detune_7_7": -7, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 } ], "name": "LEADSYN 1/SYNTHS32.SYX", "lfoPitchModDepth0_99": 53, "lfoAmpModDepth0_99": 0 }
@@ -94,5 +94,1229 @@ let libDX7list: DX7PresetData[] = [
 , { "algorithm1_32": 9, "feedback0_7": 6, "operators": [ { "rates0_99": [ 65, 48, 45, 41 ], "levels0_99": [ 99, 99, 99, 0 ], "detune_7_7": 6, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 50, 26, 9, 36 ], "levels0_99": [ 94, 99, 94, 0 ], "detune_7_7": 7, "volumeLevel0_99": 70, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 64, 40, 23, 42 ], "levels0_99": [ 99, 97, 94, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 70, 27, 16, 39 ], "levels0_99": [ 90, 99, 94, 0 ], "detune_7_7": -6, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 70, 27, 16, 40 ], "levels0_99": [ 90, 99, 95, 0 ], "detune_7_7": 7, "volumeLevel0_99": 65, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 70, 27, 16, 31 ], "levels0_99": [ 90, 99, 94, 0 ], "detune_7_7": -6, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 } ], "name": "Digi Pad \\/vrc110bBo Tomlyn Selection.syx", "lfoPitchModDepth0_99": 11, "lfoAmpModDepth0_99": 0 }
 , { "algorithm1_32": 3, "feedback0_7": 0, "operators": [ { "rates0_99": [ 95, 48, 49, 62 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 95, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 99, 72, 0, 0 ], "levels0_99": [ 82, 48, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 96, "constMode0_1": 0, "freqCoarse0_31": 5, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [ 95, 26, 49, 57 ], "levels0_99": [ 99, 0, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 73, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 1 }, { "rates0_99": [ 95, 33, 49, 57 ], "levels0_99": [ 99, 92, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 75, 0, 8 ], "levels0_99": [ 82, 48, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 93, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 0, 63, 55, 0 ], "levels0_99": [ 78, 78, 0, 0 ], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 13, "enabled": true, "velocitySens0_7": 2 } ], "name": "O-F-SEQ 1/vrc112aLive 64 - Akira Inoue.syx", "lfoPitchModDepth0_99": 99, "lfoAmpModDepth0_99": 99 }
 , { "algorithm1_32": 4, "feedback0_7": 0, "operators": [ { "rates0_99": [ 99, 48, 38, 43 ], "levels0_99": [ 99, 94, 0, 0 ], "detune_7_7": -5, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 5 }, { "rates0_99": [ 99, 51, 11, 24 ], "levels0_99": [ 99, 79, 2, 0 ], "detune_7_7": -4, "volumeLevel0_99": 74, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 99, 48, 20, 39 ], "levels0_99": [ 94, 79, 2, 2 ], "detune_7_7": -2, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 6, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [ 99, 64, 43, 45 ], "levels0_99": [ 99, 94, 0, 0 ], "detune_7_7": 5, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [ 99, 51, 11, 23 ], "levels0_99": [ 99, 79, 2, 0 ], "detune_7_7": 4, "volumeLevel0_99": 72, "constMode0_1": 0, "freqCoarse0_31": 4, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 }, { "rates0_99": [ 99, 55, 19, 37 ], "levels0_99": [ 94, 79, 0, 2 ], "detune_7_7": 6, "volumeLevel0_99": 93, "constMode0_1": 0, "freqCoarse0_31": 8, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 4 } ], "name": "DIGI LOG/vrc112aLive 64 - Akira Inoue.syx", "lfoPitchModDepth0_99": 0, "lfoAmpModDepth0_99": 0 } 
+,{
+    "algorithm1_32": 4,
+    "feedback0_7": 3,
+    "operators": [
+        {
+            "rates0_99": [
+                79,
+                28,
+                24,
+                33
+            ],
+            "levels0_99": [
+                99,
+                30,
+                0,
+                0
+            ],
+            "detune_7_7": -6,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                74,
+                38,
+                17,
+                35
+            ],
+            "levels0_99": [
+                99,
+                95,
+                0,
+                0
+            ],
+            "detune_7_7": 1,
+            "volumeLevel0_99": 74,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 99,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                60,
+                53,
+                22,
+                4
+            ],
+            "levels0_99": [
+                99,
+                91,
+                0,
+                0
+            ],
+            "detune_7_7": -4,
+            "volumeLevel0_99": 85,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 3
+        },
+        {
+            "rates0_99": [
+                80,
+                28,
+                35,
+                35
+            ],
+            "levels0_99": [
+                99,
+                33,
+                0,
+                0
+            ],
+            "detune_7_7": 1,
+            "volumeLevel0_99": 91,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 1,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                69,
+                55,
+                19,
+                35
+            ],
+            "levels0_99": [
+                99,
+                94,
+                0,
+                0
+            ],
+            "detune_7_7": 4,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 3
+        },
+        {
+            "rates0_99": [
+                74,
+                22,
+                22,
+                4
+            ],
+            "levels0_99": [
+                88,
+                1,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 73,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 8,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        }
+    ],
+    "name": "ClasGitar+/BASSEA.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 6,
+    "feedback0_7": 0,
+    "operators": [
+        {
+            "rates0_99": [
+                60,
+                25,
+                25,
+                71
+            ],
+            "levels0_99": [
+                99,
+                99,
+                98,
+                0
+            ],
+            "detune_7_7": 2,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                97,
+                62,
+                54
+            ],
+            "levels0_99": [
+                99,
+                99,
+                90,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                57,
+                97,
+                62,
+                54
+            ],
+            "levels0_99": [
+                99,
+                99,
+                90,
+                0
+            ],
+            "detune_7_7": -2,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                99,
+                25,
+                50
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 77,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                66,
+                99,
+                99,
+                51
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 86,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                99,
+                99,
+                45
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 84,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 4,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        }
+    ],
+    "name": "PIPES 5/CHURCH.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 29,
+    "feedback0_7": 7,
+    "operators": [
+        {
+            "rates0_99": [
+                45,
+                25,
+                25,
+                36
+            ],
+            "levels0_99": [
+                99,
+                99,
+                98,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                97,
+                62,
+                47
+            ],
+            "levels0_99": [
+                99,
+                99,
+                90,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 90,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                97,
+                62,
+                47
+            ],
+            "levels0_99": [
+                99,
+                99,
+                90,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 75,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                61,
+                25,
+                25,
+                50
+            ],
+            "levels0_99": [
+                99,
+                99,
+                97,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 4,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                61,
+                25,
+                25,
+                61
+            ],
+            "levels0_99": [
+                99,
+                99,
+                93,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 97,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                72,
+                25,
+                25,
+                70
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 76,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 10,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        }
+    ],
+    "name": "PIPES 6/CHURCH.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 6,
+    "feedback0_7": 4,
+    "operators": [
+        {
+            "rates0_99": [
+                99,
+                0,
+                7,
+                31
+            ],
+            "levels0_99": [
+                99,
+                99,
+                92,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                68,
+                97,
+                32
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 76,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 1,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                0,
+                7,
+                31
+            ],
+            "levels0_99": [
+                99,
+                99,
+                92,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                68,
+                97,
+                32
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": -7,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 1,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                0,
+                7,
+                31
+            ],
+            "levels0_99": [
+                99,
+                99,
+                92,
+                0
+            ],
+            "detune_7_7": -6,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                11,
+                14,
+                2
+            ],
+            "levels0_99": [
+                99,
+                99,
+                88,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 97,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 1,
+            "enabled": true,
+            "velocitySens0_7": 0
+        }
+    ],
+    "name": "SYNTHYX/DXOC24.SYX",
+    "lfoPitchModDepth0_99": 99,
+    "lfoAmpModDepth0_99": 20
+}
+,
+{
+    "algorithm1_32": 5,
+    "feedback0_7": 7,
+    "operators": [
+        {
+            "rates0_99": [
+                80,
+                35,
+                30,
+                40
+            ],
+            "levels0_99": [
+                95,
+                99,
+                95,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 95,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                50,
+                25,
+                32,
+                40
+            ],
+            "levels0_99": [
+                90,
+                99,
+                40,
+                40
+            ],
+            "detune_7_7": -5,
+            "volumeLevel0_99": 74,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 3,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                75,
+                35,
+                30,
+                40
+            ],
+            "levels0_99": [
+                95,
+                99,
+                80,
+                0
+            ],
+            "detune_7_7": 2,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                80,
+                35,
+                30,
+                40
+            ],
+            "levels0_99": [
+                99,
+                95,
+                95,
+                0
+            ],
+            "detune_7_7": 2,
+            "volumeLevel0_99": 90,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 3,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                7,
+                35,
+                30,
+                40
+            ],
+            "levels0_99": [
+                95,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": -5,
+            "volumeLevel0_99": 70,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                70,
+                53,
+                30,
+                28
+            ],
+            "levels0_99": [
+                90,
+                85,
+                85,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 1,
+            "freqCoarse0_31": 3,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        }
+    ],
+    "name": "Marvin/MAGAZINE.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 18,
+    "feedback0_7": 7,
+    "operators": [
+        {
+            "rates0_99": [
+                95,
+                62,
+                17,
+                58
+            ],
+            "levels0_99": [
+                99,
+                95,
+                32,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                20,
+                0,
+                0
+            ],
+            "levels0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 84,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                88,
+                96,
+                32,
+                30
+            ],
+            "levels0_99": [
+                79,
+                65,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 68,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                90,
+                42,
+                7,
+                55
+            ],
+            "levels0_99": [
+                90,
+                30,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 62,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 5,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "levels0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 68,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                94,
+                56,
+                24,
+                55
+            ],
+            "levels0_99": [
+                93,
+                28,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 65,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 4,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        }
+    ],
+    "name": "BASSdb3/ATSU_4.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 18,
+    "feedback0_7": 7,
+    "operators": [
+        {
+            "rates0_99": [
+                95,
+                62,
+                17,
+                58
+            ],
+            "levels0_99": [
+                99,
+                95,
+                32,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                20,
+                0,
+                0
+            ],
+            "levels0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                88,
+                96,
+                32,
+                30
+            ],
+            "levels0_99": [
+                79,
+                65,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 95,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                90,
+                42,
+                7,
+                55
+            ],
+            "levels0_99": [
+                90,
+                30,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 81,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 5,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "levels0_99": [
+                99,
+                0,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 57,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                94,
+                56,
+                24,
+                55
+            ],
+            "levels0_99": [
+                93,
+                28,
+                0,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        }
+    ],
+    "name": "DBBASS  1/ATSU_5.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 3,
+    "feedback0_7": 0,
+    "operators": [
+        {
+            "rates0_99": [
+                91,
+                32,
+                28,
+                49
+            ],
+            "levels0_99": [
+                99,
+                93,
+                0,
+                0
+            ],
+            "detune_7_7": -4,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 3
+        },
+        {
+            "rates0_99": [
+                75,
+                21,
+                27,
+                72
+            ],
+            "levels0_99": [
+                91,
+                90,
+                0,
+                0
+            ],
+            "detune_7_7": -4,
+            "volumeLevel0_99": 83,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        },
+        {
+            "rates0_99": [
+                95,
+                30,
+                27,
+                72
+            ],
+            "levels0_99": [
+                83,
+                77,
+                0,
+                0
+            ],
+            "detune_7_7": -3,
+            "volumeLevel0_99": 54,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 7
+        },
+        {
+            "rates0_99": [
+                90,
+                84,
+                28,
+                55
+            ],
+            "levels0_99": [
+                99,
+                97,
+                0,
+                0
+            ],
+            "detune_7_7": -5,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 4
+        },
+        {
+            "rates0_99": [
+                98,
+                79,
+                43,
+                2
+            ],
+            "levels0_99": [
+                91,
+                90,
+                0,
+                0
+            ],
+            "detune_7_7": -5,
+            "volumeLevel0_99": 12,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 11,
+            "freqFine0_99": 64,
+            "enabled": true,
+            "velocitySens0_7": 7
+        },
+        {
+            "rates0_99": [
+                90,
+                58,
+                28,
+                52
+            ],
+            "levels0_99": [
+                89,
+                99,
+                0,
+                0
+            ],
+            "detune_7_7": -1,
+            "volumeLevel0_99": 88,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 7
+        }
+    ],
+    "name": "Bass Guitr/BANK01.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 0
+}
+,
+{
+    "algorithm1_32": 9,
+    "feedback0_7": 6,
+    "operators": [
+        {
+            "rates0_99": [
+                65,
+                99,
+                99,
+                41
+            ],
+            "levels0_99": [
+                99,
+                99,
+                99,
+                0
+            ],
+            "detune_7_7": 6,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                50,
+                26,
+                9,
+                36
+            ],
+            "levels0_99": [
+                94,
+                99,
+                94,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 86,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                64,
+                40,
+                23,
+                42
+            ],
+            "levels0_99": [
+                99,
+                97,
+                94,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                70,
+                27,
+                16,
+                39
+            ],
+            "levels0_99": [
+                90,
+                99,
+                94,
+                0
+            ],
+            "detune_7_7": -6,
+            "volumeLevel0_99": 82,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                70,
+                27,
+                16,
+                40
+            ],
+            "levels0_99": [
+                90,
+                99,
+                95,
+                0
+            ],
+            "detune_7_7": 7,
+            "volumeLevel0_99": 65,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                53,
+                27,
+                16,
+                31
+            ],
+            "levels0_99": [
+                90,
+                99,
+                94,
+                0
+            ],
+            "detune_7_7": -6,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        }
+    ],
+    "name": "MOOG-52  1/DXMIK2.SYX",
+    "lfoPitchModDepth0_99": 11,
+    "lfoAmpModDepth0_99": 0
+}
+
 ]; 
 

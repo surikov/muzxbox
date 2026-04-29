@@ -8,8 +8,45 @@
 </head>
 
 <body>
-	<h1>Plugin not found</h1>
-
+	<h1>&nbsp;</h1>
+	<h1>Plugin loading...</h1>
+	<script>
+		let idx = localStorage.getItem('uicolortheme');
+		if (idx) {
+			let cssPath = '../theme/colordarkred.css';
+			if (idx == 'green1') {
+				cssPath = '../theme/colordarkgreen.css';
+			}
+			if (idx == 'red1') {
+				cssPath = '../theme/colordarkred.css';
+			}
+			if (idx == 'neon1') {
+				cssPath = '../theme/colorneon.css';
+			}
+			if (idx == 'light1') {
+				cssPath = '../theme/colorlight.css';
+			}
+			if (idx == 'light2') {
+				cssPath = '../theme/colorwhite.css';
+			}
+			if (idx == 'blue1') {
+				cssPath = '../theme/colordarkblue.css';
+			}
+			if (idx == 'light3') {
+				cssPath = '../theme/colorbirch.css';
+			}
+			//console.log('cssPath',cssPath);
+			//startLoadCSSfile(cssPath);
+			var head = document.getElementsByTagName('head')[0];
+			var link = document.createElement('link');
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = cssPath;
+			link.media = 'all';
+			head.appendChild(link);
+			console.log('set',link);
+		}
+	</script>
 </body>
 
 </html>
