@@ -5,6 +5,9 @@
 	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 	<link rel="stylesheet" type="text/css" href="theme/midiru.css">
 	<script type='text/javascript' src='./js/midiru.js'></script>
+	<script type='text/javascript' src='https://mzxbox.ru/minium/js/mzxbx.js'></script>
+	<script type='text/javascript' src='https://mzxbox.ru/minium/js/mzxbxlib.js'></script>
+	<script type='text/javascript' src='https://mzxbox.ru/minium/plugins/catalog.js'></script>
 	<title>MIDI.ru Archive</title>
 </head>
 
@@ -33,13 +36,13 @@
 		<div class="itemslist">
 			<div class="fileinfo">
 				<div class='fileplay'>
-<!-- 
+					<!-- 
 					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/check-circle-svgrepo-com.svg" /></a>
 					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/pause-circle-svgrepo-com.svg" /></a>
 					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/play-circle-svgrepo-com.svg" /></a>
 					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/download-svgrepo-com.svg" /></a>
 -->
-					<a href='javascript:startload();'><img class='buttonplay' src="theme/img/arrow-down-circle-svgrepo-com.svg" /></a>
+					<a href='javascript:plr.startLoad();'><img class='buttonplay' src="theme/img/arrow-down-circle-svgrepo-com.svg" /></a>
 				</div>
 				<div class="fileinforows">
 					<?php
@@ -88,7 +91,7 @@
 							$munote = str_replace("\n", "<br/>", $munote);
 							$munote = str_replace("\r", "<br/>", $munote);
 							$munote = str_replace("<br/><br/>", "<br/>", $munote);
-							$fileurl='../midi/midiru-archive-2022-02-25/music_files/'.$file.'.mid';
+							$fileurl = '../midi/midiru-archive-2022-02-25/music_files/' . $file . '.mid';
 					?>
 
 							<p><?php echo ($row["date"]); ?></p>
@@ -122,9 +125,9 @@
 				</div>
 			</div>
 			<div class='player'>
-				<div><a href='javascript:startload();'><img class='buttonplay' src="theme/img/play-circle-svgrepo-com.svg" /></a></div>
-				<div><input type='range' class='timelinerange' min=0 max=100 value=90 step=10 /></div>
-				<div><input type='range' id='timeline2' min=0 max=100 value=90 step=10 /></div>
+				<div><a href='javascript:plr.startPlay();'><img class='buttonplay' src="theme/img/play-circle-svgrepo-com.svg" /></a></div>
+				<div class='playpos'><input onchange='plr.jumpPos(this.value);' type='range' class='timelinerange' min=0 max=100 value=0 step=10 /></div>
+
 			</div>
 			<div class="itemslist">
 				<div class="itemscolumn">
@@ -170,5 +173,9 @@
 		</div>
 	</div>
 </body>
+<script>
+	let plr = new InMIDI();
+	plr.loadFromFileURL();
+</script>
 
 </html>

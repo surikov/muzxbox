@@ -42,21 +42,25 @@ h2 {
 	margin: 0cm;
 	font-weight: normal;
 }
-pre{
-	max-width:100%;
+
+pre {
+	max-width: 100%;
 	white-space77: wrap-line;
 	overflow-wrap: break-word;
 }
-.listtitle{
+
+.listtitle {
 	font-size: 0.5cm;
 	text-align: center;
 	margin-top: 0.5cm;
 	margin-bottom: 0.5cm;
 }
-.listtitle > a{
+
+.listtitle>a {
 
 	color: var(--page-link-color);
 }
+
 .buttonplay {
 	width: 1cm;
 	height: 1cm;
@@ -125,13 +129,13 @@ pre{
 	padding-bottom: 0;
 	padding-right: 0.25cm;
 	text-align: center;
-	max-width:100%;
+	max-width: 100%;
 }
 
 .itemscolumn {
 	text-align: left;
 	display: inline-block;
-	max-width:100%;
+	max-width: 100%;
 }
 
 .singleitem {
@@ -142,7 +146,7 @@ pre{
 
 .itemsmallinfo {
 	font-size: 0.35cm;
-	max-width:100%;
+	max-width: 100%;
 }
 
 .itemsmallline {
@@ -216,7 +220,7 @@ pre{
 
 .timelinerange {
 	color: #c30;
-	--thumb-height: 1cm;
+	--thumb-height: 0.75cm;
 	--track-height: 0.05cm;
 	--track-color: rgba(0, 0, 0, 0.2);
 	--brightness-hover2: 180%;
@@ -229,7 +233,7 @@ pre{
 
 
 
-.timelinerange{
+.timelinerange {
 	position: relative;
 	background: #00ff0000;
 	overflow: hidden;
@@ -257,36 +261,38 @@ pre{
 	--clip-top: calc((var(--thumb-height) - var(--track-height)) * 0.5 - 0.5px);
 	--clip-bottom: calc(var(--thumb-height) - var(--clip-top));
 	--clip-further: calc(100% + 1px);
-	--box-fill: calc(-100vmax - var(--thumb-width, var(--thumb-height))) 0 0
-		100vmax currentColor;
+	--box-fill: calc(-100vmax - var(--thumb-width, var(--thumb-height))) 0 0 100vmax currentColor;
 
 	width: var(--thumb-width, var(--thumb-height));
-	background: linear-gradient(currentColor 0 0) scroll no-repeat left center /
-		50% calc(var(--track-height) + 1px);
+	background: linear-gradient(currentColor 0 0) scroll no-repeat left center / 50% calc(var(--track-height) + 1px);
 	background-color: currentColor;
 	box-shadow: var(--box-fill);
 	border-radius: var(--thumb-width, var(--thumb-height));
 
 	filter: brightness(100%);
-	clip-path: polygon(
-		100% -1px,
-		var(--clip-edges) -1px,
-		0 var(--clip-top),
-		-100vmax var(--clip-top),
-		-100vmax var(--clip-bottom),
-		0 var(--clip-bottom),
-		var(--clip-edges) 100%,
-		var(--clip-further) var(--clip-further)
-	);
+	clip-path: polygon(100% -1px,
+			var(--clip-edges) -1px,
+			0 var(--clip-top),
+			-100vmax var(--clip-top),
+			-100vmax var(--clip-bottom),
+			0 var(--clip-bottom),
+			var(--clip-edges) 100%,
+			var(--clip-further) var(--clip-further));
 }
 
 
 
 .timelinerange::-webkit-slider-runnable-track {
-	background: linear-gradient(var(--track-color) 0 0) scroll no-repeat center /
-		100% calc(var(--track-height) + 1px);
+	background: linear-gradient(var(--track-color) 0 0) scroll no-repeat center / 100% calc(var(--track-height) + 1px);
 }
 
 
-
-
+.player {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items:center;
+}
+.playpos{
+	flex-grow: 1;
+}
