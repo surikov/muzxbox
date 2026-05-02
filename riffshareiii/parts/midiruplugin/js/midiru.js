@@ -2251,6 +2251,9 @@ class InMIDI {
         this.player = null;
         this.parsedProject = testminium;
         this.audioContext = null;
+        this.duration = 0;
+        this.position = 0;
+        this.tick = 0;
         console.log('init');
     }
     startLoad() {
@@ -2271,10 +2274,12 @@ class InMIDI {
         this.initContext();
         let me = this;
         if (this.player) {
+            this.player.cancel();
         }
         else {
+            this.slider = document.getElementById('slider');
             this.player = createSchedulePlayer((start, position, end) => {
-                console.log('player', start, position, end);
+                me.updatePos(position);
             });
         }
         if (me.parsedProject) {
@@ -2283,23 +2288,41 @@ class InMIDI {
             if (me.audioContext) {
                 let result = this.player.startSetupPlugins(me.audioContext, raw);
                 if (result) {
-                    alert(result);
+                    setTimeout(() => {
+                        me.startPlay();
+                    }, 500);
+                    console.log('startSetupPlugins', result);
                 }
                 else {
-                    let to = 0;
+                    this.duration = 0;
                     for (let nn = 0; nn < raw.series.length; nn++) {
-                        to = to + raw.series[nn].duration;
+                        this.duration = this.duration + raw.series[nn].duration;
                     }
-                    let msg = this.player.startLoopTicks(0, 0, to);
+                    console.log('start', 0, this.duration * this.position / 100, this.duration);
+                    let msg = this.player.startLoopTicks(0, this.duration * this.position / 100, this.duration);
                     if (msg) {
-                        alert(msg);
+                        setTimeout(() => {
+                            me.startPlay();
+                        }, 500);
+                        console.log('startLoopTicks', msg);
                     }
                 }
             }
         }
     }
+    updatePos(nn) {
+        if (this.slider) {
+            if (this.tick != Math.round(100 * nn / this.duration)) {
+                this.tick = Math.round(100 * nn / this.duration);
+                this.slider.value = this.tick;
+            }
+        }
+    }
     jumpPos(vv) {
-        console.log('jumpPos', vv);
+        if (this.tick != 1 * vv) {
+            this.position = vv;
+            this.startPlay();
+        }
     }
     loadFromFileURL() {
         console.log(this.parsedProject);

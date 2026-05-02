@@ -691,10 +691,15 @@ declare class InMIDI {
     player: MZXBX_Player | null;
     parsedProject: Zvoog_Project | null;
     audioContext: AudioContext | null;
+    duration: number;
+    position: number;
+    tick: number;
+    slider: any;
     constructor();
     startLoad(): void;
     initContext(): void;
     startPlay(): void;
+    updatePos(nn: number): void;
     jumpPos(vv: any): void;
     loadFromFileURL(): void;
     loadFromArray(arrayBuffer: ArrayBuffer, filetitle: string | null): void;

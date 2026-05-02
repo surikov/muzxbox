@@ -131,7 +131,7 @@
 			</div>
 			<div class='player'>
 				<div><a href='javascript:plr.startPlay();'><img class='buttonplay' src="theme/img/play-circle-svgrepo-com.svg" /></a></div>
-				<div class='playpos'><input onchange='plr.jumpPos(this.value);' type='range' class='timelinerange' min=0 max=100 value=0 step=10 /></div>
+				<div class='playpos'><input onchange='plr.jumpPos(this.value);' id='slider' type='range' class='timelinerange' min=0 max=100 value=0 step=1 /></div>
 
 			</div>
 			<div class="itemslist">

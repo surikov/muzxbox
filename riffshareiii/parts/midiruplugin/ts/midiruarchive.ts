@@ -4,6 +4,10 @@ class InMIDI {
 	player: MZXBX_Player | null = null;
 	parsedProject: Zvoog_Project | null = testminium;
 	audioContext: AudioContext | null = null;
+	duration: number = 0;
+	position = 0;
+	tick = 0;
+	slider;
 	constructor() {
 		console.log('init');
 	}
@@ -25,10 +29,12 @@ class InMIDI {
 		this.initContext();
 		let me = this;
 		if (this.player) {
-			//
+			this.player.cancel();
 		} else {
+			this.slider = document.getElementById('slider');
 			this.player = createSchedulePlayer((start: number, position: number, end: number) => {
-				console.log('player', start, position, end);
+				//console.log('player', start, position, end);
+				me.updatePos(position);
 			});
 		}
 
@@ -40,23 +46,53 @@ class InMIDI {
 				let result = this.player.startSetupPlugins(me.audioContext, raw);
 				//console.log('loading result', result);
 				if (result) {
-					alert(result);
+					setTimeout(() => {
+						me.startPlay();
+					}, 500);
+					console.log('startSetupPlugins', result);
 				} else {
-					let to = 0;
+
+					this.duration = 0;
 					for (let nn = 0; nn < raw.series.length; nn++) {
-						to = to + raw.series[nn].duration;
+						this.duration = this.duration + raw.series[nn].duration;
 					}
-					let msg: string = this.player.startLoopTicks(0, 0, to);
+					console.log('start', 0, this.duration * this.position / 100, this.duration);
+					let msg: string = this.player.startLoopTicks(0, this.duration * this.position / 100, this.duration);
 					if (msg) {
-						alert(msg);
+						setTimeout(() => {
+							me.startPlay();
+						}, 500);
+						console.log('startLoopTicks', msg);
 					}
 				}
 			}
 			//}
 		}
 	}
+	updatePos(nn: number) {
+		if (this.slider) {
+			if (this.tick != Math.round(100 * nn / this.duration)) {
+				this.tick = Math.round(100 * nn / this.duration);
+				//console.log('set', this.tick, nn, this.duration);
+				this.slider.value = this.tick;
+			}
+		}
+	}
 	jumpPos(vv) {
-		console.log('jumpPos', vv);
+		//console.log('jumpPos', 1 * vv);
+		if (this.tick != 1 * vv) {
+			//console.log('restart');
+			this.position = vv;
+			this.startPlay();
+		}
+		/*
+				if (this.player) {
+					this.player.cancel();
+				}*/
+
+		//this.duration * vv / 100;
+		//console.log('jump', this.position);
+
 	}
 	loadFromFileURL() {
 		console.log(this.parsedProject);
