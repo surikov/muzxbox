@@ -23,21 +23,36 @@ class InMIDI {
 	startPlay() {
 		console.log('startPlay');
 		this.initContext();
+		let me = this;
 		if (this.player) {
 			//
 		} else {
-			let me = this;
 			this.player = createSchedulePlayer((start: number, position: number, end: number) => {
 				console.log('player', start, position, end);
 			});
-			if (me.parsedProject) {
-				let raw = me.renderCurrentProjectForOutput(me.parsedProject);
-				console.log('rendered', raw);
-				if (me.audioContext) {
-					let result = this.player.startSetupPlugins(me.audioContext, raw);
-					console.log('loading result', result);
+		}
+
+
+		if (me.parsedProject) {
+			let raw = me.renderCurrentProjectForOutput(me.parsedProject);
+			console.log('rendered', raw);
+			if (me.audioContext) {
+				let result = this.player.startSetupPlugins(me.audioContext, raw);
+				//console.log('loading result', result);
+				if (result) {
+					alert(result);
+				} else {
+					let to = 0;
+					for (let nn = 0; nn < raw.series.length; nn++) {
+						to = to + raw.series[nn].duration;
+					}
+					let msg: string = this.player.startLoopTicks(0, 0, to);
+					if (msg) {
+						alert(msg);
+					}
 				}
 			}
+			//}
 		}
 	}
 	jumpPos(vv) {

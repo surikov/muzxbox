@@ -1,6 +1,7 @@
 <?php
 //include('../minium/dbcfg/dbcfgdata.php');
-include('D://projects/muzxbox/riffshareiii/parts/exe/dbcfg/dbcfgdata.php');
+//include('D://projects/muzxbox/riffshareiii/parts/exe/dbcfg/dbcfgdata.php');
+include('/home/sss/Documents/GitHub/muzxbox/riffshareiii/parts/exe/dbcfg/dbcfgdata.php');
 function shutDownFunction()
 {
 	$error = error_get_last();

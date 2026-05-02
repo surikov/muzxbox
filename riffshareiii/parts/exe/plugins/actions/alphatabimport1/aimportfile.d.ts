@@ -296,10 +296,10 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
-declare function allPercussionDrumTitles(): string[];
-declare let drumKeysArrayPercussionPaths: string[];
-declare class ChordPitchPerformerUtil {
+declare function firstDrumKeysArrayPercussionPathsMIDI(midi: number): number;
+declare let drumKeysArrayPercussionPathsMIDI: string[];
+declare function allPercussionDrumTitlesMIDI(): string[];
+declare class ChordPitchPerformerUtilMIDI {
     checkParameters(parameters: string): {
         loudness: number;
         idx: number;
@@ -2793,7 +2793,7 @@ declare class AlphaTabImportMusicPlugin {
     loadMusicfile(inputFile: any): void;
 }
 declare class FileLoaderAlpha {
-    inames: ChordPitchPerformerUtil;
+    inames: ChordPitchPerformerUtilMIDI;
     constructor(inputFile: any);
     convertScore2Project(score: Score): void;
     addRepeats(project: Zvoog_Project, score: Score): void;

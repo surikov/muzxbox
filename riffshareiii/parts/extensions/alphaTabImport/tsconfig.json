@@ -41,9 +41,9 @@
 		
         "../../mzxbxapi/musicenginetypes.ts"
 		,"../../mzxbxapi/musicenginedeclarations.ts"
-		,"../minium.percussion/list/names.ts"
-		,"../minium.pitch/list/names.ts"
-
+		//,"../minium.percussion/list/names.ts"
+		//,"../minium.pitch/list/names.ts"
+,"midiimport/typesmidi.ts"
 		,"./alphatab/AlphaTabError.ts"
 		,"./alphatab/FormatError.ts"
 		,"./alphatab/CoreSettings.ts"

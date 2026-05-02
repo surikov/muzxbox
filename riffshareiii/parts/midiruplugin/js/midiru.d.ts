@@ -296,19 +296,6 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare function firstDrumKeysArrayPercussionPaths(midi: number): number;
-declare function allPercussionDrumTitles(): string[];
-declare let drumKeysArrayPercussionPaths: string[];
-declare class ChordPitchPerformerUtil {
-    checkParameters(parameters: string): {
-        loudness: number;
-        idx: number;
-        mode: 0 | 1 | 2 | 3 | 4;
-    };
-    dumpParameters(loudness: number, idx: number, mode: number): string;
-    tonechordinslist(): string[];
-    tonechordinstrumentKeys(): string[];
-}
 declare enum AlphaTabErrorType {
     General = 0,
     Format = 1,
@@ -684,6 +671,19 @@ declare class EventsConverter {
         value: number;
         channel: number;
     }[]): number;
+}
+declare function firstDrumKeysArrayPercussionPathsMIDI(midi: number): number;
+declare let drumKeysArrayPercussionPathsMIDI: string[];
+declare function allPercussionDrumTitlesMIDI(): string[];
+declare class ChordPitchPerformerUtilMIDI {
+    checkParameters(parameters: string): {
+        loudness: number;
+        idx: number;
+        mode: 0 | 1 | 2 | 3 | 4;
+    };
+    dumpParameters(loudness: number, idx: number, mode: number): string;
+    tonechordinslist(): string[];
+    tonechordinstrumentKeys(): string[];
 }
 declare let testminium: Zvoog_Project;
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;

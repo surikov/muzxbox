@@ -5,9 +5,14 @@
 	<meta name="viewport" content="initial-scale=1.0, width=device-width, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no" />
 	<link rel="stylesheet" type="text/css" href="theme/midiru.css">
 	<script type='text/javascript' src='./js/midiru.js'></script>
+<!--	
 	<script type='text/javascript' src='https://mzxbox.ru/minium/js/mzxbx.js'></script>
 	<script type='text/javascript' src='https://mzxbox.ru/minium/js/mzxbxlib.js'></script>
 	<script type='text/javascript' src='https://mzxbox.ru/minium/plugins/catalog.js'></script>
+-->
+	<script type='text/javascript' src='http://127.0.0.1:8080/exe/js/mzxbx.js'></script>
+	<script type='text/javascript' src='http://127.0.0.1:8080/exe/js/mzxbxlib.js'></script>
+	<script type='text/javascript' src='http://127.0.0.1:8080/exe/plugins/catalog.js'></script>
 	<title>MIDI.ru Archive</title>
 </head>
 
@@ -176,6 +181,7 @@
 <script>
 	let plr = new InMIDI();
 	plr.loadFromFileURL();
+	console.log('drumKeysArrayPercussionPaths',drumKeysArrayPercussionPaths);
 </script>
 
 </html>

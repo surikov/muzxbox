@@ -4,13 +4,17 @@ class PluginLoader {
 
 		for (let ff = 0; ff < schedule.filters.length; ff++) {
 			let filter: MZXBX_Filter = schedule.filters[ff];
+			//console.log('collectFilterPlugin',filter.id);
 			this.collectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
 		}
+		
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			//let chanid = schedule.channels[ch].id;
+			//console.log('collectPerformerPlugin',schedule.channels[ch]);
 			this.collectPerformerPlugin(schedule.channels[ch], performer.kind, performer.properties, performer.description, allperformers);
 		}
+		//console.log('startLoadCollectedPlugins',allfilters, allperformers);
 		let result = this.startLoadCollectedPlugins(allfilters, allperformers);
 		//afterStart();
 		return result;
@@ -46,17 +50,18 @@ class PluginLoader {
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
-			//console.log(info);
+			console.log('startLoadPluginStarter',info.kind,info.script);
 			MZXBX_appendScriptURL(info.script);
 			MZXBX_waitForCondition(250
 				, () => {
-					//console.log('check evaluate',Math.random(),info);
+					//console.log('check evaluate',info);
 					return (window[info.evaluate]);
 				}
 				, () => {
 					//console.log('exe',info);
 					let exe = window[info.evaluate];
 					let plugin = exe();
+					//console.log('plugin',plugin);
 					if (plugin) {
 						onDone(plugin);
 						this.startLoadCollectedPlugins(filters, performers);

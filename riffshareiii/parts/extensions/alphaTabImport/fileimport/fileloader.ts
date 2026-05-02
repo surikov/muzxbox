@@ -1,5 +1,5 @@
 class FileLoaderAlpha {
-	inames: ChordPitchPerformerUtil = new ChordPitchPerformerUtil();
+	inames: ChordPitchPerformerUtilMIDI = new ChordPitchPerformerUtilMIDI();
 
 	constructor(inputFile) {
 		var file = inputFile.files[0];
@@ -369,7 +369,7 @@ class FileLoaderAlpha {
 	}
 	findVolumeInstrument(program: number): { idx: number, ratio: number } {
 		let re = { idx: 0, ratio: 0.7 };
-		let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		let instrs = new ChordPitchPerformerUtilMIDI().tonechordinstrumentKeys();
 		for (var i = 0; i < instrs.length; i++) {
 			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
 				re.idx = i;
@@ -777,7 +777,7 @@ class FileLoaderAlpha {
 			//
 		} else {
 			//console.log(title, drumNum);
-			let idx = firstDrumKeysArrayPercussionPaths(drumNum);
+			let idx = firstDrumKeysArrayPercussionPathsMIDI(drumNum);
 			let track: Zvoog_PercussionTrack = {
 				title: title
 				, measures: []
@@ -800,7 +800,7 @@ class FileLoaderAlpha {
 			}
 			trackDrums[drumNum] = track;
 		}
-		trackDrums[drumNum].title = title + ': ' + allPercussionDrumTitles()[drumNum];
+		trackDrums[drumNum].title = title + ': ' + allPercussionDrumTitlesMIDI()[drumNum];
 		return trackDrums[drumNum];
 	}
 }

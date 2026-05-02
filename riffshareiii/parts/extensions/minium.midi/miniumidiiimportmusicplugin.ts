@@ -20,6 +20,7 @@ class MINIUMIDIIImportMusicPlugin {
 				dialogID: this.callbackID
 				, pluginData: this.parsedProject
 				, done: true
+				, screenWait: false
 			};
 			window.parent.postMessage(oo, '*');
 		} else {
@@ -53,19 +54,19 @@ class MINIUMIDIIImportMusicPlugin {
 					console.log(xx);
 				}
 				let comment: string = ', ' + file.size / 1000 + 'kb, ' + dat;
-				var arrayBuffer :ArrayBuffer= progressEvent.target.result as ArrayBuffer;
-/*
-				var midiParser = newMIDIparser2(arrayBuffer);
-				console.log('done midiParser', midiParser);
-				dumpStat(midiParser);
-				//me.parsedProject = midiParser.convertProject(title, comment);
-				let cnvrtr: MIDIConverter = new MIDIConverter();
-
-				let midiSongData: MIDISongData = cnvrtr.convertProject(midiParser);
-				console.log('done midiSongData', midiSongData);
-				let proj = new Projectr();
-				me.parsedProject = proj.readProject(midiSongData, title, comment);
-				*/
+				var arrayBuffer: ArrayBuffer = progressEvent.target.result as ArrayBuffer;
+				/*
+								var midiParser = newMIDIparser2(arrayBuffer);
+								console.log('done midiParser', midiParser);
+								dumpStat(midiParser);
+								//me.parsedProject = midiParser.convertProject(title, comment);
+								let cnvrtr: MIDIConverter = new MIDIConverter();
+				
+								let midiSongData: MIDISongData = cnvrtr.convertProject(midiParser);
+								console.log('done midiSongData', midiSongData);
+								let proj = new Projectr();
+								me.parsedProject = proj.readProject(midiSongData, title, comment);
+								*/
 				let proj = new Projectr();
 				me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
 				console.log('done zproject', me.parsedProject);
@@ -86,6 +87,6 @@ class MINIUMIDIIImportMusicPlugin {
 
 }
 
-function newMIDIparser2(arrayBuffer: ArrayBuffer):MidiParser {
+function newMIDIparser2(arrayBuffer: ArrayBuffer): MidiParser {
 	return new MidiParser(arrayBuffer);
 }

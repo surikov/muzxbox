@@ -26,8 +26,8 @@
 	"files": [
 		"../../mzxbxapi/musicenginetypes.ts",
 		"../../mzxbxapi/musicenginedeclarations.ts",
-		"../../extensions/minium.percussion/list/names.ts",
-		"../../extensions/minium.pitch/list/names.ts",
+		//"../../extensions/minium.percussion/list/names.ts",
+		//"../../extensions/minium.pitch/list/names.ts",
 		"../../extensions/alphaTabImport/alphatab/AlphaTabError.ts",
 		"../../extensions/alphaTabImport/midiimport/MIDIEvent.ts",
 		"../../extensions/alphaTabImport/midiimport/MIDIParser.ts",
@@ -36,6 +36,7 @@
 		"../../extensions/alphaTabImport/midiimport/DataViewStream.ts",
 		"../../extensions/alphaTabImport/midiimport/midiimport.ts",
 		"../../extensions/alphaTabImport/midiimport/eventsconvert.ts",
+		"../../extensions/alphaTabImport/midiimport/typesmidi.ts",
 		"testminium.ts",
 		"midiruarchive.ts"
 	]

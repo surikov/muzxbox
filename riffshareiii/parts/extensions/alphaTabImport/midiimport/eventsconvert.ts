@@ -349,7 +349,7 @@ class EventsConverter {
 				program: program
 				, ratio: 0
 
-				, title: new ChordPitchPerformerUtil().tonechordinslist()[program]
+				, title: new ChordPitchPerformerUtilMIDI().tonechordinslist()[program]
 				, singlCount: singles.length
 				, chordCount: chords.length
 				, singleDuration: Math.round(snglDur)
@@ -382,7 +382,7 @@ class EventsConverter {
 				, count: allNotes
 					.filter((it) => it.channelidx == 9 && it.basePitch == pitch)
 					.reduce((last, it) => last + 1, 0)
-				, title: allPercussionDrumTitles()[pitch]
+				, title: allPercussionDrumTitlesMIDI()[pitch]
 				, ratio: 0
 				, baravg: 0
 			};
@@ -435,7 +435,7 @@ class EventsConverter {
 					}
 				}
 				let title = '' + this.midiFileInfo.tracks[tt].program;
-				let path = new ChordPitchPerformerUtil().tonechordinslist()[this.midiFileInfo.tracks[tt].program];
+				let path = new ChordPitchPerformerUtilMIDI().tonechordinslist()[this.midiFileInfo.tracks[tt].program];
 				if (path) {
 					let parts = path.split(':');
 					title = path.split(':')[1].trim();
@@ -688,7 +688,7 @@ class EventsConverter {
 			let drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
 
 			let insOut: string[] = [compresID];
-			let perTrackTitle = '' + parsedMIDItrack.trackTitle + ': ' + allPercussionDrumTitles()[allPercussions[ii].midiPitch];
+			let perTrackTitle = '' + parsedMIDItrack.trackTitle + ': ' + allPercussionDrumTitlesMIDI()[allPercussions[ii].midiPitch];
 			//if (parsedMIDItrack.trackVolumePoints.length > 1) {
 			if (this.hasVolumeAutomation(parsedMIDItrack.trackVolumePoints)) {
 				let filterID = '';
@@ -822,7 +822,7 @@ class EventsConverter {
 			let idxRatio = this.findVolumeInstrument(midiProgram);
 			//let volumeRatio = idxRatio.ratio;
 			let iidx = idxRatio.idx;
-			let intitle = '' + parsedMIDItrack.trackTitle + ': ' + new ChordPitchPerformerUtil().tonechordinslist()[midiProgram];
+			let intitle = '' + parsedMIDItrack.trackTitle + ': ' + new ChordPitchPerformerUtilMIDI().tonechordinslist()[midiProgram];
 			let imode = this.findModeInstrument(midiProgram);//Flat / Down / Up / Snap / Pong
 			let insData = '100/' + iidx + '/' + imode;
 			let insOut: string[] = [compresID];
@@ -1033,8 +1033,8 @@ class EventsConverter {
 
 		let re = { idx: 0, ratio: 1 };
 		let pre = '' + midi;
-		for (let nn = 0; nn < drumKeysArrayPercussionPaths.length; nn++) {
-			if (drumKeysArrayPercussionPaths[nn].startsWith(pre)) {
+		for (let nn = 0; nn < drumKeysArrayPercussionPathsMIDI.length; nn++) {
+			if (drumKeysArrayPercussionPathsMIDI[nn].startsWith(pre)) {
 				re.idx = nn;
 				break;
 			}
@@ -1044,7 +1044,7 @@ class EventsConverter {
 
 	findVolumeInstrument(program: number): { idx: number, ratio: number } {
 		let re = { idx: 0, ratio: 0.7 };
-		let instrs = new ChordPitchPerformerUtil().tonechordinstrumentKeys();
+		let instrs = new ChordPitchPerformerUtilMIDI().tonechordinstrumentKeys();
 		for (var i = 0; i < instrs.length; i++) {
 			if (program == 1 * parseInt(instrs[i].substring(0, 3))) {
 				re.idx = i;
