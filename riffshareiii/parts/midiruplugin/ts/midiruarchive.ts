@@ -2,7 +2,7 @@ console.log('MIDI.Ru Archive plugin v1.0');
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 class InMIDI {
 	player: MZXBX_Player | null = null;
-	parsedProject: Zvoog_Project | null = testminium;
+	parsedProject: Zvoog_Project | null = null;//testminium;
 	audioContext: AudioContext | null = null;
 	duration: number = 0;
 	position = 0;
@@ -13,6 +13,7 @@ class InMIDI {
 	}
 	startLoad() {
 		console.log('startLoad');
+		this.sendImportedMusicData();
 	}
 	initContext() {
 		if (this.audioContext) {
@@ -22,6 +23,21 @@ class InMIDI {
 		}
 		if (this.audioContext.state == 'suspended') {
 			this.audioContext.resume();
+		}
+	}
+	sendImportedMusicData() {
+		console.log('sendImportedMusicData', this.parsedProject);
+		if (this.parsedProject) {
+			let callbackID = '' + localStorage.getItem('callbackID');
+			var oo: MZXBX_MessageToHost = {
+				dialogID: callbackID
+				, pluginData: this.parsedProject
+				, done: true
+				, screenWait: false
+			};
+			window.parent.postMessage(oo, '*');
+		} else {
+			alert('No parsed data');
 		}
 	}
 	startPlay() {
@@ -304,5 +320,30 @@ class InMIDI {
 		}
 		//console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
+	}
+}
+class LibBridge {
+	callbackID = '';
+	constructor() {
+		console.log('register');
+		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+		let msg: MZXBX_MessageToHost = {
+			dialogID: this.callbackID
+			, pluginData: null
+			, done: false
+			, screenWait: false
+		};
+		window.parent.postMessage(msg, '*');
+	}
+	receiveHostMessage(par) {
+		console.log('receiveHostMessage', par);
+		let message: MZXBX_MessageToPlugin = par.data;
+		if (this.callbackID) {
+			//
+		} else {
+			this.callbackID = message.hostData;
+			localStorage.setItem('callbackID', this.callbackID);
+			console.log('callbackID', this.callbackID);
+		}
 	}
 }

@@ -698,6 +698,7 @@ declare class InMIDI {
     constructor();
     startLoad(): void;
     initContext(): void;
+    sendImportedMusicData(): void;
     startPlay(): void;
     updatePos(nn: number): void;
     jumpPos(vv: any): void;
@@ -706,4 +707,9 @@ declare class InMIDI {
     findCurrentFilter(zp: Zvoog_Project, id: string): null | Zvoog_FilterTarget;
     renderCurrentOutputs(zp: Zvoog_Project, id: string, result: string[], outputs: string[]): void;
     renderCurrentProjectForOutput(zp: Zvoog_Project): MZXBX_Schedule;
+}
+declare class LibBridge {
+    callbackID: string;
+    constructor();
+    receiveHostMessage(par: any): void;
 }

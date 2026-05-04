@@ -18,8 +18,8 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 
 	//{ label: 'Import MIDI from file', purpose: 'Action', kind: 'importmidifile', ui: 'https://mzxbox.ru/minium/plugins/actions/midi/midimusicimport.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Import Guitar Pro file', purpose: 'Action', kind: 'import345gp', ui: 'https://mzxbox.ru/minium/plugins/actions/alphagpimport/guitartab.html', evaluate: 'none', script: 'none' }
-//	 { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: 'https://mzxbox.ru/minium/plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' }
-//	, { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: 'https://mzxbox.ru/minium/plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' }
+	//	 { label: 'Save local file', purpose: 'Action', kind: 'exportfile', ui: 'https://mzxbox.ru/minium/plugins/actions/exp2fi/localselector.html', evaluate: 'none', script: 'none' }
+	//	, { label: 'Load local file', purpose: 'Action', kind: 'importfile', ui: 'https://mzxbox.ru/minium/plugins/actions/exp2fi/localprochooser.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Base Volume', purpose: 'Filter', kind: 'basevolume', ui: 'https://mzxbox.ru/minium/plugins/filters/basevolume/volume1.html', evaluate: 'none', script: 'none' }
 	//, { label: 'Project info', purpose: 'Action', kind: 'projectstatistics', ui: 'https://mzxbox.ru/minium/plugins/actions/projinfo/info.html', evaluate: 'none', script: 'none' }
 	//, {
@@ -49,138 +49,139 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	//}
 
 
-{
-    label: "Minium Compressor"
-    , purpose: "Filter"
-    , kind: "miniumdcompressor1"
-    , ui: "https://mzxbox.ru/minium/plugins/filters/miniumdcompressor1/ui/cmprui.html"
-    , evaluate: "newBaseCompressor"
-    , script: "https://mzxbox.ru/minium/plugins/filters/miniumdcompressor1/audio/compress.js"
-}
-/*,{
-    label: "Minium 10-band Equalizer"
-    , purpose: "Filter"
-    , kind: "10band_equalizer1"
-    , ui: "https://mzxbox.ru/minium/plugins/filters/10band_equalizer1/ui/equi.html"
-    , evaluate: "new10bEqualizer"
-    , script: "https://mzxbox.ru/minium/plugins/filters/10band_equalizer1/audio/eqfilter.js"
-}*/
-,{
-    label: "Minium 10-band Equalizer"
-    , purpose: "Filter"
-    , kind: "minium10band_equalizer1"
-    , ui: "https://mzxbox.ru/minium/plugins/filters/minium.equalizer/ui/equi.html"
-    , evaluate: "new10bEqualizer"
-    , script: "https://mzxbox.ru/minium/plugins/filters/minium.equalizer/audio/eqfilter.js"
-}
-,{
-    label: "Minium Fader"
-    , purpose: "Filter"
-    , kind: "miniumfader1"
-    , ui: "https://mzxbox.ru/minium/plugins/filters/minium.fader/ui/faderui.html"
-    , evaluate: "newBaseFader"
-    , script: "https://mzxbox.ru/minium/plugins/filters/minium.fader/audio/faderaudio.js"
-}
-,{
-    label: "Minium Echo"
-    , purpose: "Filter"
-    , kind: "miniumecho1"
-    , ui: "https://mzxbox.ru/minium/plugins/filters/miniumecho1/ui/echo.html"
-    , evaluate: "newBaseEchoV1"
-    , script: "https://mzxbox.ru/minium/plugins/filters/miniumecho1/audio/plugin.js"
-}
+	{
+		label: "Minium Compressor"
+		, purpose: "Filter"
+		, kind: "miniumdcompressor1"
+		, ui: "https://mzxbox.ru/minium/plugins/filters/miniumdcompressor1/ui/cmprui.html"
+		, evaluate: "newBaseCompressor"
+		, script: "https://mzxbox.ru/minium/plugins/filters/miniumdcompressor1/audio/compress.js"
+	}
+	/*,{
+		label: "Minium 10-band Equalizer"
+		, purpose: "Filter"
+		, kind: "10band_equalizer1"
+		, ui: "https://mzxbox.ru/minium/plugins/filters/10band_equalizer1/ui/equi.html"
+		, evaluate: "new10bEqualizer"
+		, script: "https://mzxbox.ru/minium/plugins/filters/10band_equalizer1/audio/eqfilter.js"
+	}*/
+	, {
+		label: "Minium 10-band Equalizer"
+		, purpose: "Filter"
+		, kind: "minium10band_equalizer1"
+		, ui: "https://mzxbox.ru/minium/plugins/filters/minium.equalizer/ui/equi.html"
+		, evaluate: "new10bEqualizer"
+		, script: "https://mzxbox.ru/minium/plugins/filters/minium.equalizer/audio/eqfilter.js"
+	}
+	, {
+		label: "Minium Fader"
+		, purpose: "Filter"
+		, kind: "miniumfader1"
+		, ui: "https://mzxbox.ru/minium/plugins/filters/minium.fader/ui/faderui.html"
+		, evaluate: "newBaseFader"
+		, script: "https://mzxbox.ru/minium/plugins/filters/minium.fader/audio/faderaudio.js"
+	}
+	, {
+		label: "Minium Echo"
+		, purpose: "Filter"
+		, kind: "miniumecho1"
+		, ui: "https://mzxbox.ru/minium/plugins/filters/miniumecho1/ui/echo.html"
+		, evaluate: "newBaseEchoV1"
+		, script: "https://mzxbox.ru/minium/plugins/filters/miniumecho1/audio/plugin.js"
+	}
 
 
-,{
-    label: "Minium Audio File"
-    , purpose: "Sampler"
-    , kind: "miniumaudiofile1"
-    , ui: "https://mzxbox.ru/minium/plugins/samplers/miniumaudiofile1/chooser/pickfile.html"
-    , evaluate: "newAudiFileSamplerTrack"
-    , script: "https://mzxbox.ru/minium/plugins/samplers/miniumaudiofile1/player/fileplay.js"
-},{
-    label: "Minium Percussion"
-    , purpose: "Sampler"
-    , kind: "miniumdrums1"
-    , ui: "https://mzxbox.ru/minium/plugins/samplers/miniumdrums1/gui/drmsui.html"
-    , evaluate: "newBasePercussionPlugin"
-    , script: "https://mzxbox.ru/minium/plugins/samplers/miniumdrums1/drm/drmsplgn.js"
-}
-/*,{
-    "label": "Minium Import *.mid"
-    , "purpose": "Action"
-    , "kind": "minimidimport1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/minimidimport1/mimidi.html"
-    , "evaluate": ""
-    , "script": ""
-}*/
-,{
-    "label": "Minium Chords"
-    , "purpose": "Performer"
-    , "kind": "miniumpitchchord1"
-    , "ui": "https://mzxbox.ru/minium/plugins/performers/miniumpitchchord1/gui/pitchui.html"
-    , "evaluate": "newStrumPerformerImplementation"
-    , "script": "https://mzxbox.ru/minium/plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
-}
-/*,{
-    "label": "Minium Selection properties"
-    , "purpose": "Action"
-    , "kind": "miniumeditselection1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/miniumeditselection1/mied.html"
-    , "evaluate": ""
-    , "script": ""
-}*/
-,{
-    "label": "Import"
-    , "purpose": "Action"
-    , "kind": "alphatabimport1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/alphatabimport1/ui.html"
-    , "evaluate": ""
-    , "script": ""
-}
-,{
-    "label": "MIDI.RU Archive"
-    , "purpose": "Action"
-    , "kind": "midiarchive1"
-    , "ui": "https://mzxbox.ru/midiruplugin/midiru.php"
-    , "evaluate": ""
-    , "script": ""
-}
-/*,{
-    "label": "Yandex/VKontakte"
-    , "purpose": "Action"
-    , "kind": "shareyavk"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/shareyavk/preview.html"
-    , "evaluate": ""
-    , "script": ""
-}*/
-,
-{
-    "label": "Publish & Share"
-    , "purpose": "Action"
-    , "kind": "sharemzxbox1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/miniumshare/shareui.html"
-    , "evaluate": ""
-    , "script": ""
-}
-,
-{
-    "label": "Timeline editor"
-    , "purpose": "Action"
-    , "kind": "baredit1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/baredit1/mied.html"
-    , "evaluate": ""
-    , "script": ""
-}
-,
-{
-    "label": "Export"
-    , "purpose": "Action"
-    , "kind": "midiexport1"
-    , "ui": "https://mzxbox.ru/minium/plugins/actions/midiexport1/miex.html"
-    , "evaluate": ""
-    , "script": ""
-}
+	, {
+		label: "Minium Audio File"
+		, purpose: "Sampler"
+		, kind: "miniumaudiofile1"
+		, ui: "https://mzxbox.ru/minium/plugins/samplers/miniumaudiofile1/chooser/pickfile.html"
+		, evaluate: "newAudiFileSamplerTrack"
+		, script: "https://mzxbox.ru/minium/plugins/samplers/miniumaudiofile1/player/fileplay.js"
+	}, {
+		label: "Minium Percussion"
+		, purpose: "Sampler"
+		, kind: "miniumdrums1"
+		, ui: "https://mzxbox.ru/minium/plugins/samplers/miniumdrums1/gui/drmsui.html"
+		, evaluate: "newBasePercussionPlugin"
+		, script: "https://mzxbox.ru/minium/plugins/samplers/miniumdrums1/drm/drmsplgn.js"
+	}
+	/*,{
+		"label": "Minium Import *.mid"
+		, "purpose": "Action"
+		, "kind": "minimidimport1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/minimidimport1/mimidi.html"
+		, "evaluate": ""
+		, "script": ""
+	}*/
+	, {
+		"label": "Minium Chords"
+		, "purpose": "Performer"
+		, "kind": "miniumpitchchord1"
+		, "ui": "https://mzxbox.ru/minium/plugins/performers/miniumpitchchord1/gui/pitchui.html"
+		, "evaluate": "newStrumPerformerImplementation"
+		, "script": "https://mzxbox.ru/minium/plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
+	}
+	/*,{
+		"label": "Minium Selection properties"
+		, "purpose": "Action"
+		, "kind": "miniumeditselection1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/miniumeditselection1/mied.html"
+		, "evaluate": ""
+		, "script": ""
+	}*/
+	, {
+		"label": "Import"
+		, "purpose": "Action"
+		, "kind": "alphatabimport1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/alphatabimport1/ui.html"
+		, "evaluate": ""
+		, "script": ""
+	}
+	, {
+		"label": "MIDI.RU Archive"
+		, "purpose": "Action"
+		, "kind": "midiarchive1"
+		//, ui: 'http://127.0.0.1:8080/libstart.html'
+		, "ui": "https://mzxbox.ru/midiruplugin/libstart.html"
+		, "evaluate": ""
+		, "script": ""
+	}
+	/*,{
+		"label": "Yandex/VKontakte"
+		, "purpose": "Action"
+		, "kind": "shareyavk"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/shareyavk/preview.html"
+		, "evaluate": ""
+		, "script": ""
+	}*/
+	,
+	{
+		"label": "Publish & Share"
+		, "purpose": "Action"
+		, "kind": "sharemzxbox1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/miniumshare/shareui.html"
+		, "evaluate": ""
+		, "script": ""
+	}
+	,
+	{
+		"label": "Timeline editor"
+		, "purpose": "Action"
+		, "kind": "baredit1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/baredit1/mied.html"
+		, "evaluate": ""
+		, "script": ""
+	}
+	,
+	{
+		"label": "Export"
+		, "purpose": "Action"
+		, "kind": "midiexport1"
+		, "ui": "https://mzxbox.ru/minium/plugins/actions/midiexport1/miex.html"
+		, "evaluate": ""
+		, "script": ""
+	}
 
 
 

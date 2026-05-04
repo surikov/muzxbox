@@ -2249,7 +2249,7 @@ console.log('MIDI.Ru Archive plugin v1.0');
 class InMIDI {
     constructor() {
         this.player = null;
-        this.parsedProject = testminium;
+        this.parsedProject = null;
         this.audioContext = null;
         this.duration = 0;
         this.position = 0;
@@ -2258,6 +2258,7 @@ class InMIDI {
     }
     startLoad() {
         console.log('startLoad');
+        this.sendImportedMusicData();
     }
     initContext() {
         if (this.audioContext) {
@@ -2267,6 +2268,22 @@ class InMIDI {
         }
         if (this.audioContext.state == 'suspended') {
             this.audioContext.resume();
+        }
+    }
+    sendImportedMusicData() {
+        console.log('sendImportedMusicData', this.parsedProject);
+        if (this.parsedProject) {
+            let callbackID = '' + localStorage.getItem('callbackID');
+            var oo = {
+                dialogID: callbackID,
+                pluginData: this.parsedProject,
+                done: true,
+                screenWait: false
+            };
+            window.parent.postMessage(oo, '*');
+        }
+        else {
+            alert('No parsed data');
         }
     }
     startPlay() {
@@ -2517,6 +2534,31 @@ class InMIDI {
             }
         }
         return forOutput;
+    }
+}
+class LibBridge {
+    constructor() {
+        this.callbackID = '';
+        console.log('register');
+        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        let msg = {
+            dialogID: this.callbackID,
+            pluginData: null,
+            done: false,
+            screenWait: false
+        };
+        window.parent.postMessage(msg, '*');
+    }
+    receiveHostMessage(par) {
+        console.log('receiveHostMessage', par);
+        let message = par.data;
+        if (this.callbackID) {
+        }
+        else {
+            this.callbackID = message.hostData;
+            localStorage.setItem('callbackID', this.callbackID);
+            console.log('callbackID', this.callbackID);
+        }
     }
 }
 //# sourceMappingURL=midiru.js.map
