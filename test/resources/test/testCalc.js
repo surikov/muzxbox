@@ -1448,6 +1448,20 @@ function test9() {
     console.log(freq);
     console.log(antifreq);
 }
+function test10() {
+    var counts = [0];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var first = datarows[ii].balls[0];
+        counts[first] = counts[first] ? counts[first] : 0;
+        counts[first]++;
+    }
+    console.log(counts);
+    var min = 0;
+    for (var ii = 1; ii < counts.length; ii++) {
+        console.log(ii, Math.round(100 - 100 * min / datarows.length) + '%');
+        min = min + counts[ii];
+    }
+}
 init();
 addTails();
 //dumpPairsCounts();
@@ -1468,5 +1482,5 @@ for (let ii = 0; ii < 10; ii++) {
     console.log(chackRow(randBalls(33), row));
 }
 */
-test9();
+test10();
 console.log('start', datarows);

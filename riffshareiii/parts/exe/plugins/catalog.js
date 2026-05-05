@@ -56,6 +56,14 @@ let _t_all_registerd_plugins_list = [
         "script": "https://mzxbox.ru/minium/plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
     },
     {
+        "label": "Yamaha DX7",
+        "purpose": "Performer",
+        "kind": "dx7fmsynth1",
+        "ui": "./plugins/performers/dx7fmsynth1/ui/dx7ui.html",
+        "evaluate": "newDX7FMSynth1",
+        "script": "./plugins/performers/dx7fmsynth1/synth/dx7minium.js"
+    },
+    {
         "label": "Import",
         "purpose": "Action",
         "kind": "alphatabimport1",

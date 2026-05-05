@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2015",
-		"outFile": "./dx7tester.js"
+		"outFile": "./dx7minium.js"
 		//,"outDir":"../js"
 		,
 		"strictNullChecks": true,
@@ -26,12 +26,6 @@
 	"files": [
 		"../../../../mzxbxapi/musicenginetypes.ts",
 		"../../../../mzxbxapi/musicenginedeclarations.ts",
-		"lib.ts",
-		"synthesizer.ts",
-		"loadersys.ts",
-		"voice.ts",
-		"operator.ts",
-		"test.ts"
-		
+		"dx7synth.ts"
 	]
 }

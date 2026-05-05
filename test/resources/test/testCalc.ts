@@ -1562,28 +1562,42 @@ function test9() {
 	let found = 0;
 	for (let ii = 1; ii < datarows.length; ii++) {
 		let lastBall = datarows[ii].balls[0];
-		let cuarr=antifreq;
+		let cuarr = antifreq;
 		if (lastBall == last) {
-			 cuarr=freq;
+			cuarr = freq;
 		}
-			let lenCount = 0;
-			for (let kk = 1; ii + kk < datarows.length; kk++) {
-				let cuball = datarows[ii + kk].balls[0];
-				if (cuball > limit) {
-					if (cuball > first) {
-						cuarr[lenCount] = cuarr[lenCount] ? cuarr[lenCount] : 0;
-						cuarr[lenCount]++;
-						found++;
-					}
-					break;
+		let lenCount = 0;
+		for (let kk = 1; ii + kk < datarows.length; kk++) {
+			let cuball = datarows[ii + kk].balls[0];
+			if (cuball > limit) {
+				if (cuball > first) {
+					cuarr[lenCount] = cuarr[lenCount] ? cuarr[lenCount] : 0;
+					cuarr[lenCount]++;
+					found++;
 				}
-				lenCount++;
+				break;
 			}
+			lenCount++;
+		}
 		//}
 	}
 
 	console.log(freq);
 	console.log(antifreq);
+}
+function test10() {
+	let counts: number[] = [0];
+	for (let ii = 1; ii < datarows.length; ii++) {
+		let first = datarows[ii].balls[0];
+		counts[first] = counts[first] ? counts[first] : 0;
+		counts[first]++;
+	}
+	console.log(counts);
+	let min = 0;
+	for (let ii = 1; ii < counts.length; ii++) {
+		console.log(ii, Math.round(100-100*min / datarows.length)+'%');
+		min = min + counts[ii];
+	}
 }
 init();
 addTails();
@@ -1606,8 +1620,8 @@ for (let ii = 0; ii < 10; ii++) {
 	console.log(chackRow(randBalls(33), row));
 }
 */
-test9();
-console.log('start',datarows);
+test10();
+console.log('start', datarows);
 
 
 
