@@ -26,6 +26,7 @@
 	"files": [
 		"../../../../mzxbxapi/musicenginetypes.ts",
 		"../../../../mzxbxapi/musicenginedeclarations.ts",
+		"../dx7types.ts",
 		"lib.ts",
 		"loadersys.ts",
 		"dx7ui.ts"	

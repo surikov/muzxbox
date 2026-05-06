@@ -1,53 +1,5 @@
 function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
-	type DX7OperatorData = {
-		enabled: boolean;
-		freqFine0_99: number;
-		freqCoarse0_31: number;
-		volumeLevel0_99: number;
-		constMode0_1: number;
-		detune_7_7: number;
-		rates0_99: number[];
-		levels0_99: number[];
-		velocitySens0_7: number;
-	};
-	type DX7PresetData = {
-		name: string;
-		algorithm1_32: number;
-		operators: DX7OperatorData[];
-		feedback0_7: number;
-		lfoPitchModDepth0_99: number;
-		lfoAmpModDepth0_99: number;
-	};
-	type ConnectionSchemeDX7 = {
-		outputMix: number[]
-		, modulationMatrix: (number[])[]
-		, feedbackMatrix: (number[])[]
-	};
-	type SynthSlope = {
-		duration: number;
-		values: number[];
-	};
-	type EnvelopeInfo = {
-		attack: SynthSlope;
-		decay: SynthSlope;
-		sustain: SynthSlope;
-		release: number;
-	};
-	type OperatorInfo = {
-		constantFrequency: number;
-		frequencyRatio: number;
-		detune: number;
-		enabled: boolean;
-		volume: number;
-		envelope: EnvelopeInfo;
-	};
-	type SynthPreset = {
-		label: string;
-		mixID: number;
-		operators: OperatorInfo[];
-		feedbackRatio: number;
-		modulationRatio: number;
-	};
+	console.log('newDX7FMSynth1');
 	let matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[] = [
 		//stacking
 		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //1
@@ -251,10 +203,10 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);
 			}
 		}
-
 	}
 	class MiniumPluginDX7Bridge implements MZXBX_AudioPerformerPlugin {
 		synth: MiniumFMSynth | null = null;
+		fm: FMParameter | null = null;
 		launch(context: AudioContext, parameters: string): number {
 			if (this.synth) {
 				//
@@ -262,6 +214,8 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				this.synth = new MiniumFMSynth();
 				this.synth.init(context);
 			}
+			console.log('parameters', parameters);
+			this.fm = (parameters as any) as FMParameter;
 			return 1;
 		}
 		busy(): null | string {
@@ -280,7 +234,11 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			}
 		}
 		strum(whenStart: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void {
-
+			if (this.synth) {
+				if(this.fm){
+				this.synth.scheduleStrum(this.fm.preset,whenStart,zpitches,mzbxslide);
+				}
+			}
 		}
 	}
 	return new MiniumPluginDX7Bridge();

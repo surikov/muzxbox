@@ -296,7 +296,6 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare let libDX7list: DX7PresetData[];
 type DX7OperatorData = {
     enabled: boolean;
     freqFine0_99: number;
@@ -346,6 +345,7 @@ type SynthPreset = {
     feedbackRatio: number;
     modulationRatio: number;
 };
+declare let libDX7list: DX7PresetData[];
 declare class DX7Loader {
     scale99(nn: number): number;
     durationDown(nn: number): number;
@@ -361,7 +361,18 @@ declare class DX7Loader {
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
 }
+type FMParameter = {
+    volume: number;
+    preset: SynthPreset;
+};
 declare class DX7UI {
+    id: string;
+    volumeValue: number;
+    preset: SynthPreset | null;
+    volumeSlider: any;
+    titleText: any;
     constructor();
+    parseHostData(data: any): FMParameter | null;
+    receiveHostMessage(messageEvent: MessageEvent): void;
     renderLibList(): void;
 }

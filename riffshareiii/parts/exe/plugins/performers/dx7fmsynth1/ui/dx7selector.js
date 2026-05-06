@@ -1460,11 +1460,57 @@ class DX7Loader {
 }
 class DX7UI {
     constructor() {
+        this.id = '';
+        this.volumeValue = 100;
+        this.preset = null;
+        window.addEventListener('message', this.receiveHostMessage.bind(this), false);
+        var message = { dialogID: '', pluginData: '', done: false, screenWait: false };
+        window.parent.postMessage(message, '*');
         this.renderLibList();
+        let me = this;
+        this.titleText = document.getElementById('presettitle');
+        this.volumeSlider = document.getElementById('volume');
+        this.volumeSlider.addEventListener('change', (event) => {
+            if (me.preset) {
+                me.volumeValue = me.volumeSlider.value;
+                let par = {
+                    volume: me.volumeValue, preset: me.preset
+                };
+                var message = { dialogID: me.id, pluginData: par, done: false, screenWait: false };
+                window.parent.postMessage(message, '*');
+            }
+        });
+    }
+    parseHostData(data) {
+        if (data) {
+            if (data.preset) {
+                if (data.preset.operators) {
+                    if (data.preset.operators.length == 6) {
+                        return data;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    receiveHostMessage(messageEvent) {
+        let message = messageEvent.data;
+        if (this.id) {
+            let data = this.parseHostData(message.hostData);
+            if (data) {
+                this.volumeSlider.value = data.volume;
+                this.volumeValue = data.volume;
+                this.preset = data.preset;
+                this.titleText.innerHTML = this.preset.label;
+            }
+        }
+        else {
+            this.id = message.hostData;
+        }
     }
     renderLibList() {
         let liblist = document.getElementById('liblist');
-        console.log(liblist);
+        let me = this;
         if (liblist) {
             libDX7list.sort((a, b) => {
                 return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
@@ -1477,6 +1523,13 @@ class DX7UI {
                     console.log(pid, libDX7list[pid].name);
                     let loader = new DX7Loader();
                     let selectedPreset = loader.convertDX7data(libDX7list[pid]);
+                    me.preset = selectedPreset;
+                    let par = {
+                        volume: me.volumeValue, preset: me.preset
+                    };
+                    var message = { dialogID: me.id, pluginData: par, done: false, screenWait: false };
+                    window.parent.postMessage(message, '*');
+                    this.titleText.innerHTML = me.preset.label;
                 };
                 liblist.appendChild(li);
             }

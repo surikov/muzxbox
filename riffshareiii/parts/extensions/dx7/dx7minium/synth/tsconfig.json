@@ -26,6 +26,7 @@
 	"files": [
 		"../../../../mzxbxapi/musicenginetypes.ts",
 		"../../../../mzxbxapi/musicenginedeclarations.ts",
+		"../dx7types.ts",
 		"dx7synth.ts"
 	]
 }

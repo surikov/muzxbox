@@ -1,5 +1,6 @@
 "use strict";
 function newDX7FMSynth1() {
+    console.log('newDX7FMSynth1');
     let matrixConnectionAlgorithmsDX7 = [
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
@@ -185,6 +186,7 @@ function newDX7FMSynth1() {
     class MiniumPluginDX7Bridge {
         constructor() {
             this.synth = null;
+            this.fm = null;
         }
         launch(context, parameters) {
             if (this.synth) {
@@ -193,6 +195,8 @@ function newDX7FMSynth1() {
                 this.synth = new MiniumFMSynth();
                 this.synth.init(context);
             }
+            console.log('parameters', parameters);
+            this.fm = parameters;
             return 1;
         }
         busy() {
@@ -212,6 +216,11 @@ function newDX7FMSynth1() {
             }
         }
         strum(whenStart, zpitches, tempo, mzbxslide) {
+            if (this.synth) {
+                if (this.fm) {
+                    this.synth.scheduleStrum(this.fm.preset, whenStart, zpitches, mzbxslide);
+                }
+            }
         }
     }
     return new MiniumPluginDX7Bridge();
