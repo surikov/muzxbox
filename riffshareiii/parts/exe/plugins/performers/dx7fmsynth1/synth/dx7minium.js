@@ -57,6 +57,12 @@ function newDX7FMSynth1() {
             this.compensateNegativeDelay.start(this.audioContext.currentTime);
             this.carrier.start(this.audioContext.currentTime);
         }
+        addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
+            this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+            this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
+            this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+            this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
+        }
         startPlayFrequency(info, when, duration, frequency, modulationRatio, feedbackRatio) {
             this.envelope.gain.setValueAtTime(0, when);
             this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
@@ -70,6 +76,13 @@ function newDX7FMSynth1() {
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
             this.output.gain.value = info.volume;
         }
+        stop() {
+            this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
+            this.modulationLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
+            this.carrier.frequency.cancelScheduledValues(this.audioContext.currentTime);
+            this.compensateNegativeDelay.offset.cancelScheduledValues(this.audioContext.currentTime);
+            this.feedbackLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
+        }
     }
     class MinumFMVoice {
         constructor(mixID, audioContext, to) {
@@ -78,7 +91,6 @@ function newDX7FMSynth1() {
             this.audioContext = audioContext;
             this.output = this.audioContext.createGain();
             this.output.connect(to);
-            this.output.gain.value = 0.175;
             this.operators = [
                 new MiniumFMOperator(this.audioContext),
                 new MiniumFMOperator(this.audioContext),
@@ -120,22 +132,42 @@ function newDX7FMSynth1() {
                 this.operators[outIdx].output.connect(this.output);
             }
         }
-        startPlayNote(preset, when, duration, note) {
+        startPlayNote(preset, when, note, slides) {
+            this.output.gain.value = 0.175;
+            let duration = slides.reduce((sm, cur) => sm + cur.duration, 0);
             for (let ii = 0; ii < 6; ii++) {
-                if (preset.operators[ii].enabled) {
-                    let frequency = preset.operators[ii].constantFrequency;
+                let info = preset.operators[ii];
+                if (info.enabled) {
+                    let frequency = info.constantFrequency;
                     if (!(frequency)) {
                         let noteFreq = 440 * Math.pow(2, (note - 69) / 12);
-                        let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), preset.operators[ii].detune);
-                        frequency = noteFreq * detuneRatio * preset.operators[ii].frequencyRatio;
+                        let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), info.detune);
+                        frequency = noteFreq * detuneRatio * info.frequencyRatio;
                     }
-                    this.operators[ii].startPlayFrequency(preset.operators[ii], when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
-                    let otime = when + duration + preset.operators[ii].envelope.release + 0.01;
+                    this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
+                    let otime = when + duration + info.envelope.release + 0.01;
                     if (this.locktime < otime) {
                         this.locktime = otime;
                     }
+                    if (info.frequencyRatio && (slides.length > 1 || slides[0].delta != 0)) {
+                        let next = when;
+                        for (let ff = 0; ff < slides.length; ff++) {
+                            next = next + slides[ff].duration;
+                            let noteFreq = 440 * Math.pow(2, (note + slides[ff].delta - 69) / 12);
+                            let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), info.detune);
+                            let slideFreq = noteFreq * detuneRatio * info.frequencyRatio;
+                            this.operators[ii].addFrequencySlide(next, slideFreq, preset.modulationRatio, preset.feedbackRatio);
+                        }
+                    }
                 }
             }
+        }
+        stop() {
+            for (let ii = 0; ii < this.operators.length; ii++) {
+                this.operators[ii].stop();
+            }
+            this.output.gain.value = 0;
+            this.locktime = 0;
         }
     }
     class MiniumFMSynth {
@@ -174,12 +206,15 @@ function newDX7FMSynth1() {
             this.cache.push(vx);
             return vx;
         }
-        cancelVoices() {
+        stop() {
+            for (let ii = 0; ii < this.cache.length; ii++) {
+                this.cache[ii].stop();
+            }
         }
         scheduleStrum(preset, when, pitches, slides) {
             for (let ii = 0; ii < pitches.length; ii++) {
                 let vox = this.takeVox(preset.mixID);
-                vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);
+                vox.startPlayNote(preset, when, pitches[ii], slides);
             }
         }
     }
@@ -204,7 +239,7 @@ function newDX7FMSynth1() {
         }
         cancel() {
             if (this.synth) {
-                this.synth.cancelVoices();
+                this.synth.stop();
             }
         }
         output() {
