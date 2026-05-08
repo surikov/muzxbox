@@ -142,34 +142,34 @@ let menuPointSettings: MenuInfo = {
 		}, {
 			text: localMenuColors, children: [
 				{
-					text: 'Minium', noLocalization:true,onClick: () => {
+					text: 'Minium', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('red1');//'theme/colordarkred.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Greenstone', noLocalization:true,onClick: () => {
+					text: 'Greenstone', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('green1');//'theme/colordarkgreen.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Deep', noLocalization:true,onClick: () => {
+					text: 'Deep', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('blue1');//'theme/colordarkblue.css');
 					}, itemKind: kindAction
 				}, {
-					text: 'Neon',noLocalization:true, onClick: () => {
+					text: 'Neon', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('neon1');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Gjel', noLocalization:true,onClick: () => {
+					text: 'Gjel', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('light1');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Vorot', noLocalization:true,onClick: () => {
+					text: 'Vorot', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('light2');
 					}, itemKind: kindAction
 				}
 				, {
-					text: 'Bereza', noLocalization:true,onClick: () => {
+					text: 'Bereza', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('light3');
 					}, itemKind: kindAction
 				}
@@ -647,7 +647,17 @@ function fillPluginsLists() {
 					};
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (xx: number, yy: number) => {
 						//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+						let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+						let zisx=0;
+						console.log('track', xx, yy,zz, MZXBX_currentPlugins()[ii].kind,zoomPrefixLevelsCSS);
 						globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+							//let sz=globalCommandDispatcher.cfg().fanPluginIconSize(Math.round(zz));
+							//let sz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+							
+							for (let trnum = 0; trnum < globalCommandDispatcher.cfg().data.tracks.length; trnum++) {
+								let checkTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trnum];
+								console.log(trnum, 'track', checkTrack.performer.iconPosition);
+							}
 							globalCommandDispatcher.cfg().data.tracks.push({
 								performer: {
 									id: '' + Math.random()
@@ -826,15 +836,15 @@ function composeBaseMenu(): MenuInfo[] {
 			, menuPointClipboard
 			, menuPointSettings
 			, {
-				text: 'English',noLocalization:true, onClick: () => {
+				text: 'English', noLocalization: true, onClick: () => {
 					globalCommandDispatcher.setThemeLocale('en', 1);
 				}, itemKind: kindAction
 			}, {
-				text: 'Русский',noLocalization:true, onClick: () => {
+				text: 'Русский', noLocalization: true, onClick: () => {
 					globalCommandDispatcher.setThemeLocale('ru', 1);
 				}, itemKind: kindAction
 			}, {
-				text: '中文',noLocalization:true, onClick: () => {
+				text: '中文', noLocalization: true, onClick: () => {
 					globalCommandDispatcher.setThemeLocale('zh', 1.5);
 				}, itemKind: kindAction
 			}

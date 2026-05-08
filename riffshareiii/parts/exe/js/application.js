@@ -3739,7 +3739,14 @@ function fillPluginsLists() {
                         css: 'rectangleDragItem'
                     };
                     let dragger = new DragMenuItemUtil(square, info, (xx, yy) => {
+                        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+                        let zisx = 0;
+                        console.log('track', xx, yy, zz, MZXBX_currentPlugins()[ii].kind, zoomPrefixLevelsCSS);
                         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+                            for (let trnum = 0; trnum < globalCommandDispatcher.cfg().data.tracks.length; trnum++) {
+                                let checkTrack = globalCommandDispatcher.cfg().data.tracks[trnum];
+                                console.log(trnum, 'track', checkTrack.performer.iconPosition);
+                            }
                             globalCommandDispatcher.cfg().data.tracks.push({
                                 performer: {
                                     id: '' + Math.random(),
