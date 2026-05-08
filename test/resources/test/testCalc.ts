@@ -1,3 +1,5 @@
+
+
 let skipRowsCount = 0;
 
 var levelA: SVGElement;
@@ -929,7 +931,85 @@ function paintCellsBlue(ratioPre: number
 
 	}
 }
-function paintCellsGreen(//ratioPre: number
+function countBallRay(xx: number, shifts: number[][], rowIdx: number, rows: BallsRow[]): number {
+	let cnt = 0;
+	for (let yy = 0; yy < shifts.length; yy++) {
+		let rowdelta = shifts[yy];
+		for (let ii = 0; ii < rowdelta.length; ii++) {
+			if (ballExists(xx + 1 + rowdelta[ii], rows[rowIdx + yy + 1])) {
+				cnt++;
+			}
+		}
+	}
+	if (cnt > 1) {
+		return cnt
+	} else {
+		return 0;
+	}
+}
+function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
+	let cellColors: number[] = [];
+	for (let xx = 0; xx < rowLen; xx++) {
+		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0;
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1, 2], [3, 4], [5]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1], [2, 3], [4], [5]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1], [2], [3], [4]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [1], [1], [1, 2]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [1], [1]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [0], [-1, 0, 1]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [-1], [-1]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [-1], [-1], [-1, -2]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2], [-3], [-4]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2, -3], [-4], [-5]], rowIdx, rows);
+		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1, -2], [-3, -4], [-5]], rowIdx, rows);
+	}
+	/*
+		if (rowIdx == 0) {
+			let weight = [4, 3, 2, 1];
+			let cellweight99: number[] = [];
+			for (let yy = 0; yy < 44; yy++) {
+				let cellrow: number[] = [];
+				for (let xx = 0; xx < rowLen; xx++) {
+	
+				}
+			}
+			console.log('paintCellsGreen', cellweight99);
+		}
+	
+		let rr = rowIdx + 1;
+		for (let xx = 0; xx < rowLen; xx++) {
+	
+			cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0;
+			if (ballExists(xx + 1, rows[rr])) {
+				cellColors[xx] = cellColors[xx] + 1;
+			}
+			if (ballExists(xx + 1 + 1, rows[rr]) || ballExists(xx + 1 - 1, rows[rr])) {
+				cellColors[xx] = cellColors[xx] + 0.5;
+			}
+			if (ballExists(xx + 1 + 2, rows[rr]) || ballExists(xx + 1 - 2, rows[rr])) {
+				cellColors[xx] = cellColors[xx] + 0.25;
+			}
+			if (ballExists(xx + 1 + 3, rows[rr]) || ballExists(xx + 1 - 3, rows[rr])) {
+				cellColors[xx] = cellColors[xx] + 0.125;
+			}
+		}
+		*/
+	let max = 0;
+	for (let xx = 0; xx < rowLen; xx++) {
+		if (max < cellColors[xx]) {
+			max = cellColors[xx];
+		}
+	}
+
+	for (let xx = 0; xx < rowLen; xx++) {
+		let idx = cellColors[xx] / max;
+		addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
+			, 'rgba(0,66,0,' + idx + ')');
+		addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
+			, 'rgba(0,66,0,' + idx + ')');
+	}
+}
+function paintCellsGreen222(//ratioPre: number
 	//, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
 	//, minCnt: number
 	svg: SVGElement
@@ -1595,7 +1675,7 @@ function test10() {
 	console.log(counts);
 	let min = 0;
 	for (let ii = 1; ii < counts.length; ii++) {
-		console.log(ii, Math.round(100-100*min / datarows.length)+'%');
+		console.log(ii, Math.round(100 - 100 * min / datarows.length) + '%');
 		min = min + counts[ii];
 	}
 }
@@ -1620,7 +1700,7 @@ for (let ii = 0; ii < 10; ii++) {
 	console.log(chackRow(randBalls(33), row));
 }
 */
-test10();
+//test10();
 console.log('start', datarows);
 
 
