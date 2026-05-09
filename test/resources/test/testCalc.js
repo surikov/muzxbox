@@ -144,7 +144,7 @@ function addCircle(svg, x, y, r, strokecolor, fillcolor) {
     rect.setAttribute('rx', '' + r);
     rect.setAttribute('ry', '' + r);
     rect.setAttribute("stroke", strokecolor);
-    rect.setAttribute("stroke-width", '1');
+    rect.setAttribute("stroke-width", '0'); //'1');
     rect.setAttribute("fill", fillcolor);
     svg.append(rect);
 }
@@ -279,7 +279,7 @@ function drawStat3(svg, rows) {
                 if (ballExists(colNum, rows[rowNum])) {
                     var topy = topShift + 0.5 * cellSize + rowNum * cellSize;
                     var szz = cellSize / 3 - 0.5;
-                    var clr = '#ff000066';
+                    var clr = '#ff0000';
                     if (rowNum == 0) {
                         topy = topy - 1.5 * cellSize;
                         szz = cellSize / 3 - 0.5;
@@ -820,26 +820,68 @@ function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
         , color);
     }
 }
-function countBallRay(xx, shifts, rowIdx, rows) {
-    var cnt = 0;
-    for (var yy = 0; yy < shifts.length; yy++) {
-        var rowdelta = shifts[yy];
-        for (var ii = 0; ii < rowdelta.length; ii++) {
+/*
+function countBallRay(xx: number, shifts: number[][], rowIdx: number, rows: BallsRow[]): number {
+    let cnt = 0;
+    for (let yy = 0; yy < shifts.length; yy++) {
+        let rowdelta = shifts[yy];
+        for (let ii = 0; ii < rowdelta.length; ii++) {
             if (ballExists(xx + 1 + rowdelta[ii], rows[rowIdx + yy + 1])) {
                 cnt++;
             }
         }
     }
     if (cnt > 1) {
-        return cnt;
-    }
-    else {
+        return cnt
+    } else {
         return 0;
     }
+}*/
+function countGreenTail() {
 }
 function paintCellsGreen(svg, rowIdx, rows) {
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
+        cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+        for (var rowY = 1; rowY <= 3; rowY++) {
+            for (var ballX = -3; ballX <= 3; ballX++) {
+                if (ballExists(xx + 1 + ballX, rows[rowIdx + rowY])) {
+                    //cellColors[xx] = cellColors[xx] + 1;
+                    var bnds = [-1, +1];
+                    if (ballX == 3) {
+                        bnds = [2, 3];
+                    }
+                    if (ballX == 2) {
+                        bnds = [1, 3];
+                    }
+                    if (ballX == 1) {
+                        bnds = [0, 2];
+                    }
+                    if (ballX == -1) {
+                        bnds = [-2, 0];
+                    }
+                    if (ballX == -2) {
+                        bnds = [-3, -1];
+                    }
+                    if (ballX == -3) {
+                        bnds = [-3, -2];
+                    }
+                    for (var _rowY = 1; _rowY <= 3; _rowY++) {
+                        for (var _ballX = bnds[0]; _ballX <= bnds[1]; _ballX++) {
+                            if (ballExists(xx + 1 + ballX + _ballX, rows[rowIdx + rowY + _rowY])) {
+                                cellColors[xx] = cellColors[xx] + 1;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        /*if (ballExists(bb - 1, rows[rr + 1]) || ballExists(bb + 0, rows[rr + 1]) || ballExists(bb + 1, rows[rr + 1])) {
+            cellColors[xx] = cellColors[xx] + 0.5;
+        }*/
+    }
+    /*for (let xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0;
         cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1, 2], [3, 4], [5]], rowIdx, rows);
         cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1], [2, 3], [4], [5]], rowIdx, rows);
@@ -852,7 +894,7 @@ function paintCellsGreen(svg, rowIdx, rows) {
         cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2], [-3], [-4]], rowIdx, rows);
         cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2, -3], [-4], [-5]], rowIdx, rows);
         cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1, -2], [-3, -4], [-5]], rowIdx, rows);
-    }
+    }*/
     /*
         if (rowIdx == 0) {
             let weight = [4, 3, 2, 1];
@@ -890,10 +932,19 @@ function paintCellsGreen(svg, rowIdx, rows) {
             max = cellColors[xx];
         }
     }
+    console.log(max); //cellColors);
     for (var xx = 0; xx < rowLen; xx++) {
         var idx = cellColors[xx] / max;
-        addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(0,66,0,' + idx + ')');
-        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(0,66,0,' + idx + ')');
+        idx = (idx) ? idx : 0;
+        if (idx > 1) {
+            idx = 1;
+        }
+        idx = idx * 255;
+        //console.log(idx);
+        addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
+        //, 'rgba(0,66,0,' + idx + ')');
+        , 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
     }
 }
 function paintCellsGreen222(//ratioPre: number
