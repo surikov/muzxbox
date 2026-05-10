@@ -957,84 +957,61 @@ x... x... x... x... x... x... x... x...
 .... .... .... .... .... 0... .... ....
 .... .... .... .... .... .... 0... 0...
 */
-function countGreenTail() {
-
+function rayPoints(ray: number): number[][] {
+	let gr = Math.PI / 180;
+	let points: number[][] = [];
+	let preX = -1;
+	let preY = -1;
+	for (let st = 1; st <= 6; st++) {
+		let xx = Math.round(st * Math.cos(ray * gr));
+		let yy = Math.round(st * Math.sin(ray * gr));
+		if (preX == xx && preY == yy) {
+			//
+		} else {
+			if (yy > 0) {
+				preX = xx;
+				preY = yy;
+				//console.log('x', xx, 'y', yy);
+				points.push([xx, yy])
+			}
+		}
+	}
+	return points;
+}
+function ray2points(xx: number, points: number[][], rowIdx: number, rows: BallsRow[]): number {
+	let cnt = 0;
+	let last=-1;
+	for (let pp = 0; pp < points.length; pp++) {
+		if (ballExists(xx + 1 + points[pp][0], rows[rowIdx + points[pp][1]])) {
+			if (pp > 2 && cnt == 0) {
+				return 0;
+			} else {
+				cnt++;
+				last=pp;
+			}
+		}
+	}
+	if (cnt > 1) {
+		return points.length-last;
+	} else {
+		return 0;
+	}
 }
 function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 	let cellColors: number[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
 		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-		for (let rowY = 1; rowY <= 3; rowY++) {
-			for (let ballX = -3; ballX <= 3; ballX++) {
-				if (ballExists(xx + 1 + ballX, rows[rowIdx + rowY])) {
-					//cellColors[xx] = cellColors[xx] + 1;
-					let bnds: number[] = [-1, +1];
-					if (ballX == 3) { bnds = [2, 3]; }
-					if (ballX == 2) { bnds = [1, 3]; }
-					if (ballX == 1) { bnds = [0, 2]; }
-					if (ballX == -1) { bnds = [-2, 0]; }
-					if (ballX == -2) { bnds = [-3, -1]; }
-					if (ballX == -3) { bnds = [-3, -2]; }
-					for (let _rowY = 1; _rowY <= 3; _rowY++) {
-						for (let _ballX = bnds[0]; _ballX <= bnds[1]; _ballX++) {
-							if (ballExists(xx + 1 + ballX+_ballX, rows[rowIdx + rowY+_rowY])) {
-								cellColors[xx] = cellColors[xx] + 1;
-								break;
-							}
-						}
-					}
-				}
+		for (let ray = 30; ray <= 75; ray = ray + 15) {
+			let points = rayPoints(ray);
+			cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
+			for (let pp = 0; pp < points.length; pp++) {
+				points[pp][0] = -points[pp][0];
 			}
+			cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
 		}
-		/*if (ballExists(bb - 1, rows[rr + 1]) || ballExists(bb + 0, rows[rr + 1]) || ballExists(bb + 1, rows[rr + 1])) {
-			cellColors[xx] = cellColors[xx] + 0.5;
-		}*/
+		let points = rayPoints(90);
+		cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
 	}
-	/*for (let xx = 0; xx < rowLen; xx++) {
-		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0;
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1, 2], [3, 4], [5]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1], [2, 3], [4], [5]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[1], [2], [3], [4]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [1], [1], [1, 2]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [1], [1]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [0], [-1, 0, 1]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [0], [-1], [-1]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[0], [-1], [-1], [-1, -2]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2], [-3], [-4]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1], [-2, -3], [-4], [-5]], rowIdx, rows);
-		cellColors[xx] = cellColors[xx] + countBallRay(xx, [[-1, -2], [-3, -4], [-5]], rowIdx, rows);
-	}*/
-	/*
-		if (rowIdx == 0) {
-			let weight = [4, 3, 2, 1];
-			let cellweight99: number[] = [];
-			for (let yy = 0; yy < 44; yy++) {
-				let cellrow: number[] = [];
-				for (let xx = 0; xx < rowLen; xx++) {
-	
-				}
-			}
-			console.log('paintCellsGreen', cellweight99);
-		}
-	
-		let rr = rowIdx + 1;
-		for (let xx = 0; xx < rowLen; xx++) {
-	
-			cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0;
-			if (ballExists(xx + 1, rows[rr])) {
-				cellColors[xx] = cellColors[xx] + 1;
-			}
-			if (ballExists(xx + 1 + 1, rows[rr]) || ballExists(xx + 1 - 1, rows[rr])) {
-				cellColors[xx] = cellColors[xx] + 0.5;
-			}
-			if (ballExists(xx + 1 + 2, rows[rr]) || ballExists(xx + 1 - 2, rows[rr])) {
-				cellColors[xx] = cellColors[xx] + 0.25;
-			}
-			if (ballExists(xx + 1 + 3, rows[rr]) || ballExists(xx + 1 - 3, rows[rr])) {
-				cellColors[xx] = cellColors[xx] + 0.125;
-			}
-		}
-		*/
 	let max = 0;
 	for (let xx = 0; xx < rowLen; xx++) {
 		if (max < cellColors[xx]) {
@@ -1752,7 +1729,36 @@ for (let ii = 0; ii < 10; ii++) {
 console.log('start', datarows);
 
 
+//let gr = Math.PI / 180;
+/*
+console.log(Math.sin(210 * gr));
+console.log(Math.sin(240 * gr));
+console.log(Math.sin(270 * gr));
+console.log(Math.sin(300 * gr));
+console.log(Math.sin(330 * gr));
+*/
+/*
+for (let ray = 20; ray <= 90; ray = ray + 10) {
+	let points: number[][] = [];
+	let preX = -1;
+	let preY = -1;
+	for (let st = 1; st <= 7; st++) {
+		let xx = Math.round(st * Math.cos(ray * gr));
+		let yy = Math.round(st * Math.sin(ray * gr));
+		if (preX == xx && preY == yy) {
+			//
+		} else {
+			if (yy > 0) {
+				preX = xx;
+				preY = yy;
+				//console.log('x', xx, 'y', yy);
+				points.push([xx, yy])
+			}
+		}
+	}
+	console.log(ray, points);
+}
 
 
 
-
+*/
