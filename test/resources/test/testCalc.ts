@@ -957,12 +957,16 @@ x... x... x... x... x... x... x... x...
 .... .... .... .... .... 0... .... ....
 .... .... .... .... .... .... 0... 0...
 */
-function rayPoints(ray: number): number[][] {
+function rayPoints(len: number, raydegr: number): number[][] {
+	raydegr = raydegr % 360;
+	let ray = raydegr - 180;
+	if (raydegr > 270) ray = 360 - raydegr;
 	let gr = Math.PI / 180;
+	//console.log(raydegr, ray)
 	let points: number[][] = [];
 	let preX = -1;
 	let preY = -1;
-	for (let st = 1; st <= 6; st++) {
+	for (let st = 1; st <= len; st++) {
 		let xx = Math.round(st * Math.cos(ray * gr));
 		let yy = Math.round(st * Math.sin(ray * gr));
 		if (preX == xx && preY == yy) {
@@ -976,41 +980,49 @@ function rayPoints(ray: number): number[][] {
 			}
 		}
 	}
-	return points;
-}
-function ray2points(xx: number, points: number[][], rowIdx: number, rows: BallsRow[]): number {
-	let cnt = 0;
-	let last=-1;
-	for (let pp = 0; pp < points.length; pp++) {
-		if (ballExists(xx + 1 + points[pp][0], rows[rowIdx + points[pp][1]])) {
-			if (pp > 2 && cnt == 0) {
-				return 0;
-			} else {
-				cnt++;
-				last=pp;
-			}
+	if (raydegr >= 90 && raydegr <= 270) {
+		for (let nn = 0; nn < points.length; nn++) {
+			points[nn][0] = -points[nn][0];
 		}
 	}
-	if (cnt > 1) {
-		return points.length-last;
-	} else {
-		return 0;
+	if (raydegr >= 180 && raydegr <= 360) {
+		for (let nn = 0; nn < points.length; nn++) {
+			points[nn][1] = -points[nn][1];
+		}
 	}
+	return points;
+}
+function ray2points(xx: number, points: number[][], rowIdx: number, rows: BallsRow[]): number[] {
+	let found: number[] = [];
+	for (let pp = 0; pp < points.length; pp++) {
+		if (ballExists(xx + 1 + points[pp][0], rows[rowIdx - points[pp][1]])) {
+			found.push(pp);
+		}
+	}
+	return found;
 }
 function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
+	//if (rowIdx > 20) return;
 	let cellColors: number[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
 		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-		for (let ray = 30; ray <= 75; ray = ray + 15) {
-			let points = rayPoints(ray);
-			cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
-			for (let pp = 0; pp < points.length; pp++) {
-				points[pp][0] = -points[pp][0];
+		//let ray = 270;
+		for (let ray = 200; ray <= 340; ray = ray + 10) {
+			if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
+				if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
+					if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
+						cellColors[xx] = cellColors[xx] + 1;
+					}
+				}
 			}
-			cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
 		}
-		let points = rayPoints(90);
-		cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
+		/*let points = rayPoints(8, ray);
+		let found = ray2points(xx, points, rowIdx, rows);
+		if (found.length > 1) {
+			cellColors[xx] = cellColors[xx] + 1;
+			//console.log(xx, 'x', rowIdx, 'points', points, 'found', found);
+		}*/
+
 	}
 	let max = 0;
 	for (let xx = 0; xx < rowLen; xx++) {
@@ -1025,13 +1037,13 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 		if (idx > 1) {
 			idx = 1;
 		}
-		idx = idx * 255;
+		idx = 255-idx * 255;
 		//console.log(idx);
 		addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
 			//, 'rgba(0,66,0,' + idx + ')');
-			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+			, 'rgba(' + idx + ',255,' + idx + ',1)');
 		addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
-			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+			, 'rgba(' + idx + ',255,' + idx + ',1)');
 	}
 }
 function paintCellsGreen222(//ratioPre: number

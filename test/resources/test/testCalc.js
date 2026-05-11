@@ -846,12 +846,17 @@ x... x... x... x... x... x... x... x...
 .... .... .... .... .... 0... .... ....
 .... .... .... .... .... .... 0... 0...
 */
-function rayPoints(ray) {
+function rayPoints(len, raydegr) {
+    raydegr = raydegr % 360;
+    var ray = raydegr - 180;
+    if (raydegr > 270)
+        ray = 360 - raydegr;
     var gr = Math.PI / 180;
+    //console.log(raydegr, ray)
     var points = [];
     var preX = -1;
     var preY = -1;
-    for (var st = 1; st <= 6; st++) {
+    for (var st = 1; st <= len; st++) {
         var xx = Math.round(st * Math.cos(ray * gr));
         var yy = Math.round(st * Math.sin(ray * gr));
         if (preX == xx && preY == yy) {
@@ -866,43 +871,48 @@ function rayPoints(ray) {
             }
         }
     }
+    if (raydegr >= 90 && raydegr <= 270) {
+        for (var nn = 0; nn < points.length; nn++) {
+            points[nn][0] = -points[nn][0];
+        }
+    }
+    if (raydegr >= 180 && raydegr <= 360) {
+        for (var nn = 0; nn < points.length; nn++) {
+            points[nn][1] = -points[nn][1];
+        }
+    }
     return points;
 }
 function ray2points(xx, points, rowIdx, rows) {
-    var cnt = 0;
-    var last = -1;
+    var found = [];
     for (var pp = 0; pp < points.length; pp++) {
-        if (ballExists(xx + 1 + points[pp][0], rows[rowIdx + points[pp][1]])) {
-            if (pp > 2 && cnt == 0) {
-                return 0;
-            }
-            else {
-                cnt++;
-                last = pp;
-            }
+        if (ballExists(xx + 1 + points[pp][0], rows[rowIdx - points[pp][1]])) {
+            found.push(pp);
         }
     }
-    if (cnt > 1) {
-        return points.length - last;
-    }
-    else {
-        return 0;
-    }
+    return found;
 }
 function paintCellsGreen(svg, rowIdx, rows) {
+    //if (rowIdx > 20) return;
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-        for (var ray = 30; ray <= 75; ray = ray + 15) {
-            var points_1 = rayPoints(ray);
-            cellColors[xx] = cellColors[xx] + ray2points(xx, points_1, rowIdx, rows);
-            for (var pp = 0; pp < points_1.length; pp++) {
-                points_1[pp][0] = -points_1[pp][0];
+        //let ray = 270;
+        for (var ray = 200; ray <= 340; ray = ray + 10) {
+            if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
+                if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
+                    if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
+                        cellColors[xx] = cellColors[xx] + 1;
+                    }
+                }
             }
-            cellColors[xx] = cellColors[xx] + ray2points(xx, points_1, rowIdx, rows);
         }
-        var points = rayPoints(90);
-        cellColors[xx] = cellColors[xx] + ray2points(xx, points, rowIdx, rows);
+        /*let points = rayPoints(8, ray);
+        let found = ray2points(xx, points, rowIdx, rows);
+        if (found.length > 1) {
+            cellColors[xx] = cellColors[xx] + 1;
+            //console.log(xx, 'x', rowIdx, 'points', points, 'found', found);
+        }*/
     }
     var max = 0;
     for (var xx = 0; xx < rowLen; xx++) {
@@ -917,12 +927,12 @@ function paintCellsGreen(svg, rowIdx, rows) {
         if (idx > 1) {
             idx = 1;
         }
-        idx = idx * 255;
+        idx = 255 - idx * 255;
         //console.log(idx);
         addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
         //, 'rgba(0,66,0,' + idx + ')');
-        , 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
-        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+        , 'rgba(' + idx + ',255,' + idx + ',1)');
+        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',255,' + idx + ',1)');
     }
 }
 function paintCellsGreen222(//ratioPre: number
