@@ -883,6 +883,9 @@ function rayPoints(len, raydegr) {
     }
     return points;
 }
+for (var ii = 270 - 60; ii <= 270 + 60; ii = ii + 15) {
+    console.log(ii, rayPoints(7, ii));
+}
 function ray2points(xx, points, rowIdx, rows) {
     var found = [];
     for (var pp = 0; pp < points.length; pp++) {
@@ -893,8 +896,8 @@ function ray2points(xx, points, rowIdx, rows) {
     return found;
 }
 function rayConsistsPoints(ray, xx, rowIdx, rows) {
-    if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
-        if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
+    if (ray2points(xx, rayPoints(4, ray), rowIdx, rows).length > 0) {
+        if (ray2points(xx, rayPoints(6, ray), rowIdx, rows).length > 1) {
             if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
                 return true;
             }
@@ -918,26 +921,40 @@ function paintCellsGreen(svg, rowIdx, rows) {
             }
             
         }*/
+        if (rayConsistsPoints(270 - 60, xx, rowIdx, rows)
+            || rayConsistsPoints(275 - 45, xx, rowIdx, rows)
+            || rayConsistsPoints(270 - 30, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 - 15, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 0, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 15, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 + 30, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 45, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 60, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        /*
         if (rayConsistsPoints(270 - 70, xx, rowIdx, rows)
             || rayConsistsPoints(275 - 60, xx, rowIdx, rows)
-            || rayConsistsPoints(270 - 50, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+            || rayConsistsPoints(270 - 50, xx, rowIdx, rows)
+        ) cellColors[xx] = cellColors[xx] + 1;
         if (rayConsistsPoints(270 - 40, xx, rowIdx, rows)
             || rayConsistsPoints(275 - 30, xx, rowIdx, rows)
-            || rayConsistsPoints(270 - 20, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+            || rayConsistsPoints(270 - 20, xx, rowIdx, rows)
+        ) cellColors[xx] = cellColors[xx] + 1;
         if (rayConsistsPoints(270 - 10, xx, rowIdx, rows)
             || rayConsistsPoints(270 + 0, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 10, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+            || rayConsistsPoints(270 + 10, xx, rowIdx, rows)
+        ) cellColors[xx] = cellColors[xx] + 1;
         if (rayConsistsPoints(270 + 20, xx, rowIdx, rows)
             || rayConsistsPoints(270 + 30, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 40, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+            || rayConsistsPoints(270 + 40, xx, rowIdx, rows)
+        ) cellColors[xx] = cellColors[xx] + 1;
         if (rayConsistsPoints(270 + 50, xx, rowIdx, rows)
             || rayConsistsPoints(270 + 60, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 70, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+            || rayConsistsPoints(270 + 70, xx, rowIdx, rows)
+        ) cellColors[xx] = cellColors[xx] + 1;
+        */
         /*let points = rayPoints(8, ray);
         let found = ray2points(xx, points, rowIdx, rows);
         if (found.length > 1) {
