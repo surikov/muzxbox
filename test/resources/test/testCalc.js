@@ -892,13 +892,23 @@ function ray2points(xx, points, rowIdx, rows) {
     }
     return found;
 }
+function rayConsistsPoints(ray, xx, rowIdx, rows) {
+    if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
+        if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
+            if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
 function paintCellsGreen(svg, rowIdx, rows) {
     //if (rowIdx > 20) return;
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
         //let ray = 270;
-        for (var ray = 200; ray <= 340; ray = ray + 10) {
+        /*for (let ray = 200; ray <= 340; ray = ray + 10) {
             if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
                 if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
                     if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
@@ -906,7 +916,28 @@ function paintCellsGreen(svg, rowIdx, rows) {
                     }
                 }
             }
-        }
+            
+        }*/
+        if (rayConsistsPoints(270 - 70, xx, rowIdx, rows)
+            || rayConsistsPoints(275 - 60, xx, rowIdx, rows)
+            || rayConsistsPoints(270 - 50, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 - 40, xx, rowIdx, rows)
+            || rayConsistsPoints(275 - 30, xx, rowIdx, rows)
+            || rayConsistsPoints(270 - 20, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 - 10, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 0, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 10, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 + 20, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 30, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 40, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
+        if (rayConsistsPoints(270 + 50, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 60, xx, rowIdx, rows)
+            || rayConsistsPoints(270 + 70, xx, rowIdx, rows))
+            cellColors[xx] = cellColors[xx] + 1;
         /*let points = rayPoints(8, ray);
         let found = ray2points(xx, points, rowIdx, rows);
         if (found.length > 1) {
@@ -931,8 +962,8 @@ function paintCellsGreen(svg, rowIdx, rows) {
         //console.log(idx);
         addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
         //, 'rgba(0,66,0,' + idx + ')');
-        , 'rgba(' + idx + ',255,' + idx + ',1)');
-        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',255,' + idx + ',1)');
+        , 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+        addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
     }
 }
 function paintCellsGreen222(//ratioPre: number
