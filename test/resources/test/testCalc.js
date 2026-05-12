@@ -859,7 +859,7 @@ function rayPoints(len, raydegr) {
     for (var st = 1; st <= len; st++) {
         var xx = Math.round(st * Math.cos(ray * gr));
         var yy = Math.round(st * Math.sin(ray * gr));
-        if (preX == xx && preY == yy) {
+        if (preX == xx || preY == yy) {
             //
         }
         else {
@@ -883,9 +883,6 @@ function rayPoints(len, raydegr) {
     }
     return points;
 }
-for (var ii = 270 - 60; ii <= 270 + 60; ii = ii + 15) {
-    console.log(ii, rayPoints(7, ii));
-}
 function ray2points(xx, points, rowIdx, rows) {
     var found = [];
     for (var pp = 0; pp < points.length; pp++) {
@@ -905,11 +902,70 @@ function rayConsistsPoints(ray, xx, rowIdx, rows) {
     }
     return false;
 }
+function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, rowIdx, rows) {
+    var gr = Math.PI / 180;
+    var cnt = 0;
+    var skipX = [];
+    var skipY = [];
+    for (var distance = mindistance; distance <= maxdistance; distance++) {
+        for (var rr = minray; rr <= maxray; rr = rr + 1) {
+            var raydegr = rr % 360;
+            var ray = raydegr - 180;
+            if (raydegr > 270)
+                ray = 360 - raydegr;
+            var px = Math.round(distance * Math.cos(ray * gr));
+            var py = Math.round(distance * Math.sin(ray * gr));
+            if (rr >= 90 && rr <= 270) {
+                px = -px;
+            }
+            if (rr >= 180 && rr <= 360) {
+                py = -py;
+            }
+            var skip = false;
+            for (var ss = 0; ss < skipX.length; ss++) {
+                if (skipX[ss] == px && skipY[ss] == py) {
+                    skip = true;
+                    break;
+                }
+            }
+            if (skip) {
+                //
+            }
+            else {
+                if (py < 0) {
+                    if (ballExists(xx + 1 + px, rows[rowIdx - py])) {
+                        skipX.push(px);
+                        skipY.push(py);
+                        cnt++;
+                    }
+                }
+            }
+        }
+    }
+    return cnt;
+}
 function paintCellsGreen(svg, rowIdx, rows) {
     //if (rowIdx > 20) return;
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+        for (var zz = 205; zz <= 335; zz = zz + 10) {
+            var df = 0;
+            if (sectorConsistsPointsAt(1, 1, zz, zz + 10, xx, rowIdx, rows) > 0) {
+                df = 27;
+            }
+            if (sectorConsistsPointsAt(1, 2, zz, zz + 10, xx, rowIdx, rows) > 0) {
+                df = 9;
+            }
+            if (sectorConsistsPointsAt(1, 3, zz, zz + 10, xx, rowIdx, rows) > 0) {
+                df = 1;
+            }
+            if (df) {
+                if (sectorConsistsPointsAt(1, 7, zz, zz + 10, xx, rowIdx, rows) > 2) {
+                    cellColors[xx] = cellColors[xx] + df;
+                }
+            }
+        }
         //let ray = 270;
         /*for (let ray = 200; ray <= 340; ray = ray + 10) {
             if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
@@ -921,18 +977,26 @@ function paintCellsGreen(svg, rowIdx, rows) {
             }
             
         }*/
-        if (rayConsistsPoints(270 - 60, xx, rowIdx, rows)
-            || rayConsistsPoints(275 - 45, xx, rowIdx, rows)
-            || rayConsistsPoints(270 - 30, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
-        if (rayConsistsPoints(270 - 15, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 0, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 15, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
-        if (rayConsistsPoints(270 + 30, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 45, xx, rowIdx, rows)
-            || rayConsistsPoints(270 + 60, xx, rowIdx, rows))
-            cellColors[xx] = cellColors[xx] + 1;
+        /*
+                if (rayConsistsPoints(270 - 7 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 - 6 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 - 5 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 - 4 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 - 3 * 7.5, xx, rowIdx, rows)
+                ) cellColors[xx] = cellColors[xx] + 1;
+                if (rayConsistsPoints(270 - 2 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 - 1 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 0 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 1 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 2 * 7.5, xx, rowIdx, rows)
+                ) cellColors[xx] = cellColors[xx] + 1;
+                if (rayConsistsPoints(270 + 3 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 4 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 5 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 6 * 7.5, xx, rowIdx, rows)
+                    || rayConsistsPoints(270 + 7 * 7.5, xx, rowIdx, rows)
+                ) cellColors[xx] = cellColors[xx] + 1;
+                */
         /*
         if (rayConsistsPoints(270 - 70, xx, rowIdx, rows)
             || rayConsistsPoints(275 - 60, xx, rowIdx, rows)
