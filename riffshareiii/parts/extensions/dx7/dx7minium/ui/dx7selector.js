@@ -1469,17 +1469,8 @@ class DX7UI {
         this.renderLibList();
         let me = this;
         this.titleText = document.getElementById('presettitle');
-        this.volumeSlider = document.getElementById('volume');
-        this.volumeSlider.addEventListener('change', (event) => {
-            if (me.preset) {
-                me.volumeValue = me.volumeSlider.value;
-                let par = {
-                    volume: me.volumeValue, preset: me.preset
-                };
-                var message = { dialogID: me.id, pluginData: par, done: false, screenWait: false };
-                window.parent.postMessage(message, '*');
-            }
-        });
+        this.volumeValueText = document.getElementById('volumeValue');
+        this.volumeValueText.innerText = '' + this.volumeValue;
     }
     parseHostData(data) {
         if (data) {
@@ -1498,7 +1489,6 @@ class DX7UI {
         if (this.id) {
             let data = this.parseHostData(message.hostData);
             if (data) {
-                this.volumeSlider.value = data.volume;
                 this.volumeValue = data.volume;
                 this.preset = data.preset;
                 this.titleText.innerHTML = this.preset.label;
@@ -1517,7 +1507,7 @@ class DX7UI {
             });
             for (let ii = 0; ii < libDX7list.length; ii++) {
                 let li = document.createElement('li');
-                li.innerText = '' + ii + ': ' + libDX7list[ii].name;
+                li.innerText = '' + ii + '. ' + libDX7list[ii].name;
                 let pid = ii;
                 li.onclick = () => {
                     console.log(pid, libDX7list[pid].name);
@@ -1532,6 +1522,37 @@ class DX7UI {
                     this.titleText.innerHTML = me.preset.label;
                 };
                 liblist.appendChild(li);
+            }
+        }
+    }
+    importFile() {
+        console.log('importFile');
+    }
+    minusVolume() {
+        console.log('minusVolume');
+        if (this.volumeValue > 0) {
+            if (this.preset) {
+                this.volumeValue = this.volumeValue - 10;
+                this.volumeValueText.innerText = '' + this.volumeValue;
+                let par = {
+                    volume: this.volumeValue, preset: this.preset
+                };
+                var message = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
+                window.parent.postMessage(message, '*');
+            }
+        }
+    }
+    plusVolume() {
+        console.log('plusVolume');
+        if (this.volumeValue < 150) {
+            if (this.preset) {
+                this.volumeValue = this.volumeValue + 10;
+                this.volumeValueText.innerText = '' + this.volumeValue;
+                let par = {
+                    volume: this.volumeValue, preset: this.preset
+                };
+                var message = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
+                window.parent.postMessage(message, '*');
             }
         }
     }

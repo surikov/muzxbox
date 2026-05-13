@@ -345,6 +345,10 @@ type SynthPreset = {
     feedbackRatio: number;
     modulationRatio: number;
 };
+type FMParameter = {
+    volume: number;
+    preset: SynthPreset;
+};
 declare let libDX7list: DX7PresetData[];
 declare class DX7Loader {
     scale99(nn: number): number;
@@ -361,18 +365,17 @@ declare class DX7Loader {
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
 }
-type FMParameter = {
-    volume: number;
-    preset: SynthPreset;
-};
 declare class DX7UI {
     id: string;
     volumeValue: number;
+    volumeValueText: any;
     preset: SynthPreset | null;
-    volumeSlider: any;
     titleText: any;
     constructor();
     parseHostData(data: any): FMParameter | null;
     receiveHostMessage(messageEvent: MessageEvent): void;
     renderLibList(): void;
+    importFile(): void;
+    minusVolume(): void;
+    plusVolume(): void;
 }

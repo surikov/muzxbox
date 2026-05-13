@@ -6,19 +6,28 @@
 </head>
 
 <body>
-<p id='presettitle'>?</p>
+	<div class='rake'>
+		<p>Yamaha DX7 library</p>
+		<p>
+			<span onclick='dx7ui.importFile();'>[Import]</span>
+			<br/>
+			<span onclick='dx7ui.minusVolume();'>[-]</span> <span onclick='dx7ui.plusVolume();'>[+]</span></span> <span>Volume: <span id='volumeValue'>123</span>% 
+		</p>
+		<p>Current preset: <span id='presettitle'>presetName/fileName</span></p>
+		<div id='libpane'>
+			<ul id='liblist'>
+
+			</ul>
+		</div>
+		<!--
 	<p id='titlebar'>
 		<button>Import</button>
 	</p>
 	<p>
 		<input type="range" id='volume'>
 	</p>
-	<div id='libpane'>
-		<ul id='liblist'>
-
-		</ul>
-	</div>
-
+-->
+		<div>
 </body>
 <script src='dx7selector.js'></script>
 <script>
