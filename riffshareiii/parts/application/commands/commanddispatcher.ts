@@ -1085,7 +1085,7 @@ class CommandDispatcher {
 		}
 	}
 	adjustTimeLineLength(project: Zvoog_Project) {
-		console.log('adjustTimeLineLength');
+		//console.log('adjustTimeLineLength');
 		this.adjustTimelineEmptyEnd(project);
 		this.adjustTimelineEmptyEnd(project);
 		this.adjustTimelineEmptyEnd(project);

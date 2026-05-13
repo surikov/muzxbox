@@ -524,28 +524,34 @@ class DragMenuItemUtil {
 		}
 	}
 	doDrag(x: number, y: number) {
+		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+		let zidx = zoomIndexFromZoom(zz);
+		let ss = globalCommandDispatcher.renderer.menu.scrollY;
+		let tt = this.info.menuTop ? this.info.menuTop : 0;
+		let yy = (tt + ss - 0.0) * zz;
+		let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
 		if (!this.dragStarted) {
-			//console.log(this);
-			let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-			let ss = globalCommandDispatcher.renderer.menu.scrollY;
-			let tt = this.info.menuTop ? this.info.menuTop : 0;
-			let yy = (tt + ss - 0.0) * zz;
-			let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+
+
 			this.dragStarted = true;
 			globalCommandDispatcher.hideRightMenu();
 			if (this.onPluck) {
 				this.onPluck(zz);
 			}
 			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
+
 		}
 		globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+		let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
+		console.log('found performer', toPerformer);
 		if (x == 0 && y == 0) {
+			this.dragStarted = false;
 			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
 			//let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 			//let dx = globalCommandDispatcher.renderer.menu.dragItemX * zz;
 			//let dy = globalCommandDispatcher.renderer.menu.dragItemY * zz;
 			this.onDone(pos.x, pos.y);
-			//console.log(globalCommandDispatcher.renderer.menu.dragItemX,globalCommandDispatcher.renderer.menu.dragItemY);
+			//console.log('drag onDone', globalCommandDispatcher.renderer.menu.dragItemX, globalCommandDispatcher.renderer.menu.dragItemY, '/', zz, zidx);
 		}
 	}
 }
@@ -645,26 +651,32 @@ function fillPluginsLists() {
 						, rx: 1 / 20, ry: 1 / 20
 						, css: 'rectangleDragItem'
 					};
-					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (xx: number, yy: number) => {
+					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
 						//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-						let zz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-						let zisx=0;
-						console.log('track', xx, yy,zz, MZXBX_currentPlugins()[ii].kind,zoomPrefixLevelsCSS);
+						let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+						let zisx = 0;
+						console.log('drop new track', dx, dy, zz, globalCommandDispatcher.cfg().padGridFan, MZXBX_currentPlugins()[ii].kind, zoomPrefixLevelsCSS);
+						let xx = dx;
+						if (xx < globalCommandDispatcher.cfg().padGridFan) {
+							xx = globalCommandDispatcher.cfg().padGridFan;
+						}
 						globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 							//let sz=globalCommandDispatcher.cfg().fanPluginIconSize(Math.round(zz));
 							//let sz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-							
+
 							for (let trnum = 0; trnum < globalCommandDispatcher.cfg().data.tracks.length; trnum++) {
 								let checkTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trnum];
-								console.log(trnum, 'track', checkTrack.performer.iconPosition);
+
 							}
+							//console.log('check new', xx, yy,globalCommandDispatcher.cfg().fanPluginLeft());
+
 							globalCommandDispatcher.cfg().data.tracks.push({
 								performer: {
 									id: '' + Math.random()
 									, kind: MZXBX_currentPlugins()[ii].kind
 									, data: ''
 									, outputs: ['']
-									, iconPosition: { x: xx, y: yy }
+									, iconPosition: { x: xx, y: dy }
 									, state: 0
 									, hint1_128: 0
 								}

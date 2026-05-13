@@ -79,6 +79,9 @@ class MixerDataMathUtility {
 	wholeWidth(): number {
 		return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
 	}
+	fanPluginLeft(): number {
+		return this.leftPad + this.timelineWidth() + this.padGridFan;
+	}
 	fanPluginIconSize(zidx: number) {
 		return this.pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
 	}
@@ -152,6 +155,26 @@ class MixerDataMathUtility {
 		}
 		return null;
 	}*/
+	dragFindPluginPerformerIcon(x: number, y: number, z: number
+		//, xid: string//, outputs: string[]
+	): Zvoog_AudioSequencer | null {
+		let sz = this.fanPluginIconSize(z);
+		for (let ii = 0; ii < this.data.tracks.length; ii++) {
+			let plugin = this.data.tracks[ii].performer;
+			//if (plugin.id != xid) {
+			//if (outputs.indexOf(plugin.id, 0) < 0) {
+			if (plugin.iconPosition) {
+				if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+					if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+						return plugin;
+					}
+				}
+			}
+			//}
+			//}
+		}
+		return null;
+	}
 	dragFindPluginFilterIcon(x: number, y: number, z: number, xid: string, outputs: string[]): Zvoog_FilterTarget | null {
 
 		let sz = this.fanPluginIconSize(z);

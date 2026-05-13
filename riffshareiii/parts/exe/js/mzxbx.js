@@ -528,7 +528,6 @@ class PluginLoader {
         let tt = this.findPluginInfo(kind);
         if (tt) {
             let info = tt;
-            console.log('startLoadPluginStarter', info.kind, info.script);
             MZXBX_appendScriptURL(info.script);
             MZXBX_waitForCondition(250, () => {
                 return (window[info.evaluate]);

@@ -8,7 +8,8 @@ var sversion = 'v1.143 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
 var markX = -1;
 var markY = -1;
 var cellSize = 12;
-var topShift = cellSize * 21;
+//let topShift = cellSize * 21;
+var topShift = cellSize * 5;
 var rowsVisibleCount = 101;
 var rowsAvgCount = 5;
 var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
@@ -949,22 +950,27 @@ function paintCellsGreen(svg, rowIdx, rows) {
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-        for (var zz = 205; zz <= 335; zz = zz + 10) {
-            var df = 0;
-            if (sectorConsistsPointsAt(1, 1, zz, zz + 10, xx, rowIdx, rows) > 0) {
-                df = 27;
+        //for (let zz = 205; zz <= 335; zz = zz + 10) {
+        for (var zz = 265 - 60; zz <= 270 + 60; zz = zz + 5) {
+            //let df = 0;
+            if (sectorConsistsPointsAt(1, 6, zz, zz + 5, xx, rowIdx, rows) > 2) {
+                cellColors[xx] = cellColors[xx] + 1;
+            }
+            /*if (sectorConsistsPointsAt(1, 1, zz, zz + 10, xx, rowIdx, rows) > 0) {
+                df = 4;
             }
             if (sectorConsistsPointsAt(1, 2, zz, zz + 10, xx, rowIdx, rows) > 0) {
-                df = 9;
+                df = 2;
             }
             if (sectorConsistsPointsAt(1, 3, zz, zz + 10, xx, rowIdx, rows) > 0) {
                 df = 1;
             }
             if (df) {
-                if (sectorConsistsPointsAt(1, 7, zz, zz + 10, xx, rowIdx, rows) > 2) {
-                    cellColors[xx] = cellColors[xx] + df;
+                let xsts=sectorConsistsPointsAt(1, 7, zz, zz + 10, xx, rowIdx, rows)
+                if ( xsts> 2) {
+                    cellColors[xx] = cellColors[xx] + xsts*df;
                 }
-            }
+            }*/
         }
         //let ray = 270;
         /*for (let ray = 200; ray <= 340; ray = ray + 10) {
@@ -1710,7 +1716,7 @@ for (let ii = 0; ii < 10; ii++) {
 }
 */
 //test10();
-console.log('start', datarows);
+//console.log('start', datarows);
 //let gr = Math.PI / 180;
 /*
 console.log(Math.sin(210 * gr));
@@ -1743,4 +1749,26 @@ for (let ray = 20; ray <= 90; ray = ray + 10) {
 
 
 
+*/
+/*
+function density9() {
+    
+    for (let yy = 1; yy < 100; yy++) {
+        let cnts:number[] =[];
+        for (let xx = 0; xx <= rowLen; xx++) {
+            let sing=0;
+            for (let dx = 0; dx < 3; dx++) {
+                for (let dy = 0; dy < 3; dy++) {
+                    if (ballExists(xx + 1 + dx, datarows[yy + dy])) {
+                        sing++;
+                    }
+                }
+            }
+            cnts.push(sing);
+        }
+        cnts.sort();
+        console.log(yy, cnts);
+    }
+}
+density9();
 */ 

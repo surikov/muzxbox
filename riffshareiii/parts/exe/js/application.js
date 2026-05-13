@@ -2040,7 +2040,6 @@ class CommandDispatcher {
         }
     }
     adjustTimeLineLength(project) {
-        console.log('adjustTimeLineLength');
         this.adjustTimelineEmptyEnd(project);
         this.adjustTimelineEmptyEnd(project);
         this.adjustTimelineEmptyEnd(project);
@@ -2270,6 +2269,14 @@ let gridLinesExplicit = [
     { ratio: 0.1, duration: { count: 1, part: 32 } },
     { ratio: 0.4, duration: { count: 1, part: 32 }, label: true }
 ];
+function zoomIndexFromZoom(zz) {
+    for (let ii = 1; ii < zoomPrefixLevelsCSS.length; ii++) {
+        if (zoomPrefixLevelsCSS[ii].minZoom >= zz) {
+            return ii - 1;
+        }
+    }
+    return 0;
+}
 let zoomPrefixLevelsCSS = [
     { prefix: '025', minZoom: 0.25, gridLines: gridLinesExplicit, iconRatio: 1 },
     { prefix: '05', minZoom: 0.5, gridLines: gridLinesDtailed, iconRatio: 1.25 },
@@ -3670,12 +3677,13 @@ class DragMenuItemUtil {
         }
     }
     doDrag(x, y) {
+        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+        let zidx = zoomIndexFromZoom(zz);
+        let ss = globalCommandDispatcher.renderer.menu.scrollY;
+        let tt = this.info.menuTop ? this.info.menuTop : 0;
+        let yy = (tt + ss - 0.0) * zz;
+        let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
         if (!this.dragStarted) {
-            let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-            let ss = globalCommandDispatcher.renderer.menu.scrollY;
-            let tt = this.info.menuTop ? this.info.menuTop : 0;
-            let yy = (tt + ss - 0.0) * zz;
-            let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
             this.dragStarted = true;
             globalCommandDispatcher.hideRightMenu();
             if (this.onPluck) {
@@ -3684,9 +3692,13 @@ class DragMenuItemUtil {
             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
         }
         globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+        let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
+        console.log('found performer', toPerformer);
         if (x == 0 && y == 0) {
+            this.dragStarted = false;
             let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
             this.onDone(pos.x, pos.y);
+            console.log('drag onDone', globalCommandDispatcher.renderer.menu.dragItemX, globalCommandDispatcher.renderer.menu.dragItemY, '/', zz, zidx);
         }
     }
 }
@@ -3738,14 +3750,17 @@ function fillPluginsLists() {
                         rx: 1 / 20, ry: 1 / 20,
                         css: 'rectangleDragItem'
                     };
-                    let dragger = new DragMenuItemUtil(square, info, (xx, yy) => {
+                    let dragger = new DragMenuItemUtil(square, info, (dx, dy) => {
                         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
                         let zisx = 0;
-                        console.log('track', xx, yy, zz, MZXBX_currentPlugins()[ii].kind, zoomPrefixLevelsCSS);
+                        console.log('drop new track', dx, dy, zz, globalCommandDispatcher.cfg().padGridFan, MZXBX_currentPlugins()[ii].kind, zoomPrefixLevelsCSS);
+                        let xx = dx;
+                        if (xx < globalCommandDispatcher.cfg().padGridFan) {
+                            xx = globalCommandDispatcher.cfg().padGridFan;
+                        }
                         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                             for (let trnum = 0; trnum < globalCommandDispatcher.cfg().data.tracks.length; trnum++) {
                                 let checkTrack = globalCommandDispatcher.cfg().data.tracks[trnum];
-                                console.log(trnum, 'track', checkTrack.performer.iconPosition);
                             }
                             globalCommandDispatcher.cfg().data.tracks.push({
                                 performer: {
@@ -3753,7 +3768,7 @@ function fillPluginsLists() {
                                     kind: MZXBX_currentPlugins()[ii].kind,
                                     data: '',
                                     outputs: [''],
-                                    iconPosition: { x: xx, y: yy },
+                                    iconPosition: { x: xx, y: dy },
                                     state: 0,
                                     hint1_128: 0
                                 },
@@ -6757,6 +6772,9 @@ class MixerDataMathUtility {
     wholeWidth() {
         return this.leftPad + this.timelineWidth() + this.padGridFan + this.fanWidth() + this.rightPad;
     }
+    fanPluginLeft() {
+        return this.leftPad + this.timelineWidth() + this.padGridFan;
+    }
     fanPluginIconSize(zidx) {
         return this.pluginIconSize * zoomPrefixLevelsCSS[zidx].iconRatio;
     }
@@ -6794,6 +6812,20 @@ class MixerDataMathUtility {
         }
         ww = ww + this.speakerIconPad + 7 * this.pluginIconSize;
         return ww;
+    }
+    dragFindPluginPerformerIcon(x, y, z) {
+        let sz = this.fanPluginIconSize(z);
+        for (let ii = 0; ii < this.data.tracks.length; ii++) {
+            let plugin = this.data.tracks[ii].performer;
+            if (plugin.iconPosition) {
+                if (Math.abs(x - plugin.iconPosition.x) < sz * 0.75) {
+                    if (Math.abs(y - plugin.iconPosition.y) < sz * 0.75) {
+                        return plugin;
+                    }
+                }
+            }
+        }
+        return null;
     }
     dragFindPluginFilterIcon(x, y, z, xid, outputs) {
         let sz = this.fanPluginIconSize(z);

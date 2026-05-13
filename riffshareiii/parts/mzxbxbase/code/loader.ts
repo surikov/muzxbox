@@ -50,7 +50,7 @@ class PluginLoader {
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
-			console.log('startLoadPluginStarter',info.kind,info.script);
+			//console.log('startLoadPluginStarter',info.kind,info.script);
 			MZXBX_appendScriptURL(info.script);
 			MZXBX_waitForCondition(250
 				, () => {

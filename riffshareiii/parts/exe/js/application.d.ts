@@ -243,6 +243,7 @@ declare let gridLinesBrief: GridTimeTemplate14[];
 declare let gridLinesAccurate: GridTimeTemplate14[];
 declare let gridLinesDtailed: GridTimeTemplate14[];
 declare let gridLinesExplicit: GridTimeTemplate14[];
+declare function zoomIndexFromZoom(zz: number): number;
 declare let zoomPrefixLevelsCSS: {
     prefix: string;
     minZoom: number;
@@ -769,8 +770,10 @@ declare class MixerDataMathUtility {
     extractDifference(from: Zvoog_Project): Object;
     mergeDifference(diff: Object): void;
     wholeWidth(): number;
+    fanPluginLeft(): number;
     fanPluginIconSize(zidx: number): number;
     fanWidth(): number;
+    dragFindPluginPerformerIcon(x: number, y: number, z: number): Zvoog_AudioSequencer | null;
     dragFindPluginFilterIcon(x: number, y: number, z: number, xid: string, outputs: string[]): Zvoog_FilterTarget | null;
     dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean;
     speakerFanPosition(): TilePoint;

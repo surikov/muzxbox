@@ -51,6 +51,14 @@ let gridLinesExplicit: GridTimeTemplate14[] = [
 	, { ratio: 0.1, duration: { count: 1, part: 32 } }
 	, { ratio: 0.4, duration: { count: 1, part: 32 }, label: true }
 ];
+function zoomIndexFromZoom(zz: number) {
+	for (let ii = 1; ii < zoomPrefixLevelsCSS.length; ii++) {
+		if (zoomPrefixLevelsCSS[ii].minZoom >= zz) {
+			return ii - 1;
+		}
+	}
+	return 0;
+}
 let zoomPrefixLevelsCSS: {
 	prefix: string
 	, minZoom: number
