@@ -190,7 +190,7 @@ class PerformerIcon {
 				//, css: 'fanSamplerInteractionIcon fanButton' + zidx
 				, css: interSamplerCss + ' fanButton' + zidx
 				, activation: (x: number, y: number) => {
-					//console.log(farNo, trackNo, track.title);
+					//console.log('open',farNo, trackNo, track.title);
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
 					globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, track, info);
 				}

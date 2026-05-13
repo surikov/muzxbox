@@ -773,7 +773,6 @@ declare class MixerDataMathUtility {
     fanPluginLeft(): number;
     fanPluginIconSize(zidx: number): number;
     fanWidth(): number;
-    dragFindPluginPerformerIcon(x: number, y: number, z: number): Zvoog_AudioSequencer | null;
     dragFindPluginFilterIcon(x: number, y: number, z: number, xid: string, outputs: string[]): Zvoog_FilterTarget | null;
     dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean;
     speakerFanPosition(): TilePoint;

@@ -525,7 +525,7 @@ class DragMenuItemUtil {
 	}
 	doDrag(x: number, y: number) {
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		let zidx = zoomIndexFromZoom(zz);
+		//let zidx = zoomIndexFromZoom(zz);
 		let ss = globalCommandDispatcher.renderer.menu.scrollY;
 		let tt = this.info.menuTop ? this.info.menuTop : 0;
 		let yy = (tt + ss - 0.0) * zz;
@@ -542,8 +542,8 @@ class DragMenuItemUtil {
 
 		}
 		globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-		let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
-		console.log('found performer', toPerformer);
+		//let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
+		//console.log('found performer', toPerformer);
 		if (x == 0 && y == 0) {
 			this.dragStarted = false;
 			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
@@ -654,37 +654,72 @@ function fillPluginsLists() {
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
 						//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
 						let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-						let zisx = 0;
-						console.log('drop new track', dx, dy, zz, globalCommandDispatcher.cfg().padGridFan, MZXBX_currentPlugins()[ii].kind, zoomPrefixLevelsCSS);
+						let zidx = zoomIndexFromZoom(zz);
+						//let toPerformerTrack = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(dx, dy, zidx);
+						let trackNo = 0;
+						let farNo = 0;
+						let toPerformerTrack: Zvoog_MusicTrack | null = null;
+						let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+						for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+							let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+							//if (plugin.id != xid) {
+							//if (outputs.indexOf(plugin.id, 0) < 0) {
+							if (plugin.iconPosition) {
+								if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+									if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+										trackNo = ii;
+										let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+										for (let ff = 0; ff < farorder.length; ff++) {
+											if (farorder[ff] == trackNo) {
+												farNo = ff;
+												break;
+											}
+										}
+										toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[ii];
+										break;
+									}
+								}
+							}
+							//}
+							//}
+						}
+
+
+
+
+
+
+						//let trackNo = farorder[farNo];
+						//console.log('drop new track', dx, dy, zz, zidx, 'found', globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(dx, dy, zidx));
 						let xx = dx;
 						if (xx < globalCommandDispatcher.cfg().padGridFan) {
 							xx = globalCommandDispatcher.cfg().padGridFan;
 						}
-						globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-							//let sz=globalCommandDispatcher.cfg().fanPluginIconSize(Math.round(zz));
-							//let sz=globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-
-							for (let trnum = 0; trnum < globalCommandDispatcher.cfg().data.tracks.length; trnum++) {
-								let checkTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trnum];
-
-							}
-							//console.log('check new', xx, yy,globalCommandDispatcher.cfg().fanPluginLeft());
-
-							globalCommandDispatcher.cfg().data.tracks.push({
-								performer: {
-									id: '' + Math.random()
-									, kind: MZXBX_currentPlugins()[ii].kind
-									, data: ''
-									, outputs: ['']
-									, iconPosition: { x: xx, y: dy }
-									, state: 0
-									, hint1_128: 0
-								}
-								, measures: []
-								, title: MZXBX_currentPlugins()[ii].label
+						if (toPerformerTrack) {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+								toPerformerTrack.performer.kind = MZXBX_currentPlugins()[ii].kind;
+								toPerformerTrack.performer.data = '';
 							});
-							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-						});
+							let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
+							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
+						} else {
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+								globalCommandDispatcher.cfg().data.tracks.push({
+									performer: {
+										id: '' + Math.random()
+										, kind: MZXBX_currentPlugins()[ii].kind
+										, data: ''
+										, outputs: ['']
+										, iconPosition: { x: xx, y: dy }
+										, state: 0
+										, hint1_128: 0
+									}
+									, measures: []
+									, title: MZXBX_currentPlugins()[ii].label
+								});
+								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+							});
+						}
 					});
 					info.onDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);
