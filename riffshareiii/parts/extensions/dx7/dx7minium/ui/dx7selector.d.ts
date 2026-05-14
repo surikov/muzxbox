@@ -361,6 +361,7 @@ declare class DX7Loader {
         duration: number;
     };
     convertDX7data(dx7preset: DX7PresetData): SynthPreset;
+    loadSyxFile(from: File, onDone: (dx7presets: DX7PresetData[]) => void): void;
     parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
@@ -368,9 +369,10 @@ declare class DX7Loader {
 declare class DX7UI {
     id: string;
     volumeValue: number;
-    volumeValueText: any;
+    volumeLabel: any;
     preset: SynthPreset | null;
     titleText: any;
+    fileInput: any;
     constructor();
     parseHostData(data: any): FMParameter | null;
     receiveHostMessage(messageEvent: MessageEvent): void;
@@ -378,4 +380,6 @@ declare class DX7UI {
     importFile(): void;
     minusVolume(): void;
     plusVolume(): void;
+    resetVolumeLabel(): void;
+    sendPresetToHost(par: FMParameter): void;
 }

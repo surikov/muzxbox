@@ -159,8 +159,9 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		}
 		//startPlayNote(preset: SynthPreset, when: number, duration: number, note: number) {
 
-		startPlayNote(preset: SynthPreset, when: number, note: number, slides: MZXBX_SlideItem[]) {
-			this.output.gain.value = 0.175;
+		startPlayNote(volume: number, preset: SynthPreset, when: number, note: number, slides: MZXBX_SlideItem[]) {
+			//this.output.gain.value = 0.175;
+			this.output.gain.value = 0.33 * volume / 100;
 			let duration = slides.reduce((sm, cur) => sm + cur.duration, 0);
 			for (let ii = 0; ii < 6; ii++) {
 				let info = preset.operators[ii];
@@ -241,12 +242,12 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				this.cache[ii].stop();
 			}
 		}
-		scheduleStrum(preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
+		scheduleStrum(volume: number, preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
 			//console.log('slides',slides);
 			for (let ii = 0; ii < pitches.length; ii++) {
 				let vox = this.takeVox(preset.mixID);
 				//vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);
-				vox.startPlayNote(preset, when, pitches[ii], slides);
+				vox.startPlayNote(volume, preset, when, pitches[ii], slides);
 			}
 		}
 	}
@@ -282,7 +283,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		strum(whenStart: number, zpitches: number[], tempo: number, mzbxslide: MZXBX_SlideItem[]): void {
 			if (this.synth) {
 				if (this.fm) {
-					this.synth.scheduleStrum(this.fm.preset, whenStart, zpitches, mzbxslide);
+					this.synth.scheduleStrum(this.fm.volume, this.fm.preset, whenStart, zpitches, mzbxslide);
 				}
 			}
 		}

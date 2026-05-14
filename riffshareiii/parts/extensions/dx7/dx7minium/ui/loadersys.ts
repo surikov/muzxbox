@@ -134,6 +134,27 @@ class DX7Loader {
 		}
 		return preset;
 	}
+	loadSyxFile(from: File, onDone: (dx7presets: DX7PresetData[]) => void) {
+		let reader = new FileReader();
+		let all: DX7PresetData[] = [];
+		reader.onload = () => {
+			let result: string = reader.result as string;
+			//console.log(from.name);
+			//let customPresets: DX7PresetData[] = [];
+			for (let ii = 0; ii < 32; ii++) {
+				let one: DX7PresetData = this.parseSysexData(result, ii, from.name);
+				//let preset: SynthPreset = this.convertDX7data(one);
+				//console.log(ii, preset);
+				all.push(one);
+			}
+			//console.log(customPresets);
+			onDone(all);
+		};
+		reader.onerror = (error) => {
+			console.log('error', error)
+		};
+		reader.readAsText(from);
+	}
 	parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void) {
 		let reader = new FileReader();
 		let all: SynthPreset[] = [];
@@ -189,7 +210,7 @@ class DX7Loader {
 			algorithm1_32: voiceData.charCodeAt(110) + 1,
 			feedback0_7: voiceData.charCodeAt(111) & 7,
 			operators: operators,
-			name: voiceData.substring(118, 128).trim() + '/' + filename,
+			name: voiceData.substring(118, 128).trim() + ' / ' + filename,
 
 			//lfoSpeed: voiceData.charCodeAt(112),
 			//lfoDelay: voiceData.charCodeAt(113),
@@ -199,7 +220,7 @@ class DX7Loader {
 			//lfoWaveform: Math.floor(voiceData.charCodeAt(116) >> 1) & 7,
 			//lfoSync: voiceData.charCodeAt(116) & 1,
 		};
-		console.log('parseSysexData', patchId, preset);
+		//console.log('parseSysexData', patchId, preset);
 		return preset;
 	}
 }

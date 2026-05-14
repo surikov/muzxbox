@@ -1065,83 +1065,9 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			if (sectorConsistsPointsAt(1, 6, zz, zz + 5, xx, rowIdx, rows) > 2) {
 				cellColors[xx] = cellColors[xx] + 1;
 			}
-			/*if (sectorConsistsPointsAt(1, 1, zz, zz + 10, xx, rowIdx, rows) > 0) {
-				df = 4;
-			}
-			if (sectorConsistsPointsAt(1, 2, zz, zz + 10, xx, rowIdx, rows) > 0) {
-				df = 2;
-			}
-			if (sectorConsistsPointsAt(1, 3, zz, zz + 10, xx, rowIdx, rows) > 0) {
-				df = 1;
-			}
-			if (df) {
-				let xsts=sectorConsistsPointsAt(1, 7, zz, zz + 10, xx, rowIdx, rows)
-				if ( xsts> 2) {
-					cellColors[xx] = cellColors[xx] + xsts*df;
-				}
-			}*/
+
 		}
-		//let ray = 270;
-		/*for (let ray = 200; ray <= 340; ray = ray + 10) {
-			if (ray2points(xx, rayPoints(3, ray), rowIdx, rows).length > 0) {
-				if (ray2points(xx, rayPoints(5, ray), rowIdx, rows).length > 1) {
-					if (ray2points(xx, rayPoints(7, ray), rowIdx, rows).length > 2) {
-						cellColors[xx] = cellColors[xx] + 1;
-					}
-				}
-			}
-			
-		}*/
-		/*
-				if (rayConsistsPoints(270 - 7 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 - 6 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 - 5 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 - 4 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 - 3 * 7.5, xx, rowIdx, rows)
-				) cellColors[xx] = cellColors[xx] + 1;
-				if (rayConsistsPoints(270 - 2 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 - 1 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 0 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 1 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 2 * 7.5, xx, rowIdx, rows)
-				) cellColors[xx] = cellColors[xx] + 1;
-				if (rayConsistsPoints(270 + 3 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 4 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 5 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 6 * 7.5, xx, rowIdx, rows)
-					|| rayConsistsPoints(270 + 7 * 7.5, xx, rowIdx, rows)
-				) cellColors[xx] = cellColors[xx] + 1;
-				*/
 
-		/*
-		if (rayConsistsPoints(270 - 70, xx, rowIdx, rows)
-			|| rayConsistsPoints(275 - 60, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 - 50, xx, rowIdx, rows)
-		) cellColors[xx] = cellColors[xx] + 1;
-		if (rayConsistsPoints(270 - 40, xx, rowIdx, rows)
-			|| rayConsistsPoints(275 - 30, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 - 20, xx, rowIdx, rows)
-		) cellColors[xx] = cellColors[xx] + 1;
-		if (rayConsistsPoints(270 - 10, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 0, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 10, xx, rowIdx, rows)
-		) cellColors[xx] = cellColors[xx] + 1;
-		if (rayConsistsPoints(270 + 20, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 30, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 40, xx, rowIdx, rows)
-		) cellColors[xx] = cellColors[xx] + 1;
-		if (rayConsistsPoints(270 + 50, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 60, xx, rowIdx, rows)
-			|| rayConsistsPoints(270 + 70, xx, rowIdx, rows)
-		) cellColors[xx] = cellColors[xx] + 1;
-		*/
-
-		/*let points = rayPoints(8, ray);
-		let found = ray2points(xx, points, rowIdx, rows);
-		if (found.length > 1) {
-			cellColors[xx] = cellColors[xx] + 1;
-			//console.log(xx, 'x', rowIdx, 'points', points, 'found', found);
-		}*/
 
 	}
 	let max = 0;
@@ -1150,7 +1076,7 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			max = cellColors[xx];
 		}
 	}
-	//console.log(max);//cellColors);
+	//console.log(rowIdx,cellColors);
 	for (let xx = 0; xx < rowLen; xx++) {
 		let idx = cellColors[xx] / max;
 		idx = (idx) ? idx : 0;
@@ -1158,13 +1084,113 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			idx = 1;
 		}
 		idx = 255 - idx * 255;
-		//console.log(idx);
 		addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
-			//, 'rgba(0,66,0,' + idx + ')');
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
 		addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
 	}
+
+	let cLL = 0;
+	let cMM = 0;
+	let cEE = 0;
+
+	let cLM = 0;
+	let cML = 0;
+
+	let cEL = 0;
+	let cEM = 0;
+	let cLE = 0;
+	let cME = 0;
+
+	for (let xx = 0; xx < rowLen; xx++) {
+		if (ballExists(xx + 1, rows[rowIdx])) {
+			let x1 = xx - 1;
+			let x2 = xx;
+			let x3 = xx + 1;
+			if (x1 < 0) x1 = cellColors.length - 1;
+			if (x3 > cellColors.length - 1) x3 = 0;
+			let left = '=';
+			if (cellColors[x1] < cellColors[x2]) {
+				left = '<';
+			} else {
+				if (cellColors[x1] > cellColors[x2]) {
+					left = '>';
+				}
+			}
+			let right = '=';
+			if (cellColors[x2] < cellColors[x3]) {
+				right = '<';
+			} else {
+				if (cellColors[x2] > cellColors[x3]) {
+					right = '>';
+				}
+			}
+			if ('' + left + right == '<<') cLL++;
+			if ('' + left + right == '<=') cLE++;
+			if ('' + left + right == '<>') cLM++;
+
+			if ('' + left + right == '>>') cMM++;
+			if ('' + left + right == '>=') cME++;
+			if ('' + left + right == '><') cML++;
+
+			if ('' + left + right == '=<') cEL++;
+			if ('' + left + right == '==') cEE++;
+			if ('' + left + right == '=>') cEM++;
+
+			//console.log(xx + 1, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
+		}
+	}
+	//console.log(rowIdx, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
+	console.log(rowIdx, ':',(cLL + cLE + cLM ), (cLM + cEM + cMM  ));
+	cLL = 0;
+	cMM = 0;
+	cEE = 0;
+
+	cLM = 0;
+	cML = 0;
+
+	cEL = 0;
+	cEM = 0;
+	cLE = 0;
+	cME = 0;
+
+	for (let xx = 0; xx < rowLen; xx++) {
+		//if (ballExists(xx + 1, rows[rowIdx])) {
+		let x1 = xx - 1;
+		let x2 = xx;
+		let x3 = xx + 1;
+		if (x1 < 0) x1 = cellColors.length - 1;
+		if (x3 > cellColors.length - 1) x3 = 0;
+		let left = '=';
+		if (cellColors[x1] < cellColors[x2]) {
+			left = '<';
+		} else {
+			if (cellColors[x1] > cellColors[x2]) {
+				left = '>';
+			}
+		}
+		let right = '=';
+		if (cellColors[x2] < cellColors[x3]) {
+			right = '<';
+		} else {
+			if (cellColors[x2] > cellColors[x3]) {
+				right = '>';
+			}
+		}
+		if ('' + left + right == '<<') cLL++;
+		if ('' + left + right == '<=') cLE++;
+		if ('' + left + right == '<>') cLM++;
+
+		if ('' + left + right == '>>') cMM++;
+		if ('' + left + right == '>=') cME++;
+		if ('' + left + right == '><') cML++;
+
+		if ('' + left + right == '=<') cEL++;
+		if ('' + left + right == '==') cEE++;
+		if ('' + left + right == '=>') cEM++;
+		//}
+	}
+	console.log('            ', (cLL + cLE + cLM ), (cLM + cEM + cMM  ));
 }
 function paintCellsGreen222(//ratioPre: number
 	//, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
@@ -1568,7 +1594,7 @@ function diffPart(a: number, b: number): number {
 function dumpPairsCounts() {
 	let start = Math.round(Math.random() * 4321 + 1);
 	//let deep=4;
-
+	
 	let ball = datarows[start].balls[0];
 	console.log('dumpPairsCounts', start, datarows[start], datarows);
 	let line = '';
@@ -1585,7 +1611,7 @@ function dumpPairsCounts() {
 	dumpPairsPatterns(start, preArr1, ball, 6);
 	dumpPairsPatterns(start, preArr1, ball, 7);
 	console.log('dumpPairsPatterns', ball, preArr1);
-
+	
 }
 function dumpPairsPatterns(start, preArr, left, deep) {
 	for (let nn = start; nn < start + 100; nn++) {
@@ -1610,7 +1636,7 @@ function dumpPairsPatterns(start, preArr, left, deep) {
 			//console.log(nn,datarows[nn]);
 		}
 	}
-
+	
 }
 function randBalls(count: number): number[] {
 	let test: number[] = [];
