@@ -24,6 +24,14 @@ body {
 
 p {
 	margin: 0.5cm;
+	text-overflow: ellipsis;
+	white-space2: nowrap;
+	width2: 100%;
+
+	width: 90vw;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .rake {
@@ -60,6 +68,10 @@ ul {
 li {
 	padding-left: 1em;
 	text-indent: -1em;
+	width: 90vw;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 li:before {

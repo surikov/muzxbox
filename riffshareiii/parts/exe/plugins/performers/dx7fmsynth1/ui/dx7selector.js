@@ -1,5 +1,205 @@
 "use strict";
-let libDX7list = [
+class DX7Loader {
+    scale99(nn) {
+        let speed = Math.pow(2, nn * 0.16);
+        return speed;
+    }
+    durationDown(nn) {
+        return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+    }
+    durationUp(nn) {
+        return 24.9 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
+    }
+    levelRatio(nn) {
+        return nn / 99;
+    }
+    slopeDuration(r99, from99, to99) {
+        let partDuration = Math.abs(this.levelRatio(from99) - this.levelRatio(to99)) / this.levelRatio(99);
+        let fullDuration = this.durationDown(r99);
+        if (from99 < to99) {
+            fullDuration = this.durationUp(r99);
+        }
+        let slope = {
+            duration: partDuration * fullDuration,
+            from: this.scale99(from99) / this.scale99(99),
+            to: this.scale99(to99) / this.scale99(99)
+        };
+        return slope;
+    }
+    convertDX7data(dx7preset) {
+        let modlev = 2.8;
+        let preset = {
+            label: dx7preset.name,
+            mixID: dx7preset.algorithm1_32,
+            operators: [],
+            feedbackRatio: 0.075 * modlev * Math.pow(2, (dx7preset.feedback0_7 - 7)),
+            modulationRatio: modlev
+        };
+        for (let ii = 0; ii < 6; ii++) {
+            let data = dx7preset.operators[ii];
+            let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
+            let decaySlope = this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]);
+            let sustainSlope = this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2]);
+            let releaseSlope = this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3]);
+            let operator = {
+                constantFrequency: 0,
+                frequencyRatio: 0,
+                enabled: data.enabled,
+                volume: 0,
+                detune: data.detune_7_7,
+                envelope: {
+                    attack: {
+                        values: [0,
+                            0.025 * attackSlope.to,
+                            0.05 * attackSlope.to,
+                            0.2 * attackSlope.to,
+                            0.35 * attackSlope.to,
+                            attackSlope.to],
+                        duration: attackSlope.duration
+                    },
+                    decay: {
+                        values: [attackSlope.to,
+                            attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to),
+                            attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to),
+                            decaySlope.to],
+                        duration: decaySlope.duration
+                    },
+                    sustain: {
+                        values: [decaySlope.to,
+                            decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to),
+                            decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to),
+                            sustainSlope.to],
+                        duration: sustainSlope.duration
+                    },
+                    release: releaseSlope.duration
+                }
+            };
+            operator.envelope.attack.duration = Math.max(0.0001, operator.envelope.attack.duration);
+            operator.envelope.decay.duration = Math.max(0.0001, operator.envelope.decay.duration);
+            operator.envelope.sustain.duration = Math.max(0.0001, operator.envelope.sustain.duration);
+            operator.envelope.release = Math.max(0.005, operator.envelope.release);
+            operator.envelope.release = Math.min(3, operator.envelope.release);
+            let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
+            if (data.constMode0_1 > 0) {
+                operator.volume = 0.51 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+                operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
+            }
+            else {
+                operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
+                let coarse = 0.5;
+                if (data.freqCoarse0_31) {
+                    coarse = data.freqCoarse0_31;
+                }
+                operator.frequencyRatio = freqRatio * coarse * (1 + data.freqFine0_99 / 100);
+            }
+            operator.volume = operator.volume * (1 + dx7preset.lfoAmpModDepth0_99 / 99);
+            preset.operators.push(operator);
+        }
+        return preset;
+    }
+    loadSyxFile(from, onDone) {
+        let reader = new FileReader();
+        let all = [];
+        reader.onload = () => {
+            let result = reader.result;
+            for (let ii = 0; ii < 32; ii++) {
+                let one = this.parseSysexData(result, ii, from.name);
+                all.push(one);
+            }
+            onDone(all);
+        };
+        reader.onerror = (error) => {
+            console.log('error', error);
+        };
+        reader.readAsText(from);
+    }
+    loadTxtFile(from, onDone) {
+        let reader = new FileReader();
+        reader.onload = () => {
+            let result = reader.result;
+            let one = JSON.parse(result);
+            onDone(one);
+        };
+        reader.onerror = (error) => {
+            console.log('error', error);
+        };
+        reader.readAsText(from);
+    }
+    loadJSONFile(from, onDone) {
+        let reader = new FileReader();
+        reader.onload = () => {
+            let result = reader.result;
+            let one = JSON.parse(result);
+            onDone(one);
+        };
+        reader.onerror = (error) => {
+            console.log('error', error);
+        };
+        reader.readAsText(from);
+    }
+    parseSyxFile(from, onDone) {
+        let reader = new FileReader();
+        let all = [];
+        reader.onload = () => {
+            let result = reader.result;
+            for (let ii = 0; ii < 32; ii++) {
+                let one = this.parseSysexData(result, ii, from.name);
+                let preset = this.convertDX7data(one);
+                all.push(preset);
+            }
+            onDone(all);
+        };
+        reader.onerror = (error) => {
+            console.log('error', error);
+        };
+        reader.readAsText(from);
+    }
+    pow2x(x01, minx, maxx, yratio) {
+        if (x01) {
+            return yratio * Math.pow(2, x01 * (maxx - minx) + minx);
+        }
+        else {
+            return 0;
+        }
+    }
+    parseSysexData(bankData, patchId, filename) {
+        var dataStart = 128 * patchId + 6;
+        var dataEnd = dataStart + 128;
+        var voiceData = bankData.substring(dataStart, dataEnd);
+        var operators = [];
+        for (var ii = 5; ii >= 0; --ii) {
+            var oscStart = (5 - ii) * 17;
+            var oscEnd = oscStart + 17;
+            var oscData = voiceData.substring(oscStart, oscEnd);
+            var operator = {
+                rates0_99: [oscData.charCodeAt(0), oscData.charCodeAt(1), oscData.charCodeAt(2), oscData.charCodeAt(3)],
+                levels0_99: [oscData.charCodeAt(4), oscData.charCodeAt(5), oscData.charCodeAt(6), oscData.charCodeAt(7)],
+                detune_7_7: Math.floor(oscData.charCodeAt(12) >> 3) - 7,
+                volumeLevel0_99: oscData.charCodeAt(14),
+                constMode0_1: oscData.charCodeAt(15) & 1,
+                freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1),
+                freqFine0_99: oscData.charCodeAt(16),
+                enabled: true,
+                velocitySens0_7: oscData.charCodeAt(13) >> 2
+            };
+            operators.splice(0, 0, operator);
+        }
+        let preset = {
+            algorithm1_32: voiceData.charCodeAt(110) + 1,
+            feedback0_7: voiceData.charCodeAt(111) & 7,
+            operators: operators,
+            name: voiceData.substring(118, 128).trim() + ' / ' + filename,
+            lfoPitchModDepth0_99: voiceData.charCodeAt(114),
+            lfoAmpModDepth0_99: voiceData.charCodeAt(115),
+        };
+        return preset;
+    }
+}
+let libForDX7list = [
     { "algorithm1_32": 22, "feedback0_7": 7, "operators": [{ "rates0_99": [72, 76, 99, 71], "levels0_99": [99, 88, 96, 0], "detune_7_7": 7, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [62, 51, 29, 71], "levels0_99": [82, 95, 96, 0], "detune_7_7": 7, "volumeLevel0_99": 86, "constMode0_1": 0, "freqCoarse0_31": 0, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [77, 76, 82, 71], "levels0_99": [99, 98, 98, 0], "detune_7_7": -2, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [77, 36, 41, 71], "levels0_99": [99, 98, 98, 0], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [77, 36, 41, 71], "levels0_99": [99, 98, 98, 0], "detune_7_7": 1, "volumeLevel0_99": 98, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [49, 99, 28, 68], "levels0_99": [98, 98, 91, 0], "detune_7_7": 0, "volumeLevel0_99": 82, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }], "name": "BRASS 1 / ROM1A.SYX", "lfoPitchModDepth0_99": 5, "lfoAmpModDepth0_99": 0 },
     { "algorithm1_32": 2, "feedback0_7": 7, "operators": [{ "rates0_99": [45, 24, 20, 41], "levels0_99": [99, 85, 70, 0], "detune_7_7": 0, "volumeLevel0_99": 99, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 3 }, { "rates0_99": [75, 71, 17, 49], "levels0_99": [82, 92, 62, 0], "detune_7_7": 0, "volumeLevel0_99": 83, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [44, 45, 20, 54], "levels0_99": [99, 85, 82, 0], "detune_7_7": 0, "volumeLevel0_99": 86, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 7 }, { "rates0_99": [96, 19, 20, 54], "levels0_99": [99, 92, 86, 0], "detune_7_7": 0, "volumeLevel0_99": 77, "constMode0_1": 0, "freqCoarse0_31": 1, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [53, 19, 20, 54], "levels0_99": [86, 92, 86, 0], "detune_7_7": 0, "volumeLevel0_99": 84, "constMode0_1": 0, "freqCoarse0_31": 3, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }, { "rates0_99": [53, 19, 20, 54], "levels0_99": [99, 92, 86, 0], "detune_7_7": 0, "volumeLevel0_99": 53, "constMode0_1": 0, "freqCoarse0_31": 14, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 2 }], "name": "STRINGS 1 / ROM1A.SYX", "lfoPitchModDepth0_99": 8, "lfoAmpModDepth0_99": 0 },
     { "algorithm1_32": 2, "feedback0_7": 7, "operators": [{ "rates0_99": [48, 56, 10, 47], "levels0_99": [98, 98, 36, 0], "detune_7_7": 0, "volumeLevel0_99": 92, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [81, 13, 7, 25], "levels0_99": [99, 92, 28, 0], "detune_7_7": -6, "volumeLevel0_99": 74, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [51, 15, 10, 47], "levels0_99": [99, 92, 0, 0], "detune_7_7": 6, "volumeLevel0_99": 92, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [49, 74, 10, 32], "levels0_99": [98, 98, 36, 0], "detune_7_7": 0, "volumeLevel0_99": 76, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [76, 73, 10, 28], "levels0_99": [99, 92, 0, 0], "detune_7_7": 0, "volumeLevel0_99": 66, "constMode0_1": 0, "freqCoarse0_31": 2, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }, { "rates0_99": [72, 76, 10, 32], "levels0_99": [99, 92, 0, 0], "detune_7_7": 0, "volumeLevel0_99": 70, "constMode0_1": 0, "freqCoarse0_31": 8, "freqFine0_99": 0, "enabled": true, "velocitySens0_7": 0 }], "name": "STRINGS 2 / ROM1A.SYX", "lfoPitchModDepth0_99": 8, "lfoAmpModDepth0_99": 0 },
@@ -1297,184 +1497,13 @@ let libDX7list = [
         "lfoAmpModDepth0_99": 0
     }
 ];
-libDX7list.sort((a, b) => {
+libForDX7list.sort((a, b) => {
     return a.name.toLowerCase().localeCompare(b.name.toLowerCase());
 });
-class DX7Loader {
-    scale99(nn) {
-        let speed = Math.pow(2, nn * 0.16);
-        return speed;
-    }
-    durationDown(nn) {
-        return 169 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
-    }
-    durationUp(nn) {
-        return 24.9 * Math.pow(2, (99 - nn) * 0.16) / Math.pow(2, 99 * 0.16);
-    }
-    levelRatio(nn) {
-        return nn / 99;
-    }
-    slopeDuration(r99, from99, to99) {
-        let partDuration = Math.abs(this.levelRatio(from99) - this.levelRatio(to99)) / this.levelRatio(99);
-        let fullDuration = this.durationDown(r99);
-        if (from99 < to99) {
-            fullDuration = this.durationUp(r99);
-        }
-        let slope = {
-            duration: partDuration * fullDuration,
-            from: this.scale99(from99) / this.scale99(99),
-            to: this.scale99(to99) / this.scale99(99)
-        };
-        return slope;
-    }
-    convertDX7data(dx7preset) {
-        let modlev = 2.8;
-        let preset = {
-            label: dx7preset.name,
-            mixID: dx7preset.algorithm1_32,
-            operators: [],
-            feedbackRatio: 0.075 * modlev * Math.pow(2, (dx7preset.feedback0_7 - 7)),
-            modulationRatio: modlev
-        };
-        for (let ii = 0; ii < 6; ii++) {
-            let data = dx7preset.operators[ii];
-            let attackSlope = this.slopeDuration(data.rates0_99[0], data.levels0_99[3], data.levels0_99[0]);
-            let decaySlope = this.slopeDuration(data.rates0_99[1], data.levels0_99[0], data.levels0_99[1]);
-            let sustainSlope = this.slopeDuration(data.rates0_99[2], data.levels0_99[1], data.levels0_99[2]);
-            let releaseSlope = this.slopeDuration(data.rates0_99[3], data.levels0_99[2], data.levels0_99[3]);
-            let operator = {
-                constantFrequency: 0,
-                frequencyRatio: 0,
-                enabled: data.enabled,
-                volume: 0,
-                detune: data.detune_7_7,
-                envelope: {
-                    attack: {
-                        values: [0,
-                            0.025 * attackSlope.to,
-                            0.05 * attackSlope.to,
-                            0.2 * attackSlope.to,
-                            0.35 * attackSlope.to,
-                            attackSlope.to],
-                        duration: attackSlope.duration
-                    },
-                    decay: {
-                        values: [attackSlope.to,
-                            attackSlope.to - 0.65 * (attackSlope.to - decaySlope.to),
-                            attackSlope.to - 0.8 * (attackSlope.to - decaySlope.to),
-                            attackSlope.to - 0.95 * (attackSlope.to - decaySlope.to),
-                            attackSlope.to - 0.975 * (attackSlope.to - decaySlope.to),
-                            decaySlope.to],
-                        duration: decaySlope.duration
-                    },
-                    sustain: {
-                        values: [decaySlope.to,
-                            decaySlope.to - 0.65 * (decaySlope.to - sustainSlope.to),
-                            decaySlope.to - 0.8 * (decaySlope.to - sustainSlope.to),
-                            decaySlope.to - 0.95 * (decaySlope.to - sustainSlope.to),
-                            decaySlope.to - 0.975 * (decaySlope.to - sustainSlope.to),
-                            sustainSlope.to],
-                        duration: sustainSlope.duration
-                    },
-                    release: releaseSlope.duration
-                }
-            };
-            operator.envelope.attack.duration = Math.max(0.0001, operator.envelope.attack.duration);
-            operator.envelope.decay.duration = Math.max(0.0001, operator.envelope.decay.duration);
-            operator.envelope.sustain.duration = Math.max(0.0001, operator.envelope.sustain.duration);
-            operator.envelope.release = Math.max(0.005, operator.envelope.release);
-            operator.envelope.release = Math.min(3, operator.envelope.release);
-            let freqRatio = 1 / (1 + dx7preset.lfoPitchModDepth0_99 / 99);
-            if (data.constMode0_1 > 0) {
-                operator.volume = 0.51 * Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
-                operator.constantFrequency = freqRatio * Math.pow(10, data.freqCoarse0_31 % 4) * (1 + (data.freqFine0_99 / 99) * 8.772);
-            }
-            else {
-                operator.volume = Math.pow(2, data.volumeLevel0_99 * 0.125) / Math.pow(2, 99 * 0.125) * (1 - 0.2 * data.velocitySens0_7 / 7);
-                let coarse = 0.5;
-                if (data.freqCoarse0_31) {
-                    coarse = data.freqCoarse0_31;
-                }
-                operator.frequencyRatio = freqRatio * coarse * (1 + data.freqFine0_99 / 100);
-            }
-            operator.volume = operator.volume * (1 + dx7preset.lfoAmpModDepth0_99 / 99);
-            preset.operators.push(operator);
-        }
-        return preset;
-    }
-    loadSyxFile(from, onDone) {
-        let reader = new FileReader();
-        let all = [];
-        reader.onload = () => {
-            let result = reader.result;
-            for (let ii = 0; ii < 32; ii++) {
-                let one = this.parseSysexData(result, ii, from.name);
-                all.push(one);
-            }
-            onDone(all);
-        };
-        reader.onerror = (error) => {
-            console.log('error', error);
-        };
-        reader.readAsText(from);
-    }
-    parseSyxFile(from, onDone) {
-        let reader = new FileReader();
-        let all = [];
-        reader.onload = () => {
-            let result = reader.result;
-            for (let ii = 0; ii < 32; ii++) {
-                let one = this.parseSysexData(result, ii, from.name);
-                let preset = this.convertDX7data(one);
-                all.push(preset);
-            }
-            onDone(all);
-        };
-        reader.onerror = (error) => {
-            console.log('error', error);
-        };
-        reader.readAsText(from);
-    }
-    pow2x(x01, minx, maxx, yratio) {
-        if (x01) {
-            return yratio * Math.pow(2, x01 * (maxx - minx) + minx);
-        }
-        else {
-            return 0;
-        }
-    }
-    parseSysexData(bankData, patchId, filename) {
-        var dataStart = 128 * patchId + 6;
-        var dataEnd = dataStart + 128;
-        var voiceData = bankData.substring(dataStart, dataEnd);
-        var operators = [];
-        for (var ii = 5; ii >= 0; --ii) {
-            var oscStart = (5 - ii) * 17;
-            var oscEnd = oscStart + 17;
-            var oscData = voiceData.substring(oscStart, oscEnd);
-            var operator = {
-                rates0_99: [oscData.charCodeAt(0), oscData.charCodeAt(1), oscData.charCodeAt(2), oscData.charCodeAt(3)],
-                levels0_99: [oscData.charCodeAt(4), oscData.charCodeAt(5), oscData.charCodeAt(6), oscData.charCodeAt(7)],
-                detune_7_7: Math.floor(oscData.charCodeAt(12) >> 3) - 7,
-                volumeLevel0_99: oscData.charCodeAt(14),
-                constMode0_1: oscData.charCodeAt(15) & 1,
-                freqCoarse0_31: Math.floor(oscData.charCodeAt(15) >> 1),
-                freqFine0_99: oscData.charCodeAt(16),
-                enabled: true,
-                velocitySens0_7: oscData.charCodeAt(13) >> 2
-            };
-            operators.splice(0, 0, operator);
-        }
-        let preset = {
-            algorithm1_32: voiceData.charCodeAt(110) + 1,
-            feedback0_7: voiceData.charCodeAt(111) & 7,
-            operators: operators,
-            name: voiceData.substring(118, 128).trim() + ' / ' + filename,
-            lfoPitchModDepth0_99: voiceData.charCodeAt(114),
-            lfoAmpModDepth0_99: voiceData.charCodeAt(115),
-        };
-        return preset;
-    }
+let allFMPresets = [];
+let loader = new DX7Loader();
+for (let ii = 0; ii < libForDX7list.length; ii++) {
+    allFMPresets.push(loader.convertDX7data(libForDX7list[ii]));
 }
 class DX7UI {
     constructor() {
@@ -1491,22 +1520,55 @@ class DX7UI {
         this.resetVolumeLabel();
         this.fileInput.addEventListener('change', (changeEvent) => {
             let file = changeEvent.target.files[0];
-            let fileReder = new FileReader();
-            fileReder.onload = () => {
-                let loader = new DX7Loader();
-                loader.loadSyxFile(file, (dx7presets) => {
-                    for (var ii = 0; ii < dx7presets.length; ii++) {
-                        libDX7list.splice(0, 0, dx7presets[ii]);
+            let fname = file.name.trim().toLowerCase();
+            if (fname.endsWith('.syx')) {
+                this.importSys(file);
+            }
+            else {
+                if (fname.endsWith('.txt')) {
+                    this.importTxt(file);
+                }
+                else {
+                    if (fname.endsWith('.json')) {
+                        this.importJson(file);
                     }
-                    me.renderLibList();
-                });
-            };
-            fileReder.readAsText(file);
+                    else {
+                        alert('Only .syx|.txt|.json');
+                    }
+                }
+            }
         });
         let loader = new DX7Loader();
-        this.preset = loader.convertDX7data(libDX7list[32]);
+        this.preset = allFMPresets[32];
         this.titleText.innerHTML = this.preset.label;
         this.renderLibList();
+    }
+    importSys(file) {
+        let me = this;
+        let loader = new DX7Loader();
+        loader.loadSyxFile(file, (dx7presets) => {
+            for (var ii = 0; ii < dx7presets.length; ii++) {
+                console.log(ii, dx7presets[ii]);
+                allFMPresets.splice(0, 0, loader.convertDX7data(dx7presets[ii]));
+            }
+            me.renderLibList();
+        });
+    }
+    importTxt(file) {
+        let loader = new DX7Loader();
+        loader.loadTxtFile(file, (dx7preset) => {
+            console.log(dx7preset);
+            allFMPresets.splice(0, 0, loader.convertDX7data(dx7preset));
+            this.renderLibList();
+        });
+    }
+    importJson(file) {
+        let loader = new DX7Loader();
+        loader.loadJSONFile(file, (preset) => {
+            console.log(preset);
+            allFMPresets.splice(0, 0, preset);
+            this.renderLibList();
+        });
     }
     parseHostData(data) {
         if (data) {
@@ -1543,14 +1605,13 @@ class DX7UI {
             while (liblist.lastElementChild) {
                 liblist.removeChild(liblist.lastElementChild);
             }
-            for (let ii = 0; ii < libDX7list.length; ii++) {
+            for (let ii = 0; ii < allFMPresets.length; ii++) {
                 let li = document.createElement('li');
-                li.innerText = '' + (1 + ii) + '. ' + libDX7list[ii].name;
+                li.innerText = '' + (1 + ii) + '. ' + allFMPresets[ii].label;
                 let pid = ii;
                 li.onclick = () => {
-                    let loader = new DX7Loader();
-                    let selectedPreset = loader.convertDX7data(libDX7list[pid]);
-                    console.log(pid, 'DX7 preset', libDX7list[pid], 'Synth parameters', selectedPreset);
+                    let selectedPreset = allFMPresets[pid];
+                    console.log(pid, selectedPreset);
                     me.preset = selectedPreset;
                     let par = {
                         volume: me.volumeValue, preset: me.preset
@@ -1598,6 +1659,7 @@ class DX7UI {
         this.volumeLabel.innerText = '' + this.volumeValue;
     }
     sendPresetToHost(par) {
+        console.log('sendPresetToHost', par);
         var message = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
         window.parent.postMessage(message, '*');
     }
