@@ -70,13 +70,14 @@ class RightMenuPanel {
 		this.dragAnchor.css = 'dragDropMixerItem';
 		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
 	}
-	moveDragMenuItem(dx: number, dy: number) {
+	moveDragMenuItem(dx: number, dy: number): TilePoint {
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		this.dragItemX = this.dragItemX + dx / zz;
 		this.dragItemY = this.dragItemY + dy / zz;
 		this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
 		this.dragAnchor.css = 'dragDropMixerItem';
 		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
+		return { x: dx, y: dy };
 	}
 	hideDragMenuItem(): TilePoint {
 		let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();

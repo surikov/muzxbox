@@ -385,7 +385,7 @@ declare class RightMenuPanel {
     constructor();
     resetAllAnchors(): void;
     showDragMenuItem(dx: number, dy: number, dragContent: TileItem): void;
-    moveDragMenuItem(dx: number, dy: number): void;
+    moveDragMenuItem(dx: number, dy: number): TilePoint;
     hideDragMenuItem(): TilePoint;
     createMenu(): TileLayerDefinition[];
     scrollListing(dx: number, dy: number): void;
@@ -458,6 +458,7 @@ declare class DragMenuItemUtil {
     doDrag(x: number, y: number): void;
 }
 declare function fillPluginsLists(): void;
+declare function findPerformerIdxByXYcurZ(dx: any, dy: any): number;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
     leftLayer: TileLayerDefinition;

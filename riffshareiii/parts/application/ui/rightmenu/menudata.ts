@@ -524,6 +524,7 @@ class DragMenuItemUtil {
 		}
 	}
 	doDrag(x: number, y: number) {
+		console.log();
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		//let zidx = zoomIndexFromZoom(zz);
 		let ss = globalCommandDispatcher.renderer.menu.scrollY;
@@ -541,9 +542,9 @@ class DragMenuItemUtil {
 			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
 
 		}
-		globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+		let pp=globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
 		//let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
-		//console.log('found performer', toPerformer);
+		console.log('found performer', pp);
 		if (x == 0 && y == 0) {
 			this.dragStarted = false;
 			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
@@ -652,18 +653,14 @@ function fillPluginsLists() {
 						, css: 'rectangleDragItem'
 					};
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
-						//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-						let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+						/*let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 						let zidx = zoomIndexFromZoom(zz);
-						//let toPerformerTrack = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(dx, dy, zidx);
 						let trackNo = 0;
 						let farNo = 0;
 						let toPerformerTrack: Zvoog_MusicTrack | null = null;
 						let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 						for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 							let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-							//if (plugin.id != xid) {
-							//if (outputs.indexOf(plugin.id, 0) < 0) {
 							if (plugin.iconPosition) {
 								if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
 									if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
@@ -676,33 +673,39 @@ function fillPluginsLists() {
 											}
 										}
 										toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[ii];
+										console.log('found track', plugin.iconPosition.x, plugin.iconPosition.y, 'at', dx, dy, 'zoom', zidx, zz);
 										break;
 									}
 								}
 							}
-							//}
-							//}
 						}
-
-
-
-
-
-
-						//let trackNo = farorder[farNo];
-						//console.log('drop new track', dx, dy, zz, zidx, 'found', globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(dx, dy, zidx));
 						let xx = dx;
 						if (xx < globalCommandDispatcher.cfg().padGridFan) {
 							xx = globalCommandDispatcher.cfg().padGridFan;
-						}
-						if (toPerformerTrack) {
+						}*/
+						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+						if (trackNo > -1) {
+							let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								toPerformerTrack.performer.kind = MZXBX_currentPlugins()[ii].kind;
 								toPerformerTrack.performer.data = '';
 							});
+							let farNo = 0;
+							let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+							for (let ff = 0; ff < farorder.length; ff++) {
+								if (farorder[ff] == trackNo) {
+									farNo = ff;
+									break;
+								}
+							}
 							let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
 							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
+							console.log('found track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
 						} else {
+							let xx = dx;
+							if (xx < globalCommandDispatcher.cfg().padGridFan) {
+								xx = globalCommandDispatcher.cfg().padGridFan;
+							}
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								globalCommandDispatcher.cfg().data.tracks.push({
 									performer: {
@@ -723,53 +726,6 @@ function fillPluginsLists() {
 					});
 					info.onDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);
-					/*
-										let dragStarted = false;
-										let info: MenuInfo;
-										info = {
-											text: label
-											, noLocalization: true
-											, onDrag: (x: number, y: number) => {
-												if (!dragStarted) {
-													let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-													let ss = globalCommandDispatcher.renderer.menu.scrollY;
-													let tt = info.menuTop ? info.menuTop : 0;
-													let yy = (tt + ss - 0.0) * zz;
-													let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-													dragStarted = true;
-													globalCommandDispatcher.hideRightMenu();
-													let sz = 1;
-													globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
-														x: 0, y: 0
-														, w: sz, h: sz
-														, rx: sz / 20, ry: sz / 20
-														, css: 'rectangleDragItem'
-													});
-												}
-												globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-												if (x == 0 && y == 0) {
-													dragStarted = false;
-													let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-													globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
-														globalCommandDispatcher.cfg().data.tracks.push({
-															performer: {
-																id: '' + Math.random()
-																, kind: MZXBX_currentPlugins()[ii].kind
-																, data: ''
-																, outputs: ['']
-																, iconPosition: newPos
-																, state: 0
-															}
-															, measures: []
-															, title: MZXBX_currentPlugins()[ii].label
-														});
-														globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-													});
-												}
-											}
-											, itemKind: kindDraggableSquare
-										};
-										menuPointAddPlugin.children.push(info);*/
 				} else {
 					if (purpose == 'Filter') {
 						let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
@@ -844,7 +800,36 @@ function fillPluginsLists() {
 		}
 	}
 }
-
+function findPerformerIdxByXYcurZ(dx, dy): number {
+	//let trackNo = 0;
+	//let farNo = 0;
+	//let toPerformerTrack: Zvoog_MusicTrack | null = null;
+	let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+	let zidx = zoomIndexFromZoom(zz);
+	let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+	for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+		let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+		if (plugin.iconPosition) {
+			if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+				if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+					/*trackNo = ii;
+					let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+					for (let ff = 0; ff < farorder.length; ff++) {
+						if (farorder[ff] == trackNo) {
+							farNo = ff;
+							break;
+						}
+					}*/
+					//return globalCommandDispatcher.cfg().data.tracks[ii];
+					//console.log('found track', plugin.iconPosition.x, plugin.iconPosition.y, 'at', dx, dy, 'zoom', zidx, zz);
+					//break;
+					return ii;
+				}
+			}
+		}
+	}
+	return -1;
+}
 function composeBaseMenu(): MenuInfo[] {
 	/*menuPlayStop.text = localMenuPlay;
 	if (globalCommandDispatcher.player) {

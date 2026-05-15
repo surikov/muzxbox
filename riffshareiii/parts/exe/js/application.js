@@ -2813,6 +2813,7 @@ class RightMenuPanel {
         this.dragAnchor.translation = { x: this.dragItemX, y: this.dragItemY };
         this.dragAnchor.css = 'dragDropMixerItem';
         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
+        return { x: dx, y: dy };
     }
     hideDragMenuItem() {
         let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
@@ -3677,6 +3678,7 @@ class DragMenuItemUtil {
         }
     }
     doDrag(x, y) {
+        console.log();
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         let ss = globalCommandDispatcher.renderer.menu.scrollY;
         let tt = this.info.menuTop ? this.info.menuTop : 0;
@@ -3690,7 +3692,8 @@ class DragMenuItemUtil {
             }
             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
         }
-        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+        let pp = globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+        console.log('found performer', pp);
         if (x == 0 && y == 0) {
             this.dragStarted = false;
             let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
@@ -3747,44 +3750,30 @@ function fillPluginsLists() {
                         css: 'rectangleDragItem'
                     };
                     let dragger = new DragMenuItemUtil(square, info, (dx, dy) => {
-                        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-                        let zidx = zoomIndexFromZoom(zz);
-                        let trackNo = 0;
-                        let farNo = 0;
-                        let toPerformerTrack = null;
-                        let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
-                        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
-                            let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-                            if (plugin.iconPosition) {
-                                if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
-                                    if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
-                                        trackNo = ii;
-                                        let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
-                                        for (let ff = 0; ff < farorder.length; ff++) {
-                                            if (farorder[ff] == trackNo) {
-                                                farNo = ff;
-                                                break;
-                                            }
-                                        }
-                                        toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[ii];
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        let xx = dx;
-                        if (xx < globalCommandDispatcher.cfg().padGridFan) {
-                            xx = globalCommandDispatcher.cfg().padGridFan;
-                        }
-                        if (toPerformerTrack) {
+                        let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+                        if (trackNo > -1) {
+                            let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                                 toPerformerTrack.performer.kind = MZXBX_currentPlugins()[ii].kind;
                                 toPerformerTrack.performer.data = '';
                             });
+                            let farNo = 0;
+                            let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+                            for (let ff = 0; ff < farorder.length; ff++) {
+                                if (farorder[ff] == trackNo) {
+                                    farNo = ff;
+                                    break;
+                                }
+                            }
                             let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
                             globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
+                            console.log('found track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
                         }
                         else {
+                            let xx = dx;
+                            if (xx < globalCommandDispatcher.cfg().padGridFan) {
+                                xx = globalCommandDispatcher.cfg().padGridFan;
+                            }
                             globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
                                 globalCommandDispatcher.cfg().data.tracks.push({
                                     performer: {
@@ -3835,6 +3824,22 @@ function fillPluginsLists() {
             }
         }
     }
+}
+function findPerformerIdxByXYcurZ(dx, dy) {
+    let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+    let zidx = zoomIndexFromZoom(zz);
+    let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
+        let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+        if (plugin.iconPosition) {
+            if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+                if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+                    return ii;
+                }
+            }
+        }
+    }
+    return -1;
 }
 function composeBaseMenu() {
     fillClipboardList();
