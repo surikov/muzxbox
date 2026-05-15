@@ -1,6 +1,6 @@
 
 class DX7Loader {
-	
+
 	scale99(nn: number): number {
 		let speed = Math.pow(2, nn * 0.16);
 		return speed;
@@ -149,6 +149,30 @@ class DX7Loader {
 			}
 			//console.log(customPresets);
 			onDone(all);
+		};
+		reader.onerror = (error) => {
+			console.log('error', error)
+		};
+		reader.readAsText(from);
+	}
+	loadTxtFile(from: File, onDone: (dx7preset: DX7PresetData) => void) {
+		let reader = new FileReader();
+		reader.onload = () => {
+			let result: string = reader.result as string;
+			let one: DX7PresetData = JSON.parse(result);
+			onDone(one);
+		};
+		reader.onerror = (error) => {
+			console.log('error', error)
+		};
+		reader.readAsText(from);
+	}
+	loadJSONFile(from: File, onDone: (preset: SynthPreset) => void) {
+		let reader = new FileReader();
+		reader.onload = () => {
+			let result: string = reader.result as string;
+			let one: SynthPreset = JSON.parse(result);
+			onDone(one);
 		};
 		reader.onerror = (error) => {
 			console.log('error', error)

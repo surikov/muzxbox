@@ -1,6 +1,6 @@
 {
 	"compilerOptions": {
-		"target": "es2015",
+		"target": "es2019",
 		"outFile": "./dx7selector.js"
 		//,"outDir":"../js"
 		,
@@ -17,7 +17,7 @@
 		"module": "AMD",
 		"lib": [
 			"dom",
-			"es2015",
+			"es2019",
 			"es5"
 		],
 		"declaration": true,
@@ -27,8 +27,9 @@
 		"../../../../mzxbxapi/musicenginetypes.ts",
 		"../../../../mzxbxapi/musicenginedeclarations.ts",
 		"../dx7types.ts",
-		"lib.ts",
+		
 		"loadersys.ts",
+		"lib.ts",
 		"dx7ui.ts"	
 	]
 }

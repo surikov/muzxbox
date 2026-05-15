@@ -1014,25 +1014,36 @@ function rayConsistsPoints(ray: number, xx: number, rowIdx: number, rows: BallsR
 	}
 	return false;
 }
+type XY = { px: number, py: number };
 function sectorConsistsPointsAt(mindistance: number, maxdistance: number, minray: number, maxray: number, xx: number, rowIdx: number, rows: BallsRow[]): number {
 	let gr = Math.PI / 180;
 	let cnt = 0;
-	let skipX: number[] = [];
-	let skipY: number[] = [];
+	//let skipX: number[] = [];
+	//let skipY: number[] = [];
+	let skippoints: XY[] = []
 	for (let distance = mindistance; distance <= maxdistance; distance++) {
 		for (let rr = minray; rr <= maxray; rr = rr + 1) {
 			let raydegr = rr % 360;
 			let ray = raydegr - 180;
 			if (raydegr > 270) ray = 360 - raydegr;
-			let px = Math.round(distance * Math.cos(ray * gr));
-			let py = Math.round(distance * Math.sin(ray * gr));
-			if (rr >= 90 && rr <= 270) {
-				px = -px;
+			let point: XY = {
+				px: Math.round(distance * Math.cos(ray * gr))
+				, py: Math.round(distance * Math.sin(ray * gr))
+			};
+			if (rr >= 90 && rr <= 270) point.px = -point.px;
+			if (rr >= 180 && rr <= 360) point.py = -point.py;
+			if (skippoints.filter((element, index, array) => { return element.px == point.px && element.py == point.py }).length) {
+				//
+			} else {
+				skippoints.push(point);
+				if (ballExists(xx + 1 + point.px, rows[rowIdx - point.py])) {
+					cnt++;
+				}
 			}
-			if (rr >= 180 && rr <= 360) {
-				py = -py;
-			}
-			let skip = false;
+
+
+
+			/*let skip = false;
 			for (let ss = 0; ss < skipX.length; ss++) {
 				if (skipX[ss] == px && skipY[ss] == py) {
 					skip = true;
@@ -1049,26 +1060,39 @@ function sectorConsistsPointsAt(mindistance: number, maxdistance: number, minray
 						cnt++;
 					}
 				}
-			}
+			}*/
 		}
 	}
 	return cnt;
 }
 function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
-	//if (rowIdx > 20) return;
+
 	let cellColors: number[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
 		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-		//for (let zz = 205; zz <= 335; zz = zz + 10) {
-		for (let zz = 265 - 60; zz <= 270 + 60; zz = zz + 5) {
-			//let df = 0;
-			if (sectorConsistsPointsAt(1, 6, zz, zz + 5, xx, rowIdx, rows) > 2) {
-				cellColors[xx] = cellColors[xx] + 1;
+		//if (rowIdx == 1 && xx == 4) {
+		for (let gg = 270 - 60; gg <= 270 + 60; gg = gg + 10) {
+			let left = sectorConsistsPointsAt(2, 8, gg - 15, gg - 5, xx, rowIdx, rows);
+			let center = sectorConsistsPointsAt(2, 8, gg - 5, gg + 5, xx, rowIdx, rows);
+			let right = sectorConsistsPointsAt(2, 8, gg + 5, gg + 15, xx, rowIdx, rows);
+			if (center >= 3 && (center > 2 * left || center > 2 * right)) {
+				if (sectorConsistsPointsAt(3, 3, gg - 5, gg + 5, xx, rowIdx, rows)) {
+					cellColors[xx] = cellColors[xx] + 2 * center;
+				} else {
+					if (sectorConsistsPointsAt(2, 2, gg - 5, gg + 5, xx, rowIdx, rows)) {
+						cellColors[xx] = cellColors[xx] + 4 * center;
+					} else {
+						if (sectorConsistsPointsAt(1, 1, gg - 5, gg + 5, xx, rowIdx, rows)) {
+							cellColors[xx] = cellColors[xx] + 8 * center;
+						} else {
+							cellColors[xx] = cellColors[xx] + 1 * center;
+						}
+					}
+				}
 			}
-
+			//console.log(gg,center);
 		}
-
-
+		//}
 	}
 	let max = 0;
 	for (let xx = 0; xx < rowLen; xx++) {
@@ -1090,107 +1114,6 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
 	}
 
-	let cLL = 0;
-	let cMM = 0;
-	let cEE = 0;
-
-	let cLM = 0;
-	let cML = 0;
-
-	let cEL = 0;
-	let cEM = 0;
-	let cLE = 0;
-	let cME = 0;
-
-	for (let xx = 0; xx < rowLen; xx++) {
-		if (ballExists(xx + 1, rows[rowIdx])) {
-			let x1 = xx - 1;
-			let x2 = xx;
-			let x3 = xx + 1;
-			if (x1 < 0) x1 = cellColors.length - 1;
-			if (x3 > cellColors.length - 1) x3 = 0;
-			let left = '=';
-			if (cellColors[x1] < cellColors[x2]) {
-				left = '<';
-			} else {
-				if (cellColors[x1] > cellColors[x2]) {
-					left = '>';
-				}
-			}
-			let right = '=';
-			if (cellColors[x2] < cellColors[x3]) {
-				right = '<';
-			} else {
-				if (cellColors[x2] > cellColors[x3]) {
-					right = '>';
-				}
-			}
-			if ('' + left + right == '<<') cLL++;
-			if ('' + left + right == '<=') cLE++;
-			if ('' + left + right == '<>') cLM++;
-
-			if ('' + left + right == '>>') cMM++;
-			if ('' + left + right == '>=') cME++;
-			if ('' + left + right == '><') cML++;
-
-			if ('' + left + right == '=<') cEL++;
-			if ('' + left + right == '==') cEE++;
-			if ('' + left + right == '=>') cEM++;
-
-			//console.log(xx + 1, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
-		}
-	}
-	//console.log(rowIdx, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
-	console.log(rowIdx, ':',(cLL + cLE + cLM ), (cLM + cEM + cMM  ));
-	cLL = 0;
-	cMM = 0;
-	cEE = 0;
-
-	cLM = 0;
-	cML = 0;
-
-	cEL = 0;
-	cEM = 0;
-	cLE = 0;
-	cME = 0;
-
-	for (let xx = 0; xx < rowLen; xx++) {
-		//if (ballExists(xx + 1, rows[rowIdx])) {
-		let x1 = xx - 1;
-		let x2 = xx;
-		let x3 = xx + 1;
-		if (x1 < 0) x1 = cellColors.length - 1;
-		if (x3 > cellColors.length - 1) x3 = 0;
-		let left = '=';
-		if (cellColors[x1] < cellColors[x2]) {
-			left = '<';
-		} else {
-			if (cellColors[x1] > cellColors[x2]) {
-				left = '>';
-			}
-		}
-		let right = '=';
-		if (cellColors[x2] < cellColors[x3]) {
-			right = '<';
-		} else {
-			if (cellColors[x2] > cellColors[x3]) {
-				right = '>';
-			}
-		}
-		if ('' + left + right == '<<') cLL++;
-		if ('' + left + right == '<=') cLE++;
-		if ('' + left + right == '<>') cLM++;
-
-		if ('' + left + right == '>>') cMM++;
-		if ('' + left + right == '>=') cME++;
-		if ('' + left + right == '><') cML++;
-
-		if ('' + left + right == '=<') cEL++;
-		if ('' + left + right == '==') cEE++;
-		if ('' + left + right == '=>') cEM++;
-		//}
-	}
-	console.log('            ', (cLL + cLE + cLM ), (cLM + cEM + cMM  ));
 }
 function paintCellsGreen222(//ratioPre: number
 	//, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]

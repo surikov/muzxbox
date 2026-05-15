@@ -349,7 +349,6 @@ type FMParameter = {
     volume: number;
     preset: SynthPreset;
 };
-declare let libDX7list: DX7PresetData[];
 declare class DX7Loader {
     scale99(nn: number): number;
     durationDown(nn: number): number;
@@ -362,10 +361,15 @@ declare class DX7Loader {
     };
     convertDX7data(dx7preset: DX7PresetData): SynthPreset;
     loadSyxFile(from: File, onDone: (dx7presets: DX7PresetData[]) => void): void;
+    loadTxtFile(from: File, onDone: (dx7preset: DX7PresetData) => void): void;
+    loadJSONFile(from: File, onDone: (preset: SynthPreset) => void): void;
     parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
     pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
     parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
 }
+declare let libForDX7list: DX7PresetData[];
+declare let allFMPresets: SynthPreset[];
+declare let loader: DX7Loader;
 declare class DX7UI {
     id: string;
     volumeValue: number;
@@ -374,6 +378,9 @@ declare class DX7UI {
     titleText: any;
     fileInput: any;
     constructor();
+    importSys(file: File): void;
+    importTxt(file: File): void;
+    importJson(file: File): void;
     parseHostData(data: any): FMParameter | null;
     receiveHostMessage(messageEvent: MessageEvent): void;
     renderLibList(): void;

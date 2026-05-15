@@ -906,57 +906,69 @@ function rayConsistsPoints(ray, xx, rowIdx, rows) {
 function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, rowIdx, rows) {
     var gr = Math.PI / 180;
     var cnt = 0;
-    var skipX = [];
-    var skipY = [];
+    //let skipX: number[] = [];
+    //let skipY: number[] = [];
+    var skippoints = [];
     for (var distance = mindistance; distance <= maxdistance; distance++) {
-        for (var rr = minray; rr <= maxray; rr = rr + 1) {
+        var _loop_1 = function (rr) {
             var raydegr = rr % 360;
             var ray = raydegr - 180;
             if (raydegr > 270)
                 ray = 360 - raydegr;
-            var px = Math.round(distance * Math.cos(ray * gr));
-            var py = Math.round(distance * Math.sin(ray * gr));
-            if (rr >= 90 && rr <= 270) {
-                px = -px;
-            }
-            if (rr >= 180 && rr <= 360) {
-                py = -py;
-            }
-            var skip = false;
-            for (var ss = 0; ss < skipX.length; ss++) {
-                if (skipX[ss] == px && skipY[ss] == py) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip) {
+            var point = {
+                px: Math.round(distance * Math.cos(ray * gr)),
+                py: Math.round(distance * Math.sin(ray * gr))
+            };
+            if (rr >= 90 && rr <= 270)
+                point.px = -point.px;
+            if (rr >= 180 && rr <= 360)
+                point.py = -point.py;
+            if (skippoints.filter(function (element, index, array) { return element.px == point.px && element.py == point.py; }).length) {
                 //
             }
             else {
-                if (py < 0) {
-                    if (ballExists(xx + 1 + px, rows[rowIdx - py])) {
-                        skipX.push(px);
-                        skipY.push(py);
-                        cnt++;
-                    }
+                skippoints.push(point);
+                if (ballExists(xx + 1 + point.px, rows[rowIdx - point.py])) {
+                    cnt++;
                 }
             }
+        };
+        for (var rr = minray; rr <= maxray; rr = rr + 1) {
+            _loop_1(rr);
         }
     }
     return cnt;
 }
 function paintCellsGreen(svg, rowIdx, rows) {
-    //if (rowIdx > 20) return;
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-        //for (let zz = 205; zz <= 335; zz = zz + 10) {
-        for (var zz = 265 - 60; zz <= 270 + 60; zz = zz + 5) {
-            //let df = 0;
-            if (sectorConsistsPointsAt(1, 6, zz, zz + 5, xx, rowIdx, rows) > 2) {
-                cellColors[xx] = cellColors[xx] + 1;
+        //if (rowIdx == 1 && xx == 4) {
+        for (var gg = 270 - 60; gg <= 270 + 60; gg = gg + 10) {
+            var left = sectorConsistsPointsAt(2, 8, gg - 15, gg - 5, xx, rowIdx, rows);
+            var center = sectorConsistsPointsAt(2, 8, gg - 5, gg + 5, xx, rowIdx, rows);
+            var right = sectorConsistsPointsAt(2, 8, gg + 5, gg + 15, xx, rowIdx, rows);
+            if (center >= 3 && (center > 2 * left || center > 2 * right)) {
+                if (sectorConsistsPointsAt(3, 3, gg - 5, gg + 5, xx, rowIdx, rows)) {
+                    cellColors[xx] = cellColors[xx] + 2 * center;
+                }
+                else {
+                    if (sectorConsistsPointsAt(2, 2, gg - 5, gg + 5, xx, rowIdx, rows)) {
+                        cellColors[xx] = cellColors[xx] + 4 * center;
+                    }
+                    else {
+                        if (sectorConsistsPointsAt(1, 1, gg - 5, gg + 5, xx, rowIdx, rows)) {
+                            cellColors[xx] = cellColors[xx] + 8 * center;
+                        }
+                        else {
+                            cellColors[xx] = cellColors[xx] + 1 * center;
+                        }
+                    }
+                }
             }
+            //console.log(gg,center);
         }
+        //}
     }
     var max = 0;
     for (var xx = 0; xx < rowLen; xx++) {
@@ -975,122 +987,6 @@ function paintCellsGreen(svg, rowIdx, rows) {
         addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
         addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
     }
-    var cLL = 0;
-    var cMM = 0;
-    var cEE = 0;
-    var cLM = 0;
-    var cML = 0;
-    var cEL = 0;
-    var cEM = 0;
-    var cLE = 0;
-    var cME = 0;
-    for (var xx = 0; xx < rowLen; xx++) {
-        if (ballExists(xx + 1, rows[rowIdx])) {
-            var x1 = xx - 1;
-            var x2 = xx;
-            var x3 = xx + 1;
-            if (x1 < 0)
-                x1 = cellColors.length - 1;
-            if (x3 > cellColors.length - 1)
-                x3 = 0;
-            var left = '=';
-            if (cellColors[x1] < cellColors[x2]) {
-                left = '<';
-            }
-            else {
-                if (cellColors[x1] > cellColors[x2]) {
-                    left = '>';
-                }
-            }
-            var right = '=';
-            if (cellColors[x2] < cellColors[x3]) {
-                right = '<';
-            }
-            else {
-                if (cellColors[x2] > cellColors[x3]) {
-                    right = '>';
-                }
-            }
-            if ('' + left + right == '<<')
-                cLL++;
-            if ('' + left + right == '<=')
-                cLE++;
-            if ('' + left + right == '<>')
-                cLM++;
-            if ('' + left + right == '>>')
-                cMM++;
-            if ('' + left + right == '>=')
-                cME++;
-            if ('' + left + right == '><')
-                cML++;
-            if ('' + left + right == '=<')
-                cEL++;
-            if ('' + left + right == '==')
-                cEE++;
-            if ('' + left + right == '=>')
-                cEM++;
-            //console.log(xx + 1, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
-        }
-    }
-    //console.log(rowIdx, '><', cML, '>=', cME, '>>', cMM, '=<', cEL, '==', cEE, '=>', cEM, '<<', cLL, '<>', cLM, '<=', cLE);
-    console.log(rowIdx, ':', (cLL + cLE + cLM), (cLM + cEM + cMM));
-    cLL = 0;
-    cMM = 0;
-    cEE = 0;
-    cLM = 0;
-    cML = 0;
-    cEL = 0;
-    cEM = 0;
-    cLE = 0;
-    cME = 0;
-    for (var xx = 0; xx < rowLen; xx++) {
-        //if (ballExists(xx + 1, rows[rowIdx])) {
-        var x1 = xx - 1;
-        var x2 = xx;
-        var x3 = xx + 1;
-        if (x1 < 0)
-            x1 = cellColors.length - 1;
-        if (x3 > cellColors.length - 1)
-            x3 = 0;
-        var left = '=';
-        if (cellColors[x1] < cellColors[x2]) {
-            left = '<';
-        }
-        else {
-            if (cellColors[x1] > cellColors[x2]) {
-                left = '>';
-            }
-        }
-        var right = '=';
-        if (cellColors[x2] < cellColors[x3]) {
-            right = '<';
-        }
-        else {
-            if (cellColors[x2] > cellColors[x3]) {
-                right = '>';
-            }
-        }
-        if ('' + left + right == '<<')
-            cLL++;
-        if ('' + left + right == '<=')
-            cLE++;
-        if ('' + left + right == '<>')
-            cLM++;
-        if ('' + left + right == '>>')
-            cMM++;
-        if ('' + left + right == '>=')
-            cME++;
-        if ('' + left + right == '><')
-            cML++;
-        if ('' + left + right == '=<')
-            cEL++;
-        if ('' + left + right == '==')
-            cEE++;
-        if ('' + left + right == '=>')
-            cEM++;
-        //}
-    }
-    console.log('            ', (cLL + cLE + cLM), (cLM + cEM + cMM));
 }
 function paintCellsGreen222(//ratioPre: number
 //, calcs: { ball: number, fills: { dx1: number, dx2: number }[], summ: number, logr: number }[]
