@@ -304,15 +304,21 @@ function setupHomeBackURL() {
     let home = urlParams.get('home');
     if (home) {
         goHomeBackURL = home;
-        console.log('goHomeBackURL', goHomeBackURL);
+        console.log('goHomeBackURL param', goHomeBackURL);
     }
     else {
         let saved = readRawTextFromlocalStorage('goHomeBackURL');
         if (saved) {
             goHomeBackURL = saved;
+            console.log('goHomeBackURL cache', goHomeBackURL);
         }
     }
-    saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
+    if (goHomeBackURL) {
+        saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
+    }
+    else {
+        saveRawText2localStorage('goHomeBackURL', '');
+    }
 }
 function getNavigatorLanguage() {
     console.log('navigator.languages', navigator.languages);
@@ -2726,16 +2732,21 @@ class UIToolbar {
             }
         });
         this.backHomeButton = new ToolBarButton([icon_home], 0, -1.5, (nn) => {
+            console.log('goHomeBackURL', goHomeBackURL);
             if (goHomeBackURL) {
-                window.location.replace(goHomeBackURL);
+                if (goHomeBackURL.length > 7) {
+                    window.location.replace(goHomeBackURL);
+                }
             }
         });
+        this.toolBarRow = { x: 0, y: 0, w: 4.4, h: 2, rx: 0.25, ry: 0.25, css: 'fillShadow' };
         this.toolBarGroup = document.getElementById("toolBarPanelGroup");
         this.toolBarAnchor = {
             xx: 0, yy: 0, ww: 111, hh: 111,
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
+                this.toolBarRow,
                 this.undoButton.iconLabelButton.anchor,
                 this.redoButton.iconLabelButton.anchor,
                 this.playStopButton.iconLabelButton.anchor,
@@ -2758,11 +2769,13 @@ class UIToolbar {
         this.redoButton.resize(viewWIdth, viewHeight);
         this.playStopButton.resize(viewWIdth, viewHeight);
         this.backHomeButton.resize(viewWIdth, viewHeight);
+        this.toolBarRow.y = viewHeight - 1.1;
+        this.toolBarRow.x = viewWIdth / 2 - 2.2;
     }
 }
 class ToolBarButton {
     constructor(labels, stick, position, action) {
-        this.iconLabelButton = new IconLabelButton(labels, 'toolBarButtonCircle', 'toolBarButtonLabel', action);
+        this.iconLabelButton = new IconLabelButton(false, labels, 'toolBarButtonCircle', 'toolBarButtonLabel', action);
         this.stick = stick;
         this.position = position;
     }
@@ -2836,11 +2849,12 @@ class RightMenuPanel {
         this.backgroundRectangle = { x: 0, y: 0, w: 5, h: 5, css: 'rightMenuPanel' };
         this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
         this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-        this.menuUpButton = new IconLabelButton([icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
+        this.menuUpButton = new IconLabelButton(false, [icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
-        this.menuToggleButton = new IconLabelButton([''], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
+        this.menuToggleButton = new IconLabelButton(true, [''], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
+            console.log('locick');
             if (globalCommandDispatcher.cfg().data.list) {
                 globalCommandDispatcher.hideRightMenu();
             }
@@ -6178,19 +6192,28 @@ class FanOutputLine {
     }
 }
 class IconLabelButton {
-    constructor(labels, cssBG, cssLabel, action) {
+    constructor(menuToggler, labels, cssBG, cssLabel, action) {
         this.shadow = null;
+        this.line = null;
         this.left = 0;
         this.top = 0;
         this.selection = 0;
         this.labels = labels;
         this.action = action;
+        this.menuToggler = menuToggler;
         this.bg = { x: 0, y: 0, w: 5, h: 5, rx: 0.4, ry: 0.4, css: cssBG };
-        this.shadow = {
-            x: 0, y: 0, w: 5, h: 5,
-            rx: 0.5, ry: 0.5,
-            css: 'fillShadow'
-        };
+        if (this.menuToggler) {
+            this.shadow = {
+                x: 0, y: 0, w: 5, h: 5,
+                rx: 0.5, ry: 0.5,
+                css: 'fillShadow'
+            };
+            this.line = {
+                x: 0, y: 0, w: 5, h: 5,
+                rx: 0.5, ry: 0.5,
+                css: 'fillShadow'
+            };
+        }
         this.spot = {
             x: 0, y: 0, w: 1, h: 1, css: 'transparentSpot', activation: (x, y) => {
                 this.selection++;
@@ -6213,6 +6236,9 @@ class IconLabelButton {
         }
         this.anchor.content.push(this.bg);
         this.anchor.content.push(this.label);
+        if (this.line) {
+            this.anchor.content.push(this.line);
+        }
         this.anchor.content.push(this.spot);
     }
     resize(left, top, size) {
@@ -6224,6 +6250,14 @@ class IconLabelButton {
         this.bg.h = size - 2 * pad;
         this.bg.rx = 0.5 * (size - 2 * pad);
         this.bg.ry = 0.5 * (size - 2 * pad);
+        if (this.menuToggler) {
+            this.bg.rx = 0.1 * (size - 2 * pad);
+            this.bg.ry = 0.1 * (size - 2 * pad);
+        }
+        else {
+            this.bg.rx = 0.5 * (size - 2 * pad);
+            this.bg.ry = 0.5 * (size - 2 * pad);
+        }
         this.label.x = left + 0.5 * size;
         this.label.y = top + 0.69 * size;
         this.spot.x = left;
@@ -6235,8 +6269,16 @@ class IconLabelButton {
             this.shadow.y = top + pad - sh;
             this.shadow.w = size - 2 * (pad - sh);
             this.shadow.h = size - 2 * (pad - sh);
-            this.shadow.rx = 0.5 * (size - 2 * (pad - sh));
-            this.shadow.ry = 0.5 * (size - 2 * (pad - sh));
+            this.shadow.rx = 0.1 * (size - 2 * (pad - sh));
+            this.shadow.ry = 0.1 * (size - 2 * (pad - sh));
+        }
+        if (this.line) {
+            this.line.x = left + pad + 2 * sh;
+            this.line.y = top + pad + 2 * sh;
+            this.line.w = sh / 2;
+            this.line.h = size - 6 * sh;
+            this.line.rx = 0;
+            this.line.ry = 0;
         }
     }
 }

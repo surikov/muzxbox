@@ -10,6 +10,8 @@ class UIToolbar {
 
 	backHomeButton: ToolBarButton;
 
+	toolBarRow: TileRectangle;
+
 	constructor() {
 		//
 	}
@@ -29,7 +31,7 @@ class UIToolbar {
 		this.undoButton = new ToolBarButton([icon_undo], 0, -0.5, (nn: number) => {
 			globalCommandDispatcher.exe.undo(1);
 		});
-		this.playStopButton = new ToolBarButton([icon_pause,icon_play], 0, 1.5, (nn: number) => {
+		this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn: number) => {
 			//globalCommandDispatcher.toggleStartStop();
 			if (globalCommandDispatcher.player.playState().play) {
 				globalCommandDispatcher.stopPlay();
@@ -40,9 +42,11 @@ class UIToolbar {
 
 
 		this.backHomeButton = new ToolBarButton([icon_home], 0, -1.5, (nn: number) => {
-			//location.href='midiru.php';
+			console.log('goHomeBackURL', goHomeBackURL)
 			if (goHomeBackURL) {
-				window.location.replace(goHomeBackURL);
+				if (goHomeBackURL.length > 7) {
+					window.location.replace(goHomeBackURL);
+				}
 			}
 		});
 
@@ -56,7 +60,7 @@ class UIToolbar {
 		//this.redoButton = new ToolBarButton([icon_redo], -1, 2, (nn: number) => {
 		//	globalCommandDispatcher.exe.redo(1);
 		//});
-
+		this.toolBarRow = { x: 0, y: 0, w: 4.4, h: 2, rx: 0.25, ry: 0.25, css: 'fillShadow' };
 		this.toolBarGroup = (document.getElementById("toolBarPanelGroup") as any) as SVGElement;
 		this.toolBarAnchor = {
 			xx: 0, yy: 0, ww: 111, hh: 111
@@ -65,6 +69,7 @@ class UIToolbar {
 			, content: [
 				//this.openRightMenuButton.iconLabelButton.anchor
 				//, 
+				this.toolBarRow,
 				this.undoButton.iconLabelButton.anchor
 				, this.redoButton.iconLabelButton.anchor
 				, this.playStopButton.iconLabelButton.anchor
@@ -88,5 +93,7 @@ class UIToolbar {
 		this.redoButton.resize(viewWIdth, viewHeight);
 		this.playStopButton.resize(viewWIdth, viewHeight);
 		this.backHomeButton.resize(viewWIdth, viewHeight);
+		this.toolBarRow.y = viewHeight - 1.1;
+		this.toolBarRow.x = viewWIdth / 2 - 2.2;
 	}
 }

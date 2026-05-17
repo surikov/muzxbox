@@ -25,9 +25,7 @@ body {
 p {
 	margin: 0.5cm;
 	text-overflow: ellipsis;
-	white-space2: nowrap;
-	width2: 100%;
-
+	line-height: 1.025;
 	width: 90vw;
 	white-space: nowrap;
 	overflow: hidden;
@@ -72,6 +70,7 @@ li {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	line-height: 1.025;
 }
 
 li:before {

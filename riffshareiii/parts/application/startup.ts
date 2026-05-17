@@ -46,10 +46,10 @@ function startApplication() {
 				globalCommandDispatcher.redoQueue = redocommands;
 			}
 		}
-		globalCommandDispatcher.clipboardData=null;
+		globalCommandDispatcher.clipboardData = null;
 		let lastClipboardData = readLzObjectFromlocalStorage('clipboardData');
 		if (lastClipboardData) {
-			globalCommandDispatcher.clipboardData=lastClipboardData;
+			globalCommandDispatcher.clipboardData = lastClipboardData;
 		}
 	} catch (xx) {
 		console.log(xx);
@@ -96,14 +96,19 @@ function setupHomeBackURL() {
 	let home = urlParams.get('home');
 	if (home) {
 		goHomeBackURL = home;
-		console.log('goHomeBackURL', goHomeBackURL);
+		console.log('goHomeBackURL param', goHomeBackURL);
 	} else {
 		let saved = readRawTextFromlocalStorage('goHomeBackURL');
 		if (saved) {
 			goHomeBackURL = saved;
+			console.log('goHomeBackURL cache', goHomeBackURL);
 		}
 	}
-	saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
+	if (goHomeBackURL) {
+		saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
+	} else {
+		saveRawText2localStorage('goHomeBackURL', '');
+	}
 }
 /*function squashString(data: string): string {
 	return data;

@@ -343,6 +343,7 @@ declare class UIToolbar {
     redoButton: ToolBarButton;
     playStopButton: ToolBarButton;
     backHomeButton: ToolBarButton;
+    toolBarRow: TileRectangle;
     constructor();
     createToolbar(): TileLayerDefinition[];
     resizeToolbar(viewWIdth: number, viewHeight: number): void;
@@ -594,6 +595,7 @@ declare class IconLabelButton {
     anchor: TileAnchor;
     bg: TileRectangle;
     shadow: TileRectangle | null;
+    line: TileRectangle | null;
     spot: TileRectangle;
     label: TileText;
     left: number;
@@ -601,7 +603,8 @@ declare class IconLabelButton {
     labels: string[];
     action: (selection: number) => void;
     selection: number;
-    constructor(labels: string[], cssBG: string, cssLabel: string, action: (nn: number) => void);
+    menuToggler: boolean;
+    constructor(menuToggler: boolean, labels: string[], cssBG: string, cssLabel: string, action: (nn: number) => void);
     resize(left: number, top: number, size: number): void;
 }
 declare abstract class UIAction {
