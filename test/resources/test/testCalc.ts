@@ -1100,7 +1100,28 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			max = cellColors[xx];
 		}
 	}
-	//console.log(rowIdx,cellColors);
+
+	let m3 = Math.round(max / 3);
+	let cnt0 = 0;
+	let cnt1 = 0;
+	let cnt2 = 0;
+	let cnt3 = 0;
+	for (let xx = 0; xx < rowLen; xx++) {
+		cellColors[xx] = Math.round(cellColors[xx] / m3);
+		if (cellColors[xx] == 0) cnt0++;
+		if (cellColors[xx] == 1) cnt1++;
+		if (cellColors[xx] == 2) cnt2++;
+		if (cellColors[xx] == 3) cnt3++;
+	}
+	max = 3;
+	if (rowIdx == 0) {
+		console.log(rowIdx, 'white', cnt0, Math.round(1000 * ballsInRow * cnt0 / rowLen) / 1000
+			, 'grey', cnt1, Math.round(1000 * ballsInRow * cnt1 / rowLen) / 1000
+			, 'dark', cnt2, Math.round(1000 * ballsInRow * cnt2 / rowLen) / 1000
+			, 'black', cnt3, Math.round(1000 * ballsInRow * cnt3 / rowLen) / 1000
+			//, cellColors
+		);
+	}
 	for (let xx = 0; xx < rowLen; xx++) {
 		let idx = cellColors[xx] / max;
 		idx = (idx) ? idx : 0;
