@@ -45,7 +45,8 @@ class UIToolbar {
 			console.log('goHomeBackURL', goHomeBackURL)
 			if (goHomeBackURL) {
 				if (goHomeBackURL.length > 7) {
-					window.location.replace(goHomeBackURL);
+					//window.location.replace(goHomeBackURL);
+					window.location.href = goHomeBackURL;
 				}
 			}
 		});
