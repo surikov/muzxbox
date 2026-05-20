@@ -1065,13 +1065,13 @@ function sectorConsistsPointsAt(mindistance: number, maxdistance: number, minray
 	}
 	return cnt;
 }
-function pointsInRay(len: number, raydegr: number): XY[] {
+function pointsInRay(start: number, end: number, raydegr: number): XY[] {
 	raydegr = raydegr % 360;
 	let ray = raydegr - 180;
 	if (raydegr > 270) ray = 360 - raydegr;
 	let gr = Math.PI / 180;
 	let points: XY[] = [];
-	for (let st = 0.5; st <= len; st = st + 0.5) {
+	for (let st = start; st <= end; st = st + 0.5) {
 		let xx = Math.floor(st * Math.cos(ray * gr));
 		let yy = Math.floor(st * Math.sin(ray * gr));
 		if (yy > 0) {
@@ -1090,8 +1090,8 @@ function pointsInRay(len: number, raydegr: number): XY[] {
 	}
 	return points;
 }
-function rayBallCount(len: number, raydegr: number, xx: number, rowIdx: number, rows: BallsRow[]): number {
-	let points: XY[] = pointsInRay(len, raydegr);
+function rayBallCount(start: number, end: number, raydegr: number, xx: number, rowIdx: number, rows: BallsRow[]): number {
+	let points: XY[] = pointsInRay(start, end, raydegr);
 	let cnt = 0;
 	for (let ii = 0; ii < points.length; ii++) {
 		if (ballExists(xx + 1 + points[ii].px, rows[rowIdx - points[ii].py])) {
@@ -1104,14 +1104,34 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 
 	let cellColors: number[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
-		//if ((rowIdx == 0 || rowIdx == 1 || rowIdx == 2 || rowIdx == 3) && xx + 1 == 4) {
+		//if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
 		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-		for (let rr = 270 - 80; rr < 270 + 80; rr = rr + 10) {
-			let cnt = rayBallCount(9, rr, xx, rowIdx, rows)
-			//console.log('paintCellsGreen', rowIdx, (xx + 1), ballExists(xx + 1, rows[rowIdx]), pointsInRay(7, 270 + 45), rayBallCount(7, 270 + 45, xx, rowIdx, rows));
-			if (cnt > 2) {
-				cellColors[xx] = cellColors[xx] + cnt;
+		for (let rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
+			let cnt1 = rayBallCount(1, 2, rr, xx, rowIdx, rows);
+			let cnt2 = rayBallCount(3, 4, rr, xx, rowIdx, rows);
+			let cnt3 = rayBallCount(5, 6, rr, xx, rowIdx, rows);
+			let cnt4 = rayBallCount(7, 8, rr, xx, rowIdx, rows);
+			if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
+				cellColors[xx] = cellColors[xx] + 5;
 			}
+			if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
+				cellColors[xx] = cellColors[xx] + 5;
+			}
+			if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
+				cellColors[xx] = cellColors[xx] + 4;
+			}
+			if ((cnt1 + cnt2) / 2 > 1) {
+				cellColors[xx] = cellColors[xx] + 3;
+			}
+			if ((cnt2 + cnt3) / 2 > 1) {
+				cellColors[xx] = cellColors[xx] + 2;
+			}
+			if (cnt1 > 1) {
+				cellColors[xx] = cellColors[xx] + 1;
+			}
+
+
+
 		}
 		//}
 	}

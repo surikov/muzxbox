@@ -939,7 +939,7 @@ function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, ro
     }
     return cnt;
 }
-function pointsInRay(len, raydegr) {
+function pointsInRay(start, end, raydegr) {
     raydegr = raydegr % 360;
     var ray = raydegr - 180;
     if (raydegr > 270)
@@ -958,7 +958,7 @@ function pointsInRay(len, raydegr) {
             }
         }
     };
-    for (var st = 0.5; st <= len; st = st + 0.5) {
+    for (var st = start; st <= end; st = st + 0.5) {
         _loop_2(st);
     }
     if (raydegr >= 90 && raydegr <= 270) {
@@ -969,8 +969,8 @@ function pointsInRay(len, raydegr) {
     }
     return points;
 }
-function rayBallCount(len, raydegr, xx, rowIdx, rows) {
-    var points = pointsInRay(len, raydegr);
+function rayBallCount(start, end, raydegr, xx, rowIdx, rows) {
+    var points = pointsInRay(start, end, raydegr);
     var cnt = 0;
     for (var ii = 0; ii < points.length; ii++) {
         if (ballExists(xx + 1 + points[ii].px, rows[rowIdx - points[ii].py])) {
@@ -982,13 +982,30 @@ function rayBallCount(len, raydegr, xx, rowIdx, rows) {
 function paintCellsGreen(svg, rowIdx, rows) {
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
-        //if ((rowIdx == 0 || rowIdx == 1 || rowIdx == 2 || rowIdx == 3) && xx + 1 == 4) {
+        //if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
-        for (var rr = 270 - 80; rr < 270 + 80; rr = rr + 10) {
-            var cnt = rayBallCount(9, rr, xx, rowIdx, rows);
-            //console.log('paintCellsGreen', rowIdx, (xx + 1), ballExists(xx + 1, rows[rowIdx]), pointsInRay(7, 270 + 45), rayBallCount(7, 270 + 45, xx, rowIdx, rows));
-            if (cnt > 2) {
-                cellColors[xx] = cellColors[xx] + cnt;
+        for (var rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
+            var cnt1 = rayBallCount(1, 2, rr, xx, rowIdx, rows);
+            var cnt2 = rayBallCount(3, 4, rr, xx, rowIdx, rows);
+            var cnt3 = rayBallCount(5, 6, rr, xx, rowIdx, rows);
+            var cnt4 = rayBallCount(7, 8, rr, xx, rowIdx, rows);
+            if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
+                cellColors[xx] = cellColors[xx] + 5;
+            }
+            if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
+                cellColors[xx] = cellColors[xx] + 5;
+            }
+            if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
+                cellColors[xx] = cellColors[xx] + 4;
+            }
+            if ((cnt1 + cnt2) / 2 > 1) {
+                cellColors[xx] = cellColors[xx] + 3;
+            }
+            if ((cnt2 + cnt3) / 2 > 1) {
+                cellColors[xx] = cellColors[xx] + 2;
+            }
+            if (cnt1 > 1) {
+                cellColors[xx] = cellColors[xx] + 1;
             }
         }
         //}
