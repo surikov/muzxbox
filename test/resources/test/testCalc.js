@@ -985,28 +985,81 @@ function paintCellsGreen(svg, rowIdx, rows) {
         //if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
         for (var rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
-            var cnt1 = rayBallCount(1, 2, rr, xx, rowIdx, rows);
-            var cnt2 = rayBallCount(3, 4, rr, xx, rowIdx, rows);
-            var cnt3 = rayBallCount(5, 6, rr, xx, rowIdx, rows);
-            var cnt4 = rayBallCount(7, 8, rr, xx, rowIdx, rows);
-            if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
-                cellColors[xx] = cellColors[xx] + 5;
+            var aa = rayBallCount(1, 2, rr, xx, rowIdx, rows);
+            var bb = rayBallCount(2.5, 3.5, rr, xx, rowIdx, rows);
+            var cc = rayBallCount(4, 5.5, rr, xx, rowIdx, rows);
+            var dd = rayBallCount(6, 7.5, rr, xx, rowIdx, rows);
+            if (aa + bb + cc > 3) {
+                cellColors[xx] = cellColors[xx] + 16;
             }
-            if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
-                cellColors[xx] = cellColors[xx] + 5;
+            else {
+                if (bb + cc + dd > 3) {
+                    cellColors[xx] = cellColors[xx] + 2;
+                }
+                else {
+                    aa = rayBallCount(1, 3, rr, xx, rowIdx, rows);
+                    bb = rayBallCount(3.5, 5.5, rr, xx, rowIdx, rows);
+                    cc = rayBallCount(6, 8, rr, xx, rowIdx, rows);
+                    dd = rayBallCount(8.5, 10.5, rr, xx, rowIdx, rows);
+                    if (aa + bb + cc > 3) {
+                        cellColors[xx] = cellColors[xx] + 9;
+                    }
+                    else {
+                        if (bb + cc + dd > 3) {
+                            cellColors[xx] = cellColors[xx] + 1;
+                        }
+                    }
+                }
             }
-            if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
-                cellColors[xx] = cellColors[xx] + 4;
-            }
-            if ((cnt1 + cnt2) / 2 > 1) {
-                cellColors[xx] = cellColors[xx] + 3;
-            }
-            if ((cnt2 + cnt3) / 2 > 1) {
-                cellColors[xx] = cellColors[xx] + 2;
-            }
-            if (cnt1 > 1) {
-                cellColors[xx] = cellColors[xx] + 1;
-            }
+            /*
+            
+                        cnt1 = rayBallCount(1, 4, rr, xx, rowIdx, rows);
+                        cnt2 = rayBallCount(2, 5, rr, xx, rowIdx, rows);
+                        cnt3 = rayBallCount(3, 6, rr, xx, rowIdx, rows);
+                        cnt4 = rayBallCount(4, 7, rr, xx, rowIdx, rows);
+                        if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
+                            cellColors[xx] = cellColors[xx] + 5;
+                        }
+                        if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
+                            cellColors[xx] = cellColors[xx] + 5;
+                        }
+                        if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
+                            cellColors[xx] = cellColors[xx] + 4;
+                        }
+                        if ((cnt1 + cnt2) / 2 > 1) {
+                            cellColors[xx] = cellColors[xx] + 3;
+                        }
+                        if ((cnt2 + cnt3) / 2 > 1) {
+                            cellColors[xx] = cellColors[xx] + 2;
+                        }
+                        if (cnt1 > 1) {
+                            cellColors[xx] = cellColors[xx] + 1;
+                        }
+            */
+            /*
+                        cnt1 = rayBallCount(1, 2, rr, xx, rowIdx, rows);
+                        cnt2 = rayBallCount(2, 3, rr, xx, rowIdx, rows);
+                        cnt3 = rayBallCount(3, 4, rr, xx, rowIdx, rows);
+                        cnt4 = rayBallCount(4, 5, rr, xx, rowIdx, rows);
+                        if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
+                            cellColors[xx] = cellColors[xx] + 5;
+                        }
+                        if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
+                            cellColors[xx] = cellColors[xx] + 5;
+                        }
+                        if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
+                            cellColors[xx] = cellColors[xx] + 4;
+                        }
+                        if ((cnt1 + cnt2) / 2 > 1) {
+                            cellColors[xx] = cellColors[xx] + 3;
+                        }
+                        if ((cnt2 + cnt3) / 2 > 1) {
+                            cellColors[xx] = cellColors[xx] + 2;
+                        }
+                        if (cnt1 > 1) {
+                            cellColors[xx] = cellColors[xx] + 1;
+                        }
+            */
         }
         //}
     }
