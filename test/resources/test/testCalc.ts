@@ -1065,7 +1065,76 @@ function sectorConsistsPointsAt(mindistance: number, maxdistance: number, minray
 	}
 	return cnt;
 }
+function pointsInRay(len: number, raydegr: number): XY[] {
+	raydegr = raydegr % 360;
+	let ray = raydegr - 180;
+	if (raydegr > 270) ray = 360 - raydegr;
+	let gr = Math.PI / 180;
+	let points: XY[] = [];
+	for (let st = 0.5; st <= len; st = st + 0.5) {
+		let xx = Math.floor(st * Math.cos(ray * gr));
+		let yy = Math.floor(st * Math.sin(ray * gr));
+		if (yy > 0) {
+			if (points.find((xy: XY) => xy.px == xx && xy.py == yy)) {
+				//
+			} else {
+				points.push({ px: xx, py: yy });
+			}
+		}
+	}
+	if (raydegr >= 90 && raydegr <= 270) {
+		points.forEach((xy: XY) => xy.px = -xy.px);
+	}
+	if (raydegr >= 180 && raydegr <= 360) {
+		points.forEach((xy: XY) => xy.py = -xy.py);
+	}
+	return points;
+}
+function rayBallCount(len: number, raydegr: number, xx: number, rowIdx: number, rows: BallsRow[]): number {
+	let points: XY[] = pointsInRay(len, raydegr);
+	let cnt = 0;
+	for (let ii = 0; ii < points.length; ii++) {
+		if (ballExists(xx + 1 + points[ii].px, rows[rowIdx - points[ii].py])) {
+			cnt++;
+		}
+	}
+	return cnt;
+}
 function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
+
+	let cellColors: number[] = [];
+	for (let xx = 0; xx < rowLen; xx++) {
+		//if ((rowIdx == 0 || rowIdx == 1 || rowIdx == 2 || rowIdx == 3) && xx + 1 == 4) {
+		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+		for (let rr = 270 - 80; rr < 270 + 80; rr = rr + 10) {
+			let cnt = rayBallCount(9, rr, xx, rowIdx, rows)
+			//console.log('paintCellsGreen', rowIdx, (xx + 1), ballExists(xx + 1, rows[rowIdx]), pointsInRay(7, 270 + 45), rayBallCount(7, 270 + 45, xx, rowIdx, rows));
+			if (cnt > 2) {
+				cellColors[xx] = cellColors[xx] + cnt;
+			}
+		}
+		//}
+	}
+	let max = 0;
+	for (let xx = 0; xx < rowLen; xx++) {
+		if (max < cellColors[xx]) {
+			max = cellColors[xx];
+		}
+	}
+	for (let xx = 0; xx < rowLen; xx++) {
+		let idx = cellColors[xx] / max;
+		idx = (idx) ? idx : 0;
+		if (idx > 1) {
+			idx = 1;
+		}
+		idx = 255 - idx * 255;
+		addRect(svg, xx * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
+			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+		addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
+			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+	}
+}
+function paintCellsGreen333(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 
 	let cellColors: number[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
