@@ -1,5 +1,14 @@
 console.log('MIDI.Ru Archive plugin v1.0');
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
+function findprompt() {
+	let what = prompt("Поиск по тексту", "");
+	if (what != null) {
+		console.log('what', what);
+		let url = 'midiru.php?find=' + what;
+		(window as any).location = url;
+	}
+}
+
 class InMIDI {
 	player: MZXBX_Player | null = null;
 	parsedProject: Zvoog_Project | null = null;//testminium;
@@ -40,6 +49,7 @@ class InMIDI {
 			alert('No parsed data');
 		}
 	}
+
 	startPlay() {
 		console.log('startPlay');
 		this.initContext();

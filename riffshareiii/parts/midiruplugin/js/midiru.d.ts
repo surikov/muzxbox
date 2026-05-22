@@ -687,6 +687,7 @@ declare class ChordPitchPerformerUtilMIDI {
 }
 declare let testminium: Zvoog_Project;
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
+declare function findprompt(): void;
 declare class InMIDI {
     player: MZXBX_Player | null;
     parsedProject: Zvoog_Project | null;

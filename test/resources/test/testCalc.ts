@@ -1131,59 +1131,8 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 				}
 			}
 
-
-			/*
-			
-						cnt1 = rayBallCount(1, 4, rr, xx, rowIdx, rows);
-						cnt2 = rayBallCount(2, 5, rr, xx, rowIdx, rows);
-						cnt3 = rayBallCount(3, 6, rr, xx, rowIdx, rows);
-						cnt4 = rayBallCount(4, 7, rr, xx, rowIdx, rows);
-						if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
-							cellColors[xx] = cellColors[xx] + 5;
-						}
-						if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
-							cellColors[xx] = cellColors[xx] + 5;
-						}
-						if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
-							cellColors[xx] = cellColors[xx] + 4;
-						}
-						if ((cnt1 + cnt2) / 2 > 1) {
-							cellColors[xx] = cellColors[xx] + 3;
-						}
-						if ((cnt2 + cnt3) / 2 > 1) {
-							cellColors[xx] = cellColors[xx] + 2;
-						}
-						if (cnt1 > 1) {
-							cellColors[xx] = cellColors[xx] + 1;
-						}
-			*/
-
-			/*
-						cnt1 = rayBallCount(1, 2, rr, xx, rowIdx, rows);
-						cnt2 = rayBallCount(2, 3, rr, xx, rowIdx, rows);
-						cnt3 = rayBallCount(3, 4, rr, xx, rowIdx, rows);
-						cnt4 = rayBallCount(4, 5, rr, xx, rowIdx, rows);
-						if ((cnt1 + cnt2 + cnt3 + cnt4) / 4 > 1) {
-							cellColors[xx] = cellColors[xx] + 5;
-						}
-						if ((cnt1 + cnt2 + cnt3) / 3 > 1) {
-							cellColors[xx] = cellColors[xx] + 5;
-						}
-						if ((cnt2 + cnt3 + cnt4) / 3 > 1) {
-							cellColors[xx] = cellColors[xx] + 4;
-						}
-						if ((cnt1 + cnt2) / 2 > 1) {
-							cellColors[xx] = cellColors[xx] + 3;
-						}
-						if ((cnt2 + cnt3) / 2 > 1) {
-							cellColors[xx] = cellColors[xx] + 2;
-						}
-						if (cnt1 > 1) {
-							cellColors[xx] = cellColors[xx] + 1;
-						}
-			*/
 		}
-		//}
+
 	}
 	let max = 0;
 	for (let xx = 0; xx < rowLen; xx++) {
@@ -1202,6 +1151,15 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
 		addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
+	}
+	if (rowIdx == 0) {
+		let txt = '';
+		for (let ii = 0; ii < cellColors.length; ii++) {
+			if (ballExists(ii + 1, rows[rowIdx])) {
+				txt = txt + ' ' + cellColors[ii];
+			}
+		}
+		console.log( txt, cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
 	}
 }
 function paintCellsGreen333(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {

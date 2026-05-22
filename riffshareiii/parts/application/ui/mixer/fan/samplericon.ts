@@ -231,76 +231,108 @@ class SamplerIcon {
 					});
 			}
 		}
-		this.addReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
-	}
-	addReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor) {
+
 		if (zidx < 4) {
-			let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
-			if (zidx >= 3) {
-				ratio = ratio / 2;
-			}
-			let top = globalCommandDispatcher.cfg().samplerTop();
-			let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-			let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
-			let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-			let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
-			let dragOrderSampleAnchor: TileAnchor = {
-				xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
-				, minZoom: fanLevelAnchor.minZoom
-				, beforeZoom: fanLevelAnchor.beforeZoom
-				, content: []
-				, translation: { x: 0, y: 0 }
-			};
-			let reorderSamplerButton: TileRectangle = {
-				x: xx - 0.5 * sz
-				, y: yy - 0.5 * sz
-				, w: sz
-				, h: sz
-				, rx: 0.5 * sz
-				, ry: 0.5 * sz
-				, css: css
-				, draggable: true
-
-			};
-			let aim = percnum;
-			reorderSamplerButton.activation = (xx, yy) => {
-				if (dragOrderSampleAnchor.translation) {
-					if (xx == 0 && yy == 0) {
-						dragOrderSampleAnchor.translation.x = 0;
-						dragOrderSampleAnchor.translation.y = 0;
-						if (aim < 0) {
-							aim = 0;
-						}
-						if (aim > globalCommandDispatcher.cfg().data.percussions.length - 1) {
-							aim = globalCommandDispatcher.cfg().data.percussions.length - 1;
-
-						}
-						if (aim == percnum) {
-							globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
-						} else {
-							globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-								let percTrack: Zvoog_PercussionTrack
-									= globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
-								globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);
-							});
-							globalCommandDispatcher.resetProject();
-						}
-					} else {
-						dragOrderSampleAnchor.translation.x = sz / 3;
-						aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
-							/ globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
-						//console.log(aim);
-						if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.percussions.length) {
-							dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
-						}
-						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
-					}
-					//console.log(xx, yy,dragOrderSampleAnchor.translation.x,dragOrderSampleAnchor.translation.y);
-
+			this.addReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
+		} else {
+			if (percnum == 0) {
+				if (zidx < 7) {
+					this.addZoomReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
 				}
 			}
-			dragOrderSampleAnchor.content.push(reorderSamplerButton);
-			fanLevelAnchor.content.push(dragOrderSampleAnchor);
 		}
+	}
+	addZoomReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor) {
+		let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+		if (zidx >= 3) {
+			ratio = ratio / 2;
+		}
+		let top = globalCommandDispatcher.cfg().samplerTop();
+		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+		//let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+		let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+		let zoomReorderSamplerButton: TileRectangle = {
+			x: xx - 0.5 * sz
+			, y: yy - 0.5 * sz
+			, w: sz
+			, h: sz
+			, rx: 0.5 * sz
+			, ry: 0.5 * sz
+			, css: 'fanEmptySymbol fanButton' + zidx
+			, draggable: true
+
+		};
+		fanLevelAnchor.content.push(zoomReorderSamplerButton);
+	}
+	addReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor) {
+		//if (zidx < 4) {
+		let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+		if (zidx >= 3) {
+			ratio = ratio / 2;
+		}
+		let top = globalCommandDispatcher.cfg().samplerTop();
+		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+		let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+		let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+		let dragOrderSampleAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, minZoom: fanLevelAnchor.minZoom
+			, beforeZoom: fanLevelAnchor.beforeZoom
+			, content: []
+			, translation: { x: 0, y: 0 }
+		};
+		let reorderSamplerButton: TileRectangle = {
+			x: xx - 0.5 * sz
+			, y: yy - 0.5 * sz
+			, w: sz
+			, h: sz
+			, rx: 0.5 * sz
+			, ry: 0.5 * sz
+			, css: css
+			, draggable: true
+
+		};
+		let aim = percnum;
+		reorderSamplerButton.activation = (xx, yy) => {
+			if (dragOrderSampleAnchor.translation) {
+				if (xx == 0 && yy == 0) {
+					dragOrderSampleAnchor.translation.x = 0;
+					dragOrderSampleAnchor.translation.y = 0;
+					if (aim < 0) {
+						aim = 0;
+					}
+					if (aim > globalCommandDispatcher.cfg().data.percussions.length - 1) {
+						aim = globalCommandDispatcher.cfg().data.percussions.length - 1;
+
+					}
+					if (aim == percnum) {
+						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
+					} else {
+						globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+							let percTrack: Zvoog_PercussionTrack
+								= globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
+							globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);
+						});
+						globalCommandDispatcher.resetProject();
+					}
+				} else {
+					dragOrderSampleAnchor.translation.x = sz / 3;
+					aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
+						/ globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
+					//console.log(aim);
+					if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.percussions.length) {
+						dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
+					}
+					globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
+				}
+				//console.log(xx, yy,dragOrderSampleAnchor.translation.x,dragOrderSampleAnchor.translation.y);
+
+			}
+		}
+		dragOrderSampleAnchor.content.push(reorderSamplerButton);
+		fanLevelAnchor.content.push(dragOrderSampleAnchor);
+		//}
 	}
 }

@@ -91,11 +91,21 @@
 	stroke-linejoin: round;
 	paint-order: stroke fill;
 }
+.fanEmptySymbol {
+	fill: #00000000;
+	pointer-events: none;
+	stroke: var(--line-color75);
+}
+
 .fanButton0 {stroke-width: calc(0.02*var(--tapSize));}
 .fanButton1 {stroke-width: calc(0.04*var(--tapSize));}
 .fanButton2 {stroke-width: calc(0.08*var(--tapSize));}
 .fanButton3 {stroke-width: calc(0.16*var(--tapSize));}
 .fanButton4 {stroke-width: calc(0.32*var(--tapSize));}
+.fanButton5 {stroke-width: calc(0.64*var(--tapSize));}
+.fanButton6 {stroke-width: calc(1.28*var(--tapSize));}
+.fanButton7 {stroke-width: calc(2.56*var(--tapSize));}
+.fanButton8 {stroke-width: calc(5.12*var(--tapSize));}
 
 .fanSamplerActionIconLabel {
 	fill: var(--main-color);

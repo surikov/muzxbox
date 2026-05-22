@@ -84,7 +84,8 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.envelope.gain.cancelAndHoldAtTime(when + duration);
 			this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
 
-			this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+			//this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+			this.carrier.frequency.value=frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
 			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
@@ -261,7 +262,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				this.synth = new MiniumFMSynth();
 				this.synth.init(context);
 			}
-			console.log('parameters', parameters);
+			//console.log('parameters', parameters);
 			this.fm = (parameters as any) as FMParameter;
 			return 1;
 		}

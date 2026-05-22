@@ -5749,73 +5749,101 @@ class SamplerIcon {
                 });
             }
         }
-        this.addReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
+        if (zidx < 4) {
+            this.addReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
+        }
+        else {
+            if (percnum == 0) {
+                if (zidx < 7) {
+                    this.addZoomReorderSamplerIcon(zidx, percnum, fanLevelAnchor);
+                }
+            }
+        }
+    }
+    addZoomReorderSamplerIcon(zidx, percnum, fanLevelAnchor) {
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let top = globalCommandDispatcher.cfg().samplerTop();
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+        let zoomReorderSamplerButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: 'fanEmptySymbol fanButton' + zidx,
+            draggable: true
+        };
+        fanLevelAnchor.content.push(zoomReorderSamplerButton);
     }
     addReorderSamplerIcon(zidx, percnum, fanLevelAnchor) {
-        if (zidx < 4) {
-            let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
-            if (zidx >= 3) {
-                ratio = ratio / 2;
-            }
-            let top = globalCommandDispatcher.cfg().samplerTop();
-            let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-            let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
-            let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-            let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
-            let dragOrderSampleAnchor = {
-                xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-                minZoom: fanLevelAnchor.minZoom,
-                beforeZoom: fanLevelAnchor.beforeZoom,
-                content: [],
-                translation: { x: 0, y: 0 }
-            };
-            let reorderSamplerButton = {
-                x: xx - 0.5 * sz,
-                y: yy - 0.5 * sz,
-                w: sz,
-                h: sz,
-                rx: 0.5 * sz,
-                ry: 0.5 * sz,
-                css: css,
-                draggable: true
-            };
-            let aim = percnum;
-            reorderSamplerButton.activation = (xx, yy) => {
-                if (dragOrderSampleAnchor.translation) {
-                    if (xx == 0 && yy == 0) {
-                        dragOrderSampleAnchor.translation.x = 0;
-                        dragOrderSampleAnchor.translation.y = 0;
-                        if (aim < 0) {
-                            aim = 0;
-                        }
-                        if (aim > globalCommandDispatcher.cfg().data.percussions.length - 1) {
-                            aim = globalCommandDispatcher.cfg().data.percussions.length - 1;
-                        }
-                        if (aim == percnum) {
-                            globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
-                        }
-                        else {
-                            globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                                let percTrack = globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
-                                globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);
-                            });
-                            globalCommandDispatcher.resetProject();
-                        }
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let top = globalCommandDispatcher.cfg().samplerTop();
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+        let dragOrderSampleAnchor = {
+            xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+            minZoom: fanLevelAnchor.minZoom,
+            beforeZoom: fanLevelAnchor.beforeZoom,
+            content: [],
+            translation: { x: 0, y: 0 }
+        };
+        let reorderSamplerButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: css,
+            draggable: true
+        };
+        let aim = percnum;
+        reorderSamplerButton.activation = (xx, yy) => {
+            if (dragOrderSampleAnchor.translation) {
+                if (xx == 0 && yy == 0) {
+                    dragOrderSampleAnchor.translation.x = 0;
+                    dragOrderSampleAnchor.translation.y = 0;
+                    if (aim < 0) {
+                        aim = 0;
                     }
-                    else {
-                        dragOrderSampleAnchor.translation.x = sz / 3;
-                        aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
-                            / globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
-                        if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.percussions.length) {
-                            dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
-                        }
+                    if (aim > globalCommandDispatcher.cfg().data.percussions.length - 1) {
+                        aim = globalCommandDispatcher.cfg().data.percussions.length - 1;
+                    }
+                    if (aim == percnum) {
                         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
                     }
+                    else {
+                        globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+                            let percTrack = globalCommandDispatcher.cfg().data.percussions.splice(percnum, 1)[0];
+                            globalCommandDispatcher.cfg().data.percussions.splice(aim, 0, percTrack);
+                        });
+                        globalCommandDispatcher.resetProject();
+                    }
                 }
-            };
-            dragOrderSampleAnchor.content.push(reorderSamplerButton);
-            fanLevelAnchor.content.push(dragOrderSampleAnchor);
-        }
+                else {
+                    dragOrderSampleAnchor.translation.x = sz / 3;
+                    aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
+                        / globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
+                    if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.percussions.length) {
+                        dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
+                    }
+                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
+                }
+            }
+        };
+        dragOrderSampleAnchor.content.push(reorderSamplerButton);
+        fanLevelAnchor.content.push(dragOrderSampleAnchor);
     }
 }
 class FilterIcon {
@@ -6027,73 +6055,101 @@ class FilterIcon {
                 });
             }
         }
-        this.addReorderFilterIcon(zidx, order, fanLevelAnchor);
+        if (zidx < 4) {
+            this.addReorderFilterIcon(zidx, order, fanLevelAnchor);
+        }
+        else {
+            if (order == 0) {
+                if (zidx < 7) {
+                    this.addZoomReorderIcon(zidx, order, fanLevelAnchor);
+                }
+            }
+        }
+    }
+    addZoomReorderIcon(zidx, order, fanLevelAnchor) {
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let top = globalCommandDispatcher.cfg().automationTop();
+        let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let zoomReorderAutoButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: 'fanEmptySymbol fanButton' + zidx,
+            draggable: false
+        };
+        fanLevelAnchor.content.push(zoomReorderAutoButton);
     }
     addReorderFilterIcon(zidx, order, fanLevelAnchor) {
-        if (zidx < 4) {
-            let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
-            if (zidx >= 3) {
-                ratio = ratio / 2;
-            }
-            let top = globalCommandDispatcher.cfg().automationTop();
-            let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-            let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
-            let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-            let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
-            let dragOrderFilterAnchor = {
-                xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
-                minZoom: fanLevelAnchor.minZoom,
-                beforeZoom: fanLevelAnchor.beforeZoom,
-                content: [],
-                translation: { x: 0, y: 0 }
-            };
-            let reorderAutoButton = {
-                x: xx - 0.5 * sz,
-                y: yy - 0.5 * sz,
-                w: sz,
-                h: sz,
-                rx: 0.5 * sz,
-                ry: 0.5 * sz,
-                css: css,
-                draggable: true
-            };
-            let aim = order;
-            reorderAutoButton.activation = (xx, yy) => {
-                if (dragOrderFilterAnchor.translation) {
-                    if (xx == 0 && yy == 0) {
-                        dragOrderFilterAnchor.translation.x = 0;
-                        dragOrderFilterAnchor.translation.y = 0;
-                        if (aim < 0) {
-                            aim = 0;
-                        }
-                        if (aim > globalCommandDispatcher.cfg().data.filters.length - 1) {
-                            aim = globalCommandDispatcher.cfg().data.filters.length - 1;
-                        }
-                        if (aim == order) {
-                            globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
-                        }
-                        else {
-                            globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-                                let autoTrack = globalCommandDispatcher.cfg().data.filters.splice(order, 1)[0];
-                                globalCommandDispatcher.cfg().data.filters.splice(aim, 0, autoTrack);
-                            });
-                            globalCommandDispatcher.resetProject();
-                        }
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let top = globalCommandDispatcher.cfg().automationTop();
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+        let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+        let dragOrderFilterAnchor = {
+            xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+            minZoom: fanLevelAnchor.minZoom,
+            beforeZoom: fanLevelAnchor.beforeZoom,
+            content: [],
+            translation: { x: 0, y: 0 }
+        };
+        let reorderAutoButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: css,
+            draggable: true
+        };
+        let aim = order;
+        reorderAutoButton.activation = (xx, yy) => {
+            if (dragOrderFilterAnchor.translation) {
+                if (xx == 0 && yy == 0) {
+                    dragOrderFilterAnchor.translation.x = 0;
+                    dragOrderFilterAnchor.translation.y = 0;
+                    if (aim < 0) {
+                        aim = 0;
                     }
-                    else {
-                        dragOrderFilterAnchor.translation.x = sz / 3;
-                        aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
-                            / globalCommandDispatcher.cfg().autoPointHeight) + order;
-                        if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
-                            dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
-                        }
+                    if (aim > globalCommandDispatcher.cfg().data.filters.length - 1) {
+                        aim = globalCommandDispatcher.cfg().data.filters.length - 1;
+                    }
+                    if (aim == order) {
                         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
                     }
+                    else {
+                        globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+                            let autoTrack = globalCommandDispatcher.cfg().data.filters.splice(order, 1)[0];
+                            globalCommandDispatcher.cfg().data.filters.splice(aim, 0, autoTrack);
+                        });
+                        globalCommandDispatcher.resetProject();
+                    }
                 }
-            };
-            dragOrderFilterAnchor.content.push(reorderAutoButton);
-            fanLevelAnchor.content.push(dragOrderFilterAnchor);
-        }
+                else {
+                    dragOrderFilterAnchor.translation.x = sz / 3;
+                    aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
+                        / globalCommandDispatcher.cfg().autoPointHeight) + order;
+                    if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
+                        dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
+                    }
+                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
+                }
+            }
+        };
+        dragOrderFilterAnchor.content.push(reorderAutoButton);
+        fanLevelAnchor.content.push(dragOrderFilterAnchor);
     }
 }
 class ControlConnection {

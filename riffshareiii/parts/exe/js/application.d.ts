@@ -569,6 +569,7 @@ declare class SamplerIcon {
     constructor(samplerId: string);
     buildSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
     addSamplerSpot(percnum: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addZoomReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor): void;
     addReorderSamplerIcon(zidx: number, percnum: number, fanLevelAnchor: TileAnchor): void;
 }
 declare class FilterIcon {
@@ -576,6 +577,7 @@ declare class FilterIcon {
     constructor(filterId: string);
     buildAutoSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
     addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number): void;
+    addZoomReorderIcon(zidx: number, order: number, fanLevelAnchor: TileAnchor): void;
     addReorderFilterIcon(zidx: number, order: number, fanLevelAnchor: TileAnchor): void;
 }
 declare class ControlConnection {

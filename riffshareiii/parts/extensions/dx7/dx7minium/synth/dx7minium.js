@@ -70,7 +70,7 @@ function newDX7FMSynth1() {
             this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
             this.envelope.gain.cancelAndHoldAtTime(when + duration);
             this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
-            this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+            this.carrier.frequency.value = frequency;
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
             this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
@@ -230,7 +230,6 @@ function newDX7FMSynth1() {
                 this.synth = new MiniumFMSynth();
                 this.synth.init(context);
             }
-            console.log('parameters', parameters);
             this.fm = parameters;
             return 1;
         }
