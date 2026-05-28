@@ -12,6 +12,7 @@ class ChordPitchPerformerUtil {
 			if (mode == 3) checked.mode = 3;
 			if (mode == 4) checked.mode = 4;
 		} catch (xx) {
+			console.log('parameters',parameters);
 			console.log(xx);
 		}
 		if (!(checked.loudness >= 0 && checked.loudness <= 150)) {

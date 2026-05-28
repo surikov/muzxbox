@@ -979,22 +979,25 @@ function rayBallCount(start, end, raydegr, xx, rowIdx, rows) {
     }
     return cnt;
 }
+//let firstCellColors: { b: number, v: number }[] = [];
+//let firstCellColors: number[] = [];
 function paintCellsGreen(svg, rowIdx, rows) {
     var cellColors = [];
     for (var xx = 0; xx < rowLen; xx++) {
         //if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
-        cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+        //cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+        cellColors[xx] = cellColors[xx] ? cellColors[xx] : { b: xx + 1, v: 0 };
         for (var rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
             var aa = rayBallCount(1, 2, rr, xx, rowIdx, rows);
             var bb = rayBallCount(2.5, 3.5, rr, xx, rowIdx, rows);
             var cc = rayBallCount(4, 5.5, rr, xx, rowIdx, rows);
             var dd = rayBallCount(6, 7.5, rr, xx, rowIdx, rows);
             if (aa + bb + cc > 3) {
-                cellColors[xx] = cellColors[xx] + 16;
+                cellColors[xx].v = cellColors[xx].v + 16;
             }
             else {
                 if (bb + cc + dd > 3) {
-                    cellColors[xx] = cellColors[xx] + 2;
+                    cellColors[xx].v = cellColors[xx].v + 2;
                 }
                 else {
                     aa = rayBallCount(1, 3, rr, xx, rowIdx, rows);
@@ -1002,11 +1005,11 @@ function paintCellsGreen(svg, rowIdx, rows) {
                     cc = rayBallCount(6, 8, rr, xx, rowIdx, rows);
                     dd = rayBallCount(8.5, 10.5, rr, xx, rowIdx, rows);
                     if (aa + bb + cc > 3) {
-                        cellColors[xx] = cellColors[xx] + 9;
+                        cellColors[xx].v = cellColors[xx].v + 9;
                     }
                     else {
                         if (bb + cc + dd > 3) {
-                            cellColors[xx] = cellColors[xx] + 1;
+                            cellColors[xx].v = cellColors[xx].v + 1;
                         }
                     }
                 }
@@ -1015,12 +1018,12 @@ function paintCellsGreen(svg, rowIdx, rows) {
     }
     var max = 0;
     for (var xx = 0; xx < rowLen; xx++) {
-        if (max < cellColors[xx]) {
-            max = cellColors[xx];
+        if (max < cellColors[xx].v) {
+            max = cellColors[xx].v;
         }
     }
     for (var xx = 0; xx < rowLen; xx++) {
-        var idx = cellColors[xx] / max;
+        var idx = cellColors[xx].v / max;
         idx = (idx) ? idx : 0;
         if (idx > 1) {
             idx = 1;
@@ -1033,10 +1036,19 @@ function paintCellsGreen(svg, rowIdx, rows) {
         var txt = '';
         for (var ii = 0; ii < cellColors.length; ii++) {
             if (ballExists(ii + 1, rows[rowIdx])) {
-                txt = txt + ' ' + cellColors[ii];
+                txt = txt + ' ' + cellColors[ii].v;
             }
         }
-        console.log(txt, cellColors.sort(function (a, b) { return b - a; }), rows[rowIdx].balls); //, rows[rowIdx]);
+        /*for (let ff = 0; ff < cellColors.length; ff++) {
+            firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] ? firstCellColors[cellColors[ff].b] : 0;
+            firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] + cellColors[ff].v;
+            cellColors[ff].v=firstCellColors[cellColors[ff].b];
+        }
+        console.log('naritg', firstCellColors);*/
+        //console.log(cellColors,rows[rowIdx].balls);
+        console.log(txt, cellColors.sort(function (a, b) { return b.v - a.v; }), rows[rowIdx].balls);
+        //console.log( txt, cellColors,cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
+        //console.log( txt, cellColors,rows[rowIdx].balls);//, rows[rowIdx]);
     }
 }
 function paintCellsGreen333(svg, rowIdx, rows) {

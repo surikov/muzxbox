@@ -272,6 +272,7 @@ type MZXBX_PluginRegistrationInformation = {
     ui: string;
     evaluate: string;
     script: string;
+    silent: boolean;
 };
 type MZXBX_MessageToPlugin = {
     hostData: any;
@@ -344,6 +345,7 @@ type SynthPreset = {
     operators: OperatorInfo[];
     feedbackRatio: number;
     modulationRatio: number;
+    transpose: number;
 };
 type FMParameter = {
     volume: number;

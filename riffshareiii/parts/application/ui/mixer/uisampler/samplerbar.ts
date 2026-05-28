@@ -74,7 +74,7 @@ class SamplerBar {
 		}
 	}
 	drumCellClick(barIdx: number, barX: number, yy: number, zz: number) {
-		//console.log(barIdx, barX, yy, zz);
+		//console.log('drumCellClick',barIdx);
 		let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
 		let drum = globalCommandDispatcher.cfg().data.percussions[row];
 		let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
@@ -102,5 +102,6 @@ class SamplerBar {
 				drum.measures[barIdx].skips.push(muStart.metre());
 			}
 		});
+		globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 	}
 }

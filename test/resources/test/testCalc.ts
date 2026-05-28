@@ -1100,32 +1100,35 @@ function rayBallCount(start: number, end: number, raydegr: number, xx: number, r
 	}
 	return cnt;
 }
+//let firstCellColors: { b: number, v: number }[] = [];
+//let firstCellColors: number[] = [];
 function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 
-	let cellColors: number[] = [];
+	let cellColors: { b: number, v: number }[] = [];
 	for (let xx = 0; xx < rowLen; xx++) {
 		//if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
-		cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+		//cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
+		cellColors[xx] = cellColors[xx] ? cellColors[xx] : { b: xx + 1, v: 0 };
 		for (let rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
 			let aa = rayBallCount(1, 2, rr, xx, rowIdx, rows);
 			let bb = rayBallCount(2.5, 3.5, rr, xx, rowIdx, rows);
 			let cc = rayBallCount(4, 5.5, rr, xx, rowIdx, rows);
 			let dd = rayBallCount(6, 7.5, rr, xx, rowIdx, rows);
 			if (aa + bb + cc > 3) {
-				cellColors[xx] = cellColors[xx] + 16;
+				cellColors[xx].v = cellColors[xx].v + 16;
 			} else {
 				if (bb + cc + dd > 3) {
-					cellColors[xx] = cellColors[xx] + 2;
+					cellColors[xx].v = cellColors[xx].v + 2;
 				} else {
 					aa = rayBallCount(1, 3, rr, xx, rowIdx, rows);
 					bb = rayBallCount(3.5, 5.5, rr, xx, rowIdx, rows);
 					cc = rayBallCount(6, 8, rr, xx, rowIdx, rows);
 					dd = rayBallCount(8.5, 10.5, rr, xx, rowIdx, rows);
 					if (aa + bb + cc > 3) {
-						cellColors[xx] = cellColors[xx] + 9;
+						cellColors[xx].v = cellColors[xx].v + 9;
 					} else {
 						if (bb + cc + dd > 3) {
-							cellColors[xx] = cellColors[xx] + 1;
+							cellColors[xx].v = cellColors[xx].v + 1;
 						}
 					}
 				}
@@ -1136,12 +1139,12 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 	}
 	let max = 0;
 	for (let xx = 0; xx < rowLen; xx++) {
-		if (max < cellColors[xx]) {
-			max = cellColors[xx];
+		if (max < cellColors[xx].v) {
+			max = cellColors[xx].v;
 		}
 	}
 	for (let xx = 0; xx < rowLen; xx++) {
-		let idx = cellColors[xx] / max;
+		let idx = cellColors[xx].v / max;
 		idx = (idx) ? idx : 0;
 		if (idx > 1) {
 			idx = 1;
@@ -1156,10 +1159,19 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 		let txt = '';
 		for (let ii = 0; ii < cellColors.length; ii++) {
 			if (ballExists(ii + 1, rows[rowIdx])) {
-				txt = txt + ' ' + cellColors[ii];
+				txt = txt + ' ' + cellColors[ii].v;
 			}
 		}
-		console.log( txt, cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
+		/*for (let ff = 0; ff < cellColors.length; ff++) {
+			firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] ? firstCellColors[cellColors[ff].b] : 0;
+			firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] + cellColors[ff].v;
+			cellColors[ff].v=firstCellColors[cellColors[ff].b];
+		}
+		console.log('naritg', firstCellColors);*/
+		//console.log(cellColors,rows[rowIdx].balls);
+		console.log(txt, cellColors.sort((a, b) => b.v - a.v), rows[rowIdx].balls);
+		//console.log( txt, cellColors,cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
+		//console.log( txt, cellColors,rows[rowIdx].balls);//, rows[rowIdx]);
 	}
 }
 function paintCellsGreen333(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {

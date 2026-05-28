@@ -153,7 +153,7 @@ class SequencerPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
 			this.track.performer.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	receiveMessageFromPlugin(event) {
 		//console.log('sequencer receiveMessageFromPlugin', event);

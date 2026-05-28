@@ -98,6 +98,7 @@ function MMUtil() {
     return new MZXBX_MetreMathUtil().set({ count: 0, part: 1 });
 }
 function MZXBX_appendScriptURL(url) {
+    console.log('MZXBX_appendScriptURL', url);
     let scripts = document.getElementsByTagName("script");
     for (let ii = 0; ii < scripts.length; ii++) {
         let script = scripts.item(ii);

@@ -542,9 +542,9 @@ class DragMenuItemUtil {
 			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
 
 		}
-		let pp=globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+		let pp = globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
 		//let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
-		console.log('found performer', pp);
+		//console.log('found performer', pp);
 		if (x == 0 && y == 0) {
 			this.dragStarted = false;
 			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
@@ -700,7 +700,8 @@ function fillPluginsLists() {
 							}
 							let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
 							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
-							console.log('found track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+							console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+							globalCommandDispatcher.reStartPlayIfPlay(true);
 						} else {
 							let xx = dx;
 							if (xx < globalCommandDispatcher.cfg().padGridFan) {

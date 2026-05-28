@@ -137,7 +137,7 @@ class FilterPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
 			this.filter.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	receiveMessageFromFilterPlugin(event) {
 		//console.log('filter receiveMessageFromPlugin', event);

@@ -281,6 +281,8 @@ class MixerBar {
 				chord.slides = [{ duration: duration, delta: shift }];
 			});
 			globalCommandDispatcher.cfg().editmark = null;
+			//console.log('trackCellClick barIdx',barIdx);
+			globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 		} else {
 			let cuslidemark = globalCommandDispatcher.cfg().slidemark;
 			if (cuslidemark) {
@@ -337,6 +339,8 @@ class MixerBar {
 				});
 				if (!drop) {
 					globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
+				}else{
+					globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 				}
 			}
 		}

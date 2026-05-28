@@ -2,6 +2,7 @@ class DX7UI {
 	id: string = '';
 	volumeValue: number = 100;
 	volumeLabel: any;
+	transposeLabel: any;
 	preset: SynthPreset | null = null;
 	titleText: any;
 	fileInput: any;
@@ -15,6 +16,8 @@ class DX7UI {
 		this.fileInput = document.getElementById('fileInput') as any;
 		this.volumeLabel = document.getElementById('volumeValue') as any;
 		this.resetVolumeLabel();
+		this.transposeLabel = document.getElementById('transposeValue') as any;
+
 		this.fileInput.addEventListener('change', (changeEvent) => {
 			let file: File = changeEvent.target.files[0];
 			let fname: string = file.name.trim().toLowerCase();
@@ -51,6 +54,7 @@ class DX7UI {
 		this.preset = allFMPresets[32];
 		this.titleText.innerHTML = this.preset.label;
 		this.renderLibList();
+		this.resetTransposeLabel();
 	}
 	importSys(file: File) {
 		let me = this;
@@ -104,6 +108,7 @@ class DX7UI {
 				this.preset = data.preset;
 				this.titleText.innerHTML = this.preset.label;
 				this.resetVolumeLabel();
+				this.resetTransposeLabel() ;
 			}
 		} else {
 			this.id = message.hostData;
@@ -132,6 +137,7 @@ class DX7UI {
 					//window.parent.postMessage(message, '*');
 					this.sendPresetToHost(par);
 					this.titleText.innerHTML = me.preset.label;
+					this.resetTransposeLabel() ;
 				};
 				liblist.appendChild(li);
 			}
@@ -153,8 +159,6 @@ class DX7UI {
 			let par: FMParameter = {
 				volume: this.volumeValue, preset: this.preset
 			};
-			//var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
-			//window.parent.postMessage(message, '*');
 			this.sendPresetToHost(par);
 		}
 
@@ -170,11 +174,50 @@ class DX7UI {
 			let par: FMParameter = {
 				volume: this.volumeValue, preset: this.preset
 			};
-			//var message: MZXBX_MessageToHost = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
-			//window.parent.postMessage(message, '*');
 			this.sendPresetToHost(par);
 		}
 
+	}
+	minusOctave() {
+		console.log('minusOctave');
+		if (this.preset) {
+			if (this.preset.transpose > -1) {
+				this.preset.transpose = this.preset.transpose - 1;
+				this.resetTransposeLabel();
+				let par: FMParameter = {
+					volume: this.volumeValue, preset: this.preset
+				};
+				this.sendPresetToHost(par);
+			}
+		}
+	}
+	plusOctave() {
+		console.log('plusOctave');
+		if (this.preset) {
+			if (this.preset.transpose < 1) {
+				this.preset.transpose = this.preset.transpose + 1;
+				this.resetTransposeLabel();
+				let par: FMParameter = {
+					volume: this.volumeValue, preset: this.preset
+				};
+				this.sendPresetToHost(par);
+			}
+		}
+	}
+	resetTransposeLabel() {
+		let txt = '?';
+		if (this.preset) {
+			if (this.preset.transpose > 0) {
+				txt = 'octave up';
+			}
+			if (this.preset.transpose < 0) {
+				txt = 'octave down';
+			}
+			if (this.preset.transpose == 0) {
+				txt = 'none';
+			}
+		}
+		this.transposeLabel.innerText = '' + txt;
 	}
 	resetVolumeLabel() {
 		this.volumeLabel.innerText = '' + this.volumeValue;

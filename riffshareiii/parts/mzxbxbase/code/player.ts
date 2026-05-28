@@ -7,7 +7,7 @@ class SchedulePlayer implements MZXBX_Player {
 	schedule: MZXBX_Schedule | null = null;
 	performerDrumHolders: MZXBX_PerformerSamplerHolder[] = [];
 	filterHolders: MZXBX_FilterHolder[] = [];
-	pluginsList: MZXBX_PerformerSamplerHolder[] = [];
+	//pluginsList: MZXBX_PerformerSamplerHolder[] = [];
 	nextAudioContextStart: number = 0;
 	tickDuration = 0.25;
 	//playState: 'waiting' | 'starting' | 'playing' | 'stopping' = 'waiting';
@@ -20,8 +20,21 @@ class SchedulePlayer implements MZXBX_Player {
 	constructor(callback: (start: number, position: number, end: number) => void) {
 		this.playCallback = callback;
 	}
+	replaceCurrentSchedule(schedule: MZXBX_Schedule) {
+		this.schedule = schedule;
+	}
+	clearPluginsCache(){
+		this.performerDrumHolders.length=0;
+		this.filterHolders.length=0;
+	}
 	startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string {
-		if (!(this.isPlayLoop || this.isLoadingPlugins)) {
+		console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
+		//if (!(this.isPlayLoop || this.isLoadingPlugins)) {
+		if (this.isPlayLoop) {
+			console.log('startSetupPlugins Already playing');
+			return 'Already playing';
+
+		} else {
 			this.isLoadingPlugins = true;
 			this.audioContext = context;
 			this.schedule = schedule;
@@ -38,8 +51,6 @@ class SchedulePlayer implements MZXBX_Player {
 			} else {
 				return 'Empty schedule';
 			}
-		} else {
-			return 'Already playing/loading';
 		}
 	}
 	allFilters(): MZXBX_FilterHolder[] {
@@ -124,7 +135,7 @@ class SchedulePlayer implements MZXBX_Player {
 				this.isPlayLoop = true;
 				//this.onAir = true;
 				this.waitForID = Math.random();
-				this.tick(loopStart, loopEnd, this.waitForID);
+				this.doTick(loopStart, loopEnd, this.waitForID);
 				return '';
 			} else {
 				this.cancel();
@@ -278,12 +289,12 @@ class SchedulePlayer implements MZXBX_Player {
 			console.log('not connected');
 		}
 	}
-	tick(loopStart: number, loopEnd: number, waitId: number) {
+	doTick(loopStart: number, loopEnd: number, waitId: number) {
 		if (this.audioContext) {
 			if (waitId == this.waitForID) {
 				let sendFrom = this.position;
 				let sendTo = this.position + this.tickDuration;
-				if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+				if (this.audioContext.currentTime > this.nextAudioContextStart - 1.5 * this.tickDuration) {
 					let atTime = this.nextAudioContextStart;
 					if (sendTo > loopEnd) {
 						this.sendPiece(sendFrom, loopEnd, atTime);
@@ -305,7 +316,7 @@ class SchedulePlayer implements MZXBX_Player {
 						this.waitForID = Math.random();
 						let id = this.waitForID;
 						window.requestAnimationFrame(function (time) {
-							me.tick(loopStart, loopEnd, id);
+							me.doTick(loopStart, loopEnd, id);
 						});
 						this.waitForID = id;
 					} else {

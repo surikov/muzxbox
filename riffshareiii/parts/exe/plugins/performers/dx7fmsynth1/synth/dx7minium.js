@@ -143,6 +143,10 @@ function newDX7FMSynth1() {
                         let noteFreq = 440 * Math.pow(2, (note - 69) / 12);
                         let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), info.detune);
                         frequency = noteFreq * detuneRatio * info.frequencyRatio;
+                        if (preset.transpose > 0)
+                            frequency = frequency * 2;
+                        if (preset.transpose < 0)
+                            frequency = frequency * 0.5;
                     }
                     this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
                     let otime = when + duration + info.envelope.release + 0.01;

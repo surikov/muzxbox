@@ -7,7 +7,7 @@ class PluginLoader {
 			//console.log('collectFilterPlugin',filter.id);
 			this.collectFilterPlugin(filter.id, filter.kind, filter.properties, filter.description, allfilters);
 		}
-		
+
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			//let chanid = schedule.channels[ch].id;
@@ -20,7 +20,9 @@ class PluginLoader {
 		return result;
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
+		//console.log('startLoadCollectedPlugins');
 		for (let ff = 0; ff < filters.length; ff++) {
+			//console.log(ff,filters[ff]);
 			if (!(filters[ff].pluginAudioFilter)) {
 				let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers
 					, (plugin) => {
@@ -32,6 +34,7 @@ class PluginLoader {
 			}
 		}
 		for (let pp = 0; pp < performers.length; pp++) {
+			//console.log(pp,performers[pp]);
 			if (!(performers[pp].plugin)) {
 				let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers
 					, (plugin) => {
@@ -47,10 +50,12 @@ class PluginLoader {
 	}
 
 	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin) => void): null | string {
+
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
+		//console.log('startLoadPluginStarter', kind, tt);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
-			//console.log('startLoadPluginStarter',info.kind,info.script);
+
 			MZXBX_appendScriptURL(info.script);
 			MZXBX_waitForCondition(250
 				, () => {
@@ -82,8 +87,7 @@ class PluginLoader {
 		}
 		filters.push({ pluginAudioFilter: null, filterId: id, kind: kind, properties: properties, description: description });
 	}
-	collectPerformerPlugin(//id: string
-		channel: MZXBX_Channel, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
+	collectPerformerPlugin(channel: MZXBX_Channel, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void {
 		for (let ii = 0; ii < performers.length; ii++) {
 			//if (performers[ii].channelId == id) {
 			if (performers[ii].channel.id == channel.id) {

@@ -15,6 +15,7 @@ class UIToolbar {
 	constructor() {
 		//
 	}
+	
 	createToolbar(): TileLayerDefinition[] {
 		/*this.openRightMenuButton = new ToolBarButton([/icon_moveright,/icon_ver_menu], 0, 2, (nn: number) => {
 			globalCommandDispatcher.resetAnchor(this.toolBarGroup, this.toolBarAnchor, LevelModes.overlay);
@@ -32,6 +33,7 @@ class UIToolbar {
 			globalCommandDispatcher.exe.undo(1);
 		});
 		this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn: number) => {
+			console.log('playStopButton', globalCommandDispatcher.player.playState());
 			//globalCommandDispatcher.toggleStartStop();
 			if (globalCommandDispatcher.player.playState().play) {
 				globalCommandDispatcher.stopPlay();

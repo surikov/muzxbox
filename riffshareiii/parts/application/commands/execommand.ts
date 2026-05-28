@@ -4,11 +4,19 @@ class CommandExe {
 		globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
 	}
 	commitProjectChanges(path: (string | number)[], proAction: () => void) {
-		//console.log('commitProjectChanges',path);
-		let state = new StateDiff(path);
-		proAction();
-		this.addUndoCommandActiions(state.diffChangedCommands());
-		this.cutLongUndo();
+		try {
+			let state = new StateDiff(path);
+			proAction();
+			this.addUndoCommandActiions(state.diffChangedCommands());
+			this.cutLongUndo();
+		} catch (xx) {
+			console.log('error commitProjectChanges');
+			console.log(xx);
+			globalCommandDispatcher.clearUndo();
+			globalCommandDispatcher.clearRedo();
+			saveRawText2localStorage('undocommands', '');
+			saveRawText2localStorage('redocommands', '');
+		}
 	}
 	addUndoCommandActiions(cmd: Zvoog_UICommand) {
 		//console.log(cmd);
@@ -187,61 +195,78 @@ class CommandExe {
 		//console.log('undo len',calc.length/1000,'kb');
 	}
 	undo(cnt: number) {
-		//console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
-		if (this.lockUndoRedo) {
-			console.log('lockUndoRedo');
-		} else {
-			globalCommandDispatcher.stopPlay();
-			this.lockUndoRedo = true;
-			for (let ii = 0; ii < cnt; ii++) {
-				if (globalCommandDispatcher.undo().length) {
-					//let cmd = globalCommandDispatcher.undo().pop();
-					let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
-					//console.log(cmd);
-					if (cmd) {
-						//this.executeCommand(cmd.kind, cmd.params, true);
-						this.unAction(cmd);
-						let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
-						globalCommandDispatcher.redo().unshift(lz);
-						if (cmd.position) {
-							this.setCurPosition(cmd.position);
+		try {
+			//console.log('undo', cnt, globalCommandDispatcher.undo(), globalCommandDispatcher.redo());
+			if (this.lockUndoRedo) {
+				console.log('lockUndoRedo');
+			} else {
+				globalCommandDispatcher.stopPlay();
+				this.lockUndoRedo = true;
+				for (let ii = 0; ii < cnt; ii++) {
+					if (globalCommandDispatcher.undo().length) {
+						//let cmd = globalCommandDispatcher.undo().pop();
+						let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
+						//console.log(cmd);
+						if (cmd) {
+							//this.executeCommand(cmd.kind, cmd.params, true);
+							this.unAction(cmd);
+							let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+							globalCommandDispatcher.redo().unshift(lz);
+							if (cmd.position) {
+								this.setCurPosition(cmd.position);
+							}
 						}
 					}
 				}
+
+				this.lockUndoRedo = false;
+				this.cutLongUndo();
+				globalCommandDispatcher.resetProject();
 			}
-
+		} catch (xx) {
+			console.log('error undo');
+			console.log(xx);
+			globalCommandDispatcher.clearUndo();
+			globalCommandDispatcher.clearRedo();
+			saveRawText2localStorage('undocommands', '');
+			saveRawText2localStorage('redocommands', '');
 			this.lockUndoRedo = false;
-			this.cutLongUndo();
-			globalCommandDispatcher.resetProject();
 		}
-
 	}
 	redo(cnt: number) {
-		if (this.lockUndoRedo) {
-			console.log('lockUndoRedo');
-		} else {
-			globalCommandDispatcher.stopPlay();
-			this.lockUndoRedo = true;
-			for (let ii = 0; ii < cnt; ii++) {
-				if (globalCommandDispatcher.redo().length) {
-					//let cmd = globalCommandDispatcher.redo().shift();
-					let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
-					if (cmd) {
-						//this.executeCommand(cmd.kind, cmd.params, false);
-						this.reAction(cmd);
-						let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
-						globalCommandDispatcher.undo().push(lz);
-						if (cmd.position) {
-							this.setCurPosition(cmd.position);
+		try {
+			if (this.lockUndoRedo) {
+				console.log('lockUndoRedo');
+			} else {
+				globalCommandDispatcher.stopPlay();
+				this.lockUndoRedo = true;
+				for (let ii = 0; ii < cnt; ii++) {
+					if (globalCommandDispatcher.redo().length) {
+						//let cmd = globalCommandDispatcher.redo().shift();
+						let cmd: Zvoog_UICommand = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
+						if (cmd) {
+							//this.executeCommand(cmd.kind, cmd.params, false);
+							this.reAction(cmd);
+							let lz: string = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+							globalCommandDispatcher.undo().push(lz);
+							if (cmd.position) {
+								this.setCurPosition(cmd.position);
+							}
 						}
 					}
 				}
+				this.lockUndoRedo = false;
+				this.cutLongUndo();
+				globalCommandDispatcher.resetProject();
 			}
-
+		} catch (xx) {
+			console.log('error redo');
+			console.log(xx);
+			globalCommandDispatcher.clearUndo();
+			globalCommandDispatcher.clearRedo();
+			saveRawText2localStorage('undocommands', '');
+			saveRawText2localStorage('redocommands', '');
 			this.lockUndoRedo = false;
-			this.cutLongUndo();
-			globalCommandDispatcher.resetProject();
 		}
-
 	}
 }

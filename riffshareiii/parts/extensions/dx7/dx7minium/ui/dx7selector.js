@@ -33,7 +33,8 @@ class DX7Loader {
             mixID: dx7preset.algorithm1_32,
             operators: [],
             feedbackRatio: 0.075 * modlev * Math.pow(2, (dx7preset.feedback0_7 - 7)),
-            modulationRatio: modlev
+            modulationRatio: modlev,
+            transpose: 0
         };
         for (let ii = 0; ii < 6; ii++) {
             let data = dx7preset.operators[ii];
@@ -1495,6 +1496,141 @@ let libForDX7list = [
         "name": "MOOG-52  1 / DXMIK2.SYX",
         "lfoPitchModDepth0_99": 11,
         "lfoAmpModDepth0_99": 0
+    },
+    {
+        "algorithm1_32": 17,
+        "feedback0_7": 6,
+        "operators": [
+            {
+                "rates0_99": [
+                    72,
+                    30,
+                    25,
+                    51
+                ],
+                "levels0_99": [
+                    99,
+                    92,
+                    90,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 99,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 1,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 1
+            },
+            {
+                "rates0_99": [
+                    99,
+                    71,
+                    35,
+                    51
+                ],
+                "levels0_99": [
+                    82,
+                    92,
+                    88,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 92,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 2,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 1
+            },
+            {
+                "rates0_99": [
+                    50,
+                    52,
+                    35,
+                    41
+                ],
+                "levels0_99": [
+                    99,
+                    92,
+                    91,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 61,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 0,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 1
+            },
+            {
+                "rates0_99": [
+                    96,
+                    19,
+                    20,
+                    54
+                ],
+                "levels0_99": [
+                    99,
+                    92,
+                    89,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 79,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 4,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 0
+            },
+            {
+                "rates0_99": [
+                    98,
+                    67,
+                    38,
+                    54
+                ],
+                "levels0_99": [
+                    86,
+                    92,
+                    74,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 73,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 0,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 1
+            },
+            {
+                "rates0_99": [
+                    99,
+                    64,
+                    44,
+                    54
+                ],
+                "levels0_99": [
+                    99,
+                    92,
+                    56,
+                    0
+                ],
+                "detune_7_7": 0,
+                "volumeLevel0_99": 84,
+                "constMode0_1": 0,
+                "freqCoarse0_31": 8,
+                "freqFine0_99": 0,
+                "enabled": true,
+                "velocitySens0_7": 2
+            }
+        ],
+        "name": "F Bass  10 / BASSEA.SYX",
+        "lfoPitchModDepth0_99": 0,
+        "lfoAmpModDepth0_99": 15
     }
 ];
 libForDX7list.sort((a, b) => {
@@ -1518,6 +1654,7 @@ class DX7UI {
         this.fileInput = document.getElementById('fileInput');
         this.volumeLabel = document.getElementById('volumeValue');
         this.resetVolumeLabel();
+        this.transposeLabel = document.getElementById('transposeValue');
         this.fileInput.addEventListener('change', (changeEvent) => {
             let file = changeEvent.target.files[0];
             let fname = file.name.trim().toLowerCase();
@@ -1542,6 +1679,7 @@ class DX7UI {
         this.preset = allFMPresets[32];
         this.titleText.innerHTML = this.preset.label;
         this.renderLibList();
+        this.resetTransposeLabel();
     }
     importSys(file) {
         let me = this;
@@ -1592,6 +1730,7 @@ class DX7UI {
                 this.preset = data.preset;
                 this.titleText.innerHTML = this.preset.label;
                 this.resetVolumeLabel();
+                this.resetTransposeLabel();
             }
         }
         else {
@@ -1618,6 +1757,7 @@ class DX7UI {
                     };
                     this.sendPresetToHost(par);
                     this.titleText.innerHTML = me.preset.label;
+                    this.resetTransposeLabel();
                 };
                 liblist.appendChild(li);
             }
@@ -1654,6 +1794,47 @@ class DX7UI {
             };
             this.sendPresetToHost(par);
         }
+    }
+    minusOctave() {
+        console.log('minusOctave');
+        if (this.preset) {
+            if (this.preset.transpose > -1) {
+                this.preset.transpose = this.preset.transpose - 1;
+                this.resetTransposeLabel();
+                let par = {
+                    volume: this.volumeValue, preset: this.preset
+                };
+                this.sendPresetToHost(par);
+            }
+        }
+    }
+    plusOctave() {
+        console.log('plusOctave');
+        if (this.preset) {
+            if (this.preset.transpose < 1) {
+                this.preset.transpose = this.preset.transpose + 1;
+                this.resetTransposeLabel();
+                let par = {
+                    volume: this.volumeValue, preset: this.preset
+                };
+                this.sendPresetToHost(par);
+            }
+        }
+    }
+    resetTransposeLabel() {
+        let txt = '?';
+        if (this.preset) {
+            if (this.preset.transpose > 0) {
+                txt = 'octave up';
+            }
+            if (this.preset.transpose < 0) {
+                txt = 'octave down';
+            }
+            if (this.preset.transpose == 0) {
+                txt = 'none';
+            }
+        }
+        this.transposeLabel.innerText = '' + txt;
     }
     resetVolumeLabel() {
         this.volumeLabel.innerText = '' + this.volumeValue;

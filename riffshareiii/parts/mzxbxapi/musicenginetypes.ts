@@ -324,6 +324,7 @@ type MZXBX_Schedule = {
 	filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
+	replaceCurrentSchedule(schedule: MZXBX_Schedule);
 	startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
 	startLoopTicks: (from: number, position: number, to: number) => string;
 	reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
@@ -332,6 +333,7 @@ type MZXBX_Player = {
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
 	position: number;
 	playState(): { connected: boolean, play: boolean, loading: boolean };
+	clearPluginsCache();
 };
 /*
 type Zvoog_import = {
@@ -351,6 +353,7 @@ type MZXBX_PluginRegistrationInformation = {
 	, ui: string
 	, evaluate: string
 	, script: string
+	//,silent:boolean
 };
 /*
 type MZXBX_PluginMessage = {

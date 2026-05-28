@@ -1,4 +1,4 @@
-console.log('Chords GUI v1.0.3');
+console.log('Chords GUI v1.0.5');
 class CHPUI {
 	id: string = '';
 	selectedCategoryIdx: number = 0;

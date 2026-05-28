@@ -85,7 +85,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
 
 			//this.carrier.frequency.linearRampToValueAtTime(frequency, when);
-			this.carrier.frequency.value=frequency;
+			this.carrier.frequency.value = frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
 			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
@@ -172,6 +172,9 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 						let noteFreq = 440 * Math.pow(2, (note - 69) / 12);
 						let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), info.detune);
 						frequency = noteFreq * detuneRatio * info.frequencyRatio;
+
+						if (preset.transpose > 0) frequency = frequency * 2;
+						if (preset.transpose < 0) frequency = frequency * 0.5;
 					}
 					//console.log(note,440 * Math.pow(2, (note - 69) / 12));
 					this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);//, slides);
@@ -245,6 +248,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		}
 		scheduleStrum(volume: number, preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
 			//console.log('slides',slides);
+
 			for (let ii = 0; ii < pitches.length; ii++) {
 				let vox = this.takeVox(preset.mixID);
 				//vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);

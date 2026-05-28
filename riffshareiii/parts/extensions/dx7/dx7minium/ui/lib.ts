@@ -1318,7 +1318,142 @@ let libForDX7list: DX7PresetData[] = [
     "lfoPitchModDepth0_99": 11,
     "lfoAmpModDepth0_99": 0
 }
-
+,
+{
+    "algorithm1_32": 17,
+    "feedback0_7": 6,
+    "operators": [
+        {
+            "rates0_99": [
+                72,
+                30,
+                25,
+                51
+            ],
+            "levels0_99": [
+                99,
+                92,
+                90,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 99,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 1,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                99,
+                71,
+                35,
+                51
+            ],
+            "levels0_99": [
+                82,
+                92,
+                88,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 92,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 2,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                50,
+                52,
+                35,
+                41
+            ],
+            "levels0_99": [
+                99,
+                92,
+                91,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 61,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                96,
+                19,
+                20,
+                54
+            ],
+            "levels0_99": [
+                99,
+                92,
+                89,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 79,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 4,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 0
+        },
+        {
+            "rates0_99": [
+                98,
+                67,
+                38,
+                54
+            ],
+            "levels0_99": [
+                86,
+                92,
+                74,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 73,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 0,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 1
+        },
+        {
+            "rates0_99": [
+                99,
+                64,
+                44,
+                54
+            ],
+            "levels0_99": [
+                99,
+                92,
+                56,
+                0
+            ],
+            "detune_7_7": 0,
+            "volumeLevel0_99": 84,
+            "constMode0_1": 0,
+            "freqCoarse0_31": 8,
+            "freqFine0_99": 0,
+            "enabled": true,
+            "velocitySens0_7": 2
+        }
+    ],
+    "name": "F Bass  10 / BASSEA.SYX",
+    "lfoPitchModDepth0_99": 0,
+    "lfoAmpModDepth0_99": 15
+}
 ]; 
 
 libForDX7list.sort((a, b) => {

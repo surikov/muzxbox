@@ -1,5 +1,5 @@
 "use strict";
-console.log('Chords GUI v1.0.3');
+console.log('Chords GUI v1.0.5');
 class CHPUI {
     constructor() {
         this.id = '';
@@ -237,6 +237,7 @@ class ChordPitchPerformerUtil {
                 checked.mode = 4;
         }
         catch (xx) {
+            console.log('parameters', parameters);
             console.log(xx);
         }
         if (!(checked.loudness >= 0 && checked.loudness <= 150)) {

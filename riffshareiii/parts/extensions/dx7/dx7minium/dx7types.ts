@@ -46,6 +46,7 @@ type SynthPreset = {
 	operators: OperatorInfo[];
 	feedbackRatio: number;
 	modulationRatio: number;
+	transpose:number;
 };
 type FMParameter = {
 	volume: number;

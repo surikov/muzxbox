@@ -218,6 +218,13 @@ class CommandDispatcher {
 			}
 		}
 	}
+	updateSingleBarPlayerSchedule(barNo: number) {
+		if (this.player.playState().play) {
+			//console.log('updateSingleBarPlayerSchedule', barNo);
+			this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+			this.player.replaceCurrentSchedule(this.lastUsedSchedule);
+		}
+	}
 	renderCurrentProjectForOutput(): MZXBX_Schedule {
 		//globalCommandDispatcher.adjustTimeline();
 		let forOutput: MZXBX_Schedule = {
@@ -375,12 +382,20 @@ class CommandDispatcher {
 			this.player.reconnectAllPlugins(schedule);
 		}
 	}
-	reStartPlayIfPlay() {
+	reStartPlayIfPlay(clearPluginCache: boolean) {
 		if (this.player.playState().play) {
 			console.log('reStartPlayIfPlay');
 			this.stopPlay();
+			if (clearPluginCache) {
+				globalCommandDispatcher.player.clearPluginsCache();
+			}
 			this.setupAndStartPlay();
+		} else {
+			if (clearPluginCache) {
+				globalCommandDispatcher.player.clearPluginsCache();
+			}
 		}
+		globalCommandDispatcher.resetPlayButtonState();
 	}
 	/*toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
@@ -400,16 +415,24 @@ class CommandDispatcher {
 		this.renderer.menu.rerenderMenuContent(null);
 		this.setHiddenTimeMark();
 		this.resetProject();
+		globalCommandDispatcher.resetPlayButtonState();
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		console.log('setupAndStartPlay');
+		//console.log('setupAndStartPlay');
 		//this.onAir = true;
 		this.lastUsedSchedule = this.renderCurrentProjectForOutput();
 		let from = 0;
 		let to = 0;
 		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-			for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+			//console.log(globalCommandDispatcher.cfg().data.selectedPart.endMeasure);
+			//console.log(this.lastUsedSchedule.series.length);
+			let endbar = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+			if (endbar > this.lastUsedSchedule.series.length - 1) {
+				endbar = this.lastUsedSchedule.series.length - 1;
+			}
+			//console.log(endbar);
+			for (let nn = 0; nn <= endbar; nn++) {
 				to = to + this.lastUsedSchedule.series[nn].duration;
 				if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
 					from = to;
@@ -472,8 +495,9 @@ class CommandDispatcher {
 		}
 		//console.log('updatePluginHint', this.cfg().data);
 	}
+
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop', from, position, to);
+		//console.log('startPlayLoop', from, position, to);
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//console.log('msg', msg, this.renderer.warning.noWarning);
@@ -484,6 +508,7 @@ class CommandDispatcher {
 					console.log('cancel wait start loop');
 					me.restartOnInitError = false;
 					me.player.cancel();
+					globalCommandDispatcher.resetPlayButtonState();
 				});
 			let waitid = setTimeout(() => {
 				if (!me.renderer.warning.noWarning) {
@@ -1412,7 +1437,21 @@ class CommandDispatcher {
 
 		this.adjustTimeLineLength(project);
 	}
+	resetPlayButtonState() {
+		console.log('resetPlayButtonState', this.player.playState());
+		if (this.player)
+			if (this.player.playState().play) {
+				this.renderer.toolbar.playStopButton.iconLabelButton.selection = 0;
+				//this.renderer.toolbar.playStopButton.iconLabelButton.label.text = this.renderer.toolbar.playStopButton.iconLabelButton.labels[0];
+			} else {
+				this.renderer.toolbar.playStopButton.iconLabelButton.selection = 1;
+
+			}
+		this.renderer.toolbar.playStopButton.iconLabelButton.label.text = this.renderer.toolbar.playStopButton.iconLabelButton.labels[this.renderer.toolbar.playStopButton.iconLabelButton.selection];
+		this.renderer.tiler.resetAnchor(this.renderer.toolbar.toolBarGroup, this.renderer.toolbar.toolBarAnchor, LevelModes.overlay);
+	}
 }
+
 let globalCommandDispatcher = new CommandDispatcher();
 //let pluginDialogPrompt = new PluginDialogPrompt();
 

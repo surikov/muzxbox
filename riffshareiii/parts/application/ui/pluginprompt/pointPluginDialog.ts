@@ -83,7 +83,7 @@ class PointPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['filters', this.filterIdx, 'automation', this.barIdx], () => {
 			this.pluginPoint.stateBlob = data;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	receiveAutoMessageFromPlugin(event) {
 		//console.log('point receiveMessageFromPlugin', event);

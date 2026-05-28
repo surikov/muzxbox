@@ -1,0 +1,8 @@
+{
+	"label": "Test Beep",
+	"purpose": "Performer",
+	"kind": "simplestBeepForTesting1",
+	"ui": "",
+	"evaluate": "MiniumPluginBeepForTesting",
+	"script": "http://127.0.0.1:8080/pluginbeep.js"
+}

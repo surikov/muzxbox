@@ -56,6 +56,7 @@ class DX7Loader {
 			, operators: []
 			, feedbackRatio: 0.075 * modlev * Math.pow(2, (dx7preset.feedback0_7 - 7))  //* 0.01 //0.4
 			, modulationRatio: modlev
+			, transpose: 0
 		};
 		/*let lfospeedval = dx7preset.lfoSpeed / 6 + 0.5;
 		if (dx7preset.lfoSpeed > 65) {

@@ -134,7 +134,7 @@ class SamplerPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
 			this.drum.sampler.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	receiveMessageFromSamplerPlugin(event) {
 		//console.log('receiveMessageFromPlugin', event);

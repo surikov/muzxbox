@@ -75,7 +75,7 @@ class ActionPluginDialog {
 							//console.log('set 2',JSON.stringify(project.tracks[0].measures[33]));
 							globalCommandDispatcher.resetProject();
 							//console.log('set 3',JSON.stringify(project.tracks[0].measures[33]));
-							globalCommandDispatcher.reStartPlayIfPlay();
+							globalCommandDispatcher.reStartPlayIfPlay(false);
 							//console.log('set 33',project.tracks[0].measures[33],JSON.stringify(project.tracks[0].measures[33]));
 						});
 					}
@@ -103,6 +103,7 @@ class ActionPluginDialog {
 		let pluginDiv = document.getElementById("pluginActionDiv") as any;
 		if (pluginFrame) {
 			if (pluginFrame.contentWindow) {
+				globalCommandDispatcher.stopPlay();
 				this.waitActionPluginInit = true;
 				//pluginFrame.src = this.pluginInfo.ui;
 				//pluginFrame.location.replace(this.pluginInfo.ui);

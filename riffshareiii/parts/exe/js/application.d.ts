@@ -186,9 +186,10 @@ declare class CommandDispatcher {
     showRightMenu(): void;
     findCurrentFilter(id: string): null | Zvoog_FilterTarget;
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
+    updateSingleBarPlayerSchedule(barNo: number): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
     reConnectPluginsIfPlay(): void;
-    reStartPlayIfPlay(): void;
+    reStartPlayIfPlay(clearPluginCache: boolean): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
     updatePluginHint(schedule: MZXBX_Schedule): void;
@@ -232,6 +233,7 @@ declare class CommandDispatcher {
     adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
     adjustContentByMeter(currentProject: Zvoog_Project): void;
     adjustTimelineContent(project: Zvoog_Project): void;
+    resetPlayButtonState(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
 type GridTimeTemplate14 = {
@@ -1209,6 +1211,7 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): any;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
@@ -1221,6 +1224,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
+    clearPluginsCache(): any;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;

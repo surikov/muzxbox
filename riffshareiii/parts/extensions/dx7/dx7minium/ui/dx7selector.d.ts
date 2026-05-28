@@ -272,6 +272,7 @@ type MZXBX_PluginRegistrationInformation = {
     ui: string;
     evaluate: string;
     script: string;
+    silent: boolean;
 };
 type MZXBX_MessageToPlugin = {
     hostData: any;
@@ -344,6 +345,7 @@ type SynthPreset = {
     operators: OperatorInfo[];
     feedbackRatio: number;
     modulationRatio: number;
+    transpose: number;
 };
 type FMParameter = {
     volume: number;
@@ -374,6 +376,7 @@ declare class DX7UI {
     id: string;
     volumeValue: number;
     volumeLabel: any;
+    transposeLabel: any;
     preset: SynthPreset | null;
     titleText: any;
     fileInput: any;
@@ -387,6 +390,9 @@ declare class DX7UI {
     importFile(): void;
     minusVolume(): void;
     plusVolume(): void;
+    minusOctave(): void;
+    plusOctave(): void;
+    resetTransposeLabel(): void;
     resetVolumeLabel(): void;
     sendPresetToHost(par: FMParameter): void;
 }

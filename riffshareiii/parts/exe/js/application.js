@@ -524,7 +524,7 @@ class FilterPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
             this.filter.data = this.pluginRawData;
         });
-        globalCommandDispatcher.reStartPlayIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     receiveMessageFromFilterPlugin(event) {
         if (!(event.data)) {
@@ -683,7 +683,7 @@ class SamplerPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.data = this.pluginRawData;
         });
-        globalCommandDispatcher.reStartPlayIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     receiveMessageFromSamplerPlugin(event) {
         if (!(event.data)) {
@@ -772,7 +772,7 @@ class ActionPluginDialog {
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             globalCommandDispatcher.registerWorkProject(project);
                             globalCommandDispatcher.resetProject();
-                            globalCommandDispatcher.reStartPlayIfPlay();
+                            globalCommandDispatcher.reStartPlayIfPlay(false);
                         });
                     }
                     if (message.done) {
@@ -800,6 +800,7 @@ class ActionPluginDialog {
         let pluginDiv = document.getElementById("pluginActionDiv");
         if (pluginFrame) {
             if (pluginFrame.contentWindow) {
+                globalCommandDispatcher.stopPlay();
                 this.waitActionPluginInit = true;
                 pluginFrame.contentWindow.window.location.replace(this.pluginInfo.ui);
                 pluginDiv.style.visibility = "visible";
@@ -1065,7 +1066,7 @@ class PointPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.filterIdx, 'automation', this.barIdx], () => {
             this.pluginPoint.stateBlob = data;
         });
-        globalCommandDispatcher.reStartPlayIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     receiveAutoMessageFromPlugin(event) {
         if (!(event.data)) {
@@ -1099,10 +1100,20 @@ class CommandExe {
         globalCommandDispatcher.cfg().data.position = { x: xyz.x, y: xyz.y, z: xyz.z };
     }
     commitProjectChanges(path, proAction) {
-        let state = new StateDiff(path);
-        proAction();
-        this.addUndoCommandActiions(state.diffChangedCommands());
-        this.cutLongUndo();
+        try {
+            let state = new StateDiff(path);
+            proAction();
+            this.addUndoCommandActiions(state.diffChangedCommands());
+            this.cutLongUndo();
+        }
+        catch (xx) {
+            console.log('error commitProjectChanges');
+            console.log(xx);
+            globalCommandDispatcher.clearUndo();
+            globalCommandDispatcher.clearRedo();
+            saveRawText2localStorage('undocommands', '');
+            saveRawText2localStorage('redocommands', '');
+        }
     }
     addUndoCommandActiions(cmd) {
         globalCommandDispatcher.clearRedo();
@@ -1182,53 +1193,75 @@ class CommandExe {
         }
     }
     undo(cnt) {
-        if (this.lockUndoRedo) {
-            console.log('lockUndoRedo');
-        }
-        else {
-            globalCommandDispatcher.stopPlay();
-            this.lockUndoRedo = true;
-            for (let ii = 0; ii < cnt; ii++) {
-                if (globalCommandDispatcher.undo().length) {
-                    let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
-                    if (cmd) {
-                        this.unAction(cmd);
-                        let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
-                        globalCommandDispatcher.redo().unshift(lz);
-                        if (cmd.position) {
-                            this.setCurPosition(cmd.position);
+        try {
+            if (this.lockUndoRedo) {
+                console.log('lockUndoRedo');
+            }
+            else {
+                globalCommandDispatcher.stopPlay();
+                this.lockUndoRedo = true;
+                for (let ii = 0; ii < cnt; ii++) {
+                    if (globalCommandDispatcher.undo().length) {
+                        let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.undo().pop()));
+                        if (cmd) {
+                            this.unAction(cmd);
+                            let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+                            globalCommandDispatcher.redo().unshift(lz);
+                            if (cmd.position) {
+                                this.setCurPosition(cmd.position);
+                            }
                         }
                     }
                 }
+                this.lockUndoRedo = false;
+                this.cutLongUndo();
+                globalCommandDispatcher.resetProject();
             }
+        }
+        catch (xx) {
+            console.log('error undo');
+            console.log(xx);
+            globalCommandDispatcher.clearUndo();
+            globalCommandDispatcher.clearRedo();
+            saveRawText2localStorage('undocommands', '');
+            saveRawText2localStorage('redocommands', '');
             this.lockUndoRedo = false;
-            this.cutLongUndo();
-            globalCommandDispatcher.resetProject();
         }
     }
     redo(cnt) {
-        if (this.lockUndoRedo) {
-            console.log('lockUndoRedo');
-        }
-        else {
-            globalCommandDispatcher.stopPlay();
-            this.lockUndoRedo = true;
-            for (let ii = 0; ii < cnt; ii++) {
-                if (globalCommandDispatcher.redo().length) {
-                    let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
-                    if (cmd) {
-                        this.reAction(cmd);
-                        let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
-                        globalCommandDispatcher.undo().push(lz);
-                        if (cmd.position) {
-                            this.setCurPosition(cmd.position);
+        try {
+            if (this.lockUndoRedo) {
+                console.log('lockUndoRedo');
+            }
+            else {
+                globalCommandDispatcher.stopPlay();
+                this.lockUndoRedo = true;
+                for (let ii = 0; ii < cnt; ii++) {
+                    if (globalCommandDispatcher.redo().length) {
+                        let cmd = JSON.parse('' + new LZUtil().decompressFromUTF16(globalCommandDispatcher.redo().shift()));
+                        if (cmd) {
+                            this.reAction(cmd);
+                            let lz = new LZUtil().compressToUTF16(JSON.stringify(cmd));
+                            globalCommandDispatcher.undo().push(lz);
+                            if (cmd.position) {
+                                this.setCurPosition(cmd.position);
+                            }
                         }
                     }
                 }
+                this.lockUndoRedo = false;
+                this.cutLongUndo();
+                globalCommandDispatcher.resetProject();
             }
+        }
+        catch (xx) {
+            console.log('error redo');
+            console.log(xx);
+            globalCommandDispatcher.clearUndo();
+            globalCommandDispatcher.clearRedo();
+            saveRawText2localStorage('undocommands', '');
+            saveRawText2localStorage('redocommands', '');
             this.lockUndoRedo = false;
-            this.cutLongUndo();
-            globalCommandDispatcher.resetProject();
         }
     }
 }
@@ -1396,6 +1429,12 @@ class CommandDispatcher {
             }
         }
     }
+    updateSingleBarPlayerSchedule(barNo) {
+        if (this.player.playState().play) {
+            this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+            this.player.replaceCurrentSchedule(this.lastUsedSchedule);
+        }
+    }
     renderCurrentProjectForOutput() {
         let forOutput = {
             series: [],
@@ -1536,26 +1575,39 @@ class CommandDispatcher {
             this.player.reconnectAllPlugins(schedule);
         }
     }
-    reStartPlayIfPlay() {
+    reStartPlayIfPlay(clearPluginCache) {
         if (this.player.playState().play) {
             console.log('reStartPlayIfPlay');
             this.stopPlay();
+            if (clearPluginCache) {
+                globalCommandDispatcher.player.clearPluginsCache();
+            }
             this.setupAndStartPlay();
         }
+        else {
+            if (clearPluginCache) {
+                globalCommandDispatcher.player.clearPluginsCache();
+            }
+        }
+        globalCommandDispatcher.resetPlayButtonState();
     }
     stopPlay() {
         this.player.cancel();
         this.renderer.menu.rerenderMenuContent(null);
         this.setHiddenTimeMark();
         this.resetProject();
+        globalCommandDispatcher.resetPlayButtonState();
     }
     setupAndStartPlay() {
-        console.log('setupAndStartPlay');
         this.lastUsedSchedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
         if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-            for (let nn = 0; nn <= globalCommandDispatcher.cfg().data.selectedPart.endMeasure; nn++) {
+            let endbar = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+            if (endbar > this.lastUsedSchedule.series.length - 1) {
+                endbar = this.lastUsedSchedule.series.length - 1;
+            }
+            for (let nn = 0; nn <= endbar; nn++) {
                 to = to + this.lastUsedSchedule.series[nn].duration;
                 if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
                     from = to;
@@ -1606,7 +1658,6 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
             let me = this;
@@ -1615,6 +1666,7 @@ class CommandDispatcher {
                 console.log('cancel wait start loop');
                 me.restartOnInitError = false;
                 me.player.cancel();
+                globalCommandDispatcher.resetPlayButtonState();
             });
             let waitid = setTimeout(() => {
                 if (!me.renderer.warning.noWarning) {
@@ -2236,6 +2288,18 @@ class CommandDispatcher {
         this.adjustRemoveEmptyChords(project);
         this.adjustTimeLineLength(project);
     }
+    resetPlayButtonState() {
+        console.log('resetPlayButtonState', this.player.playState());
+        if (this.player)
+            if (this.player.playState().play) {
+                this.renderer.toolbar.playStopButton.iconLabelButton.selection = 0;
+            }
+            else {
+                this.renderer.toolbar.playStopButton.iconLabelButton.selection = 1;
+            }
+        this.renderer.toolbar.playStopButton.iconLabelButton.label.text = this.renderer.toolbar.playStopButton.iconLabelButton.labels[this.renderer.toolbar.playStopButton.iconLabelButton.selection];
+        this.renderer.tiler.resetAnchor(this.renderer.toolbar.toolBarGroup, this.renderer.toolbar.toolBarAnchor, LevelModes.overlay);
+    }
 }
 let globalCommandDispatcher = new CommandDispatcher();
 let gridLinesBrief = [
@@ -2724,6 +2788,7 @@ class UIToolbar {
             globalCommandDispatcher.exe.undo(1);
         });
         this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn) => {
+            console.log('playStopButton', globalCommandDispatcher.player.playState());
             if (globalCommandDispatcher.player.playState().play) {
                 globalCommandDispatcher.stopPlay();
             }
@@ -3707,7 +3772,6 @@ class DragMenuItemUtil {
             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
         }
         let pp = globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-        console.log('found performer', pp);
         if (x == 0 && y == 0) {
             this.dragStarted = false;
             let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
@@ -3781,7 +3845,8 @@ function fillPluginsLists() {
                             }
                             let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
                             globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
-                            console.log('found track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+                            console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+                            globalCommandDispatcher.reStartPlayIfPlay(true);
                         }
                         else {
                             let xx = dx;
@@ -4165,6 +4230,7 @@ class SamplerBar {
                 drum.measures[barIdx].skips.push(muStart.metre());
             }
         });
+        globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
     }
 }
 class BarOctaveRender {
@@ -4580,6 +4646,7 @@ class MixerBar {
                 chord.slides = [{ duration: duration, delta: shift }];
             });
             globalCommandDispatcher.cfg().editmark = null;
+            globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
         }
         else {
             let cuslidemark = globalCommandDispatcher.cfg().slidemark;
@@ -4638,6 +4705,9 @@ class MixerBar {
                 });
                 if (!drop) {
                     globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
+                }
+                else {
+                    globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
                 }
             }
         }

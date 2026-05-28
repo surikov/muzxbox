@@ -252,6 +252,7 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): any;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
@@ -264,6 +265,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
+    clearPluginsCache(): any;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -320,7 +322,6 @@ declare class SchedulePlayer implements MZXBX_Player {
     schedule: MZXBX_Schedule | null;
     performerDrumHolders: MZXBX_PerformerSamplerHolder[];
     filterHolders: MZXBX_FilterHolder[];
-    pluginsList: MZXBX_PerformerSamplerHolder[];
     nextAudioContextStart: number;
     tickDuration: number;
     isPlayLoop: boolean;
@@ -329,6 +330,8 @@ declare class SchedulePlayer implements MZXBX_Player {
     playCallback: (start: number, position: number, end: number) => void;
     waitForID: number;
     constructor(callback: (start: number, position: number, end: number) => void);
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
+    clearPluginsCache(): void;
     startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
@@ -343,7 +346,7 @@ declare class SchedulePlayer implements MZXBX_Player {
     };
     connectAllPlugins(): string | null;
     disconnectAllPlugins(): void;
-    tick(loopStart: number, loopEnd: number, waitId: number): void;
+    doTick(loopStart: number, loopEnd: number, waitId: number): void;
     findPerformerSamplerPlugin(channel: MZXBX_Channel): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number): void;
     findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null;

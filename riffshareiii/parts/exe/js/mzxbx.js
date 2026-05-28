@@ -84,7 +84,6 @@ class SchedulePlayer {
         this.schedule = null;
         this.performerDrumHolders = [];
         this.filterHolders = [];
-        this.pluginsList = [];
         this.nextAudioContextStart = 0;
         this.tickDuration = 0.25;
         this.isPlayLoop = false;
@@ -94,8 +93,20 @@ class SchedulePlayer {
         this.waitForID = -1;
         this.playCallback = callback;
     }
+    replaceCurrentSchedule(schedule) {
+        this.schedule = schedule;
+    }
+    clearPluginsCache() {
+        this.performerDrumHolders.length = 0;
+        this.filterHolders.length = 0;
+    }
     startSetupPlugins(context, schedule) {
-        if (!(this.isPlayLoop || this.isLoadingPlugins)) {
+        console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
+        if (this.isPlayLoop) {
+            console.log('startSetupPlugins Already playing');
+            return 'Already playing';
+        }
+        else {
             this.isLoadingPlugins = true;
             this.audioContext = context;
             this.schedule = schedule;
@@ -113,9 +124,6 @@ class SchedulePlayer {
             else {
                 return 'Empty schedule';
             }
-        }
-        else {
-            return 'Already playing/loading';
         }
     }
     allFilters() {
@@ -194,7 +202,7 @@ class SchedulePlayer {
                 this.position = currentPosition;
                 this.isPlayLoop = true;
                 this.waitForID = Math.random();
-                this.tick(loopStart, loopEnd, this.waitForID);
+                this.doTick(loopStart, loopEnd, this.waitForID);
                 return '';
             }
             else {
@@ -349,12 +357,12 @@ class SchedulePlayer {
             console.log('not connected');
         }
     }
-    tick(loopStart, loopEnd, waitId) {
+    doTick(loopStart, loopEnd, waitId) {
         if (this.audioContext) {
             if (waitId == this.waitForID) {
                 let sendFrom = this.position;
                 let sendTo = this.position + this.tickDuration;
-                if (this.audioContext.currentTime > this.nextAudioContextStart - this.tickDuration) {
+                if (this.audioContext.currentTime > this.nextAudioContextStart - 1.5 * this.tickDuration) {
                     let atTime = this.nextAudioContextStart;
                     if (sendTo > loopEnd) {
                         this.sendPiece(sendFrom, loopEnd, atTime);
@@ -376,7 +384,7 @@ class SchedulePlayer {
                         this.waitForID = Math.random();
                         let id = this.waitForID;
                         window.requestAnimationFrame(function (time) {
-                            me.tick(loopStart, loopEnd, id);
+                            me.doTick(loopStart, loopEnd, id);
                         });
                         this.waitForID = id;
                     }
