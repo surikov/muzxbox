@@ -1,27 +1,23 @@
 <html>
-<button onclick='start();'>beep AHDSR</button>
-<script>
-    function start() {
-        let audioContext = new AudioContext();
-        let when = audioContext.currentTime + 0.1;
-
-        let envelope = audioContext.createGain();
-        let beep = audioContext.createOscillator();
-
-        beep.frequency.value = 440;
-
-        envelope.gain.setValueAtTime(0, when);
-        envelope.gain.linearRampToValueAtTime(1, when + 0.05);
-        envelope.gain.linearRampToValueAtTime(0.5, when + 0.2);
-        envelope.gain.setValueAtTime(0.5, when + 0.99);
-        envelope.gain.linearRampToValueAtTime(0, when + 1);
-
-        envelope.connect(audioContext.destination);
-        beep.connect(envelope);
-
-        beep.start(when);
-        beep.stop(when + 1);
-    }
-</script>
-
+	<button onclick='start();'>beep AHDSR</button>
+	<script>
+		function start() {
+			let audioContext = new AudioContext();//создаём главный объект
+			let when = audioContext.currentTime + 0.1;//играть через 0.1с после нажатия кнопки
+			let beep = audioContext.createOscillator();//осциллятор это объект который делает "Пи-и-и-и"
+			beep.frequency.value = 440;//частота ноты Ля
+			
+			let envelope = audioContext.createGain();//объект Gain это громкость
+			envelope.gain.setValueAtTime(0, when);//в начале звучания громкость 0
+			envelope.gain.linearRampToValueAtTime(1, when + 0.05);//постепенно увеличить до 1 за 0.5с
+			envelope.gain.linearRampToValueAtTime(0.5, when + 0.2);//понизить до 0.5 за 0.2с
+			envelope.gain.setValueAtTime(0.5, when + 0.99);//это нужно для правильно расчёта
+			envelope.gain.linearRampToValueAtTime(0, when + 1);//в конце звука понизить до 0
+			envelope.connect(audioContext.destination);//"громкость" направляем в аудиовыход
+			beep.connect(envelope);//осциллятор направляем в "громкость"
+			
+			beep.start(when);
+			beep.stop(when + 1);
+		}
+	</script>
 </html>

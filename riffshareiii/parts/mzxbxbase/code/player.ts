@@ -23,9 +23,9 @@ class SchedulePlayer implements MZXBX_Player {
 	replaceCurrentSchedule(schedule: MZXBX_Schedule) {
 		this.schedule = schedule;
 	}
-	clearPluginsCache(){
-		this.performerDrumHolders.length=0;
-		this.filterHolders.length=0;
+	clearPluginsCache() {
+		this.performerDrumHolders.length = 0;
+		this.filterHolders.length = 0;
 	}
 	startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string {
 		console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
@@ -120,7 +120,7 @@ class SchedulePlayer implements MZXBX_Player {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
 		let msg = this.connectAllPlugins();
-		console.log('reconnectAllPlugins', msg, schedule);
+		console.log('reconnectAllPlugins', msg);
 	}
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
 		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
@@ -168,6 +168,7 @@ class SchedulePlayer implements MZXBX_Player {
 						for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 
 							let filter = this.schedule.filters[ff];
+							//console.log(ff, 'connect filter', filter.kind);
 							let plugin = this.findFilterPlugin(filter.id);
 							if (plugin) {
 								let pluginOutput = plugin.output();
@@ -190,6 +191,7 @@ class SchedulePlayer implements MZXBX_Player {
 						}
 						for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 							let channel = this.schedule.channels[cc];
+							//console.log(cc, 'connect channel', channel.performer.kind);
 							let performer = this.findPerformerSamplerPlugin(channel);
 							if (performer) {
 								let output = performer.output();
@@ -233,6 +235,7 @@ class SchedulePlayer implements MZXBX_Player {
 						if (output) {
 							try {
 								for (let oo = 0; oo < filter.outputs.length; oo++) {
+									//console.log(oo, 'disconnect filter', filter.kind);
 									let outId = filter.outputs[oo];
 									let targetNode: AudioNode | null = master;
 									if (outId) {
@@ -261,6 +264,7 @@ class SchedulePlayer implements MZXBX_Player {
 							try {
 								plugin.cancel();
 								for (let oo = 0; oo < channel.outputs.length; oo++) {
+									//console.log(oo, 'disconnect channel', channel.performer.kind);
 									let outId = channel.outputs[oo];
 									let targetNode: AudioNode | null = master;
 									if (outId) {

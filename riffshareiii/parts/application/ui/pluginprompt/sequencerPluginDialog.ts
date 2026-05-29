@@ -44,11 +44,13 @@ class SequencerPluginDialog {
 		}
 	}
 	setSequencerOn() {
+		//console.log('setSequencerOn');
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
 			this.track.performer.state = 0;
 		});
 		this.resetStateButtons();
 		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//console.log('setSequencerOn done');
 	}
 	setSequencerMute() {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {

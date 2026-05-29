@@ -1,42 +1,38 @@
 function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 	console.log('newDX7FMSynth1');
 	let matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[] = [
-		//stacking
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //1
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },    //2
-		{ outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //3
-		{ outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [3]] },    //4
-		{ outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },     //5 e.piano 1
-		{ outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [4]] },     //6
-		//branch
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },   //7
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [3], [], []] },   //8
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },   //9
-		{ outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },   //10
-		{ outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },   //11
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [1], [], [], [], []] },  //12
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },  //13
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },   //14
-		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [1], [], [], [], []] },   //15
-		{ outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }, //16 
-		{ outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] }, //17
-		{ outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [], [5], []], feedbackMatrix: [[], [], [], [4], [], []] }, //18
-		//rooting/tower combi
-		{ outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //19
-		{ outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },   //20
-		{ outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [], [5], [5], []], feedbackMatrix: [[], [], [2], [], [], []] },    //21
-		{ outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //22 bass 1
-		{ outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },     //23 vibe 1
-		{ outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },     //24
-		{ outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },      //25
-		//branch/tower combi
-		{ outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] },    //26
-		{ outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] },    //27
-		{ outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] },     //28
-		{ outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },      //29
-		{ outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] },      //30
-		{ outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },       //31
-		{ outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }         //32 e.organ 1
+		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] }
+		, { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [3]] }
+		, { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2, 4], modulationMatrix: [[1], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [4]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [], [], [3], [], []] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] }
+		, { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] }
+		, { outputMix: [0, 3], modulationMatrix: [[1], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [1], [], [], [], []] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3, 4, 5], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4, 5], [], []], feedbackMatrix: [[], [1], [], [], [], []] }
+		, { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0], modulationMatrix: [[1, 2, 4], [], [3], [], [5], []], feedbackMatrix: [[], [1], [], [], [], []] }
+		, { outputMix: [0], modulationMatrix: [[1, 2, 3], [], [2], [], [5], []], feedbackMatrix: [[], [], [], [4], [], []] }
+		, { outputMix: [0, 3, 4], modulationMatrix: [[1], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 3], modulationMatrix: [[2], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] }
+		, { outputMix: [0, 1, 3, 4], modulationMatrix: [[2], [2], [], [5], [5], []], feedbackMatrix: [[], [], [2], [], [], []] }
+		, { outputMix: [0, 2, 3, 4], modulationMatrix: [[1], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 3, 4], modulationMatrix: [[], [2], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [5], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [5], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 3], modulationMatrix: [[], [2], [], [4, 5], [], []], feedbackMatrix: [[], [], [2], [], [], []] }
+		, { outputMix: [0, 2, 5], modulationMatrix: [[1], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] }
+		, { outputMix: [0, 1, 2, 4], modulationMatrix: [[], [], [3], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 2, 5], modulationMatrix: [[], [], [3], [4], [], []], feedbackMatrix: [[], [], [], [], [4], []] }
+		, { outputMix: [0, 1, 2, 3, 4], modulationMatrix: [[], [], [], [], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
+		, { outputMix: [0, 1, 2, 3, 4, 5], modulationMatrix: [[], [], [], [], [], []], feedbackMatrix: [[], [], [], [], [], [5]] }
 	];
 	class MiniumFMOperator {
 		audioContext: AudioContext;
@@ -77,27 +73,21 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 		}
 		startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, modulationRatio: number, feedbackRatio: number) {//}, slides: MZXBX_SlideItem[]) {
-			this.envelope.gain.setValueAtTime(0, when);
+			this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
+			this.envelope.gain.setValueAtTime(this.audioContext.currentTime, when);
 			this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
 			this.envelope.gain.setValueCurveAtTime(info.envelope.decay.values, when + info.envelope.attack.duration, info.envelope.decay.duration);
 			this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
 			this.envelope.gain.cancelAndHoldAtTime(when + duration);
 			this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
 
-			//this.carrier.frequency.linearRampToValueAtTime(frequency, when);
 			this.carrier.frequency.value = frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
 			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 			this.output.gain.value = info.volume;
-
-			/*let note=12*Math.log(frequency/440)+69;
-			console.log('--',note,frequency);
-			for (let ii = 0; ii < slides.length; ii++) {
-
-			}*/
 		}
-		stop() {
+		cancelOperator() {
 			this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
 			this.modulationLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
 			this.carrier.frequency.cancelScheduledValues(this.audioContext.currentTime);
@@ -116,7 +106,6 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.audioContext = audioContext;
 			this.output = this.audioContext.createGain();
 			this.output.connect(to);
-
 			this.operators = [
 				new MiniumFMOperator(this.audioContext)
 				, new MiniumFMOperator(this.audioContext)
@@ -158,10 +147,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				this.operators[outIdx].output.connect(this.output);
 			}
 		}
-		//startPlayNote(preset: SynthPreset, when: number, duration: number, note: number) {
-
 		startPlayNote(volume: number, preset: SynthPreset, when: number, note: number, slides: MZXBX_SlideItem[]) {
-			//this.output.gain.value = 0.175;
 			this.output.gain.value = 0.33 * volume / 100;
 			let duration = slides.reduce((sm, cur) => sm + cur.duration, 0);
 			for (let ii = 0; ii < 6; ii++) {
@@ -172,11 +158,9 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 						let noteFreq = 440 * Math.pow(2, (note - 69) / 12);
 						let detuneRatio = Math.pow(Math.exp(Math.log(2) / 1024), info.detune);
 						frequency = noteFreq * detuneRatio * info.frequencyRatio;
-
 						if (preset.transpose > 0) frequency = frequency * 2;
 						if (preset.transpose < 0) frequency = frequency * 0.5;
 					}
-					//console.log(note,440 * Math.pow(2, (note - 69) / 12));
 					this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);//, slides);
 					let otime = when + duration + info.envelope.release + 0.01;
 					if (this.locktime < otime) {
@@ -195,9 +179,9 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				}
 			}
 		}
-		stop() {
+		cancelVoice() {
 			for (let ii = 0; ii < this.operators.length; ii++) {
-				this.operators[ii].stop();
+				this.operators[ii].cancelOperator();
 			}
 			this.output.gain.value = 0;
 			this.locktime = 0;
@@ -223,35 +207,35 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				}
 			}
 		}
-		takeVox(mid: number): MinumFMVoice {
+		takeVox(mxid: number): MinumFMVoice {
 			this.checkCache();
 			for (let ii = 0; ii < this.cache.length; ii++) {
-				if (this.cache[ii].locktime < this.audioContext.currentTime && mid == this.cache[ii].mixID) {
+				if (this.cache[ii].locktime < this.audioContext.currentTime && mxid == this.cache[ii].mixID) {
+					//console.log('reuse',this.cache.length);
 					return this.cache[ii];
 				}
 			}
 			for (let ii = 0; ii < this.cache.length; ii++) {
 				if (this.cache[ii].locktime < this.audioContext.currentTime && this.cache[ii].mixID == 0) {
-					this.cache[ii].mixID = mid;
+					//console.log('change',this.cache.length);
+					this.cache[ii].mixID = mxid;
 					this.cache[ii].connectOperators()
 					return this.cache[ii];
 				}
 			}
-			let vx: MinumFMVoice = new MinumFMVoice(mid, this.audioContext, this.mixOutput);
+			//console.log('create',this.cache.length);
+			let vx: MinumFMVoice = new MinumFMVoice(mxid, this.audioContext, this.mixOutput);
 			this.cache.push(vx);
 			return vx;
 		}
-		stop() {
+		cancelSynth() {
 			for (let ii = 0; ii < this.cache.length; ii++) {
-				this.cache[ii].stop();
+				this.cache[ii].cancelVoice();
 			}
 		}
 		scheduleStrum(volume: number, preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
-			//console.log('slides',slides);
-
 			for (let ii = 0; ii < pitches.length; ii++) {
 				let vox = this.takeVox(preset.mixID);
-				//vox.startPlayNote(preset, when, slides.reduce((sm, cur) => sm + cur.duration, 0), pitches[ii]);
 				vox.startPlayNote(volume, preset, when, pitches[ii], slides);
 			}
 		}
@@ -266,7 +250,6 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 				this.synth = new MiniumFMSynth();
 				this.synth.init(context);
 			}
-			//console.log('parameters', parameters);
 			this.fm = (parameters as any) as FMParameter;
 			return 1;
 		}
@@ -275,7 +258,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		}
 		cancel(): void {
 			if (this.synth) {
-				this.synth.stop();
+				this.synth.cancelSynth();
 			}
 		}
 		output(): AudioNode | null {

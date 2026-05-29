@@ -252,6 +252,7 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): any;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoopTicks: (from: number, position: number, to: number) => string;
     reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
@@ -264,6 +265,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
+    clearPluginsCache(): any;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -272,7 +274,6 @@ type MZXBX_PluginRegistrationInformation = {
     ui: string;
     evaluate: string;
     script: string;
-    silent: boolean;
 };
 type MZXBX_MessageToPlugin = {
     hostData: any;

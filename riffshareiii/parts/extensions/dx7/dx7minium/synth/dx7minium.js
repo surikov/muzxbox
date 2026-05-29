@@ -64,7 +64,8 @@ function newDX7FMSynth1() {
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
         }
         startPlayFrequency(info, when, duration, frequency, modulationRatio, feedbackRatio) {
-            this.envelope.gain.setValueAtTime(0, when);
+            this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
+            this.envelope.gain.setValueAtTime(this.audioContext.currentTime, when);
             this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
             this.envelope.gain.setValueCurveAtTime(info.envelope.decay.values, when + info.envelope.attack.duration, info.envelope.decay.duration);
             this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
@@ -76,7 +77,7 @@ function newDX7FMSynth1() {
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
             this.output.gain.value = info.volume;
         }
-        stop() {
+        cancelOperator() {
             this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
             this.modulationLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
             this.carrier.frequency.cancelScheduledValues(this.audioContext.currentTime);
@@ -166,9 +167,9 @@ function newDX7FMSynth1() {
                 }
             }
         }
-        stop() {
+        cancelVoice() {
             for (let ii = 0; ii < this.operators.length; ii++) {
-                this.operators[ii].stop();
+                this.operators[ii].cancelOperator();
             }
             this.output.gain.value = 0;
             this.locktime = 0;
@@ -192,27 +193,27 @@ function newDX7FMSynth1() {
                 }
             }
         }
-        takeVox(mid) {
+        takeVox(mxid) {
             this.checkCache();
             for (let ii = 0; ii < this.cache.length; ii++) {
-                if (this.cache[ii].locktime < this.audioContext.currentTime && mid == this.cache[ii].mixID) {
+                if (this.cache[ii].locktime < this.audioContext.currentTime && mxid == this.cache[ii].mixID) {
                     return this.cache[ii];
                 }
             }
             for (let ii = 0; ii < this.cache.length; ii++) {
                 if (this.cache[ii].locktime < this.audioContext.currentTime && this.cache[ii].mixID == 0) {
-                    this.cache[ii].mixID = mid;
+                    this.cache[ii].mixID = mxid;
                     this.cache[ii].connectOperators();
                     return this.cache[ii];
                 }
             }
-            let vx = new MinumFMVoice(mid, this.audioContext, this.mixOutput);
+            let vx = new MinumFMVoice(mxid, this.audioContext, this.mixOutput);
             this.cache.push(vx);
             return vx;
         }
-        stop() {
+        cancelSynth() {
             for (let ii = 0; ii < this.cache.length; ii++) {
-                this.cache[ii].stop();
+                this.cache[ii].cancelVoice();
             }
         }
         scheduleStrum(volume, preset, when, pitches, slides) {
@@ -242,7 +243,7 @@ function newDX7FMSynth1() {
         }
         cancel() {
             if (this.synth) {
-                this.synth.stop();
+                this.synth.cancelSynth();
             }
         }
         output() {
