@@ -76,6 +76,12 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
 			this.envelope.gain.setValueAtTime(this.audioContext.currentTime, when);
 			this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
+			
+			
+			
+			
+			
+			
 			this.envelope.gain.setValueCurveAtTime(info.envelope.decay.values, when + info.envelope.attack.duration, info.envelope.decay.duration);
 			this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
 			this.envelope.gain.cancelAndHoldAtTime(when + duration);

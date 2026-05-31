@@ -59,6 +59,7 @@ class SchedulePlayer implements MZXBX_Player {
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[] {
 		return this.performerDrumHolders;
 	}
+
 	launchCollectedPlugins(): null | string {
 		//console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
 		let trackName: string = '?';
@@ -116,12 +117,12 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 		return null;
 	}
-	reconnectAllPlugins(schedule: MZXBX_Schedule): void {
+	/*reconnectAllPlugins(schedule: MZXBX_Schedule): void {
 		this.disconnectAllPlugins();
 		this.schedule = schedule;
 		let msg = this.connectAllPlugins();
 		console.log('reconnectAllPlugins', msg);
-	}
+	}*/
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string {
 		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
 		let msg: string | null = this.connectAllPlugins();
@@ -130,12 +131,21 @@ class SchedulePlayer implements MZXBX_Player {
 			return msg;
 		} else {
 			if (this.audioContext) {
-				this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+
 				this.position = currentPosition;
 				this.isPlayLoop = true;
 				//this.onAir = true;
 				this.waitForID = Math.random();
-				this.doTick(loopStart, loopEnd, this.waitForID);
+				//this.doTick(loopStart, loopEnd, this.waitForID);
+				//let me=this;
+				//console.log('prepare doTick');
+				setTimeout(() => {
+					this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+					//console.log('start doTick', this.nextAudioContextStart, this.audioContext.currentTime, this.tickDuration);
+					this.doTick(loopStart, loopEnd, this.waitForID);
+					console.log('started doTick');
+				}, 100);
+				//console.log('wait doTick');
 				return '';
 			} else {
 				this.cancel();
@@ -150,6 +160,71 @@ class SchedulePlayer implements MZXBX_Player {
 			, loading: this.isLoadingPlugins
 		};
 	}
+	launchNextCollectedFilter(nn: number, launchResult: (message: string | null) => void) {
+		if (nn < this.filterHolders.length) {
+			let holder = this.filterHolders[nn];
+			if (holder.pluginAudioFilter) {
+				holder.pluginAudioFilter.launch(this.audioContext, holder.properties);
+				let busyState = holder.pluginAudioFilter.busy();
+				if (busyState) {
+					launchResult('Filter ' + nn + ' for ' + holder.description + ': ' + busyState);
+				} else {
+					this.delayedStart(() => {
+						this.launchNextCollectedFilter(nn + 1, launchResult);
+					});
+				}
+			} else {
+				launchResult('Not found filter ' + nn + ' for ' + holder.description);
+			}
+		} else {
+			launchResult(null);
+		}
+	}
+	launchNextCollectedPerformer(nn: number, launchResult: (message: string | null) => void) {
+		if (nn < this.performerDrumHolders.length) {
+			let holder = this.performerDrumHolders[nn];
+			if (holder.plugin) {
+				holder.channel.hint = holder.plugin.launch(this.audioContext, holder.properties);
+				let busyState = holder.plugin.busy();
+				if (busyState) {
+					launchResult('Performer/sampler ' + nn + ' for ' + holder.description + ': ' + busyState);
+				} else {
+					this.delayedStart(() => {
+						this.launchNextCollectedPerformer(nn + 1, launchResult);
+					});
+				}
+			} else {
+				launchResult('Not found performer/sampler ' + nn + ' for ' + holder.description);
+			}
+		} else {
+			launchResult(null);
+		}
+	}
+	delayedStart(doTask: () => void) {
+		window.requestAnimationFrame(function (time) {
+			doTask();
+		});
+	}
+	connectLaunchCollectedPlugins(onDone: (message: string | null) => void) {
+		this.delayedStart(() => {
+			this.launchNextCollectedFilter(0, (message: string | null) => {
+				if (message) {
+					onDone(message);
+				} else {
+					this.delayedStart(() => {
+						this.launchNextCollectedPerformer(0, (message: string | null) => {
+							if (message) {
+								onDone(message);
+							} else {
+
+							}
+						});
+					});
+				}
+			});
+		});
+	}
+
 	connectAllPlugins(): string | null {
 		//console.log('connectAllPlugins');
 		if (!this.isConnected) {
@@ -183,6 +258,7 @@ class SchedulePlayer implements MZXBX_Player {
 											}
 										}
 										if (targetNode) {
+											console.log(ff, 'connect filter', filter.kind);
 											pluginOutput.connect(targetNode);
 										}
 									}
@@ -206,6 +282,7 @@ class SchedulePlayer implements MZXBX_Player {
 											}
 										}
 										if (targetNode) {
+											console.log(cc, 'connect channel', channel.performer.kind);
 											output.connect(targetNode);
 										}
 									}
@@ -246,6 +323,7 @@ class SchedulePlayer implements MZXBX_Player {
 										}
 									}
 									if (targetNode) {
+										console.log(oo, 'disconnect filter', filter.kind);
 										output.disconnect(targetNode);
 									}
 								}
@@ -275,6 +353,7 @@ class SchedulePlayer implements MZXBX_Player {
 										}
 									}
 									if (targetNode) {
+										console.log(oo, 'disconnect channel', channel.performer.kind);
 										output.disconnect(targetNode);
 									}
 								}
@@ -398,6 +477,7 @@ class SchedulePlayer implements MZXBX_Player {
 		return Math.round(nn * 1000);
 	}
 	sendPiece(fromPosition: number, toPosition: number, whenAudio: number) {
+
 		if (this.schedule) {
 			let serieStart = 0;
 			for (let ii = 0; ii < this.schedule.series.length; ii++) {
@@ -422,6 +502,7 @@ class SchedulePlayer implements MZXBX_Player {
 				serieStart = serieStart + cuSerie.duration;
 			}
 		}
+		//console.log('sendPiece');
 	}
 	cancel(): void {
 		if (this.isPlayLoop) {

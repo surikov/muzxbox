@@ -324,16 +324,16 @@ type MZXBX_Schedule = {
 	filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
-	replaceCurrentSchedule(schedule: MZXBX_Schedule);
+	replaceCurrentSchedule(schedule: MZXBX_Schedule):void;
 	startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
 	startLoopTicks: (from: number, position: number, to: number) => string;
-	reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
+	//reconnectAllPlugins111: (schedule: MZXBX_Schedule) => void;
 	cancel: () => void;
 	allFilters(): MZXBX_FilterHolder[];
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
 	position: number;
 	playState(): { connected: boolean, play: boolean, loading: boolean };
-	clearPluginsCache();
+	clearPluginsCache():void;
 };
 /*
 type Zvoog_import = {

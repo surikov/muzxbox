@@ -185,12 +185,6 @@ class SchedulePlayer {
         }
         return null;
     }
-    reconnectAllPlugins(schedule) {
-        this.disconnectAllPlugins();
-        this.schedule = schedule;
-        let msg = this.connectAllPlugins();
-        console.log('reconnectAllPlugins', msg);
-    }
     startLoopTicks(loopStart, currentPosition, loopEnd) {
         let msg = this.connectAllPlugins();
         if (msg) {
@@ -198,11 +192,14 @@ class SchedulePlayer {
         }
         else {
             if (this.audioContext) {
-                this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
                 this.position = currentPosition;
                 this.isPlayLoop = true;
                 this.waitForID = Math.random();
-                this.doTick(loopStart, loopEnd, this.waitForID);
+                setTimeout(() => {
+                    this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+                    this.doTick(loopStart, loopEnd, this.waitForID);
+                    console.log('started doTick');
+                }, 100);
                 return '';
             }
             else {
@@ -217,6 +214,30 @@ class SchedulePlayer {
             play: this.isPlayLoop,
             loading: this.isLoadingPlugins
         };
+    }
+    launchCollectedFilters(onDone) {
+    }
+    launchCollectedPerformers(onDone) {
+    }
+    connectLaunchCollectedPlugins(onDone) {
+        this.launchCollectedFilters((message) => {
+            if (message) {
+                onDone(message);
+            }
+            else {
+                this.launchCollectedPerformers((message) => {
+                    if (message) {
+                        onDone(message);
+                    }
+                    else {
+                    }
+                });
+            }
+        });
+    }
+    delayedStart(doTask, onDone, onFail) {
+        doTask((response) => {
+        });
     }
     connectAllPlugins() {
         if (!this.isConnected) {
@@ -248,6 +269,7 @@ class SchedulePlayer {
                                             }
                                         }
                                         if (targetNode) {
+                                            console.log(ff, 'connect filter', filter.kind);
                                             pluginOutput.connect(targetNode);
                                         }
                                     }
@@ -270,6 +292,7 @@ class SchedulePlayer {
                                             }
                                         }
                                         if (targetNode) {
+                                            console.log(cc, 'connect channel', channel.performer.kind);
                                             output.connect(targetNode);
                                         }
                                     }
@@ -309,6 +332,7 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
+                                        console.log(oo, 'disconnect filter', filter.kind);
                                         output.disconnect(targetNode);
                                     }
                                 }
@@ -337,6 +361,7 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
+                                        console.log(oo, 'disconnect channel', channel.performer.kind);
                                         output.disconnect(targetNode);
                                     }
                                 }

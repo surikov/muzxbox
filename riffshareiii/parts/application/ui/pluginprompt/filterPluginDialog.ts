@@ -40,14 +40,16 @@ class FilterPluginDialog {
 			this.filter.state = 0;
 		});
 		this.resetStateButtons();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	setFilterPass() {
 		globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
 			this.filter.state = 1;
 		});
 		this.resetStateButtons();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	dropFilter() {
 		globalCommandDispatcher.exe.commitProjectChanges([], () => {
@@ -67,7 +69,8 @@ class FilterPluginDialog {
 			}
 		});
 		this.closeFilterDialogFrame();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	openEmptyFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget) {
 		//console.log('openFilterPluginDialogFrame');

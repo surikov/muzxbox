@@ -432,14 +432,14 @@ class FilterPluginDialog {
             this.filter.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     setFilterPass() {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
             this.filter.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     dropFilter() {
         globalCommandDispatcher.exe.commitProjectChanges([], () => {
@@ -459,7 +459,7 @@ class FilterPluginDialog {
             }
         });
         this.closeFilterDialogFrame();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     openEmptyFilterPluginDialogFrame(order, filter) {
         this.filter = filter;
@@ -601,28 +601,28 @@ class SamplerPluginDialog {
             this.drum.sampler.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     setDrumMute() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     setDrumSolo() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.state = 2;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     dropDrum() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
             globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
         });
         this.closeDrumDialogFrame();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     openEmptyDrumPluginDialogFrame(order, drum) {
         this.drum = drum;
@@ -868,34 +868,32 @@ class SequencerPluginDialog {
         }
     }
     setSequencerOn() {
-        console.log('setSequencerOn');
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
             this.track.performer.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
-        console.log('setSequencerOn done');
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     setSequencerMute() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
             this.track.performer.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     setSequencerSolo() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
             this.track.performer.state = 2;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     dropSequencer() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
             globalCommandDispatcher.cfg().data.tracks.splice(this.order, 1);
         });
         this.closeSequencerDialogFrame();
-        globalCommandDispatcher.reConnectPluginsIfPlay();
+        globalCommandDispatcher.reStartPlayIfPlay(false);
     }
     openEmptySequencerPluginDialogFrame(order, track) {
         this.track = track;
@@ -1571,12 +1569,6 @@ class CommandDispatcher {
         }
         return forOutput;
     }
-    reConnectPluginsIfPlay() {
-        if (this.player.playState().play) {
-            let schedule = this.renderCurrentProjectForOutput();
-            this.player.reconnectAllPlugins(schedule);
-        }
-    }
     reStartPlayIfPlay(clearPluginCache) {
         if (this.player.playState().play) {
             console.log('reStartPlayIfPlay');
@@ -1591,7 +1583,6 @@ class CommandDispatcher {
                 globalCommandDispatcher.player.clearPluginsCache();
             }
         }
-        globalCommandDispatcher.resetPlayButtonState();
     }
     stopPlay() {
         this.player.cancel();
@@ -1660,6 +1651,13 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
+        console.log('startPlayLoop', from, position, to);
+        let me = this;
+        setTimeout(() => {
+            this.realStartPlayLoop(from, position, to);
+        }, 100);
+    }
+    realStartPlayLoop(from, position, to) {
         let msg = this.player.startLoopTicks(from, position, to);
         if (msg) {
             let me = this;
@@ -1674,7 +1672,7 @@ class CommandDispatcher {
                 if (!me.renderer.warning.noWarning) {
                     if (me.restartOnInitError) {
                         console.log('me.restartOnInitError', me.restartOnInitError, waitid);
-                        me.startPlayLoop(from, position, to);
+                        me.realStartPlayLoop(from, position, to);
                     }
                 }
             }, 1000);
@@ -1688,6 +1686,7 @@ class CommandDispatcher {
             this.renderer.menu.rerenderMenuContent(null);
             this.resetProject();
         }
+        globalCommandDispatcher.resetPlayButtonState();
     }
     setThemeLocale(loc, ratio) {
         console.log("setThemeLocale", loc, ratio);

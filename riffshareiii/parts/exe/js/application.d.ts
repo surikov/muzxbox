@@ -188,12 +188,12 @@ declare class CommandDispatcher {
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
     updateSingleBarPlayerSchedule(barNo: number): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
-    reConnectPluginsIfPlay(): void;
     reStartPlayIfPlay(clearPluginCache: boolean): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
     updatePluginHint(schedule: MZXBX_Schedule): void;
     startPlayLoop(from: number, position: number, to: number): void;
+    realStartPlayLoop(from: number, position: number, to: number): void;
     setThemeLocale(loc: string, ratio: number): void;
     setThemeColor(idx: string): void;
     resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes): void;
@@ -1211,10 +1211,9 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
-    replaceCurrentSchedule(schedule: MZXBX_Schedule): any;
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoopTicks: (from: number, position: number, to: number) => string;
-    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
@@ -1224,7 +1223,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
-    clearPluginsCache(): any;
+    clearPluginsCache(): void;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;

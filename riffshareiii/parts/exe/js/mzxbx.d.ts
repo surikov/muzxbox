@@ -252,10 +252,9 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
-    replaceCurrentSchedule(schedule: MZXBX_Schedule): any;
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
     startLoopTicks: (from: number, position: number, to: number) => string;
-    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
@@ -265,7 +264,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
-    clearPluginsCache(): any;
+    clearPluginsCache(): void;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -337,13 +336,16 @@ declare class SchedulePlayer implements MZXBX_Player {
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     launchCollectedPlugins(): null | string;
     checkCollectedPlugins(): null | string;
-    reconnectAllPlugins(schedule: MZXBX_Schedule): void;
     startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string;
     playState(): {
         connected: boolean;
         play: boolean;
         loading: boolean;
     };
+    launchCollectedFilters(onDone: (message: string | null) => void): void;
+    launchCollectedPerformers(onDone: (message: string | null) => void): void;
+    connectLaunchCollectedPlugins(onDone: (message: string | null) => void): void;
+    delayedStart(doTask: (message: string | null) => void, onDone: (message: string | null) => void, onFail: (message: string | null) => void): void;
     connectAllPlugins(): string | null;
     disconnectAllPlugins(): void;
     doTick(loopStart: number, loopEnd: number, waitId: number): void;

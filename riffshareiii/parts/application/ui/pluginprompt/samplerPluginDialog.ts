@@ -48,28 +48,32 @@ class SamplerPluginDialog {
 			this.drum.sampler.state = 0;
 		});
 		this.resetStateButtons();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	setDrumMute() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
 			this.drum.sampler.state = 1;
 		});
 		this.resetStateButtons();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	setDrumSolo() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
 			this.drum.sampler.state = 2;
 		});
 		this.resetStateButtons();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	dropDrum() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
 			globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
 		});
 		this.closeDrumDialogFrame();
-		globalCommandDispatcher.reConnectPluginsIfPlay();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay(false);
 	}
 	openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack) {
 		this.drum = drum;

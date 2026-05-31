@@ -374,14 +374,14 @@ class CommandDispatcher {
 		//console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
-	reConnectPluginsIfPlay() {
+	/*reConnectPluginsIfPlay22222() {
 		//console.log('reConnectPluginsIfPlay', this.player.playState());
 		if (this.player.playState().play) {
 			let schedule = this.renderCurrentProjectForOutput();
 			//console.log('schedule', schedule);
 			this.player.reconnectAllPlugins(schedule);
 		}
-	}
+	}*/
 	reStartPlayIfPlay(clearPluginCache: boolean) {
 		if (this.player.playState().play) {
 			console.log('reStartPlayIfPlay');
@@ -395,7 +395,7 @@ class CommandDispatcher {
 				globalCommandDispatcher.player.clearPluginsCache();
 			}
 		}
-		globalCommandDispatcher.resetPlayButtonState();
+
 	}
 	/*toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
@@ -495,9 +495,15 @@ class CommandDispatcher {
 		}
 		//console.log('updatePluginHint', this.cfg().data);
 	}
-
 	startPlayLoop(from: number, position: number, to: number) {
-		//console.log('startPlayLoop', from, position, to);
+		console.log('startPlayLoop', from, position, to);
+		let me = this;
+		setTimeout(() => {
+			this.realStartPlayLoop(from, position, to);
+		}, 100);
+	}
+	realStartPlayLoop(from: number, position: number, to: number) {
+		//
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
 			//console.log('msg', msg, this.renderer.warning.noWarning);
@@ -514,7 +520,7 @@ class CommandDispatcher {
 				if (!me.renderer.warning.noWarning) {
 					if (me.restartOnInitError) {
 						console.log('me.restartOnInitError', me.restartOnInitError, waitid);
-						me.startPlayLoop(from, position, to);
+						me.realStartPlayLoop(from, position, to);
 					}
 				}
 			}, 1000);
@@ -529,6 +535,7 @@ class CommandDispatcher {
 			this.renderer.menu.rerenderMenuContent(null);
 			this.resetProject();
 		}
+		globalCommandDispatcher.resetPlayButtonState();
 	}
 	setThemeLocale(loc: string, ratio: number) {
 		console.log("setThemeLocale", loc, ratio);
