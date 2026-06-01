@@ -303,7 +303,35 @@ class SchedulePlayer implements MZXBX_Player {
 	}
 	connectLaunchCollectedPlugins(onDone: (message: string | null) => void) {
 		if (this.schedule) {
-			let cuschedule: MZXBX_Schedule = this.schedule;
+			let msg: string | null = this.launchCollectedPlugins();
+			if (msg) {
+				onDone(msg);
+			} else {
+				msg = this.checkCollectedPlugins();
+				if (msg) {
+					onDone(msg);
+				} else {
+					let cuschedule: MZXBX_Schedule = this.schedule;
+					this.delayedStart(() => {
+						this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message: string | null) => {
+							if (message) {
+								onDone(message);
+							} else {
+								this.delayedStart(() => {
+									this.connectNextCollectedPerformer(0, (message: string | null) => {
+										if (message) {
+											onDone(message);
+										} else {
+											onDone(message);
+										}
+									});
+								});
+							}
+						});
+					});
+				}
+			}
+			/*let cuschedule: MZXBX_Schedule = this.schedule;
 			this.delayedStart(() => {
 				this.launchNextCollectedFilter(0, (message: string | null) => {
 					if (message) {
@@ -336,7 +364,7 @@ class SchedulePlayer implements MZXBX_Player {
 						});
 					}
 				});
-			});
+			});*/
 		} else {
 			onDone('no schedule');
 		}

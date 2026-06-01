@@ -348,44 +348,38 @@ class SchedulePlayer {
     }
     connectLaunchCollectedPlugins(onDone) {
         if (this.schedule) {
-            let cuschedule = this.schedule;
-            this.delayedStart(() => {
-                this.launchNextCollectedFilter(0, (message) => {
-                    if (message) {
-                        onDone(message);
-                    }
-                    else {
-                        this.delayedStart(() => {
-                            this.launchNextCollectedPerformer(0, (message) => {
-                                if (message) {
-                                    onDone(message);
-                                }
-                                else {
-                                    this.delayedStart(() => {
-                                        this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message) => {
-                                            if (message) {
-                                                onDone(message);
-                                            }
-                                            else {
-                                                this.delayedStart(() => {
-                                                    this.connectNextCollectedPerformer(0, (message) => {
-                                                        if (message) {
-                                                            onDone(message);
-                                                        }
-                                                        else {
-                                                            onDone(message);
-                                                        }
-                                                    });
-                                                });
-                                            }
-                                        });
+            let msg = this.launchCollectedPlugins();
+            if (msg) {
+                onDone(msg);
+            }
+            else {
+                msg = this.checkCollectedPlugins();
+                if (msg) {
+                    onDone(msg);
+                }
+                else {
+                    let cuschedule = this.schedule;
+                    this.delayedStart(() => {
+                        this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message) => {
+                            if (message) {
+                                onDone(message);
+                            }
+                            else {
+                                this.delayedStart(() => {
+                                    this.connectNextCollectedPerformer(0, (message) => {
+                                        if (message) {
+                                            onDone(message);
+                                        }
+                                        else {
+                                            onDone(message);
+                                        }
                                     });
-                                }
-                            });
+                                });
+                            }
                         });
-                    }
-                });
-            });
+                    });
+                }
+            }
         }
         else {
             onDone('no schedule');
