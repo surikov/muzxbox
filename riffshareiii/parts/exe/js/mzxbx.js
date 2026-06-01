@@ -185,28 +185,29 @@ class SchedulePlayer {
         }
         return null;
     }
-    startLoopTicks(loopStart, currentPosition, loopEnd) {
-        let msg = this.connectAllPlugins();
-        if (msg) {
-            return msg;
-        }
-        else {
-            if (this.audioContext) {
-                this.position = currentPosition;
-                this.isPlayLoop = true;
-                this.waitForID = Math.random();
-                setTimeout(() => {
-                    this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
-                    this.doTick(loopStart, loopEnd, this.waitForID);
-                    console.log('started doTick');
-                }, 100);
-                return '';
+    startLoopTicks(loopStart, currentPosition, loopEnd, onDone) {
+        this.connectAllPlugins((msg) => {
+            if (msg) {
+                onDone(msg);
             }
             else {
-                this.cancel();
-                return 'Empty audio context';
+                if (this.audioContext) {
+                    this.position = currentPosition;
+                    this.isPlayLoop = true;
+                    this.waitForID = Math.random();
+                    setTimeout(() => {
+                        this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+                        this.doTick(loopStart, loopEnd, this.waitForID);
+                        console.log('started doTick');
+                    }, 100);
+                    onDone(null);
+                }
+                else {
+                    this.cancel();
+                    onDone('Empty audio context');
+                }
             }
-        }
+        });
     }
     playState() {
         return {
@@ -215,31 +216,189 @@ class SchedulePlayer {
             loading: this.isLoadingPlugins
         };
     }
-    launchCollectedFilters(onDone) {
-    }
-    launchCollectedPerformers(onDone) {
-    }
-    connectLaunchCollectedPlugins(onDone) {
-        this.launchCollectedFilters((message) => {
-            if (message) {
-                onDone(message);
+    connectNextCollectedPerformer(nn, connectResult) {
+        if (this.schedule) {
+            if (nn < this.schedule.channels.length) {
+                let channel = this.schedule.channels[nn];
+                let performer = this.findPerformerSamplerPlugin(channel);
+                if (performer) {
+                    let output = performer.output();
+                    if (output) {
+                        for (let oo = 0; oo < channel.outputs.length; oo++) {
+                            let outId = channel.outputs[oo];
+                            let targetNode = this.audioContext.destination;
+                            if (outId) {
+                                let target = this.findFilterPlugin(outId);
+                                if (target) {
+                                    targetNode = target.input();
+                                }
+                            }
+                            if (targetNode) {
+                                output.connect(targetNode);
+                            }
+                        }
+                        this.connectNextCollectedPerformer(nn + 1, connectResult);
+                    }
+                    else {
+                        connectResult('No output for performer ' + nn + ' for ' + channel.performer.description);
+                    }
+                }
+                else {
+                    connectResult('Not found performer ' + nn + ' for ' + channel.performer.description);
+                }
             }
             else {
-                this.launchCollectedPerformers((message) => {
+                connectResult(null);
+            }
+        }
+        else {
+            connectResult('empty schedule');
+        }
+    }
+    connectNextCollectedFilter(nn, connectResult) {
+        if (nn < 0) {
+            connectResult(null);
+        }
+        else {
+            if (this.schedule) {
+                let filter = this.schedule.filters[nn];
+                let plugin = this.findFilterPlugin(filter.id);
+                if (plugin) {
+                    let pluginOutput = plugin.output();
+                    if (pluginOutput) {
+                        for (let oo = 0; oo < filter.outputs.length; oo++) {
+                            let outId = filter.outputs[oo];
+                            let targetNode = this.audioContext.destination;
+                            ;
+                            if (outId) {
+                                let target = this.findFilterPlugin(outId);
+                                if (target) {
+                                    targetNode = target.input();
+                                }
+                            }
+                            if (targetNode) {
+                                pluginOutput.connect(targetNode);
+                            }
+                        }
+                        this.connectNextCollectedFilter(nn - 1, connectResult);
+                    }
+                    else {
+                        connectResult('no filter output ' + nn);
+                    }
+                }
+                else {
+                    connectResult('no filter ' + nn);
+                }
+            }
+            else {
+                connectResult('empty schedule');
+            }
+        }
+    }
+    launchNextCollectedFilter(nn, launchResult) {
+        if (nn < this.filterHolders.length) {
+            let holder = this.filterHolders[nn];
+            if (holder.pluginAudioFilter) {
+                holder.pluginAudioFilter.launch(this.audioContext, holder.properties);
+                let busyState = holder.pluginAudioFilter.busy();
+                if (busyState) {
+                    launchResult('Filter ' + nn + ' for ' + holder.description + ': ' + busyState);
+                }
+                else {
+                    this.delayedStart(() => {
+                        this.launchNextCollectedFilter(nn + 1, launchResult);
+                    });
+                }
+            }
+            else {
+                launchResult('Not found filter ' + nn + ' for ' + holder.description);
+            }
+        }
+        else {
+            launchResult(null);
+        }
+    }
+    launchNextCollectedPerformer(nn, launchResult) {
+        if (nn < this.performerDrumHolders.length) {
+            let holder = this.performerDrumHolders[nn];
+            if (holder.plugin) {
+                holder.channel.hint = holder.plugin.launch(this.audioContext, holder.properties);
+                let busyState = holder.plugin.busy();
+                if (busyState) {
+                    launchResult('Performer/sampler ' + nn + ' for ' + holder.description + ': ' + busyState);
+                }
+                else {
+                    this.delayedStart(() => {
+                        this.launchNextCollectedPerformer(nn + 1, launchResult);
+                    });
+                }
+            }
+            else {
+                launchResult('Not found performer/sampler ' + nn + ' for ' + holder.description);
+            }
+        }
+        else {
+            launchResult(null);
+        }
+    }
+    delayedStart(doTask) {
+        window.requestAnimationFrame(function (time) {
+            doTask();
+        });
+    }
+    connectLaunchCollectedPlugins(onDone) {
+        if (this.schedule) {
+            let cuschedule = this.schedule;
+            this.delayedStart(() => {
+                this.launchNextCollectedFilter(0, (message) => {
                     if (message) {
                         onDone(message);
                     }
                     else {
+                        this.delayedStart(() => {
+                            this.launchNextCollectedPerformer(0, (message) => {
+                                if (message) {
+                                    onDone(message);
+                                }
+                                else {
+                                    this.delayedStart(() => {
+                                        this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message) => {
+                                            if (message) {
+                                                onDone(message);
+                                            }
+                                            else {
+                                                this.delayedStart(() => {
+                                                    this.connectNextCollectedPerformer(0, (message) => {
+                                                        if (message) {
+                                                            onDone(message);
+                                                        }
+                                                        else {
+                                                            onDone(message);
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                        });
+                                    });
+                                }
+                            });
+                        });
                     }
                 });
-            }
-        });
+            });
+        }
+        else {
+            onDone('no schedule');
+        }
     }
-    delayedStart(doTask, onDone, onFail) {
-        doTask((response) => {
-        });
+    connectAllPlufffgins() {
+        this.connectLaunchCollectedPlugins((message) => { console.log('connectAllPlugins', message); });
+        return 'test';
     }
-    connectAllPlugins() {
+    connectAllPlugins(onDone) {
+        this.connectLaunchCollectedPlugins(onDone);
+    }
+    connectAllPlugin222s() {
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
             if (msg) {

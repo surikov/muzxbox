@@ -503,6 +503,38 @@ class CommandDispatcher {
 		}, 100);
 	}
 	realStartPlayLoop(from: number, position: number, to: number) {
+		this.player.startLoopTicks(from, position, to, (msg: string | null) => {
+			if (msg) {
+				this.restartOnInitError = true;
+				this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg//,null);
+					, () => {
+						console.log('cancel wait start loop');
+						this.restartOnInitError = false;
+						this.player.cancel();
+						globalCommandDispatcher.resetPlayButtonState();
+					});
+				let waitid = setTimeout(() => {
+					if (!this.renderer.warning.noWarning) {
+						if (this.restartOnInitError) {
+							console.log('me.restartOnInitError', this.restartOnInitError, waitid);
+							this.realStartPlayLoop(from, position, to);
+						}
+					}
+				}, 1000);
+			} else {
+				if (this.lastUsedSchedule) {
+					this.updatePluginHint(this.lastUsedSchedule);
+				}
+				this.renderer.warning.hideWarning();
+				this.setVisibleTimeMark();
+				this.renderer.menu.rerenderMenuContent(null);
+				this.resetProject();
+			}
+			globalCommandDispatcher.resetPlayButtonState();
+		});
+
+	}
+	/*realStartPlayLoop(from: number, position: number, to: number) {
 		//
 		let msg: string = this.player.startLoopTicks(from, position, to);
 		if (msg) {
@@ -536,7 +568,7 @@ class CommandDispatcher {
 			this.resetProject();
 		}
 		globalCommandDispatcher.resetPlayButtonState();
-	}
+	}*/
 	setThemeLocale(loc: string, ratio: number) {
 		console.log("setThemeLocale", loc, ratio);
 		//console.log("setThemeLocale", loc, ratio);

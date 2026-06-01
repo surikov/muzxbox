@@ -1658,35 +1658,35 @@ class CommandDispatcher {
         }, 100);
     }
     realStartPlayLoop(from, position, to) {
-        let msg = this.player.startLoopTicks(from, position, to);
-        if (msg) {
-            let me = this;
-            this.restartOnInitError = true;
-            this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
-                console.log('cancel wait start loop');
-                me.restartOnInitError = false;
-                me.player.cancel();
-                globalCommandDispatcher.resetPlayButtonState();
-            });
-            let waitid = setTimeout(() => {
-                if (!me.renderer.warning.noWarning) {
-                    if (me.restartOnInitError) {
-                        console.log('me.restartOnInitError', me.restartOnInitError, waitid);
-                        me.realStartPlayLoop(from, position, to);
+        this.player.startLoopTicks(from, position, to, (msg) => {
+            if (msg) {
+                this.restartOnInitError = true;
+                this.renderer.warning.showWarning('Start playing', 'Loading...', '' + msg, () => {
+                    console.log('cancel wait start loop');
+                    this.restartOnInitError = false;
+                    this.player.cancel();
+                    globalCommandDispatcher.resetPlayButtonState();
+                });
+                let waitid = setTimeout(() => {
+                    if (!this.renderer.warning.noWarning) {
+                        if (this.restartOnInitError) {
+                            console.log('me.restartOnInitError', this.restartOnInitError, waitid);
+                            this.realStartPlayLoop(from, position, to);
+                        }
                     }
-                }
-            }, 1000);
-        }
-        else {
-            if (this.lastUsedSchedule) {
-                this.updatePluginHint(this.lastUsedSchedule);
+                }, 1000);
             }
-            this.renderer.warning.hideWarning();
-            this.setVisibleTimeMark();
-            this.renderer.menu.rerenderMenuContent(null);
-            this.resetProject();
-        }
-        globalCommandDispatcher.resetPlayButtonState();
+            else {
+                if (this.lastUsedSchedule) {
+                    this.updatePluginHint(this.lastUsedSchedule);
+                }
+                this.renderer.warning.hideWarning();
+                this.setVisibleTimeMark();
+                this.renderer.menu.rerenderMenuContent(null);
+                this.resetProject();
+            }
+            globalCommandDispatcher.resetPlayButtonState();
+        });
     }
     setThemeLocale(loc, ratio) {
         console.log("setThemeLocale", loc, ratio);

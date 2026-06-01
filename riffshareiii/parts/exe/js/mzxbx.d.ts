@@ -254,7 +254,7 @@ type MZXBX_Schedule = {
 type MZXBX_Player = {
     replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-    startLoopTicks: (from: number, position: number, to: number) => string;
+    startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
@@ -336,17 +336,21 @@ declare class SchedulePlayer implements MZXBX_Player {
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
     launchCollectedPlugins(): null | string;
     checkCollectedPlugins(): null | string;
-    startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number): string;
+    startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void;
     playState(): {
         connected: boolean;
         play: boolean;
         loading: boolean;
     };
-    launchCollectedFilters(onDone: (message: string | null) => void): void;
-    launchCollectedPerformers(onDone: (message: string | null) => void): void;
+    connectNextCollectedPerformer(nn: number, connectResult: (message: string | null) => void): void;
+    connectNextCollectedFilter(nn: number, connectResult: (message: string | null) => void): void;
+    launchNextCollectedFilter(nn: number, launchResult: (message: string | null) => void): void;
+    launchNextCollectedPerformer(nn: number, launchResult: (message: string | null) => void): void;
+    delayedStart(doTask: () => void): void;
     connectLaunchCollectedPlugins(onDone: (message: string | null) => void): void;
-    delayedStart(doTask: (message: string | null) => void, onDone: (message: string | null) => void, onFail: (message: string | null) => void): void;
-    connectAllPlugins(): string | null;
+    connectAllPlufffgins(): string | null;
+    connectAllPlugins(onDone: (message: string | null) => void): void;
+    connectAllPlugin222s(): string | null;
     disconnectAllPlugins(): void;
     doTick(loopStart: number, loopEnd: number, waitId: number): void;
     findPerformerSamplerPlugin(channel: MZXBX_Channel): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;

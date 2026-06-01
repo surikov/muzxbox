@@ -326,7 +326,8 @@ type MZXBX_Schedule = {
 type MZXBX_Player = {
 	replaceCurrentSchedule(schedule: MZXBX_Schedule):void;
 	startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-	startLoopTicks: (from: number, position: number, to: number) => string;
+	//startLoopTicks: (from: number, position: number, to: number) => string;
+	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void;
 	//reconnectAllPlugins111: (schedule: MZXBX_Schedule) => void;
 	cancel: () => void;
 	allFilters(): MZXBX_FilterHolder[];
