@@ -39,6 +39,7 @@ class SchedulePlayer implements MZXBX_Player {
 			this.audioContext = context;
 			this.schedule = schedule;
 			if (this.schedule) {
+				console.log('load plugins for',this.schedule);
 				let pluginLoader: PluginLoader = new PluginLoader();
 				let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
 				if (waitload) {
@@ -129,6 +130,7 @@ class SchedulePlayer implements MZXBX_Player {
 				onDone(msg);
 			} else {
 				if (this.audioContext) {
+					this.isConnected=true;
 					this.position = currentPosition;
 					this.isPlayLoop = true;
 					this.waitForID = Math.random();
@@ -457,6 +459,7 @@ class SchedulePlayer implements MZXBX_Player {
 				let master: AudioNode = this.audioContext.destination;
 				for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 					let filter = this.schedule.filters[ff];
+					console.log('disconnect',ff,filter);
 					let plugin = this.findFilterPlugin(filter.id);
 					if (plugin) {
 						let output = plugin.output();
@@ -486,6 +489,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 				for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 					let channel = this.schedule.channels[cc];
+					console.log('disconnect',cc,channel);
 					let plugin = this.findPerformerSamplerPlugin(channel);
 					if (plugin) {
 						let output = plugin.output();

@@ -111,6 +111,7 @@ class SchedulePlayer {
             this.audioContext = context;
             this.schedule = schedule;
             if (this.schedule) {
+                console.log('load plugins for', this.schedule);
                 let pluginLoader = new PluginLoader();
                 let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
                 if (waitload) {
@@ -192,6 +193,7 @@ class SchedulePlayer {
             }
             else {
                 if (this.audioContext) {
+                    this.isConnected = true;
                     this.position = currentPosition;
                     this.isPlayLoop = true;
                     this.waitForID = Math.random();
@@ -470,6 +472,7 @@ class SchedulePlayer {
                 let master = this.audioContext.destination;
                 for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
                     let filter = this.schedule.filters[ff];
+                    console.log('disconnect', ff, filter);
                     let plugin = this.findFilterPlugin(filter.id);
                     if (plugin) {
                         let output = plugin.output();
@@ -498,6 +501,7 @@ class SchedulePlayer {
                 }
                 for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                     let channel = this.schedule.channels[cc];
+                    console.log('disconnect', cc, channel);
                     let plugin = this.findPerformerSamplerPlugin(channel);
                     if (plugin) {
                         let output = plugin.output();

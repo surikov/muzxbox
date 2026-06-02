@@ -51,7 +51,7 @@ class SequencerPluginDialog {
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
 		globalCommandDispatcher.reStartPlayIfPlay(false);
-		//console.log('setSequencerOn done');
+		console.log('setSequencerOn',this.track.performer.state,this.track.title);
 	}
 	setSequencerMute() {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -60,6 +60,7 @@ class SequencerPluginDialog {
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
 		globalCommandDispatcher.reStartPlayIfPlay(false);
+		console.log('setSequencerMute',this.track.performer.state,this.track.title);
 	}
 	setSequencerSolo() {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -68,6 +69,7 @@ class SequencerPluginDialog {
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
 		globalCommandDispatcher.reStartPlayIfPlay(false);
+		console.log('setSequencerSolo',this.track.performer.state,this.track.title);
 	}
 	dropSequencer() {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {

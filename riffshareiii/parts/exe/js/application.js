@@ -873,6 +873,7 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay(false);
+        console.log('setSequencerOn', this.track.performer.state, this.track.title);
     }
     setSequencerMute() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -880,6 +881,7 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay(false);
+        console.log('setSequencerMute', this.track.performer.state, this.track.title);
     }
     setSequencerSolo() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -887,6 +889,7 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay(false);
+        console.log('setSequencerSolo', this.track.performer.state, this.track.title);
     }
     dropSequencer() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
@@ -1469,8 +1472,10 @@ class CommandDispatcher {
             };
             if ((soloOnly && sampler.sampler.state != 2)
                 || ((!soloOnly) && sampler.sampler.state == 1)) {
+                console.log('skip', sampler.title);
             }
             else {
+                console.log('add', sampler.title);
                 this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
             }
             forOutput.channels.push(mchannel);
@@ -1489,8 +1494,10 @@ class CommandDispatcher {
             };
             if ((soloOnly && track.performer.state != 2)
                 || ((!soloOnly) && track.performer.state == 1)) {
+                console.log('skip', track.title);
             }
             else {
+                console.log('add', track.title);
                 this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
             }
             forOutput.channels.push(mchannel);
@@ -1505,8 +1512,10 @@ class CommandDispatcher {
                 description: 'filter ' + filter.title
             };
             if (filter.state == 1) {
+                console.log('skip', filter.title);
             }
             else {
+                console.log('add', filter.title);
                 this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
             }
             forOutput.filters.push(outFilter);
@@ -1567,6 +1576,7 @@ class CommandDispatcher {
                 }
             }
         }
+        console.log('renderCurrentProjectForOutput', forOutput);
         return forOutput;
     }
     reStartPlayIfPlay(clearPluginCache) {

@@ -264,8 +264,9 @@ class CommandDispatcher {
 				(soloOnly && sampler.sampler.state != 2)
 				|| ((!soloOnly) && sampler.sampler.state == 1)
 			) {
-				//mchannel.outputs = [];
+				console.log('skip',sampler.title);
 			} else {
+				console.log('add',sampler.title);
 				this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
 			}
 			forOutput.channels.push(mchannel);
@@ -288,8 +289,9 @@ class CommandDispatcher {
 				(soloOnly && track.performer.state != 2)
 				|| ((!soloOnly) && track.performer.state == 1)
 			) {
-				//mchannel.outputs = [];
+				console.log('skip',track.title);
 			} else {
+				console.log('add',track.title);
 				this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
 			}
 			forOutput.channels.push(mchannel);
@@ -306,7 +308,9 @@ class CommandDispatcher {
 			}
 			if (filter.state == 1) {
 				//outFilter.outputs = [];
+				console.log('skip',filter.title);
 			} else {
+				console.log('add',filter.title);
 				this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
 			}
 			forOutput.filters.push(outFilter);
@@ -371,7 +375,7 @@ class CommandDispatcher {
 				}
 			}
 		}
-		//console.log('renderCurrentProjectForOutput', forOutput);
+		console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
 	/*reConnectPluginsIfPlay22222() {
@@ -422,6 +426,8 @@ class CommandDispatcher {
 		//console.log('setupAndStartPlay');
 		//this.onAir = true;
 		this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+		
+		//consol
 		let from = 0;
 		let to = 0;
 		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
