@@ -31,7 +31,7 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
 		//if (!(this.isPlayLoop || this.isLoadingPlugins)) {
 		if (this.isPlayLoop) {
-			console.log('startSetupPlugins Already playing');
+			//console.log('startSetupPlugins Already playing');
 			return 'Already playing';
 
 		} else {
@@ -39,7 +39,7 @@ class SchedulePlayer implements MZXBX_Player {
 			this.audioContext = context;
 			this.schedule = schedule;
 			if (this.schedule) {
-				console.log('load plugins for',this.schedule);
+				//console.log('load plugins for', this.schedule);
 				let pluginLoader: PluginLoader = new PluginLoader();
 				let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
 				if (waitload) {
@@ -86,7 +86,7 @@ class SchedulePlayer implements MZXBX_Player {
 			return null;
 		} catch (xx) {
 			let ermsg = 'Can not launch [' + trackName + '] due';
-			console.log(ermsg, xx);
+			//console.log(ermsg, xx);
 			return ermsg + ' ' + xx;
 		}
 	}
@@ -130,7 +130,7 @@ class SchedulePlayer implements MZXBX_Player {
 				onDone(msg);
 			} else {
 				if (this.audioContext) {
-					this.isConnected=true;
+					this.isConnected = true;
 					this.position = currentPosition;
 					this.isPlayLoop = true;
 					this.waitForID = Math.random();
@@ -193,6 +193,7 @@ class SchedulePlayer implements MZXBX_Player {
 				if (performer) {
 					let output = performer.output();
 					if (output) {
+						//console.log(nn, 'start connect channel', this.audioContext.currentTime);
 						for (let oo = 0; oo < channel.outputs.length; oo++) {
 							let outId = channel.outputs[oo];
 							let targetNode: AudioNode | null = this.audioContext.destination;
@@ -203,11 +204,15 @@ class SchedulePlayer implements MZXBX_Player {
 								}
 							}
 							if (targetNode) {
-								//console.log(nn, 'connect channel', channel.performer.kind);
+								//console.log(nn, 'connect channel', oo, channel.performer.kind, this.audioContext.currentTime);
 								output.connect(targetNode);
 							}
 						}
-						this.connectNextCollectedPerformer(nn + 1, connectResult);
+						//console.log(nn, 'next channel', this.audioContext.currentTime);
+						this.delayedStart(() => {
+							//console.log( (nn+1),'check channel', this.audioContext.currentTime);
+							this.connectNextCollectedPerformer(nn + 1, connectResult);
+						});
 					} else {
 						connectResult('No output for performer ' + nn + ' for ' + channel.performer.description);
 					}
@@ -242,11 +247,13 @@ class SchedulePlayer implements MZXBX_Player {
 								}
 							}
 							if (targetNode) {
-								//console.log(nn, 'connect filter', filter.kind);
+								//console.log(nn, 'connect filter', filter.kind, this.audioContext.currentTime);
 								pluginOutput.connect(targetNode);
 							}
 						}
-						this.connectNextCollectedFilter(nn - 1, connectResult);
+						this.delayedStart(() => {
+							this.connectNextCollectedFilter(nn - 1, connectResult);
+						});
 					} else {
 						connectResult('no filter output ' + nn);
 					}
@@ -302,6 +309,9 @@ class SchedulePlayer implements MZXBX_Player {
 		window.requestAnimationFrame(function (time) {
 			doTask();
 		});
+		/*setTimeout(() => {
+			doTask();
+		},1500);*/
 	}
 	connectLaunchCollectedPlugins(onDone: (message: string | null) => void) {
 		if (this.schedule) {
@@ -372,7 +382,9 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	connectAllPlufffgins(): string | null {
-		this.connectLaunchCollectedPlugins((message: string | null) => { console.log('connectAllPlugins', message); });
+		this.connectLaunchCollectedPlugins((message: string | null) => {
+			console.log('connectAllPlugins', message);
+		});
 		return 'test';
 	}
 	connectAllPlugins(onDone: (message: string | null) => void): void {
@@ -411,7 +423,7 @@ class SchedulePlayer implements MZXBX_Player {
 											}
 										}
 										if (targetNode) {
-											console.log(ff, 'connect filter', filter.kind);
+											//console.log(ff, 'connect filter', filter.kind);
 											pluginOutput.connect(targetNode);
 										}
 									}
@@ -435,7 +447,7 @@ class SchedulePlayer implements MZXBX_Player {
 											}
 										}
 										if (targetNode) {
-											console.log(cc, 'connect channel', channel.performer.kind);
+											//console.log(cc, 'connect channel', channel.performer.kind);
 											output.connect(targetNode);
 										}
 									}
@@ -459,7 +471,7 @@ class SchedulePlayer implements MZXBX_Player {
 				let master: AudioNode = this.audioContext.destination;
 				for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
 					let filter = this.schedule.filters[ff];
-					console.log('disconnect',ff,filter);
+					//console.log('disconnect', ff, filter);
 					let plugin = this.findFilterPlugin(filter.id);
 					if (plugin) {
 						let output = plugin.output();
@@ -477,7 +489,7 @@ class SchedulePlayer implements MZXBX_Player {
 										}
 									}
 									if (targetNode) {
-										console.log(oo, 'disconnect filter', filter.kind);
+										//console.log(oo, 'disconnect filter', filter.kind);
 										output.disconnect(targetNode);
 									}
 								}
@@ -489,7 +501,7 @@ class SchedulePlayer implements MZXBX_Player {
 				}
 				for (let cc = 0; cc < this.schedule.channels.length; cc++) {
 					let channel = this.schedule.channels[cc];
-					console.log('disconnect',cc,channel);
+					//console.log('disconnect', cc, channel);
 					let plugin = this.findPerformerSamplerPlugin(channel);
 					if (plugin) {
 						let output = plugin.output();
@@ -508,7 +520,7 @@ class SchedulePlayer implements MZXBX_Player {
 										}
 									}
 									if (targetNode) {
-										console.log(oo, 'disconnect channel', channel.performer.kind);
+										//console.log(oo, 'disconnect channel', channel.performer.kind);
 										output.disconnect(targetNode);
 									}
 								}

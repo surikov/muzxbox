@@ -103,7 +103,6 @@ class SchedulePlayer {
     startSetupPlugins(context, schedule) {
         console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
         if (this.isPlayLoop) {
-            console.log('startSetupPlugins Already playing');
             return 'Already playing';
         }
         else {
@@ -111,7 +110,6 @@ class SchedulePlayer {
             this.audioContext = context;
             this.schedule = schedule;
             if (this.schedule) {
-                console.log('load plugins for', this.schedule);
                 let pluginLoader = new PluginLoader();
                 let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
                 if (waitload) {
@@ -153,7 +151,6 @@ class SchedulePlayer {
         }
         catch (xx) {
             let ermsg = 'Can not launch [' + trackName + '] due';
-            console.log(ermsg, xx);
             return ermsg + ' ' + xx;
         }
     }
@@ -239,7 +236,9 @@ class SchedulePlayer {
                                 output.connect(targetNode);
                             }
                         }
-                        this.connectNextCollectedPerformer(nn + 1, connectResult);
+                        this.delayedStart(() => {
+                            this.connectNextCollectedPerformer(nn + 1, connectResult);
+                        });
                     }
                     else {
                         connectResult('No output for performer ' + nn + ' for ' + channel.performer.description);
@@ -282,7 +281,9 @@ class SchedulePlayer {
                                 pluginOutput.connect(targetNode);
                             }
                         }
-                        this.connectNextCollectedFilter(nn - 1, connectResult);
+                        this.delayedStart(() => {
+                            this.connectNextCollectedFilter(nn - 1, connectResult);
+                        });
                     }
                     else {
                         connectResult('no filter output ' + nn);
@@ -388,7 +389,9 @@ class SchedulePlayer {
         }
     }
     connectAllPlufffgins() {
-        this.connectLaunchCollectedPlugins((message) => { console.log('connectAllPlugins', message); });
+        this.connectLaunchCollectedPlugins((message) => {
+            console.log('connectAllPlugins', message);
+        });
         return 'test';
     }
     connectAllPlugins(onDone) {
@@ -424,7 +427,6 @@ class SchedulePlayer {
                                             }
                                         }
                                         if (targetNode) {
-                                            console.log(ff, 'connect filter', filter.kind);
                                             pluginOutput.connect(targetNode);
                                         }
                                     }
@@ -447,7 +449,6 @@ class SchedulePlayer {
                                             }
                                         }
                                         if (targetNode) {
-                                            console.log(cc, 'connect channel', channel.performer.kind);
                                             output.connect(targetNode);
                                         }
                                     }
@@ -472,7 +473,6 @@ class SchedulePlayer {
                 let master = this.audioContext.destination;
                 for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
                     let filter = this.schedule.filters[ff];
-                    console.log('disconnect', ff, filter);
                     let plugin = this.findFilterPlugin(filter.id);
                     if (plugin) {
                         let output = plugin.output();
@@ -488,7 +488,6 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        console.log(oo, 'disconnect filter', filter.kind);
                                         output.disconnect(targetNode);
                                     }
                                 }
@@ -501,7 +500,6 @@ class SchedulePlayer {
                 }
                 for (let cc = 0; cc < this.schedule.channels.length; cc++) {
                     let channel = this.schedule.channels[cc];
-                    console.log('disconnect', cc, channel);
                     let plugin = this.findPerformerSamplerPlugin(channel);
                     if (plugin) {
                         let output = plugin.output();
@@ -518,7 +516,6 @@ class SchedulePlayer {
                                         }
                                     }
                                     if (targetNode) {
-                                        console.log(oo, 'disconnect channel', channel.performer.kind);
                                         output.disconnect(targetNode);
                                     }
                                 }

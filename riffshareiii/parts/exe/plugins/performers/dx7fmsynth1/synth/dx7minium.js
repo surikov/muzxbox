@@ -37,25 +37,35 @@ function newDX7FMSynth1() {
     ];
     class MiniumFMOperator {
         constructor(cntxt) {
+            this.connectFlag = false;
             this.audioContext = cntxt;
-            this.output = this.audioContext.createGain();
+            this.operatorOutput = this.audioContext.createGain();
             this.modulationLevel = this.audioContext.createGain();
             this.feedbackLevel = this.audioContext.createGain();
             this.envelope = this.audioContext.createGain();
             this.phaseDelay = this.audioContext.createDelay();
             this.compensateNegativeDelay = this.audioContext.createConstantSource();
             this.carrier = this.audioContext.createOscillator();
-            this.envelope.connect(this.output);
-            this.phaseDelay.connect(this.envelope);
-            this.modulationLevel.connect(this.phaseDelay.delayTime);
-            this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
-            this.feedbackLevel.connect(this.phaseDelay.delayTime);
-            this.carrier.connect(this.phaseDelay);
-            this.output.gain.value = 0;
+            this.connectNodes();
+            this.operatorOutput.gain.value = 0;
             this.phaseDelay.delayTime.value = 0;
             this.envelope.gain.value = 0;
             this.compensateNegativeDelay.start(this.audioContext.currentTime);
             this.carrier.start(this.audioContext.currentTime);
+        }
+        connectNodes() {
+            if (!this.connectFlag) {
+                this.envelope.connect(this.operatorOutput);
+                this.phaseDelay.connect(this.envelope);
+                this.modulationLevel.connect(this.phaseDelay.delayTime);
+                this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+                this.feedbackLevel.connect(this.phaseDelay.delayTime);
+                this.carrier.connect(this.phaseDelay);
+                this.connectFlag = true;
+            }
+            else {
+                console.log('wrong connectNodes');
+            }
         }
         addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
             this.carrier.frequency.linearRampToValueAtTime(frequency, when);
@@ -75,7 +85,7 @@ function newDX7FMSynth1() {
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
             this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
-            this.output.gain.value = info.volume;
+            this.operatorOutput.gain.value = info.volume;
         }
         cancelOperator() {
             this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
@@ -89,9 +99,9 @@ function newDX7FMSynth1() {
         constructor(mixID, audioContext, to) {
             this.locktime = 0;
             this.mixID = mixID;
+            this.mixOutput = to;
             this.audioContext = audioContext;
             this.output = this.audioContext.createGain();
-            this.output.connect(to);
             this.operators = [
                 new MiniumFMOperator(this.audioContext),
                 new MiniumFMOperator(this.audioContext),
@@ -104,34 +114,40 @@ function newDX7FMSynth1() {
         }
         disonnectOperators() {
             for (let ii = 0; ii < 6; ii++) {
-                this.operators[ii].output.disconnect();
+                this.operators[ii].operatorOutput.disconnect();
             }
             this.mixID = 0;
+            this.output.disconnect();
         }
         connectOperators() {
             let mix = matrixConnectionAlgorithmsDX7[this.mixID - 1];
+            console.log('connectOperators mix', this.mixID, mix);
             for (let cid = 0; cid < mix.modulationMatrix.length; cid++) {
                 let carrier = this.operators[cid];
                 let modulatorIds = mix.modulationMatrix[cid];
                 for (let mm = 0; mm < modulatorIds.length; mm++) {
                     let mid = modulatorIds[mm];
                     let modulator = this.operators[mid];
-                    modulator.output.connect(carrier.modulationLevel);
+                    console.log('modulator', mid, 'to', cid);
+                    modulator.operatorOutput.connect(carrier.modulationLevel);
                 }
             }
             for (let cid = 0; cid < mix.feedbackMatrix.length; cid++) {
                 let carrier = this.operators[cid];
-                let fbIds = mix.modulationMatrix[cid];
+                let fbIds = mix.feedbackMatrix[cid];
                 for (let ff = 0; ff < fbIds.length; ff++) {
                     let fid = fbIds[ff];
                     let fbmodulator = this.operators[fid];
-                    fbmodulator.output.connect(carrier.feedbackLevel);
+                    console.log('feedback', cid, 'from', fid);
+                    fbmodulator.operatorOutput.connect(carrier.feedbackLevel);
                 }
             }
             for (let ii = 0; ii < mix.outputMix.length; ii++) {
                 let outIdx = mix.outputMix[ii];
-                this.operators[outIdx].output.connect(this.output);
+                console.log('output', outIdx);
+                this.operators[outIdx].operatorOutput.connect(this.output);
             }
+            this.output.connect(this.mixOutput);
         }
         startPlayNote(volume, preset, when, note, slides) {
             this.output.gain.value = 0.33 * volume / 100;
