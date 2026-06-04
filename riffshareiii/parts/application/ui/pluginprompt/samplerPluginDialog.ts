@@ -49,7 +49,7 @@ class SamplerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	setDrumMute() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
@@ -57,7 +57,7 @@ class SamplerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	setDrumSolo() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
@@ -65,7 +65,7 @@ class SamplerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	dropDrum() {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
@@ -73,7 +73,7 @@ class SamplerPluginDialog {
 		});
 		this.closeDrumDialogFrame();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack) {
 		this.drum = drum;
@@ -138,7 +138,7 @@ class SamplerPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
 			this.drum.sampler.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	receiveMessageFromSamplerPlugin(event) {
 		//console.log('receiveMessageFromPlugin', event);

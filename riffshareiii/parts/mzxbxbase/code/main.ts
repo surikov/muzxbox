@@ -11,13 +11,13 @@ class MuzXbox {
 		this.initAfterLoad();
 	}
 	initAfterLoad() {
-		console.log("MuzXbox loaded");
+		//console.log("MuzXbox loaded");
 	}
 	initFromUI() {
 		if (this.uiStarted) {
-			console.log("skip initFromUI");
+			//console.log("skip initFromUI");
 		} else {
-			console.log("start initFromUI");
+			//console.log("start initFromUI");
 			this.initAudioContext();
 			this.songslide = document.getElementById('songslide') as HTMLInputElement;
 			if (this.songslide) {
@@ -25,7 +25,7 @@ class MuzXbox {
 				this.updateSongSlider();
 				this.songslide.onchange = function (changeEvent: Event) {
 					if (me.songslide) {
-						console.log('changeEvent', changeEvent, me.songslide.value);
+						//console.log('changeEvent', changeEvent, me.songslide.value);
 						me.updatePosition(parseFloat(me.songslide.value));
 					}
 				};
@@ -59,7 +59,7 @@ class MuzXbox {
 	initAudioContext() {
 		let AudioContextFunc = (window as any).AudioContext || (window as any).webkitAudioContext;
 		this.audioContext = new AudioContextFunc();
-		console.log(this.audioContext);
+		//console.log(this.audioContext);
 		if (this.audioContext.state == "running") {
 			this.uiStarted = true;
 		} else {

@@ -50,7 +50,7 @@ class SequencerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 		console.log('setSequencerOn',this.track.performer.state,this.track.title);
 	}
 	setSequencerMute() {
@@ -59,7 +59,7 @@ class SequencerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 		console.log('setSequencerMute',this.track.performer.state,this.track.title);
 	}
 	setSequencerSolo() {
@@ -68,7 +68,7 @@ class SequencerPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 		console.log('setSequencerSolo',this.track.performer.state,this.track.title);
 	}
 	dropSequencer() {
@@ -77,7 +77,7 @@ class SequencerPluginDialog {
 		});
 		this.closeSequencerDialogFrame();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	openEmptySequencerPluginDialogFrame(order: number, track: Zvoog_MusicTrack) {
 
@@ -161,7 +161,7 @@ class SequencerPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
 			this.track.performer.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	receiveMessageFromPlugin(event) {
 		//console.log('sequencer receiveMessageFromPlugin', event);

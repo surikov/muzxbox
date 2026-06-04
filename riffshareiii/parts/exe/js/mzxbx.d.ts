@@ -348,7 +348,6 @@ declare class SchedulePlayer implements MZXBX_Player {
     launchNextCollectedPerformer(nn: number, launchResult: (message: string | null) => void): void;
     delayedStart(doTask: () => void): void;
     connectLaunchCollectedPlugins(onDone: (message: string | null) => void): void;
-    connectAllPlufffgins(): string | null;
     connectAllPlugins(onDone: (message: string | null) => void): void;
     connectAllPlugin222s(): string | null;
     disconnectAllPlugins(): void;

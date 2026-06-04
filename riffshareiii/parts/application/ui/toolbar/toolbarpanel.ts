@@ -33,7 +33,7 @@ class UIToolbar {
 			globalCommandDispatcher.exe.undo(1);
 		});
 		this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn: number) => {
-			console.log('playStopButton', globalCommandDispatcher.player.playState());
+			//console.log('playStopButton', globalCommandDispatcher.player.playState());
 			//globalCommandDispatcher.toggleStartStop();
 			if (globalCommandDispatcher.player.playState().play) {
 				globalCommandDispatcher.stopPlay();

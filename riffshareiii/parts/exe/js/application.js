@@ -432,14 +432,14 @@ class FilterPluginDialog {
             this.filter.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     setFilterPass() {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
             this.filter.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     dropFilter() {
         globalCommandDispatcher.exe.commitProjectChanges([], () => {
@@ -459,7 +459,7 @@ class FilterPluginDialog {
             }
         });
         this.closeFilterDialogFrame();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     openEmptyFilterPluginDialogFrame(order, filter) {
         this.filter = filter;
@@ -524,7 +524,7 @@ class FilterPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
             this.filter.data = this.pluginRawData;
         });
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromFilterPlugin(event) {
         if (!(event.data)) {
@@ -601,28 +601,28 @@ class SamplerPluginDialog {
             this.drum.sampler.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     setDrumMute() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     setDrumSolo() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.state = 2;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     dropDrum() {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
             globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
         });
         this.closeDrumDialogFrame();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     openEmptyDrumPluginDialogFrame(order, drum) {
         this.drum = drum;
@@ -683,7 +683,7 @@ class SamplerPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
             this.drum.sampler.data = this.pluginRawData;
         });
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromSamplerPlugin(event) {
         if (!(event.data)) {
@@ -772,7 +772,7 @@ class ActionPluginDialog {
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             globalCommandDispatcher.registerWorkProject(project);
                             globalCommandDispatcher.resetProject();
-                            globalCommandDispatcher.reStartPlayIfPlay(false);
+                            globalCommandDispatcher.reStartPlayIfPlay();
                         });
                     }
                     if (message.done) {
@@ -872,7 +872,7 @@ class SequencerPluginDialog {
             this.track.performer.state = 0;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
         console.log('setSequencerOn', this.track.performer.state, this.track.title);
     }
     setSequencerMute() {
@@ -880,7 +880,7 @@ class SequencerPluginDialog {
             this.track.performer.state = 1;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
         console.log('setSequencerMute', this.track.performer.state, this.track.title);
     }
     setSequencerSolo() {
@@ -888,7 +888,7 @@ class SequencerPluginDialog {
             this.track.performer.state = 2;
         });
         this.resetStateButtons();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
         console.log('setSequencerSolo', this.track.performer.state, this.track.title);
     }
     dropSequencer() {
@@ -896,7 +896,7 @@ class SequencerPluginDialog {
             globalCommandDispatcher.cfg().data.tracks.splice(this.order, 1);
         });
         this.closeSequencerDialogFrame();
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     openEmptySequencerPluginDialogFrame(order, track) {
         this.track = track;
@@ -967,7 +967,7 @@ class SequencerPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
             this.track.performer.data = this.pluginRawData;
         });
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveMessageFromPlugin(event) {
         if (!(event.data)) {
@@ -1069,7 +1069,7 @@ class PointPluginDialog {
         globalCommandDispatcher.exe.commitProjectChanges(['filters', this.filterIdx, 'automation', this.barIdx], () => {
             this.pluginPoint.stateBlob = data;
         });
-        globalCommandDispatcher.reStartPlayIfPlay(false);
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     receiveAutoMessageFromPlugin(event) {
         if (!(event.data)) {
@@ -1472,10 +1472,8 @@ class CommandDispatcher {
             };
             if ((soloOnly && sampler.sampler.state != 2)
                 || ((!soloOnly) && sampler.sampler.state == 1)) {
-                console.log('skip', sampler.title);
             }
             else {
-                console.log('add', sampler.title);
                 this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
             }
             forOutput.channels.push(mchannel);
@@ -1494,10 +1492,8 @@ class CommandDispatcher {
             };
             if ((soloOnly && track.performer.state != 2)
                 || ((!soloOnly) && track.performer.state == 1)) {
-                console.log('skip', track.title);
             }
             else {
-                console.log('add', track.title);
                 this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
             }
             forOutput.channels.push(mchannel);
@@ -1512,10 +1508,8 @@ class CommandDispatcher {
                 description: 'filter ' + filter.title
             };
             if (filter.state == 1) {
-                console.log('skip', filter.title);
             }
             else {
-                console.log('add', filter.title);
                 this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
             }
             forOutput.filters.push(outFilter);
@@ -1576,22 +1570,14 @@ class CommandDispatcher {
                 }
             }
         }
-        console.log('renderCurrentProjectForOutput', forOutput);
         return forOutput;
     }
-    reStartPlayIfPlay(clearPluginCache) {
-        if (this.player.playState().play) {
-            console.log('reStartPlayIfPlay');
-            this.stopPlay();
-            if (clearPluginCache) {
-                globalCommandDispatcher.player.clearPluginsCache();
-            }
-            this.setupAndStartPlay();
-        }
-        else {
-            if (clearPluginCache) {
-                globalCommandDispatcher.player.clearPluginsCache();
-            }
+    reStartPlayIfPlay() {
+        if (globalCommandDispatcher.player.playState().play) {
+            globalCommandDispatcher.stopPlay();
+            setTimeout(() => {
+                globalCommandDispatcher.setupAndStartPlay();
+            }, 123);
         }
     }
     stopPlay() {
@@ -1602,6 +1588,7 @@ class CommandDispatcher {
         globalCommandDispatcher.resetPlayButtonState();
     }
     setupAndStartPlay() {
+        console.log('setupAndStartPlay');
         this.lastUsedSchedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
@@ -1661,7 +1648,6 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
         let me = this;
         setTimeout(() => {
             this.realStartPlayLoop(from, position, to);
@@ -1680,7 +1666,6 @@ class CommandDispatcher {
                 let waitid = setTimeout(() => {
                     if (!this.renderer.warning.noWarning) {
                         if (this.restartOnInitError) {
-                            console.log('me.restartOnInitError', this.restartOnInitError, waitid);
                             this.realStartPlayLoop(from, position, to);
                         }
                     }
@@ -2300,7 +2285,6 @@ class CommandDispatcher {
         this.adjustTimeLineLength(project);
     }
     resetPlayButtonState() {
-        console.log('resetPlayButtonState', this.player.playState());
         if (this.player)
             if (this.player.playState().play) {
                 this.renderer.toolbar.playStopButton.iconLabelButton.selection = 0;
@@ -2799,7 +2783,6 @@ class UIToolbar {
             globalCommandDispatcher.exe.undo(1);
         });
         this.playStopButton = new ToolBarButton([icon_pause, icon_play], 0, 1.5, (nn) => {
-            console.log('playStopButton', globalCommandDispatcher.player.playState());
             if (globalCommandDispatcher.player.playState().play) {
                 globalCommandDispatcher.stopPlay();
             }
@@ -3857,7 +3840,7 @@ function fillPluginsLists() {
                             let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
                             globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
                             console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
-                            globalCommandDispatcher.reStartPlayIfPlay(true);
+                            globalCommandDispatcher.reStartPlayIfPlay();
                         }
                         else {
                             let xx = dx;

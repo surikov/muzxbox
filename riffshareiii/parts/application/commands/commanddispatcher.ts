@@ -264,9 +264,9 @@ class CommandDispatcher {
 				(soloOnly && sampler.sampler.state != 2)
 				|| ((!soloOnly) && sampler.sampler.state == 1)
 			) {
-				console.log('skip',sampler.title);
+				//console.log('skip', sampler.title);
 			} else {
-				console.log('add',sampler.title);
+				//console.log('add', sampler.title);
 				this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
 			}
 			forOutput.channels.push(mchannel);
@@ -289,9 +289,9 @@ class CommandDispatcher {
 				(soloOnly && track.performer.state != 2)
 				|| ((!soloOnly) && track.performer.state == 1)
 			) {
-				console.log('skip',track.title);
+				//console.log('skip', track.title);
 			} else {
-				console.log('add',track.title);
+				//console.log('add', track.title);
 				this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
 			}
 			forOutput.channels.push(mchannel);
@@ -308,9 +308,9 @@ class CommandDispatcher {
 			}
 			if (filter.state == 1) {
 				//outFilter.outputs = [];
-				console.log('skip',filter.title);
+				//console.log('skip', filter.title);
 			} else {
-				console.log('add',filter.title);
+				//console.log('add', filter.title);
 				this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
 			}
 			forOutput.filters.push(outFilter);
@@ -375,7 +375,7 @@ class CommandDispatcher {
 				}
 			}
 		}
-		console.log('renderCurrentProjectForOutput', forOutput);
+		//console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
 	/*reConnectPluginsIfPlay22222() {
@@ -386,7 +386,15 @@ class CommandDispatcher {
 			this.player.reconnectAllPlugins(schedule);
 		}
 	}*/
-	reStartPlayIfPlay(clearPluginCache: boolean) {
+	reStartPlayIfPlay() {//clearPluginCache: boolean) {
+		if (globalCommandDispatcher.player.playState().play) {
+			globalCommandDispatcher.stopPlay();
+			setTimeout(() => {
+				globalCommandDispatcher.setupAndStartPlay();
+			}, 123);
+
+		}
+		/*
 		if (this.player.playState().play) {
 			console.log('reStartPlayIfPlay');
 			this.stopPlay();
@@ -399,7 +407,7 @@ class CommandDispatcher {
 				globalCommandDispatcher.player.clearPluginsCache();
 			}
 		}
-
+*/
 	}
 	/*toggleStartStop() {
 		//console.log('toggleStartStop', this.onAir);
@@ -423,10 +431,17 @@ class CommandDispatcher {
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		//console.log('setupAndStartPlay');
+		console.log('setupAndStartPlay');
+		//console.log(this.cfg().data.tracks[0].performer.state);
+		/*if (this.cfg().data.tracks[0].performer.state) {
+			this.cfg().data.tracks[0].performer.state = 0;
+		} else {
+			this.cfg().data.tracks[0].performer.state = 2;
+		}*/
+		//console.log(this.cfg().data.tracks[0].performer.state);
 		//this.onAir = true;
 		this.lastUsedSchedule = this.renderCurrentProjectForOutput();
-		
+
 		//consol
 		let from = 0;
 		let to = 0;
@@ -502,7 +517,7 @@ class CommandDispatcher {
 		//console.log('updatePluginHint', this.cfg().data);
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop', from, position, to);
+		//console.log('startPlayLoop', from, position, to);
 		let me = this;
 		setTimeout(() => {
 			this.realStartPlayLoop(from, position, to);
@@ -522,7 +537,7 @@ class CommandDispatcher {
 				let waitid = setTimeout(() => {
 					if (!this.renderer.warning.noWarning) {
 						if (this.restartOnInitError) {
-							console.log('me.restartOnInitError', this.restartOnInitError, waitid);
+							//console.log('me.restartOnInitError', this.restartOnInitError, waitid);
 							this.realStartPlayLoop(from, position, to);
 						}
 					}
@@ -1483,7 +1498,7 @@ class CommandDispatcher {
 		this.adjustTimeLineLength(project);
 	}
 	resetPlayButtonState() {
-		console.log('resetPlayButtonState', this.player.playState());
+		//console.log('resetPlayButtonState', this.player.playState());
 		if (this.player)
 			if (this.player.playState().play) {
 				this.renderer.toolbar.playStopButton.iconLabelButton.selection = 0;

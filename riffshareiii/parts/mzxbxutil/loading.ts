@@ -1,5 +1,5 @@
 function MZXBX_appendScriptURL(url: string): boolean {
-	console.log('MZXBX_appendScriptURL', url);
+	//console.log('MZXBX_appendScriptURL', url);
 	let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
 	//console.log('MZXBX_appendScriptURL',url,'scripts',scripts);
 	for (let ii = 0; ii < scripts.length; ii++) {

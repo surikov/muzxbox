@@ -7,14 +7,11 @@ class MuzXbox {
         this.initAfterLoad();
     }
     initAfterLoad() {
-        console.log("MuzXbox loaded");
     }
     initFromUI() {
         if (this.uiStarted) {
-            console.log("skip initFromUI");
         }
         else {
-            console.log("start initFromUI");
             this.initAudioContext();
             this.songslide = document.getElementById('songslide');
             if (this.songslide) {
@@ -22,7 +19,6 @@ class MuzXbox {
                 this.updateSongSlider();
                 this.songslide.onchange = function (changeEvent) {
                     if (me.songslide) {
-                        console.log('changeEvent', changeEvent, me.songslide.value);
                         me.updatePosition(parseFloat(me.songslide.value));
                     }
                 };
@@ -56,7 +52,6 @@ class MuzXbox {
     initAudioContext() {
         let AudioContextFunc = window.AudioContext || window.webkitAudioContext;
         this.audioContext = new AudioContextFunc();
-        console.log(this.audioContext);
         if (this.audioContext.state == "running") {
             this.uiStarted = true;
         }
@@ -101,7 +96,6 @@ class SchedulePlayer {
         this.filterHolders.length = 0;
     }
     startSetupPlugins(context, schedule) {
-        console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
         if (this.isPlayLoop) {
             return 'Already playing';
         }
@@ -197,7 +191,6 @@ class SchedulePlayer {
                     setTimeout(() => {
                         this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
                         this.doTick(loopStart, loopEnd, this.waitForID);
-                        console.log('started doTick');
                     }, 100);
                     onDone(null);
                 }
@@ -388,16 +381,11 @@ class SchedulePlayer {
             onDone('no schedule');
         }
     }
-    connectAllPlufffgins() {
-        this.connectLaunchCollectedPlugins((message) => {
-            console.log('connectAllPlugins', message);
-        });
-        return 'test';
-    }
     connectAllPlugins(onDone) {
         this.connectLaunchCollectedPlugins(onDone);
     }
     connectAllPlugin222s() {
+        console.log('connectAllPlugins');
         if (!this.isConnected) {
             let msg = this.launchCollectedPlugins();
             if (msg) {

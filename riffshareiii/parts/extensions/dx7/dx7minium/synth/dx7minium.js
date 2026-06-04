@@ -64,7 +64,6 @@ function newDX7FMSynth1() {
                 this.connectFlag = true;
             }
             else {
-                console.log('wrong connectNodes');
             }
         }
         addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
@@ -112,23 +111,14 @@ function newDX7FMSynth1() {
             ];
             this.connectOperators();
         }
-        disonnectOperators() {
-            for (let ii = 0; ii < 6; ii++) {
-                this.operators[ii].operatorOutput.disconnect();
-            }
-            this.mixID = 0;
-            this.output.disconnect();
-        }
         connectOperators() {
             let mix = matrixConnectionAlgorithmsDX7[this.mixID - 1];
-            console.log('connectOperators mix', this.mixID, mix);
             for (let cid = 0; cid < mix.modulationMatrix.length; cid++) {
                 let carrier = this.operators[cid];
                 let modulatorIds = mix.modulationMatrix[cid];
                 for (let mm = 0; mm < modulatorIds.length; mm++) {
                     let mid = modulatorIds[mm];
                     let modulator = this.operators[mid];
-                    console.log('modulator', mid, 'to', cid);
                     modulator.operatorOutput.connect(carrier.modulationLevel);
                 }
             }
@@ -138,13 +128,11 @@ function newDX7FMSynth1() {
                 for (let ff = 0; ff < fbIds.length; ff++) {
                     let fid = fbIds[ff];
                     let fbmodulator = this.operators[fid];
-                    console.log('feedback', cid, 'from', fid);
                     fbmodulator.operatorOutput.connect(carrier.feedbackLevel);
                 }
             }
             for (let ii = 0; ii < mix.outputMix.length; ii++) {
                 let outIdx = mix.outputMix[ii];
-                console.log('output', outIdx);
                 this.operators[outIdx].operatorOutput.connect(this.output);
             }
             this.output.connect(this.mixOutput);
@@ -199,27 +187,9 @@ function newDX7FMSynth1() {
             this.audioContext = audioContext;
             this.mixOutput = this.audioContext.createGain();
         }
-        checkCache() {
-            if (this.cache.length > 25) {
-                for (let ii = 0; ii < this.cache.length; ii++) {
-                    if (this.cache[ii].locktime < this.audioContext.currentTime) {
-                        this.cache[ii].disonnectOperators();
-                        this.cache[ii].mixID = 0;
-                    }
-                }
-            }
-        }
         takeVox(mxid) {
-            this.checkCache();
             for (let ii = 0; ii < this.cache.length; ii++) {
                 if (this.cache[ii].locktime < this.audioContext.currentTime && mxid == this.cache[ii].mixID) {
-                    return this.cache[ii];
-                }
-            }
-            for (let ii = 0; ii < this.cache.length; ii++) {
-                if (this.cache[ii].locktime < this.audioContext.currentTime && this.cache[ii].mixID == 0) {
-                    this.cache[ii].mixID = mxid;
-                    this.cache[ii].connectOperators();
                     return this.cache[ii];
                 }
             }

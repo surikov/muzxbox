@@ -188,7 +188,7 @@ declare class CommandDispatcher {
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
     updateSingleBarPlayerSchedule(barNo: number): void;
     renderCurrentProjectForOutput(): MZXBX_Schedule;
-    reStartPlayIfPlay(clearPluginCache: boolean): void;
+    reStartPlayIfPlay(): void;
     stopPlay(): void;
     setupAndStartPlay(): void;
     updatePluginHint(schedule: MZXBX_Schedule): void;

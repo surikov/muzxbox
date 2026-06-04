@@ -75,7 +75,7 @@ class ActionPluginDialog {
 							//console.log('set 2',JSON.stringify(project.tracks[0].measures[33]));
 							globalCommandDispatcher.resetProject();
 							//console.log('set 3',JSON.stringify(project.tracks[0].measures[33]));
-							globalCommandDispatcher.reStartPlayIfPlay(false);
+							globalCommandDispatcher.reStartPlayIfPlay();//false);
 							//console.log('set 33',project.tracks[0].measures[33],JSON.stringify(project.tracks[0].measures[33]));
 						});
 					}

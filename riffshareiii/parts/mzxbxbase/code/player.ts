@@ -28,7 +28,7 @@ class SchedulePlayer implements MZXBX_Player {
 		this.filterHolders.length = 0;
 	}
 	startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string {
-		console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
+		//console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
 		//if (!(this.isPlayLoop || this.isLoadingPlugins)) {
 		if (this.isPlayLoop) {
 			//console.log('startSetupPlugins Already playing');
@@ -137,7 +137,7 @@ class SchedulePlayer implements MZXBX_Player {
 					setTimeout(() => {
 						this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
 						this.doTick(loopStart, loopEnd, this.waitForID);
-						console.log('started doTick');
+						//console.log('started doTick');
 					}, 100);
 					onDone(null);
 				} else {
@@ -381,17 +381,17 @@ class SchedulePlayer implements MZXBX_Player {
 			onDone('no schedule');
 		}
 	}
-	connectAllPlufffgins(): string | null {
+	/*connectAllPlufffgins(): string | null {
 		this.connectLaunchCollectedPlugins((message: string | null) => {
 			console.log('connectAllPlugins', message);
 		});
 		return 'test';
-	}
+	}*/
 	connectAllPlugins(onDone: (message: string | null) => void): void {
 		this.connectLaunchCollectedPlugins(onDone);
 	}
 	connectAllPlugin222s(): string | null {
-		//console.log('connectAllPlugins');
+		console.log('connectAllPlugins');
 		if (!this.isConnected) {
 			let msg: string | null = this.launchCollectedPlugins();
 			//console.log('launchCollectedPlugins', msg);

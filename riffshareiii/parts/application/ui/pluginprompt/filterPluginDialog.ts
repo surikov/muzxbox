@@ -41,7 +41,7 @@ class FilterPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	setFilterPass() {
 		globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
@@ -49,7 +49,7 @@ class FilterPluginDialog {
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	dropFilter() {
 		globalCommandDispatcher.exe.commitProjectChanges([], () => {
@@ -70,7 +70,7 @@ class FilterPluginDialog {
 		});
 		this.closeFilterDialogFrame();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	openEmptyFilterPluginDialogFrame(order: number, filter: Zvoog_FilterTarget) {
 		//console.log('openFilterPluginDialogFrame');
@@ -140,7 +140,7 @@ class FilterPluginDialog {
 		globalCommandDispatcher.exe.commitProjectChanges(['filters', this.order], () => {
 			this.filter.data = this.pluginRawData;
 		});
-		globalCommandDispatcher.reStartPlayIfPlay(false);
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
 	receiveMessageFromFilterPlugin(event) {
 		//console.log('filter receiveMessageFromPlugin', event);
