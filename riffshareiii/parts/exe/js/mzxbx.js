@@ -178,12 +178,15 @@ class SchedulePlayer {
         return null;
     }
     startLoopTicks(loopStart, currentPosition, loopEnd, onDone) {
+        console.log('startLoopTicks start');
         this.connectAllPlugins((msg) => {
+            console.log('startLoopTicks connected');
             if (msg) {
                 onDone(msg);
             }
             else {
                 if (this.audioContext) {
+                    console.log('startLoopTicks ready');
                     this.isConnected = true;
                     this.position = currentPosition;
                     this.isPlayLoop = true;
@@ -192,6 +195,7 @@ class SchedulePlayer {
                         this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
                         this.doTick(loopStart, loopEnd, this.waitForID);
                     }, 100);
+                    console.log('startLoopTicks done');
                     onDone(null);
                 }
                 else {
@@ -677,7 +681,9 @@ class PluginLoader {
         return result;
     }
     startLoadCollectedPlugins(filters, performers) {
+        console.log('startLoadCollectedPlugins filters');
         for (let ff = 0; ff < filters.length; ff++) {
+            console.log(ff, filters[ff]);
             if (!(filters[ff].pluginAudioFilter)) {
                 let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers, (plugin) => {
                     filters[ff].pluginAudioFilter = plugin;
@@ -686,8 +692,13 @@ class PluginLoader {
                     return result;
                 }
             }
+            else {
+                console.log('skip', ff, filters[ff]);
+            }
         }
+        console.log('startLoadCollectedPlugins samplers/performers');
         for (let pp = 0; pp < performers.length; pp++) {
+            console.log(pp, performers[pp]);
             if (!(performers[pp].plugin)) {
                 let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers, (plugin) => {
                     performers[pp].plugin = plugin;
@@ -696,17 +707,22 @@ class PluginLoader {
                     return result;
                 }
             }
+            else {
+                console.log('skip', pp, performers[pp]);
+            }
         }
         return null;
     }
     startLoadPluginStarter(kind, filters, performers, onDone) {
         let tt = this.findPluginInfo(kind);
+        console.log('startLoadPluginStarter', kind, tt);
         if (tt) {
             let info = tt;
             MZXBX_appendScriptURL(info.script);
             MZXBX_waitForCondition(250, () => {
                 return (window[info.evaluate]);
             }, () => {
+                console.log('loaded', info.kind, info.evaluate);
                 let exe = window[info.evaluate];
                 let plugin = exe();
                 if (plugin) {

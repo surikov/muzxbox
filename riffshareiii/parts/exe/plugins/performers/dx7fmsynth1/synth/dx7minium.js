@@ -37,7 +37,6 @@ function newDX7FMSynth1() {
     ];
     class MiniumFMOperator {
         constructor(cntxt) {
-            this.connectFlag = false;
             this.audioContext = cntxt;
             this.operatorOutput = this.audioContext.createGain();
             this.modulationLevel = this.audioContext.createGain();
@@ -54,17 +53,12 @@ function newDX7FMSynth1() {
             this.carrier.start(this.audioContext.currentTime);
         }
         connectNodes() {
-            if (!this.connectFlag) {
-                this.envelope.connect(this.operatorOutput);
-                this.phaseDelay.connect(this.envelope);
-                this.modulationLevel.connect(this.phaseDelay.delayTime);
-                this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
-                this.feedbackLevel.connect(this.phaseDelay.delayTime);
-                this.carrier.connect(this.phaseDelay);
-                this.connectFlag = true;
-            }
-            else {
-            }
+            this.envelope.connect(this.operatorOutput);
+            this.phaseDelay.connect(this.envelope);
+            this.modulationLevel.connect(this.phaseDelay.delayTime);
+            this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+            this.feedbackLevel.connect(this.phaseDelay.delayTime);
+            this.carrier.connect(this.phaseDelay);
         }
         addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
             this.carrier.frequency.linearRampToValueAtTime(frequency, when);
@@ -72,19 +66,19 @@ function newDX7FMSynth1() {
             this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
         }
-        startPlayFrequency(info, when, duration, frequency, modulationRatio, feedbackRatio) {
+        startPlayFrequency(volume, attack, decay, sustain, release, when, duration, frequency, modulationRatio, feedbackRatio) {
             this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
-            this.envelope.gain.setValueAtTime(this.audioContext.currentTime, when);
-            this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
-            this.envelope.gain.setValueCurveAtTime(info.envelope.decay.values, when + info.envelope.attack.duration, info.envelope.decay.duration);
-            this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
+            this.envelope.gain.setValueAtTime(0, this.audioContext.currentTime);
+            this.envelope.gain.setValueCurveAtTime(attack.values, when, attack.duration);
+            this.envelope.gain.setValueCurveAtTime(decay.values, when + attack.duration, decay.duration);
+            this.envelope.gain.setValueCurveAtTime(sustain.values, when + attack.duration + decay.duration, sustain.duration);
             this.envelope.gain.cancelAndHoldAtTime(when + duration);
-            this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
+            this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
             this.carrier.frequency.value = frequency;
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
             this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
-            this.operatorOutput.gain.value = info.volume;
+            this.operatorOutput.gain.value = volume;
         }
         cancelOperator() {
             this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
@@ -153,7 +147,7 @@ function newDX7FMSynth1() {
                         if (preset.transpose < 0)
                             frequency = frequency * 0.5;
                     }
-                    this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
+                    this.operators[ii].startPlayFrequency(info.volume, info.envelope.attack, info.envelope.decay, info.envelope.sustain, info.envelope.release, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);
                     let otime = when + duration + info.envelope.release + 0.01;
                     if (this.locktime < otime) {
                         this.locktime = otime;
@@ -203,9 +197,14 @@ function newDX7FMSynth1() {
             }
         }
         scheduleStrum(volume, preset, when, pitches, slides) {
-            for (let ii = 0; ii < pitches.length; ii++) {
-                let vox = this.takeVox(preset.mixID);
-                vox.startPlayNote(volume, preset, when, pitches[ii], slides);
+            if (when > this.audioContext.currentTime + 0.05) {
+                for (let ii = 0; ii < pitches.length; ii++) {
+                    let vox = this.takeVox(preset.mixID);
+                    vox.startPlayNote(volume, preset, when, pitches[ii], slides);
+                }
+            }
+            else {
+                console.log(when, 'is too late for', this.audioContext.currentTime);
             }
         }
     }

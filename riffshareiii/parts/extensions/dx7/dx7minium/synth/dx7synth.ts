@@ -43,7 +43,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		carrier: OscillatorNode;
 		modulationLevel: GainNode;
 		envelope: GainNode;
-		connectFlag = false;
+		//connectFlag = false;
 		constructor(cntxt: AudioContext) {
 			this.audioContext = cntxt;
 			this.operatorOutput = this.audioContext.createGain();
@@ -63,17 +63,19 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.carrier.start(this.audioContext.currentTime);
 		}
 		connectNodes() {
-			if (!this.connectFlag) {
-				this.envelope.connect(this.operatorOutput);
-				this.phaseDelay.connect(this.envelope);
-				this.modulationLevel.connect(this.phaseDelay.delayTime);
-				this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
-				this.feedbackLevel.connect(this.phaseDelay.delayTime);
-				this.carrier.connect(this.phaseDelay);
-				this.connectFlag = true;
-			} else {
-				//console.log('wrong connectNodes');
-			}
+			//if (!this.connectFlag) {
+
+			this.envelope.connect(this.operatorOutput);
+			this.phaseDelay.connect(this.envelope);
+			this.modulationLevel.connect(this.phaseDelay.delayTime);
+			this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+			this.feedbackLevel.connect(this.phaseDelay.delayTime);
+			this.carrier.connect(this.phaseDelay);
+
+			//this.connectFlag = true;
+			//} else {
+			//console.log('wrong connectNodes');
+			//}
 
 		}
 		/*disconnectNodes() {
@@ -95,27 +97,37 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 		}
-		startPlayFrequency(info: OperatorInfo, when: number, duration: number, frequency: number, modulationRatio: number, feedbackRatio: number) {//}, slides: MZXBX_SlideItem[]) {
-			//this.connectNodes();
+		startPlayFrequency(volume: number, attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number, frequency: number, modulationRatio: number, feedbackRatio: number) {//}, slides: MZXBX_SlideItem[]) {
+			//console.log('startPlayFrequency', this.audioContext.currentTime, '<', when);
+			//if (when > this.audioContext.currentTime + 0.05) {
+			//console.log('op', when, 'after', this.audioContext.currentTime, attack, decay, sustain);
 			this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
-			this.envelope.gain.setValueAtTime(this.audioContext.currentTime, when);
-			this.envelope.gain.setValueCurveAtTime(info.envelope.attack.values, when, info.envelope.attack.duration);
+			this.envelope.gain.setValueAtTime(0, this.audioContext.currentTime);
+			//console.log('attack', when, when + attack.duration);
+			this.envelope.gain.setValueCurveAtTime(attack.values, when, attack.duration);
 
 
 
 
 
-
-			this.envelope.gain.setValueCurveAtTime(info.envelope.decay.values, when + info.envelope.attack.duration, info.envelope.decay.duration);
-			this.envelope.gain.setValueCurveAtTime(info.envelope.sustain.values, when + info.envelope.attack.duration + info.envelope.decay.duration, info.envelope.sustain.duration);
+			//console.log('decay', when + attack.duration, when + attack.duration + decay.duration);
+			this.envelope.gain.setValueCurveAtTime(decay.values, when + attack.duration, decay.duration);
+			//console.log('sustain', when + attack.duration + decay.duration, when + attack.duration + decay.duration + sustain.duration);
+			this.envelope.gain.setValueCurveAtTime(sustain.values, when + attack.duration + decay.duration, sustain.duration);
+			//console.log(3, when, when + duration);
 			this.envelope.gain.cancelAndHoldAtTime(when + duration);
-			this.envelope.gain.linearRampToValueAtTime(0, when + duration + info.envelope.release);
+			//console.log(4, when, when + duration + info.envelope.release);
+			this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
 
 			this.carrier.frequency.value = frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
 			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
-			this.operatorOutput.gain.value = info.volume;
+			this.operatorOutput.gain.value = volume;
+			//console.log('end', when, when + duration + info.envelope.release);
+			//} else {
+			//	console.log('op', when, 'before', this.audioContext.currentTime);
+			//}
 		}
 		cancelOperator() {
 			this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
@@ -190,6 +202,8 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.output.connect(this.mixOutput);
 		}
 		startPlayNote(volume: number, preset: SynthPreset, when: number, note: number, slides: MZXBX_SlideItem[]) {
+
+			//console.log(when, 'after', this.audioContext.currentTime);
 			this.output.gain.value = 0.33 * volume / 100;
 			let duration = slides.reduce((sm, cur) => sm + cur.duration, 0);
 			for (let ii = 0; ii < 6; ii++) {
@@ -203,7 +217,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 						if (preset.transpose > 0) frequency = frequency * 2;
 						if (preset.transpose < 0) frequency = frequency * 0.5;
 					}
-					this.operators[ii].startPlayFrequency(info, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);//, slides);
+					this.operators[ii].startPlayFrequency(info.volume, info.envelope.attack, info.envelope.decay, info.envelope.sustain, info.envelope.release, when, duration, frequency, preset.modulationRatio, preset.feedbackRatio);//, slides);
 					let otime = when + duration + info.envelope.release + 0.01;
 					if (this.locktime < otime) {
 						this.locktime = otime;
@@ -220,6 +234,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 					}
 				}
 			}
+
 		}
 		cancelVoice() {
 			for (let ii = 0; ii < this.operators.length; ii++) {
@@ -277,9 +292,13 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			}
 		}
 		scheduleStrum(volume: number, preset: SynthPreset, when: number, pitches: number[], slides: MZXBX_SlideItem[]) {
-			for (let ii = 0; ii < pitches.length; ii++) {
-				let vox = this.takeVox(preset.mixID);
-				vox.startPlayNote(volume, preset, when, pitches[ii], slides);
+			if (when > this.audioContext.currentTime + 0.05) {
+				for (let ii = 0; ii < pitches.length; ii++) {
+					let vox = this.takeVox(preset.mixID);
+					vox.startPlayNote(volume, preset, when, pitches[ii], slides);
+				}
+			} else {
+				console.log(when, 'is too late for', this.audioContext.currentTime);
 			}
 		}
 	}

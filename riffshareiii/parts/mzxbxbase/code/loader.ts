@@ -20,9 +20,9 @@ class PluginLoader {
 		return result;
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
-		//console.log('startLoadCollectedPlugins');
+		console.log('startLoadCollectedPlugins filters');
 		for (let ff = 0; ff < filters.length; ff++) {
-			//console.log(ff,filters[ff]);
+			console.log(ff,filters[ff]);
 			if (!(filters[ff].pluginAudioFilter)) {
 				let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers
 					, (plugin) => {
@@ -31,10 +31,13 @@ class PluginLoader {
 				if (result != null) {
 					return result;
 				}
+			}else{
+				console.log('skip',ff,filters[ff]);
 			}
 		}
+		console.log('startLoadCollectedPlugins samplers/performers');
 		for (let pp = 0; pp < performers.length; pp++) {
-			//console.log(pp,performers[pp]);
+			console.log(pp,performers[pp]);
 			if (!(performers[pp].plugin)) {
 				let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers
 					, (plugin) => {
@@ -43,6 +46,8 @@ class PluginLoader {
 				if (result != null) {
 					return result;
 				}
+			}else{
+console.log('skip',pp,performers[pp]);
 			}
 		}
 
@@ -52,7 +57,7 @@ class PluginLoader {
 	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin) => void): null | string {
 
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
-		//console.log('startLoadPluginStarter', kind, tt);
+		console.log('startLoadPluginStarter', kind, tt);
 		if (tt) {
 			let info: MZXBX_PluginRegistrationInformation = tt;
 
@@ -63,7 +68,7 @@ class PluginLoader {
 					return (window[info.evaluate]);
 				}
 				, () => {
-					//console.log('exe',info);
+					console.log('loaded',info.kind,info.evaluate);
 					let exe = window[info.evaluate];
 					let plugin = exe();
 					//console.log('plugin',plugin);

@@ -517,13 +517,14 @@ class CommandDispatcher {
 		//console.log('updatePluginHint', this.cfg().data);
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		//console.log('startPlayLoop', from, position, to);
+		console.log('startPlayLoop', from, position, to);
 		let me = this;
 		setTimeout(() => {
 			this.realStartPlayLoop(from, position, to);
-		}, 100);
+		}, 123);
 	}
 	realStartPlayLoop(from: number, position: number, to: number) {
+		console.log('realStartPlayLoop');
 		this.player.startLoopTicks(from, position, to, (msg: string | null) => {
 			if (msg) {
 				this.restartOnInitError = true;

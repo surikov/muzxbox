@@ -543,27 +543,41 @@
 </script>
 <script>
 	var cntr = 0;
+	var output;
+	var audioContext = null;
+	var plugin;
 
-	function beep(audioContext, plugin) {
-		plugin.strum(audioContext.currentTime + 0.1, [66 + cntr], 120, [{
-			duration: 1,
+	function beep() {
+		plugin.strum(audioContext.currentTime + 0.06, [66 + cntr], 120, [{
+			duration: 0.2,
 			delta: 0
 		}]);
 		cntr++;
+		console.log(cntr);
 		if (cntr < 10) {
 			setTimeout(() => {
+				plugin.cancel();
+				plugin.output().disconnect(output);
+				plugin.launch(audioContext, param1);
+				plugin.output().connect(output);
 				beep(audioContext, plugin);
-			}, 500);
+			}, 100);
 		}
 	}
 
 	function start() {
-		let audioContext = new AudioContext();
-		let plugin = newDX7FMSynth1();
+		cntr = 0;
+		if (audioContext) {
+			//
+		} else {
+			audioContext = new AudioContext();
+			plugin = newDX7FMSynth1();
+			output = audioContext.createGain();
+			output.connect(audioContext.destination);
+		}
 		plugin.launch(audioContext, param1);
-		//console.log(plugin.busy());
-		plugin.output().connect(audioContext.destination);
-		beep(audioContext, plugin);
+		plugin.output().connect(output);
+		beep();
 
 
 	}
