@@ -83,13 +83,21 @@ class InMIDI {
 						this.duration = this.duration + raw.series[nn].duration;
 					}
 					console.log('start', 0, this.duration * this.position / 100, this.duration);
-					let msg: string = this.player.startLoopTicks(0, this.duration * this.position / 100, this.duration);
+					/*let msg: string = this.player.startLoopTicks(0, this.duration * this.position / 100, this.duration);
 					if (msg) {
 						setTimeout(() => {
 							me.startPlay();
 						}, 500);
 						console.log('startLoopTicks', msg);
-					}
+					}*/
+					this.player.startLoopTicks(0, this.duration * this.position / 100, this.duration, (msg: string | null) => {
+						if (msg) {
+							setTimeout(() => {
+								me.startPlay();
+							}, 500);
+							console.log('startLoopTicks', msg);
+						}
+					});
 				}
 			}
 			//}

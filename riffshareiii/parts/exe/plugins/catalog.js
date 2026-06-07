@@ -59,9 +59,9 @@ let _t_all_registerd_plugins_list = [
         "label": "Yamaha DX7",
         "purpose": "Performer",
         "kind": "dx7fmsynth1",
-        "ui": "./plugins/performers/dx7fmsynth1/ui/dx7ui.html",
+        "ui": "https://mzxbox.ru/minium/plugins/performers/dx7fmsynth1/ui/dx7ui.html",
         "evaluate": "newDX7FMSynth1",
-        "script": "./plugins/performers/dx7fmsynth1/synth/dx7minium.js"
+        "script": "https://mzxbox.ru/minium/plugins/performers/dx7fmsynth1/synth/dx7minium.js"
     },
     {
         "label": "Import",
