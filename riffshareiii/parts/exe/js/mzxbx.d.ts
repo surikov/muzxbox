@@ -179,7 +179,7 @@ type MZXBX_FilterHolder = {
     description: string;
 };
 type MZXBX_PerformerSamplerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
+    pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channel: MZXBX_Channel;
     kind: string;
     properties: string;
@@ -364,7 +364,7 @@ declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
 declare class PluginLoader {
     collectLoadPlugins(schedule: MZXBX_Schedule, allfilters: MZXBX_FilterHolder[], allperformers: MZXBX_PerformerSamplerHolder[]): null | string;
     startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string;
-    startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin: any) => void): null | string;
+    startLoadPluginStarter(kind: string, onDone: (exeName: string) => void): null | string;
     collectFilterPlugin(id: string, kind: string, properties: string, description: string, filters: MZXBX_FilterHolder[]): void;
     collectPerformerPlugin(channel: MZXBX_Channel, kind: string, properties: string, description: string, performers: MZXBX_PerformerSamplerHolder[]): void;
     findPluginInfo(kind: string): MZXBX_PluginRegistrationInformation | null;

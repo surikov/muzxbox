@@ -179,7 +179,7 @@ type MZXBX_FilterHolder = {
     description: string;
 };
 type MZXBX_PerformerSamplerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
+    pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channel: MZXBX_Channel;
     kind: string;
     properties: string;

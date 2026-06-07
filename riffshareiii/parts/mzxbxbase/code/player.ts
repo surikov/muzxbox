@@ -77,7 +77,7 @@ class SchedulePlayer implements MZXBX_Player {
 			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
 				//
 				trackName = this.performerDrumHolders[pp].description;
-				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
+				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].pluginPerformerSampler;
 				if (plugin) {
 					this.performerDrumHolders[pp].channel.hint = plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
 					//console.log('launch performer/drum', pp, this.performerDrumHolders[pp]);
@@ -105,7 +105,7 @@ class SchedulePlayer implements MZXBX_Player {
 			}
 		}
 		for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
-			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].plugin;
+			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].pluginPerformerSampler;
 			if (plugin) {
 				let busyState = plugin.busy()
 				if (busyState) {
@@ -125,14 +125,14 @@ class SchedulePlayer implements MZXBX_Player {
 		console.log('reconnectAllPlugins', msg);
 	}*/
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void {
-		console.log('startLoopTicks start');
+		//console.log('startLoopTicks start');
 		this.connectAllPlugins((msg: string | null) => {
-			console.log('startLoopTicks connected');
+			//console.log('startLoopTicks connected');
 			if (msg) {
 				onDone(msg);
 			} else {
 				if (this.audioContext) {
-					console.log('startLoopTicks ready');
+					//console.log('startLoopTicks ready');
 					this.isConnected = true;
 					this.position = currentPosition;
 					this.isPlayLoop = true;
@@ -142,7 +142,7 @@ class SchedulePlayer implements MZXBX_Player {
 						this.doTick(loopStart, loopEnd, this.waitForID);
 						//console.log('started doTick');
 					}, 100);
-					console.log('startLoopTicks done');
+					//console.log('startLoopTicks done');
 					onDone(null);
 				} else {
 					this.cancel();
@@ -198,7 +198,9 @@ class SchedulePlayer implements MZXBX_Player {
 					let output = performer.output();
 					if (output) {
 						//console.log(nn, 'start connect channel', this.audioContext.currentTime);
-						for (let oo = 0; oo < channel.outputs.length; oo++) {
+						let chcnt = channel.outputs.length;
+						for (let oo = 0; oo < chcnt; oo++) {
+							//console.log('channel', oo, chcnt);
 							let outId = channel.outputs[oo];
 							let targetNode: AudioNode | null = this.audioContext.destination;
 							if (outId) {
@@ -210,7 +212,9 @@ class SchedulePlayer implements MZXBX_Player {
 							if (targetNode) {
 								//console.log(nn, 'connect channel', oo, channel.performer.kind, this.audioContext.currentTime);
 								output.connect(targetNode);
+								//console.log('connected');
 							}
+							//console.log('done channel', oo);
 						}
 						//console.log(nn, 'next channel', this.audioContext.currentTime);
 						this.delayedStart(() => {
@@ -253,6 +257,7 @@ class SchedulePlayer implements MZXBX_Player {
 							if (targetNode) {
 								//console.log(nn, 'connect filter', filter.kind, this.audioContext.currentTime);
 								pluginOutput.connect(targetNode);
+								//console.log('connected');
 							}
 						}
 						this.delayedStart(() => {
@@ -292,9 +297,9 @@ class SchedulePlayer implements MZXBX_Player {
 	launchNextCollectedPerformer(nn: number, launchResult: (message: string | null) => void) {
 		if (nn < this.performerDrumHolders.length) {
 			let holder = this.performerDrumHolders[nn];
-			if (holder.plugin) {
-				holder.channel.hint = holder.plugin.launch(this.audioContext, holder.properties);
-				let busyState = holder.plugin.busy();
+			if (holder.pluginPerformerSampler) {
+				holder.channel.hint = holder.pluginPerformerSampler.launch(this.audioContext, holder.properties);
+				let busyState = holder.pluginPerformerSampler.busy();
 				if (busyState) {
 					launchResult('Performer/sampler ' + nn + ' for ' + holder.description + ': ' + busyState);
 				} else {
@@ -327,6 +332,7 @@ class SchedulePlayer implements MZXBX_Player {
 				if (msg) {
 					onDone(msg);
 				} else {
+					//console.log('connect plugins start');
 					let cuschedule: MZXBX_Schedule = this.schedule;
 					this.delayedStart(() => {
 						this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message: string | null) => {
@@ -469,7 +475,7 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 	}
 	disconnectAllPlugins() {
-		console.log('disconnectAllPlugins');
+		//console.log('disconnectAllPlugins');
 		if (this.isConnected) {
 			if (this.schedule) {
 				let master: AudioNode = this.audioContext.destination;
@@ -593,9 +599,9 @@ class SchedulePlayer implements MZXBX_Player {
 					for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
 						let performer = this.performerDrumHolders[nn];
 						if (channel.id == performer.channel.id) {
-							if (performer.plugin) {
-								let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.plugin;
-								return plugin;
+							if (performer.pluginPerformerSampler) {
+								let pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.pluginPerformerSampler;
+								return pluginPerformerSampler;
 							} else {
 								console.error('Empty performer plugin for', channel.id);
 							}

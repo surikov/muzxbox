@@ -873,7 +873,6 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay();
-        console.log('setSequencerOn', this.track.performer.state, this.track.title);
     }
     setSequencerMute() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -881,7 +880,6 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay();
-        console.log('setSequencerMute', this.track.performer.state, this.track.title);
     }
     setSequencerSolo() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks', this.order], () => {
@@ -889,7 +887,6 @@ class SequencerPluginDialog {
         });
         this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay();
-        console.log('setSequencerSolo', this.track.performer.state, this.track.title);
     }
     dropSequencer() {
         globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
@@ -1588,7 +1585,6 @@ class CommandDispatcher {
         globalCommandDispatcher.resetPlayButtonState();
     }
     setupAndStartPlay() {
-        console.log('setupAndStartPlay');
         this.lastUsedSchedule = this.renderCurrentProjectForOutput();
         let from = 0;
         let to = 0;
@@ -1648,14 +1644,11 @@ class CommandDispatcher {
         }
     }
     startPlayLoop(from, position, to) {
-        console.log('startPlayLoop', from, position, to);
-        let me = this;
         setTimeout(() => {
             this.realStartPlayLoop(from, position, to);
         }, 123);
     }
     realStartPlayLoop(from, position, to) {
-        console.log('realStartPlayLoop');
         this.player.startLoopTicks(from, position, to, (msg) => {
             if (msg) {
                 this.restartOnInitError = true;
@@ -4476,7 +4469,7 @@ class MixerBar {
             for (let ii = 0; ii < arr.length; ii++) {
                 if (arr[ii].channel.id == samplerId) {
                     try {
-                        let pluginImplementation = arr[ii].plugin;
+                        let pluginImplementation = arr[ii].pluginPerformerSampler;
                         if (pluginImplementation) {
                             if (pluginImplementation.duration) {
                                 return pluginImplementation.duration();

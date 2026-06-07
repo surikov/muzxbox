@@ -20,45 +20,77 @@ class PluginLoader {
 		return result;
 	}
 	startLoadCollectedPlugins(filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]): null | string {
-		console.log('startLoadCollectedPlugins filters');
+		//console.log('startLoadCollectedPlugins');
 		for (let ff = 0; ff < filters.length; ff++) {
-			console.log(ff,filters[ff]);
+			//console.log('filter', ff, filters[ff].kind);
 			if (!(filters[ff].pluginAudioFilter)) {
-				let result = this.startLoadPluginStarter(filters[ff].kind, filters, performers
-					, (plugin) => {
-						filters[ff].pluginAudioFilter = plugin;
+				let result = this.startLoadPluginStarter(filters[ff].kind//, filters, performers
+					, (exeName: string) => {
+						if (filters[ff].pluginAudioFilter) {
+							//console.log('skip', filters[ff]);
+						} else {
+							//console.log('new', filters[ff]);
+							let exe = window[exeName];
+							let plugin = exe();
+							if (plugin) {
+								filters[ff].pluginAudioFilter = plugin;
+								//this.startLoadCollectedPlugins(filters, performers);
+							} else {
+								//console.log('no', filters[ff]);
+							}
+						}
 					});
 				if (result != null) {
 					return result;
 				}
-			}else{
-				console.log('skip',ff,filters[ff]);
+			} else {
+				//console.log('skip filter', ff, filters[ff].kind);
 			}
 		}
-		console.log('startLoadCollectedPlugins samplers/performers');
+		//console.log('startLoadCollectedPlugins samplers/performers');
 		for (let pp = 0; pp < performers.length; pp++) {
-			console.log(pp,performers[pp]);
-			if (!(performers[pp].plugin)) {
-				let result = this.startLoadPluginStarter(performers[pp].kind, filters, performers
-					, (plugin) => {
-						performers[pp].plugin = plugin;
+			//console.log('performer', pp, performers[pp].kind);
+			if (!(performers[pp].pluginPerformerSampler)) {
+				let result = this.startLoadPluginStarter(performers[pp].kind//, filters, performers
+					//, (plugin) => {
+					//	performers[pp].pluginPerformerSampler = plugin;
+					//});
+					, (exeName: string) => {
+						if (performers[pp].pluginPerformerSampler) {
+							//console.log('skip', performers[pp]);
+						} else {
+							//console.log('new', performers[pp]);
+							let exe = window[exeName];
+							let plugin = exe();
+							if (plugin) {
+								performers[pp].pluginPerformerSampler=plugin;
+								//this.startLoadCollectedPlugins(filters, performers);
+							} else {
+								console.log('no', performers[pp]);
+							}
+						}
 					});
 				if (result != null) {
 					return result;
 				}
-			}else{
-console.log('skip',pp,performers[pp]);
+			} else {
+				//console.log('skip performer', pp, performers[pp].kind);
 			}
 		}
 
 		return null;
 	}
 
-	startLoadPluginStarter(kind: string, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[], onDone: (plugin) => void): null | string {
+	startLoadPluginStarter(kind: string
+		//holder: MZXBX_FilterHolder | MZXBX_PerformerSamplerHolder
+		//, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]
+		, onDone: (exeName: string) => void
+	): null | string {
 
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
-		console.log('startLoadPluginStarter', kind, tt);
+
 		if (tt) {
+			//console.log('startLoadPluginStarter', kind, tt.kind);
 			let info: MZXBX_PluginRegistrationInformation = tt;
 
 			MZXBX_appendScriptURL(info.script);
@@ -67,8 +99,11 @@ console.log('skip',pp,performers[pp]);
 					//console.log('check evaluate',info);
 					return (window[info.evaluate]);
 				}
+				//,onDone
 				, () => {
-					console.log('loaded',info.kind,info.evaluate);
+					onDone(info.evaluate);
+					/*
+					//console.log('exe', info.kind, info.evaluate);
 					let exe = window[info.evaluate];
 					let plugin = exe();
 					//console.log('plugin',plugin);
@@ -76,7 +111,9 @@ console.log('skip',pp,performers[pp]);
 						onDone(plugin);
 						this.startLoadCollectedPlugins(filters, performers);
 					}
-				});
+					*/
+				}
+			);
 			return null;
 		} else {
 			console.log('Not found registration for', kind);
@@ -102,7 +139,7 @@ console.log('skip',pp,performers[pp]);
 		}
 		//console.log('performer',description);
 		performers.push({
-			plugin: null
+			pluginPerformerSampler: null
 			//, channelId: id
 			, channel: channel
 			, kind: kind

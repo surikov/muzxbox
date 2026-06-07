@@ -431,7 +431,7 @@ class CommandDispatcher {
 		//console.log('stopPlay done', this.player.playState());
 	}
 	setupAndStartPlay() {
-		console.log('setupAndStartPlay');
+		//console.log('setupAndStartPlay');
 		//console.log(this.cfg().data.tracks[0].performer.state);
 		/*if (this.cfg().data.tracks[0].performer.state) {
 			this.cfg().data.tracks[0].performer.state = 0;
@@ -517,14 +517,14 @@ class CommandDispatcher {
 		//console.log('updatePluginHint', this.cfg().data);
 	}
 	startPlayLoop(from: number, position: number, to: number) {
-		console.log('startPlayLoop', from, position, to);
-		let me = this;
+		//console.log('startPlayLoop', from, position, to);
+		//let me = this;
 		setTimeout(() => {
 			this.realStartPlayLoop(from, position, to);
 		}, 123);
 	}
 	realStartPlayLoop(from: number, position: number, to: number) {
-		console.log('realStartPlayLoop');
+		//console.log('realStartPlayLoop');
 		this.player.startLoopTicks(from, position, to, (msg: string | null) => {
 			if (msg) {
 				this.restartOnInitError = true;

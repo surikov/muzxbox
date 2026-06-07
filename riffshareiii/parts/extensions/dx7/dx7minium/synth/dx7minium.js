@@ -1,6 +1,6 @@
 "use strict";
 function newDX7FMSynth1() {
-    console.log('newDX7FMSynth1');
+    console.log('create newDX7FMSynth1');
     let matrixConnectionAlgorithmsDX7 = [
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
@@ -38,27 +38,24 @@ function newDX7FMSynth1() {
     class MiniumFMOperator {
         constructor(cntxt) {
             this.audioContext = cntxt;
-            this.operatorOutput = this.audioContext.createGain();
+            this.operatorOut = this.audioContext.createGain();
             this.modulationLevel = this.audioContext.createGain();
             this.feedbackLevel = this.audioContext.createGain();
             this.envelope = this.audioContext.createGain();
             this.phaseDelay = this.audioContext.createDelay();
             this.compensateNegativeDelay = this.audioContext.createConstantSource();
             this.carrier = this.audioContext.createOscillator();
-            this.connectNodes();
-            this.operatorOutput.gain.value = 0;
-            this.phaseDelay.delayTime.value = 0;
-            this.envelope.gain.value = 0;
-            this.compensateNegativeDelay.start(this.audioContext.currentTime);
-            this.carrier.start(this.audioContext.currentTime);
-        }
-        connectNodes() {
-            this.envelope.connect(this.operatorOutput);
+            this.envelope.connect(this.operatorOut);
             this.phaseDelay.connect(this.envelope);
             this.modulationLevel.connect(this.phaseDelay.delayTime);
             this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
             this.feedbackLevel.connect(this.phaseDelay.delayTime);
             this.carrier.connect(this.phaseDelay);
+            this.operatorOut.gain.value = 0;
+            this.phaseDelay.delayTime.value = 0;
+            this.envelope.gain.value = 0;
+            this.compensateNegativeDelay.start(this.audioContext.currentTime);
+            this.carrier.start(this.audioContext.currentTime);
         }
         addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
             this.carrier.frequency.linearRampToValueAtTime(frequency, when);
@@ -78,21 +75,24 @@ function newDX7FMSynth1() {
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
             this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
-            this.operatorOutput.gain.value = volume;
+            this.operatorOut.gain.value = volume;
         }
         cancelOperator() {
-            this.envelope.gain.cancelScheduledValues(this.audioContext.currentTime);
-            this.modulationLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
-            this.carrier.frequency.cancelScheduledValues(this.audioContext.currentTime);
-            this.compensateNegativeDelay.offset.cancelScheduledValues(this.audioContext.currentTime);
-            this.feedbackLevel.gain.cancelScheduledValues(this.audioContext.currentTime);
+            this.operatorOut.disconnect();
+            this.envelope.disconnect();
+            this.phaseDelay.disconnect();
+            this.modulationLevel.disconnect();
+            this.compensateNegativeDelay.disconnect();
+            this.feedbackLevel.disconnect();
+            this.carrier.disconnect();
+            this.compensateNegativeDelay.stop();
+            this.carrier.stop();
         }
     }
     class MinumFMVoice {
         constructor(mixID, audioContext, to) {
             this.locktime = 0;
             this.mixID = mixID;
-            this.mixOutput = to;
             this.audioContext = audioContext;
             this.output = this.audioContext.createGain();
             this.operators = [
@@ -104,6 +104,7 @@ function newDX7FMSynth1() {
                 new MiniumFMOperator(this.audioContext)
             ];
             this.connectOperators();
+            this.output.connect(to);
         }
         connectOperators() {
             let mix = matrixConnectionAlgorithmsDX7[this.mixID - 1];
@@ -113,7 +114,7 @@ function newDX7FMSynth1() {
                 for (let mm = 0; mm < modulatorIds.length; mm++) {
                     let mid = modulatorIds[mm];
                     let modulator = this.operators[mid];
-                    modulator.operatorOutput.connect(carrier.modulationLevel);
+                    modulator.operatorOut.connect(carrier.modulationLevel);
                 }
             }
             for (let cid = 0; cid < mix.feedbackMatrix.length; cid++) {
@@ -122,14 +123,13 @@ function newDX7FMSynth1() {
                 for (let ff = 0; ff < fbIds.length; ff++) {
                     let fid = fbIds[ff];
                     let fbmodulator = this.operators[fid];
-                    fbmodulator.operatorOutput.connect(carrier.feedbackLevel);
+                    fbmodulator.operatorOut.connect(carrier.feedbackLevel);
                 }
             }
             for (let ii = 0; ii < mix.outputMix.length; ii++) {
                 let outIdx = mix.outputMix[ii];
-                this.operators[outIdx].operatorOutput.connect(this.output);
+                this.operators[outIdx].operatorOut.connect(this.output);
             }
-            this.output.connect(this.mixOutput);
         }
         startPlayNote(volume, preset, when, note, slides) {
             this.output.gain.value = 0.33 * volume / 100;
@@ -169,8 +169,7 @@ function newDX7FMSynth1() {
             for (let ii = 0; ii < this.operators.length; ii++) {
                 this.operators[ii].cancelOperator();
             }
-            this.output.gain.value = 0;
-            this.locktime = 0;
+            this.output.disconnect();
         }
     }
     class MiniumFMSynth {
@@ -195,6 +194,7 @@ function newDX7FMSynth1() {
             for (let ii = 0; ii < this.cache.length; ii++) {
                 this.cache[ii].cancelVoice();
             }
+            this.cache = [];
         }
         scheduleStrum(volume, preset, when, pitches, slides) {
             if (when > this.audioContext.currentTime + 0.05) {

@@ -235,7 +235,7 @@ type MZXBX_FilterHolder = {
 	, description: string
 };
 type MZXBX_PerformerSamplerHolder = {
-	plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null
+	pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null
 	//, channelId: string
 	, channel: MZXBX_Channel
 	, kind: string
