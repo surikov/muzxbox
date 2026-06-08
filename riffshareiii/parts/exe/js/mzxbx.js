@@ -92,6 +92,7 @@ class SchedulePlayer {
         this.schedule = schedule;
     }
     clearPluginsCache() {
+        console.log('clearPluginsCache');
         this.performerDrumHolders.length = 0;
         this.filterHolders.length = 0;
     }
@@ -577,15 +578,19 @@ class SchedulePlayer {
                                 return pluginPerformerSampler;
                             }
                             else {
-                                console.error('Empty performer plugin for', channel.id);
+                                console.log('Empty performer plugin for', channel.id);
                             }
                         }
                     }
+                    console.log('not found cache', channel.id);
                 }
             }
-            console.error('Empty schedule');
+            console.log('not found channel', channel.id);
         }
-        console.error('No performer for', channel.id);
+        else {
+            console.log('Empty schedule');
+        }
+        console.log('No performer for', channel.id);
         return null;
     }
     sendPerformerItem(it, whenAudio, tempo) {

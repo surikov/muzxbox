@@ -466,7 +466,7 @@ class CommandDispatcher {
 		}
 		//let me = this;
 		let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
-		//console.log('after setupPlugins',schedule);
+		console.log('after setupPlugins',this.lastUsedSchedule);
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;

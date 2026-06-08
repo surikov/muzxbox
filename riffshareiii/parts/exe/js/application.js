@@ -171,6 +171,8 @@ class StateDiff {
         }
     }
     calculateNonArray(nodePath, commands, old, changed) {
+        if (changed === undefined)
+            changed = 'undefined';
         for (let prop in old) {
             if (prop == 'undo' || prop == 'redo') {
             }
@@ -300,6 +302,7 @@ function startApplication() {
     globalCommandDispatcher.resetProject();
 }
 function setupHomeBackURL() {
+    let mzxbox = 'https://mzxbox.ru/';
     let urlParams = new URLSearchParams(window.location.search);
     let home = urlParams.get('home');
     if (home) {
@@ -307,11 +310,7 @@ function setupHomeBackURL() {
         console.log('goHomeBackURL param', goHomeBackURL);
     }
     else {
-        let saved = readRawTextFromlocalStorage('goHomeBackURL');
-        if (saved) {
-            goHomeBackURL = saved;
-            console.log('goHomeBackURL cache', goHomeBackURL);
-        }
+        goHomeBackURL = mzxbox;
     }
     if (goHomeBackURL) {
         saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
@@ -319,6 +318,7 @@ function setupHomeBackURL() {
     else {
         saveRawText2localStorage('goHomeBackURL', '');
     }
+    console.log('goHomeBackURL', goHomeBackURL);
 }
 function getNavigatorLanguage() {
     console.log('navigator.languages', navigator.languages);
@@ -1606,6 +1606,7 @@ class CommandDispatcher {
             }
         }
         let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
+        console.log('after setupPlugins', this.lastUsedSchedule);
         if (this.playPosition < from) {
             this.playPosition = from;
         }
@@ -3835,6 +3836,7 @@ function fillPluginsLists() {
                             let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
                             globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
                             console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+                            globalCommandDispatcher.player.clearPluginsCache();
                             globalCommandDispatcher.reStartPlayIfPlay();
                         }
                         else {

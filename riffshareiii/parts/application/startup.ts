@@ -92,23 +92,26 @@ function startApplication() {
 
 }
 function setupHomeBackURL() {
+	let mzxbox='https://mzxbox.ru/';
 	let urlParams = new URLSearchParams(window.location.search);
 	let home = urlParams.get('home');
 	if (home) {
 		goHomeBackURL = home;
 		console.log('goHomeBackURL param', goHomeBackURL);
 	} else {
-		let saved = readRawTextFromlocalStorage('goHomeBackURL');
+		/*let saved = readRawTextFromlocalStorage('goHomeBackURL');
 		if (saved) {
 			goHomeBackURL = saved;
 			console.log('goHomeBackURL cache', goHomeBackURL);
-		}
+		}*/
+		goHomeBackURL=mzxbox;
 	}
 	if (goHomeBackURL) {
 		saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
 	} else {
 		saveRawText2localStorage('goHomeBackURL', '');
 	}
+	console.log('goHomeBackURL', goHomeBackURL);
 }
 /*function squashString(data: string): string {
 	return data;

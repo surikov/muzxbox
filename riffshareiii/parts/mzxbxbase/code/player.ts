@@ -24,6 +24,7 @@ class SchedulePlayer implements MZXBX_Player {
 		this.schedule = schedule;
 	}
 	clearPluginsCache() {
+		console.log('clearPluginsCache');
 		this.performerDrumHolders.length = 0;
 		this.filterHolders.length = 0;
 	}
@@ -603,15 +604,18 @@ class SchedulePlayer implements MZXBX_Player {
 								let pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.pluginPerformerSampler;
 								return pluginPerformerSampler;
 							} else {
-								console.error('Empty performer plugin for', channel.id);
+								console.log('Empty performer plugin for', channel.id);
 							}
 						}
 					}
+					console.log('not found cache', channel.id);
 				}
 			}
-			console.error('Empty schedule');
+			console.log('not found channel', channel.id);
+		} else {
+			console.log('Empty schedule');
 		}
-		console.error('No performer for', channel.id);
+		console.log('No performer for', channel.id);
 		return null;
 	}
 	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number) {

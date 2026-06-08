@@ -1,5 +1,6 @@
 .rightMenuPanel {
-    fill: var(--background-color);
+    fill2: var(--background-color);
+	fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
 }
 
 .rectangleDragItem {

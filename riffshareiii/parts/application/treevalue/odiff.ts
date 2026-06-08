@@ -38,6 +38,7 @@ class StateDiff {
 	}
 	calculateNonArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void {
 		//console.log('calculateNonArray', nodePath, old, changed);
+		if (changed === undefined) changed = 'undefined';
 		for (let prop in old) {
 			if (prop == 'undo' || prop == 'redo') {
 				//skip

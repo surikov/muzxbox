@@ -11,7 +11,7 @@ class PluginLoader {
 		for (let ch = 0; ch < schedule.channels.length; ch++) {
 			let performer: MZXBX_ChannelSource = schedule.channels[ch].performer;
 			//let chanid = schedule.channels[ch].id;
-			//console.log('collectPerformerPlugin',schedule.channels[ch]);
+			//console.log('collectPerformerPlugin', schedule.channels[ch]);
 			this.collectPerformerPlugin(schedule.channels[ch], performer.kind, performer.properties, performer.description, allperformers);
 		}
 		//console.log('startLoadCollectedPlugins',allfilters, allperformers);
@@ -63,7 +63,7 @@ class PluginLoader {
 							let exe = window[exeName];
 							let plugin = exe();
 							if (plugin) {
-								performers[pp].pluginPerformerSampler=plugin;
+								performers[pp].pluginPerformerSampler = plugin;
 								//this.startLoadCollectedPlugins(filters, performers);
 							} else {
 								console.log('no', performers[pp]);
@@ -133,11 +133,12 @@ class PluginLoader {
 		for (let ii = 0; ii < performers.length; ii++) {
 			//if (performers[ii].channelId == id) {
 			if (performers[ii].channel.id == channel.id) {
+				//console.log('found performer', performers[ii]);
 				performers[ii].properties = properties;
 				return;
 			}
 		}
-		//console.log('performer',description);
+		//console.log('add performer', channel.id, kind);
 		performers.push({
 			pluginPerformerSampler: null
 			//, channelId: id

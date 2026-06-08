@@ -701,6 +701,7 @@ function fillPluginsLists() {
 							let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
 							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
 							console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+							globalCommandDispatcher.player.clearPluginsCache();
 							globalCommandDispatcher.reStartPlayIfPlay();//true);
 						} else {
 							let xx = dx;
