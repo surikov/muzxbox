@@ -1,6 +1,6 @@
 "use strict";
 function newDX7FMSynth1() {
-    console.log('create newDX7FMSynth1 v1.01');
+    console.log('create newDX7FMSynth1 v1.02');
     let matrixConnectionAlgorithmsDX7 = [
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
