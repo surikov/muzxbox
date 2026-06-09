@@ -2,63 +2,63 @@
 <button onclick='start();'>phase worklet</button>
 <script>
 	let phaseWorkletSource = `
-class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
-	phase = 0;
-	cntr = 0;
-	constructor() {
-		super();
-	}
-	static get parameterDescriptors() {
-		return [
-			{ name: "carrierFrequency", automationRate: "a-rate" }
-			, { name: "modulationLevel", automationRate: "a-rate" }
-		];
-	}
-	readSample(inputs, xx) {
-		let inputSumm = 0;
-		for (let ii = 0; ii < inputs.length; ii++) {
-			let singleInput = inputs[ii];
-			let channelCount = singleInput.length;
-			if (channelCount) {
-				let channelSumm = 0;
-				for (let ch = 0; ch < singleInput.length; ch++) {
-					let singleChannel = singleInput[ch];
-					channelSumm = channelSumm + singleChannel[xx];
+		class PhaseSineAudioWorkletProcessor extends AudioWorkletProcessor {
+			phase = 0;
+			cntr = 0;
+			constructor() {
+				super();
+			}
+			static get parameterDescriptors() {
+				return [
+					{ name: "carrierFrequency", automationRate: "a-rate" }
+					, { name: "modulationLevel", automationRate: "a-rate" }
+				];
+			}
+			readSample(inputs, xx) {
+				let inputSumm = 0;
+				for (let ii = 0; ii < inputs.length; ii++) {
+					let singleInput = inputs[ii];
+					let channelCount = singleInput.length;
+					if (channelCount) {
+						let channelSumm = 0;
+						for (let ch = 0; ch < singleInput.length; ch++) {
+							let singleChannel = singleInput[ch];
+							channelSumm = channelSumm + singleChannel[xx];
+						}
+						inputSumm = inputSumm + channelSumm / channelCount;
+					}
 				}
-				inputSumm = inputSumm + channelSumm / channelCount;
+				return inputSumm;
 			}
-		}
-		return inputSumm;
-	}
-	writeSample(outputs, xx, value) {
-		for (let oo = 0; oo < outputs.length; oo++) {
-			let singleOutput = outputs[oo];
-			for (let ch = 0; ch < singleOutput.length; ch++) {
-				let singleChannel = singleOutput[ch];
-				singleChannel[xx] = value;
+			writeSample(outputs, xx, value) {
+				for (let oo = 0; oo < outputs.length; oo++) {
+					let singleOutput = outputs[oo];
+					for (let ch = 0; ch < singleOutput.length; ch++) {
+						let singleChannel = singleOutput[ch];
+						singleChannel[xx] = value;
+					}
+				}
 			}
-		}
-	}
-	process(inputs, outputs, parameters) {
-		let outSampleCount = outputs[0][0].length;
-		let frequency = parameters["carrierFrequency"][0];
-		let modulationLevel = parameters["modulationLevel"][0];
-		let incrementBySample = Math.PI * 2 * frequency / sampleRate;
+			process(inputs, outputs, parameters) {
+				let outSampleCount = outputs[0][0].length;
+				let frequency = parameters["carrierFrequency"][0];
+				let modulationLevel = parameters["modulationLevel"][0];
+				let incrementBySample = Math.PI * 2 * frequency / sampleRate;
 
-		for (let xx = 0; xx < outSampleCount; xx++) {
-			let inputSumm = this.readSample(inputs, xx);
-			let resultValue = Math.sin(this.phase + modulationLevel * inputSumm);
-			this.writeSample(outputs, xx, resultValue);
-			this.phase = this.phase + incrementBySample;
-			if (this.phase >= Math.PI * 2) {
-				this.phase = this.phase - Math.PI * 2;
+				for (let xx = 0; xx < outSampleCount; xx++) {
+					let inputSumm = this.readSample(inputs, xx);
+					let resultValue = Math.sin(this.phase + modulationLevel * inputSumm);
+					this.writeSample(outputs, xx, resultValue);
+					this.phase = this.phase + incrementBySample;
+					if (this.phase >= Math.PI * 2) {
+						this.phase = this.phase - Math.PI * 2;
+					}
+				}
+				return true;
 			}
 		}
-		return true;
-	}
-}
-registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
-`;
+		registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
+		`;
 	function loadAudioWorkletCode(audioworkletcode, audioContext, onDone) {
 		let blob = new Blob([audioworkletcode], { type: 'application/javascript' });
 		let reader = new FileReader();
@@ -79,7 +79,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 	}
 	function playSound(audioContext) {
 		let when = audioContext.currentTime + 0.1;
-		let soundFrequency = 440;
+		let soundFrequency = 500;
 		let maxmodulation = 4;
 
 		let carrier = new AudioWorkletNode(audioContext, 'sinePhaseModuleID');
@@ -95,7 +95,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 		carrierFrequency.value = soundFrequency;
 		modulatorBeep.frequency.value = soundFrequency;
 		modulationLevel.setValueAtTime(0, when);
-		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 3);
+		modulationLevel.linearRampToValueAtTime(maxmodulation, when + 2);
 
 		volume.connect(audioContext.destination);
 		carrier.connect(volume);
@@ -103,7 +103,7 @@ registerProcessor("sinePhaseModuleID", PhaseSineAudioWorkletProcessor);
 
 		modulatorBeep.start(when);
 		volume.gain.setValueAtTime(1, when);
-		volume.gain.setValueAtTime(0, when + 3);
+		volume.gain.setValueAtTime(0, when + 2);
 	}
 </script>
 

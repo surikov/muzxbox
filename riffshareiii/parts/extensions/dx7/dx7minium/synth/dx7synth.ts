@@ -1,5 +1,5 @@
 function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
-	console.log('create newDX7FMSynth1');
+	console.log('create newDX7FMSynth1 v1.01');
 	let matrixConnectionAlgorithmsDX7: ConnectionSchemeDX7[] = [
 		{ outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] }
 		, { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] }
@@ -39,7 +39,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		operatorOut: GainNode;
 		feedbackLevel: GainNode;
 		phaseDelay: DelayNode;
-		compensateNegativeDelay: ConstantSourceNode;
+		//compensateNegativeDelay: ConstantSourceNode;
 		carrier: OscillatorNode;
 		modulationLevel: GainNode;
 		envelope: GainNode;
@@ -50,24 +50,26 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.feedbackLevel = this.audioContext.createGain();
 			this.envelope = this.audioContext.createGain();
 			this.phaseDelay = this.audioContext.createDelay();
-			this.compensateNegativeDelay = this.audioContext.createConstantSource();
+			//this.compensateNegativeDelay = this.audioContext.createConstantSource();
 			this.carrier = this.audioContext.createOscillator();
 			this.envelope.connect(this.operatorOut);
 			this.phaseDelay.connect(this.envelope);
 			this.modulationLevel.connect(this.phaseDelay.delayTime);
-			this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+			//this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
 			this.feedbackLevel.connect(this.phaseDelay.delayTime);
 			this.carrier.connect(this.phaseDelay);
 			this.operatorOut.gain.value = 0;
 			this.phaseDelay.delayTime.value = 0;
 			this.envelope.gain.value = 0;
-			this.compensateNegativeDelay.start(this.audioContext.currentTime);
+			//this.compensateNegativeDelay.start(this.audioContext.currentTime);
 			this.carrier.start(this.audioContext.currentTime);
 		}
 		addFrequencySlide(when: number, frequency: number, modulationRatio: number, feedbackRatio: number) {
 			this.carrier.frequency.linearRampToValueAtTime(frequency, when);
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+			//this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+			this.phaseDelay.delayTime.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 		}
 		startPlayFrequency(volume: number, attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number, frequency: number, modulationRatio: number, feedbackRatio: number) {
@@ -80,7 +82,8 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
 			this.carrier.frequency.value = frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-			this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+			//this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+			this.phaseDelay.delayTime.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 			this.operatorOut.gain.value = volume;
 		}
@@ -89,10 +92,10 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.envelope.disconnect();
 			this.phaseDelay.disconnect();
 			this.modulationLevel.disconnect();
-			this.compensateNegativeDelay.disconnect();
+			//this.compensateNegativeDelay.disconnect();
 			this.feedbackLevel.disconnect();
 			this.carrier.disconnect();
-			this.compensateNegativeDelay.stop();
+			//this.compensateNegativeDelay.stop();
 			this.carrier.stop();
 		}
 	}

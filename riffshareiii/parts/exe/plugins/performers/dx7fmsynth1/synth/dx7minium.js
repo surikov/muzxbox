@@ -1,6 +1,6 @@
 "use strict";
 function newDX7FMSynth1() {
-    console.log('create newDX7FMSynth1');
+    console.log('create newDX7FMSynth1 v1.01');
     let matrixConnectionAlgorithmsDX7 = [
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [], [], [], [], [5]] },
         { outputMix: [0, 2], modulationMatrix: [[1], [], [3], [4], [5], []], feedbackMatrix: [[], [1], [], [], [], []] },
@@ -43,24 +43,21 @@ function newDX7FMSynth1() {
             this.feedbackLevel = this.audioContext.createGain();
             this.envelope = this.audioContext.createGain();
             this.phaseDelay = this.audioContext.createDelay();
-            this.compensateNegativeDelay = this.audioContext.createConstantSource();
             this.carrier = this.audioContext.createOscillator();
             this.envelope.connect(this.operatorOut);
             this.phaseDelay.connect(this.envelope);
             this.modulationLevel.connect(this.phaseDelay.delayTime);
-            this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
             this.feedbackLevel.connect(this.phaseDelay.delayTime);
             this.carrier.connect(this.phaseDelay);
             this.operatorOut.gain.value = 0;
             this.phaseDelay.delayTime.value = 0;
             this.envelope.gain.value = 0;
-            this.compensateNegativeDelay.start(this.audioContext.currentTime);
             this.carrier.start(this.audioContext.currentTime);
         }
         addFrequencySlide(when, frequency, modulationRatio, feedbackRatio) {
             this.carrier.frequency.linearRampToValueAtTime(frequency, when);
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-            this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+            this.phaseDelay.delayTime.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
         }
         startPlayFrequency(volume, attack, decay, sustain, release, when, duration, frequency, modulationRatio, feedbackRatio) {
@@ -73,7 +70,7 @@ function newDX7FMSynth1() {
             this.envelope.gain.linearRampToValueAtTime(0, when + duration + release);
             this.carrier.frequency.value = frequency;
             this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
-            this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+            this.phaseDelay.delayTime.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
             this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
             this.operatorOut.gain.value = volume;
         }
@@ -82,10 +79,8 @@ function newDX7FMSynth1() {
             this.envelope.disconnect();
             this.phaseDelay.disconnect();
             this.modulationLevel.disconnect();
-            this.compensateNegativeDelay.disconnect();
             this.feedbackLevel.disconnect();
             this.carrier.disconnect();
-            this.compensateNegativeDelay.stop();
             this.carrier.stop();
         }
     }
