@@ -1,0 +1,158 @@
+{
+	"compilerOptions": {
+		"target": "es2020"
+		//"target": "es2015"
+        ,"outFile": "gpstart.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+		//,"module": "es2020"
+        ,"lib": [
+			"ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            //"es2022.regexp",
+            //"es2022.error",
+            //"ES2024.Promise",
+            "DOM",
+            "DOM.Iterable",
+            //"ES2017.ArrayBuffer",
+            //"ES2024.ArrayBuffer"
+            //"dom"
+            //,"es2015"
+            //,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		
+        "../../mzxbxapi/musicenginetypes.ts"
+,"../../extensions/minium.percussion/list/names.ts"
+		,"../../extensions/minium.pitch/list/names.ts"
+		,"../../extensions/alphaTabImport/midiimport/typesmidi.ts"
+		
+		,"../../extensions/alphaTabImport/alphatab/AlphaTabError.ts"
+		,"../../extensions/alphaTabImport/alphatab/FormatError.ts"
+		
+		,"../../extensions/alphaTabImport/alphatab/CoreSettings.ts"
+		,"../../extensions/alphaTabImport/alphatab/LogLevel.ts"
+		,"../../extensions/alphaTabImport/alphatab/ImporterSettings.ts"
+		,"../../extensions/alphaTabImport/alphatab/Settings.ts"
+		,"../../extensions/alphaTabImport/alphatab/Logger.ts"
+		,"../../extensions/alphaTabImport/alphatab/NotationSettings.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/IReadable.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/IOHelper.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/TypeConversions.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/IWriteable.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/ByteBuffer.ts"
+		,"../../extensions/alphaTabImport/alphatab/io/BitReader.ts"
+		,"../../extensions/alphaTabImport/alphatab/synth/SynthConstants.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Score.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/PickStroke.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/RepeatGroup.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/MasterBar.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/KeySignature.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/KeySignatureType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/TripletFeel.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Section.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Automation.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Fermata.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Direction.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Duration.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/DynamicValue.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Beat.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Voice.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Note.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BendStyle.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/AccentuationType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Ottavia.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BendType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BendPoint.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/HarmonicType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/SlideInType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/SlideOutType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/VibratoType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Fingers.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/NoteAccidentalMode.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/NoteOrnament.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Staff.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Track.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Bar.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Clef.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Chord.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Tuning.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/ModelUtils.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/GraceGroup.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/GraceType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/CrescendoType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/FadeType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Rasgueado.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BrushType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/TupletGroup.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/WhammyType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/GolpeType.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/WahPedal.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BarreShape.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Lyrics.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/SimileMark.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/Color.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/PlaybackInformation.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/InstrumentArticulation.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/BackingTrack.ts"
+		,"../../extensions/alphaTabImport/alphatab/model/PercussionMapper.ts"
+		,"../../extensions/alphaTabImport/alphatab/midi/MidiUtils.ts"		
+		,"../../extensions/alphaTabImport/alphatab/midi/GeneralMidi.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/ScoreImporter.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/UnsupportedFormatError.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/GpxFileSystem.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/GpifParser.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/BinaryStylesheet.ts"
+		,"../../extensions/alphaTabImport/alphatab/util/Lazy.ts"
+		
+		,"../../extensions/alphaTabImport/alphatab/xml/XmlNode.ts"
+		,"../../extensions/alphaTabImport/alphatab/xml/XmlDocument.ts"
+		,"../../extensions/alphaTabImport/alphatab/xml/XmlError.ts"
+		,"../../extensions/alphaTabImport/alphatab/xml/XmlParser.ts"
+		,"../../extensions/alphaTabImport/alphatab/xml/XmlWriter.ts"
+		
+		,"../../extensions/alphaTabImport/alphatab/generated/model/BeatCloner.ts"
+		,"../../extensions/alphaTabImport/alphatab/generated/model/NoteCloner.ts"
+		,"../../extensions/alphaTabImport/alphatab/generated/model/BendPointCloner.ts"
+		,"../../extensions/alphaTabImport/alphatab/generated/model/AutomationCloner.ts"
+		,"../../extensions/alphaTabImport/alphatab/generated/model/SyncPointDataCloner.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/Adler32.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/Crc32.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/Deflater.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/DeflaterConstants.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/DeflaterEngine.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/DeflaterHuffman.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/Huffman.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/HuffTools.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/Inflate.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/PendingBuffer.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/ZipEntry.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/ZipReader.ts"
+		,"../../extensions/alphaTabImport/alphatab/zip/ZipWriter.ts"
+
+		,"../../extensions/alphaTabImport/alphatab/importer/Gp3To5Importer.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/GpxImporter.ts"
+		,"../../extensions/alphaTabImport/alphatab/importer/Gp7To8Importer.ts"
+		//,"../../extensions/alphaTabImport/alphatab/importer/MusicXmlImporter.ts"
+		
+		,"gpstart.ts"
+
+	]
+}
