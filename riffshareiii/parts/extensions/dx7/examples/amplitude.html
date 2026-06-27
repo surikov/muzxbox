@@ -7,18 +7,18 @@
 			
 			let carrier = audioContext.createOscillator();
 			let modulator = audioContext.createOscillator();
-			let output = audioContext.createGain();
+			let result = audioContext.createGain();
 			let level = audioContext.createGain();
 			
 			carrier.frequency.value = 500;
 			modulator.frequency.value = 4;
-			level.gain.value = 0.5;
-			output.gain.value = 0.5;
+			level.gain.value = 0.5;//уменьшить амплитуду в 2 раза
+			result.gain.value = 0.5;//сместить волну на 0.5
 			
 			modulator.connect(level);
-			level.connect(output.gain);
-			carrier.connect(output);//
-			output.connect(audioContext.destination);
+			level.connect(result.gain);
+			carrier.connect(result);
+			result.connect(audioContext.destination);
 			
 			carrier.start(when);
 			modulator.start(when);

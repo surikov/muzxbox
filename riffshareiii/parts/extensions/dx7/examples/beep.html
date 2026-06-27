@@ -3,11 +3,11 @@
 	<script>
 		function start() {
 			let audioContext = new AudioContext();//создаём главный объект
-			let when = audioContext.currentTime + 0.1;//играть через 0.1с после нажатия кнопки
+			let when = audioContext.currentTime + 0.1;//время через 0.1с
 			let beep = audioContext.createOscillator();//осциллятор это объект который делает "Пи-и-и-и"
 			beep.frequency.value = 440;//частота ноты Ля
 			beep.connect(audioContext.destination);//направляем звук в аудиовыход
-			beep.start(when);//проигрываем в указанное время
+			beep.start(when);//запускаем звук в указанное время
 			beep.stop(when + 1);//останавливаем через 1 секунду
 		}
 	</script>

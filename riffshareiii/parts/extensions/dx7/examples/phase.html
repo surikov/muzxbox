@@ -4,29 +4,29 @@
 	function start() {
 		let audioContext = new AudioContext();
 		let when = audioContext.currentTime + 0.1;
-		let soundFrequency = 500;
+		let soundFrequency = 500;//частота носителя
 		let maxmodulation = 4;
 
 		let carrier = audioContext.createOscillator();
-		let modulatorBeep = audioContext.createOscillator();
-		let modulationLevel = audioContext.createGain();
+		let modulator = audioContext.createOscillator();
+		let level = audioContext.createGain();
 		let phaseDelay = audioContext.createDelay();
 
 		carrier.frequency.value = soundFrequency;
-		modulatorBeep.frequency.value = soundFrequency;
-		modulationLevel.gain.setValueAtTime(0, when);
-		modulationLevel.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 2);
-		phaseDelay.delayTime.value = 0.5 / soundFrequency;
+		modulator.frequency.value = soundFrequency;
+		level.gain.setValueAtTime(0, when);
+		level.gain.linearRampToValueAtTime(maxmodulation / (2 * Math.PI * soundFrequency), when + 2);
+		phaseDelay.delayTime.value = 0.5 / soundFrequency;//сдвиг пропорционально длине волны
 
-		modulatorBeep.connect(modulationLevel);
-		modulationLevel.connect(phaseDelay.delayTime);
+		modulator.connect(level);
+		level.connect(phaseDelay.delayTime);
 		carrier.connect(phaseDelay);
 		phaseDelay.connect(audioContext.destination);
 
-		modulatorBeep.start(when);
+		modulator.start(when);
 		carrier.start(when);
 
-		modulatorBeep.stop(when + 2);
+		modulator.stop(when + 2);
 		carrier.stop(when + 2);
 	}
 </script>
