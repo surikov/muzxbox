@@ -532,3 +532,97 @@ console.log(88, Math.pow(2, 88 * 0.125) / Math.pow(2, 99 * 0.125));
 console.log(77, Math.pow(2, 77 * 0.125) / Math.pow(2, 99 * 0.125));
 console.log(66, Math.pow(2, 66 * 0.125) / Math.pow(2, 99 * 0.125));
 */
+class SignVerifyTest {
+
+	startTest() {
+		this.dumpKeyPEMs((signPEM: string, verifyPEM) => {
+			console.log('signPEM', signPEM);
+			console.log('verifyPEM', verifyPEM);
+			let testMessage = 'Test message to for testing.';
+			console.log('testMessage', testMessage);
+			this.buildMessageSignature(testMessage, signPEM, (signaturePEM: string) => {
+				console.log('signaturePEM', signaturePEM);
+				this.verifyMessageSignature(testMessage, signaturePEM, verifyPEM, (same: boolean) => {
+					console.log('same', same);
+				});
+			});
+		});
+	}
+	verifyMessageSignature(message: string, signaturePEM: string, verifyPEM: string, onDone: (same: boolean) => void) {
+		let verKeyBuffer: ArrayBuffer = this.str2ab(window.atob(verifyPEM));
+		let algorithm: RsaHashedImportParams = {
+			name: "RSA-PSS",
+			hash: "SHA-256",
+		};
+		window.crypto.subtle.importKey("spki", verKeyBuffer, algorithm, true, ['verify'])
+			.then((verifyKey: CryptoKey) => {
+				let signatureBuffer: ArrayBuffer = this.str2ab(window.atob(signaturePEM));
+				let msgBuff = new TextEncoder().encode(message);
+				window.crypto.subtle.verify({ name: "RSA-PSS", saltLength: 32 }, verifyKey, signatureBuffer, msgBuff)
+					.then((same: boolean) => {
+						onDone(same);
+					})
+					;
+			})
+			;
+	}
+	buildMessageSignature(message: string, signPEM: string, onDone: (signature: string) => void) {
+		let binaryDerString = window.atob(signPEM);
+		let binaryDerBuffer: ArrayBuffer = this.str2ab(binaryDerString);
+		let algorithm: RsaHashedImportParams = {
+			name: "RSA-PSS",
+			hash: "SHA-256",
+		};
+		window.crypto.subtle.importKey("pkcs8", binaryDerBuffer, algorithm, true, ['sign'])
+			.then((signKey: CryptoKey) => {
+				let msgBuff = new TextEncoder().encode(message);
+				window.crypto.subtle.sign({ name: "RSA-PSS", saltLength: 32 }, signKey, msgBuff)
+					.then((signature: ArrayBuffer) => {
+						let str = this.ab2str(signature);
+						let signaturePEM = window.btoa(str);
+						onDone(signaturePEM);
+					});
+			});
+	}
+	dumpKeyPEMs(onDone: (signPEM: string, verifyPEM: string) => void) {
+		let rsaParam: RsaHashedKeyGenParams = {
+			name: 'RSA-PSS'
+			, modulusLength: 4096
+			, publicExponent: new Uint8Array([1, 0, 1])
+			, hash: 'SHA-256'
+		};
+		window.crypto.subtle.generateKey(rsaParam, true, ['sign', 'verify'])
+			.then((pair: CryptoKeyPair) => {
+				window.crypto.subtle.exportKey("pkcs8", pair.privateKey)
+					.then((signbuf: ArrayBuffer) => {
+						let signPEM = window.btoa(this.ab2str(signbuf));
+						window.crypto.subtle.exportKey('spki', pair.publicKey)
+							.then((vebuf: ArrayBuffer) => {
+								let verifyPEM = window.btoa(this.ab2str(vebuf));
+								onDone(signPEM, verifyPEM);
+							});
+					});
+			});
+	}
+	ab2str(buf: ArrayBuffer): string {
+		return String.fromCharCode.apply(null, new Uint8Array(buf));
+	}
+	str2ab(str: string): ArrayBuffer {
+		let buf: ArrayBuffer = new ArrayBuffer(str.length);
+		let bufView: Uint8Array = new Uint8Array(buf);
+		for (let ii = 0; ii < str.length; ii++) {
+			bufView[ii] = str.charCodeAt(ii);
+		}
+		return buf;
+	}
+
+
+}
+//new SignVerifyTest().startTest();
+let sitest = new SignVerifyTest();
+sitest.verifyMessageSignature('testMessage Test message to for testing.'
+	, 'MBpmXlcwoZwXPoO/w3G0OJnkIyPWFrcNfOE1SZcGvrv6WbiHhlgo4YQX4DKq0UOjBDg2gFaMQyu0t2079OPlqOkgWiih76dhAylAkPeNGzn7dMN+a9LaykPcuYo1Bnc/Q31pbndo8dSq3CQvftTWD+DZbjehVwkwl5rlgqTUIVL75Z3UeCMUWZMxL+H8CDCSNbGOqKNMhdKo5w9BXU+QRibgNV7UFdcgbx6rlW1oIpv7bjzdUn4yr8YNx9o5ZF5vYJh6Fq5SLJqsVyU8TYE4wpUSU9gYrBw3MM3MJJ/hP4CIgieLZ2DrJdgAnFnLZjW6rQY0/Hao6gAyZXsr+PGqWaHSq8i3w9broU1TQpFiFNOM6oksKNcVZWNuy8buWCsJ8d6mt5WW92prTATAYXeuKDnb5WNXZ2DEEVaVmGg1wnePvkAoi7w71PvtKHH6UugkAaxiEbtZpED/KGHNSlIuwpgZnxxVeCigQshLIKqP9GU31wcVMWLhCGg6nCiJ3uJYL21sj0umeZ8i4rtEIz1rFmjBtJ6HGh3NEfx0zgjWWSYg7KM8vPozGuGUgJCnJBlipG9uxOw5m//jIC3WUrKSkzEzBE4ksXhCe/+lDOMp6zzz2/pnTbA6NHUkddHSN+CwoS+ZtvVksFwsIQ0wcE3PIHEkzXxwaLiqssvvyANJGZY='
+	, 'MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAuIhBUlezFEJqeFcFPgU96hxxgYHv9lBe88ZRhQT1FA6AzjP+1ZW4ggB/CagWyFjd+l3LKtrSi0H/XyPiKmavl6daEz7Y3JJPPkEYmX6fpiUOu/QabNr9FnZ7jH8t/D9d5BXFe/3zjnZc/j9VlffBY5zxZDEYV5Mawr+GSd0UO2OgoRc5XSF4VC9IT7a8nzbdkRBzHqAqh5UOTm3eSARTnGVTIo39fDJAxjTpRhRlNztfBwefTew2aD6l6oCBFAY6O6MwESqX932U08Yj74tbb+dzG2EioOV8bwOVMvpLDq4bGAwEPyDx3+Sf8wH/rIBICGJgtzM8WxMM/7buarGph+RNrh3pEIW0Qxcz/D71ldJHdoCJ7YMR76K61PDrS9FDMOTvHRKVjy/vBIUVIcANk2rkMhtcwIVsG9G5Dfu5lSAeuS+c/m0/04lSSBRPGUKYrRjK+G4BubAnXnQP5SQI5JNMzjwJFuvHm+RQ9iztVVkaxzvqOgx/NnMKmZN2xiw6Z3wPdMr/Jkpmce1ITPWJi4rTSDy+AnF6eOQ/tUlvSDgpfamPwyPsezX6EQ+thByogGadSRBivcVeU2fCEREscrLfZKIAQC75J6BM7eIOLBL8Z+uUPURSuFCmpp9yop0Krp6h/pNvJ+HwdBpUlyTd8Zcb8OZu/3s7Wn4gaSd2j7MCAwEAAQ=='
+	, (same: boolean) => {
+		console.log('same', same);
+	});
