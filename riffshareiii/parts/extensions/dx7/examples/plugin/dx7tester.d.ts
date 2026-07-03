@@ -418,11 +418,14 @@ declare class DX7Test {
 }
 declare var tester: DX7Test;
 declare class SignVerifyTest {
-    startTest(): void;
+    startTest33(): void;
     verifyMessageSignature(message: string, signaturePEM: string, verifyPEM: string, onDone: (same: boolean) => void): void;
     buildMessageSignature(message: string, signPEM: string, onDone: (signature: string) => void): void;
     dumpKeyPEMs(onDone: (signPEM: string, verifyPEM: string) => void): void;
     ab2str(buf: ArrayBuffer): string;
     str2ab(str: string): ArrayBuffer;
 }
+declare let testMessage: string;
+declare let pemSignature: string;
+declare let verifyPEM: string;
 declare let sitest: SignVerifyTest;
