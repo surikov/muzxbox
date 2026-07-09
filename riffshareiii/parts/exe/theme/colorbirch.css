@@ -1,9 +1,9 @@
 :root {
-	--background-color: #ccddee;
+	--background-color: #ccc;
 	--main-color: #030;
-	--drag-color: #f96;
+	--drag-color: #dd6;
 	--line-color: #003;
-	--click-color: #bbdd99;
+	--click-color: #090;
 }
 #tileLevelSVG {
 	background-image: url("bg/birch2.jpg");

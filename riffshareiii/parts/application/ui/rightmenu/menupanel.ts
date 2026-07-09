@@ -136,8 +136,11 @@ class RightMenuPanel {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
-		this.menuToggleButton = new IconLabelButton(true,[''], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
-			console.log('locick');
+		this.menuToggleButton = new IconLabelButton(true,['']
+			//, 'menuButtonCircle'
+			, 'menuTogglerFill'
+			, 'menuButtonLabel', (nn: number) => {
+			//console.log('locick');
 			if (globalCommandDispatcher.cfg().data.list) {
 				globalCommandDispatcher.hideRightMenu();
 			} else {
@@ -158,10 +161,10 @@ class RightMenuPanel {
 			, content: [
 				//this.layerCurrentTitle
 				//, 
-				this.menuToggleButton.anchor
-				,
+				
 				this.listingShadow
-				, this.backgroundRectangle
+				, this.menuToggleButton.anchor
+				,this.backgroundRectangle
 
 			], id: 'rightMenuBackgroundAnchor'
 		};
@@ -379,8 +382,8 @@ class RightMenuPanel {
 				}
 				case kindDraggableCircle: {
 					this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x: number, y: number) => {
-						if (it.onDrag) {
-							it.onDrag(x, y);
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
@@ -390,8 +393,8 @@ class RightMenuPanel {
 				}
 				case kindDraggableSquare: {
 					this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x: number, y: number) => {
-						if (it.onDrag) {
-							it.onDrag(x, y);
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();
@@ -401,8 +404,8 @@ class RightMenuPanel {
 				}
 				case kindDraggableTriangle: {
 					this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x: number, y: number) => {
-						if (it.onDrag) {
-							it.onDrag(x, y);
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
 						}
 						me.setFocus(it, infos);
 						me.resetAllAnchors();

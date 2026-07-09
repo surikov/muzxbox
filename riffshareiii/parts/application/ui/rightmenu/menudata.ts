@@ -7,7 +7,7 @@ type MenuInfo = {
 	children?: MenuInfo[];
 	sid?: string;
 	onClick?: () => void;
-	onDrag?: (x: number, y: number) => void;
+	onMenuItemDrag?: (x: number, y: number) => void;
 	onSubClick?: () => void;
 	onFolderCloseOpen?: () => void;
 	itemStates?: string[];
@@ -78,6 +78,7 @@ let copyToClipboard: MenuInfo = {
 		globalCommandDispatcher.copySelectionToClipboard()
 	}, itemKind: kindAction
 };
+let refreshMixerItemFocus: WaitDoIfNoOthers = new WaitDoIfNoOthers();
 let menuPointClipboard: MenuInfo = {
 	text: localMenuClipboard
 	, onFolderCloseOpen: () => {
@@ -351,7 +352,7 @@ function fillClipboardList() {
 						tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
 						tri.w = pasteWidth / zz;
 					});
-					info.onDrag = dragger.doDrag.bind(dragger);
+					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 				}
 			}
@@ -409,7 +410,7 @@ function fillClipboardList() {
 						tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
 						tri.w = pasteWidth / zz;
 					});
-					info.onDrag = dragger.doDrag.bind(dragger);
+					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 					/*menuPointClipboard.children.push({
 						text: percussion.title
@@ -500,7 +501,7 @@ function fillClipboardList() {
 						tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
 						tri.w = pasteWidth / zz;
 					});
-					info.onDrag = dragger.doDrag.bind(dragger);
+					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 				}
 			}
@@ -512,8 +513,9 @@ class DragMenuItemUtil {
 	dragItem: TileItem;
 	info: MenuInfo
 	onDone: (xx: number, yy: number) => void;
+	onDrag: null | ((xx: number, yy: number) => void);
 	onPluck: null | ((zz: number) => void) = null;
-	constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onPluck?: (zz: number) => void) {
+	constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag?: (xx: number, yy: number) => void, onPluck?: (zz: number) => void) {
 		this.dragStarted = false;
 		this.dragItem = dragItem;
 		this.info = info;
@@ -522,9 +524,12 @@ class DragMenuItemUtil {
 		if (onPluck) {
 			this.onPluck = onPluck;
 		}
+		if (onDrag) {
+			this.onDrag = onDrag;
+		}
 	}
 	doDrag(x: number, y: number) {
-		console.log();
+		//console.log();
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		//let zidx = zoomIndexFromZoom(zz);
 		let ss = globalCommandDispatcher.renderer.menu.scrollY;
@@ -553,7 +558,20 @@ class DragMenuItemUtil {
 			//let dy = globalCommandDispatcher.renderer.menu.dragItemY * zz;
 			this.onDone(pos.x, pos.y);
 			//console.log('drag onDone', globalCommandDispatcher.renderer.menu.dragItemX, globalCommandDispatcher.renderer.menu.dragItemY, '/', zz, zidx);
+		} else {
+			if (this.onDrag) {
+				let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
+				let point: TilePoint = globalCommandDispatcher.renderer.tiler.screen2view({
+					x: globalCommandDispatcher.renderer.menu.dragItemX * tap
+					, y: globalCommandDispatcher.renderer.menu.dragItemY * tap
+				});
+				let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+				let left = point.x - start;
+				let top = point.y - globalCommandDispatcher.cfg().gridTop();
+				this.onDrag(left, top);
+			}
 		}
+
 	}
 }
 function fillPluginsLists() {
@@ -593,7 +611,7 @@ function fillPluginsLists() {
 						globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 					});
 				});
-				info.onDrag = dragger.doDrag.bind(dragger);
+				info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 				menuPointAddPlugin.children.push(info);
 				/*let dragStarted = false;
 				let info: MenuInfo;
@@ -725,8 +743,24 @@ function fillPluginsLists() {
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
 						}
+						
+					}, (dx: number, dy: number) => {
+						refreshMixerItemFocus.start(200, () => {
+							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+							if (trackNo > -1) {
+								let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
+								console.log('drag over', toPerformerTrack.title);
+								
+							}
+						});
+						/*
+						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+						if (trackNo > -1) {
+							let toPerformerTrack:Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
+							console.log('drag over', toPerformerTrack.title);
+						}*/
 					});
-					info.onDrag = dragger.doDrag.bind(dragger);
+					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);
 				} else {
 					if (purpose == 'Filter') {
@@ -748,7 +782,7 @@ function fillPluginsLists() {
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
 						});
-						info.onDrag = dragger.doDrag.bind(dragger);
+						info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 						menuPointAddPlugin.children.push(info);
 						/*let dragStarted = false;
 						let info: MenuInfo;
@@ -802,10 +836,7 @@ function fillPluginsLists() {
 		}
 	}
 }
-function findPerformerIdxByXYcurZ(dx, dy): number {
-	//let trackNo = 0;
-	//let farNo = 0;
-	//let toPerformerTrack: Zvoog_MusicTrack | null = null;
+function findPerformerIdxByXYcurZ(dx: number, dy: number): number {
 	let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 	let zidx = zoomIndexFromZoom(zz);
 	let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
@@ -814,17 +845,6 @@ function findPerformerIdxByXYcurZ(dx, dy): number {
 		if (plugin.iconPosition) {
 			if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
 				if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
-					/*trackNo = ii;
-					let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
-					for (let ff = 0; ff < farorder.length; ff++) {
-						if (farorder[ff] == trackNo) {
-							farNo = ff;
-							break;
-						}
-					}*/
-					//return globalCommandDispatcher.cfg().data.tracks[ii];
-					//console.log('found track', plugin.iconPosition.x, plugin.iconPosition.y, 'at', dx, dy, 'zoom', zidx, zz);
-					//break;
 					return ii;
 				}
 			}

@@ -236,6 +236,10 @@ declare class CommandDispatcher {
     resetPlayButtonState(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
+declare class WaitDoIfNoOthers {
+    currentID: number;
+    start(ms: number, action: () => void): void;
+}
 type GridTimeTemplate14 = {
     ratio: number;
     duration: Zvoog_Metre;
@@ -433,7 +437,7 @@ type MenuInfo = {
     children?: MenuInfo[];
     sid?: string;
     onClick?: () => void;
-    onDrag?: (x: number, y: number) => void;
+    onMenuItemDrag?: (x: number, y: number) => void;
     onSubClick?: () => void;
     onFolderCloseOpen?: () => void;
     itemStates?: string[];
@@ -446,6 +450,7 @@ type MenuInfo = {
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
 declare let copyToClipboard: MenuInfo;
+declare let refreshMixerItemFocus: WaitDoIfNoOthers;
 declare let menuPointClipboard: MenuInfo;
 declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
@@ -456,12 +461,13 @@ declare class DragMenuItemUtil {
     dragItem: TileItem;
     info: MenuInfo;
     onDone: (xx: number, yy: number) => void;
+    onDrag: null | ((xx: number, yy: number) => void);
     onPluck: null | ((zz: number) => void);
-    constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onPluck?: (zz: number) => void);
+    constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag?: (xx: number, yy: number) => void, onPluck?: (zz: number) => void);
     doDrag(x: number, y: number): void;
 }
 declare function fillPluginsLists(): void;
-declare function findPerformerIdxByXYcurZ(dx: any, dy: any): number;
+declare function findPerformerIdxByXYcurZ(dx: number, dy: number): number;
 declare function composeBaseMenu(): MenuInfo[];
 declare class LeftPanel {
     leftLayer: TileLayerDefinition;

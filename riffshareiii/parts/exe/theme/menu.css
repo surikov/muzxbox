@@ -91,10 +91,19 @@
     pointer-events: none;
     font-family: "Material-Design-Iconic-Font";
 }
+.menuTogglerLine {
+    fill: var(--click-color);
+    stroke:0;
 
+}
 
 .menuButtonCircle {
     fill: var(--click-color);
+    stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.menuTogglerFill {
+    fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
     stroke: var(--main-color);
     stroke-width: 0.015cm;
 }

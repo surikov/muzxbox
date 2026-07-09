@@ -25,7 +25,7 @@ class IconLabelButton {
 			this.line = {
 				x: 0, y: 0, w: 5, h: 5
 				, rx: 0.5, ry: 0.5
-				, css: 'fillShadow'
+				, css: 'menuTogglerLine'
 			};
 		}
 		this.spot = {
@@ -91,9 +91,9 @@ class IconLabelButton {
 			this.shadow.ry = 0.14 * (size - 2 * (pad - sh));
 		}
 		if (this.line) {
-			this.line.x = left + pad + 2*sh;
-			this.line.y = top + pad + 2*sh;
-			this.line.w = sh/4;
+			this.line.x = left + pad + 2 * sh;
+			this.line.y = top + pad + 2 * sh;
+			this.line.w = sh;
 			this.line.h = size - 6 * sh;
 			this.line.rx = 0;//0.25 * (size - 2 * (pad - sh));
 			this.line.ry = 0;//0.25 * (size - 2 * (pad - sh));

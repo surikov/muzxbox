@@ -9,6 +9,18 @@ type RenderedLayers = RenderedPart & {
 	allLayers: () => TileLayerDefinition[];
 };
 */
+class WaitDoIfNoOthers {
+    currentID: number = 0;
+    start(ms: number, action: () => void) {
+        var startId = -1;
+        this.currentID = setTimeout(function () {
+            if (startId == this.currentID) {
+                action();
+            }
+        }.bind(this), ms);
+        startId = this.currentID;
+    }
+}
 type GridTimeTemplate14 = {
 	ratio: number
 	, duration: Zvoog_Metre

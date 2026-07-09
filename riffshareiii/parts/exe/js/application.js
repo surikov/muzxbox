@@ -2293,6 +2293,20 @@ class CommandDispatcher {
     }
 }
 let globalCommandDispatcher = new CommandDispatcher();
+class WaitDoIfNoOthers {
+    constructor() {
+        this.currentID = 0;
+    }
+    start(ms, action) {
+        var startId = -1;
+        this.currentID = setTimeout(function () {
+            if (startId == this.currentID) {
+                action();
+            }
+        }.bind(this), ms);
+        startId = this.currentID;
+    }
+}
 let gridLinesBrief = [
     { ratio: 0.4, duration: { count: 1, part: 2 } }
 ];
@@ -2908,8 +2922,7 @@ class RightMenuPanel {
             this.scrollY = 0;
             this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
         });
-        this.menuToggleButton = new IconLabelButton(true, [''], 'menuButtonCircle', 'menuButtonLabel', (nn) => {
-            console.log('locick');
+        this.menuToggleButton = new IconLabelButton(true, [''], 'menuTogglerFill', 'menuButtonLabel', (nn) => {
             if (globalCommandDispatcher.cfg().data.list) {
                 globalCommandDispatcher.hideRightMenu();
             }
@@ -2922,8 +2935,8 @@ class RightMenuPanel {
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
             beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
             content: [
-                this.menuToggleButton.anchor,
                 this.listingShadow,
+                this.menuToggleButton.anchor,
                 this.backgroundRectangle
             ], id: 'rightMenuBackgroundAnchor'
         };
@@ -3064,8 +3077,8 @@ class RightMenuPanel {
                 }
                 case kindDraggableCircle: {
                     this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x, y) => {
-                        if (it.onDrag) {
-                            it.onDrag(x, y);
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
@@ -3075,8 +3088,8 @@ class RightMenuPanel {
                 }
                 case kindDraggableSquare: {
                     this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x, y) => {
-                        if (it.onDrag) {
-                            it.onDrag(x, y);
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
@@ -3086,8 +3099,8 @@ class RightMenuPanel {
                 }
                 case kindDraggableTriangle: {
                     this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x, y) => {
-                        if (it.onDrag) {
-                            it.onDrag(x, y);
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
                         }
                         me.setFocus(it, infos);
                         me.resetAllAnchors();
@@ -3410,6 +3423,7 @@ let copyToClipboard = {
         globalCommandDispatcher.copySelectionToClipboard();
     }, itemKind: kindAction
 };
+let refreshMixerItemFocus = new WaitDoIfNoOthers();
 let menuPointClipboard = {
     text: localMenuClipboard,
     onFolderCloseOpen: () => {
@@ -3607,7 +3621,7 @@ function fillClipboardList() {
                         tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
                         tri.w = pasteWidth / zz;
                     });
-                    info.onDrag = dragger.doDrag.bind(dragger);
+                    info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
             }
@@ -3664,7 +3678,7 @@ function fillClipboardList() {
                         tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
                         tri.w = pasteWidth / zz;
                     });
-                    info.onDrag = dragger.doDrag.bind(dragger);
+                    info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
             }
@@ -3728,7 +3742,7 @@ function fillClipboardList() {
                         tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
                         tri.w = pasteWidth / zz;
                     });
-                    info.onDrag = dragger.doDrag.bind(dragger);
+                    info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
             }
@@ -3736,7 +3750,7 @@ function fillClipboardList() {
     }
 }
 class DragMenuItemUtil {
-    constructor(dragItem, info, onDone, onPluck) {
+    constructor(dragItem, info, onDone, onDrag, onPluck) {
         this.onPluck = null;
         this.dragStarted = false;
         this.dragItem = dragItem;
@@ -3745,9 +3759,11 @@ class DragMenuItemUtil {
         if (onPluck) {
             this.onPluck = onPluck;
         }
+        if (onDrag) {
+            this.onDrag = onDrag;
+        }
     }
     doDrag(x, y) {
-        console.log();
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         let ss = globalCommandDispatcher.renderer.menu.scrollY;
         let tt = this.info.menuTop ? this.info.menuTop : 0;
@@ -3766,6 +3782,19 @@ class DragMenuItemUtil {
             this.dragStarted = false;
             let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
             this.onDone(pos.x, pos.y);
+        }
+        else {
+            if (this.onDrag) {
+                let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
+                let point = globalCommandDispatcher.renderer.tiler.screen2view({
+                    x: globalCommandDispatcher.renderer.menu.dragItemX * tap,
+                    y: globalCommandDispatcher.renderer.menu.dragItemY * tap
+                });
+                let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                let left = point.x - start;
+                let top = point.y - globalCommandDispatcher.cfg().gridTop();
+                this.onDrag(left, top);
+            }
         }
     }
 }
@@ -3805,7 +3834,7 @@ function fillPluginsLists() {
                         globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                     });
                 });
-                info.onDrag = dragger.doDrag.bind(dragger);
+                info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                 menuPointAddPlugin.children.push(info);
             }
             else {
@@ -3861,8 +3890,16 @@ function fillPluginsLists() {
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
                         }
+                    }, (dx, dy) => {
+                        refreshMixerItemFocus.start(200, () => {
+                            let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+                            if (trackNo > -1) {
+                                let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
+                                console.log('drag over', toPerformerTrack.title);
+                            }
+                        });
                     });
-                    info.onDrag = dragger.doDrag.bind(dragger);
+                    info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointAddPlugin.children.push(info);
                 }
                 else {
@@ -3884,7 +3921,7 @@ function fillPluginsLists() {
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
                         });
-                        info.onDrag = dragger.doDrag.bind(dragger);
+                        info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                         menuPointAddPlugin.children.push(info);
                     }
                     else {
@@ -5400,7 +5437,7 @@ class PerformerIcon {
             minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
         };
         fanLevelAnchor.content.push(dropAnchor);
-        let rec = {
+        let itemrec = {
             x: xx - sz / 2, y: yy - sz / 2,
             w: sz, h: sz
         };
@@ -5412,11 +5449,11 @@ class PerformerIcon {
             if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2)
                 showSoloOnly = true;
         if (zidx < 7) {
-            rec.draggable = true;
+            itemrec.draggable = true;
             let toFilter = null;
             let toSpeaker = false;
             let needReset = false;
-            rec.activation = (x, y) => {
+            itemrec.activation = (x, y) => {
                 if (!dragAnchor.translation) {
                     dragAnchor.translation = { x: 0, y: 0 };
                 }
@@ -5522,12 +5559,12 @@ class PerformerIcon {
                 dragSamplerCss = 'fanSamplerMoveIconDisabled';
             if (track.performer.state == 1)
                 dragSamplerCss = 'fanSamplerMoveIconDisabled';
-            rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
+            itemrec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
         }
         else {
-            rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+            itemrec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
         }
-        dragAnchor.content.push(rec);
+        dragAnchor.content.push(itemrec);
         spearsAnchor.content.push({
             x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05,
             w: sz * 0.9, h: sz * 0.9,
@@ -6328,7 +6365,7 @@ class IconLabelButton {
             this.line = {
                 x: 0, y: 0, w: 5, h: 5,
                 rx: 0.5, ry: 0.5,
-                css: 'fillShadow'
+                css: 'menuTogglerLine'
             };
         }
         this.spot = {
@@ -6392,7 +6429,7 @@ class IconLabelButton {
         if (this.line) {
             this.line.x = left + pad + 2 * sh;
             this.line.y = top + pad + 2 * sh;
-            this.line.w = sh / 4;
+            this.line.w = sh;
             this.line.h = size - 6 * sh;
             this.line.rx = 0;
             this.line.ry = 0;

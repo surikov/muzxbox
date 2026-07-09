@@ -4,8 +4,9 @@ class FanPane {
 	performerIcons: PerformerIcon[];
 	samplerIcons: SamplerIcon[];
 	//connectionspears: SpearConnection[];
+	
 	resetPlates(fanAnchors: TileAnchor[], spearsAnchors: TileAnchor[]): void {
-		//console.log('FanPane.resetPlates', cfg, fanAnchors);
+		//console.log('FanPane.resetPlates');
 		//this.filterIcons = [];
 		this.filterIcons = [];
 		this.performerIcons = [];
@@ -25,6 +26,7 @@ class FanPane {
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
 			this.performerIcons.push(new PerformerIcon(globalCommandDispatcher.cfg().data.tracks[tt].performer.id));
 		}
+		//console.log(this.performerIcons.length);
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
 			this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
 		}
@@ -98,20 +100,20 @@ class FanPane {
 		//let speakerX = globalCommandDispatcher.cfg().wholeWidth() - globalCommandDispatcher.cfg().speakerIconPad - globalCommandDispatcher.cfg().rightPad + globalCommandDispatcher.cfg().speakerIconSize / 2;
 		//let speakerY = globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight() / 2 - globalCommandDispatcher.cfg().speakerIconSize / 2;
 		let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
-/*
-		let rec: TileRectangle = {
-			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2
-			, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize / 2
-			, w: globalCommandDispatcher.cfg().speakerIconSize
-			, h: globalCommandDispatcher.cfg().speakerIconSize
-			, rx: globalCommandDispatcher.cfg().speakerIconSize / 2
-			, ry: globalCommandDispatcher.cfg().speakerIconSize / 2
-			, css: 'fanSpeakerIcon'
-		};
-		fanAnchor.content.push(rec);*/
+		/*
+				let rec: TileRectangle = {
+					x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2
+					, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize / 2
+					, w: globalCommandDispatcher.cfg().speakerIconSize
+					, h: globalCommandDispatcher.cfg().speakerIconSize
+					, rx: globalCommandDispatcher.cfg().speakerIconSize / 2
+					, ry: globalCommandDispatcher.cfg().speakerIconSize / 2
+					, css: 'fanSpeakerIcon'
+				};
+				fanAnchor.content.push(rec);*/
 		let icon: TileText = {
-			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize/2.2
-			, y: speakerCenter.y + globalCommandDispatcher.cfg().speakerIconSize/2.4
+			x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize / 2.2
+			, y: speakerCenter.y + globalCommandDispatcher.cfg().speakerIconSize / 2.4
 			, text: icon_sound_loud
 			, css: 'fanSpeakerIconLabel'
 		};

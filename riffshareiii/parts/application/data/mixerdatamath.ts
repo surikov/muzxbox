@@ -195,6 +195,7 @@ class MixerDataMathUtility {
 		}
 		return null;
 	}
+	
 	dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean {
 		if (outputs.indexOf('', 0) > -1) {
 			return false;

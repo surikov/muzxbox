@@ -1,10 +1,13 @@
 class PerformerIcon {
 	performerId: string;
+	
 	constructor(performerId: string) {
 		this.performerId = performerId;
+
 	}
 	buildPerformerSpot(fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+
 		//console.log(farorder);
 		//for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 		for (let ff = 0; ff < farorder.length; ff++) {
@@ -40,11 +43,12 @@ class PerformerIcon {
 			, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
 		};
 		fanLevelAnchor.content.push(dropAnchor);
-		let rec: TileRectangle = {
+		let itemrec: TileRectangle = {
 			x: xx - sz / 2, y: yy - sz / 2
 			, w: sz, h: sz
 		};
-
+		
+		//console.log(this.performerFocusRetangle);
 		let showSoloOnly = false;
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
 			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) showSoloOnly = true;
@@ -52,11 +56,11 @@ class PerformerIcon {
 			if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2) showSoloOnly = true;
 
 		if (zidx < 7) {
-			rec.draggable = true;
+			itemrec.draggable = true;
 			let toFilter: Zvoog_FilterTarget | null = null;
 			let toSpeaker: boolean = false;
 			let needReset = false;
-			rec.activation = (x: number, y: number) => {
+			itemrec.activation = (x: number, y: number) => {
 
 
 				if (!dragAnchor.translation) {
@@ -165,11 +169,12 @@ class PerformerIcon {
 			if (track.performer.state == 0 && showSoloOnly) dragSamplerCss = 'fanSamplerMoveIconDisabled';
 			if (track.performer.state == 1) dragSamplerCss = 'fanSamplerMoveIconDisabled';
 			//rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-			rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
+			itemrec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
 		} else {
-			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+			itemrec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
-		dragAnchor.content.push(rec);
+		
+		dragAnchor.content.push(itemrec);
 		spearsAnchor.content.push({
 			x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05
 			, w: sz * 0.9, h: sz * 0.9
@@ -250,5 +255,6 @@ class PerformerIcon {
 			}
 		}
 	}
+	
 }
 
