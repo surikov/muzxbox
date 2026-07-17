@@ -42,28 +42,28 @@ class FileLoaderAlpha {
 					settings.importer.encoding = 'windows-1251';
 					gp35.init(data, settings);
 					let score = gp35.readScore();
-					me.convertScore2Project(score);
+					me.convertScore2Project(title, score);
 				} else {
 					if (path.endsWith('.gpx')) {
 						let gpx: GpxImporter = new GpxImporter();
 						settings.importer.encoding = 'windows-1251';
 						gpx.init(data, settings);
 						let score = gpx.readScore();
-						me.convertScore2Project(score);
+						me.convertScore2Project(title, score);
 					} else {
 						if (path.endsWith('.gp')) {
 							let gp78: Gp7To8Importer = new Gp7To8Importer();
 							settings.importer.encoding = 'windows-1251';
 							gp78.init(data, settings);
 							let score = gp78.readScore();
-							me.convertScore2Project(score);
+							me.convertScore2Project(title, score);
 						} else {
 							if (path.endsWith('.mxl') || path.endsWith('.musicxml')) {
 								let mxl: MusicXmlImporter = new MusicXmlImporter();
 								settings.importer.encoding = 'windows-1251';
 								mxl.init(data, settings);
 								let score = mxl.readScore();
-								me.convertScore2Project(score);
+								me.convertScore2Project(title, score);
 							} else {
 								if (path.endsWith('.mid')) {
 
@@ -97,12 +97,12 @@ class FileLoaderAlpha {
 		};
 		fileReader.readAsArrayBuffer(file);
 	}
-	convertScore2Project(score: Score) {
+	convertScore2Project(fname: string, score: Score) {
 		console.log(score);
 
 		let project: Zvoog_Project = {
 			versionCode: '1'
-			, title: score.title
+			, title: score.title + ' ' + fname
 			, timeline: []
 			, tracks: []
 			, percussions: []
@@ -378,7 +378,16 @@ class FileLoaderAlpha {
 		}
 
 		if (program == 16) re.ratio = 0.4;
+		if (program == 17) re.ratio = 0.4;
+		if (program == 18) re.ratio = 0.4;
 		if (program == 19) re.ratio = 0.4;
+		if (program == 20) re.ratio = 0.4;
+		if (program == 21) re.ratio = 0.4;
+		if (program == 22) re.ratio = 0.4;
+		if (program == 23) re.ratio = 0.4;
+
+		if (program == 24) re.ratio = 0.44;
+		if (program == 26) re.ratio = 0.44;
 
 		if (program == 27) re.ratio = 0.95;
 
@@ -387,19 +396,19 @@ class FileLoaderAlpha {
 		if (program == 30) re.ratio = 0.99;
 		if (program == 31) re.ratio = 0.99;
 
-		if (program == 32) re.ratio = 0.95;
-		if (program == 33) re.ratio = 0.95;
-		if (program == 34) re.ratio = 0.95;
-		if (program == 35) re.ratio = 0.95;
-		if (program == 36) re.ratio = 0.95;
-		if (program == 37) re.ratio = 0.95;
-		if (program == 38) re.ratio = 0.95;
-		if (program == 39) re.ratio = 0.95;
+		if (program == 32) re.ratio = 0.45;
+		if (program == 33) re.ratio = 0.45;
+		if (program == 34) re.ratio = 0.45;
+		if (program == 35) re.ratio = 0.45;
+		if (program == 36) re.ratio = 0.65;
+		if (program == 37) re.ratio = 0.65;
+		if (program == 38) re.ratio = 0.75;
+		if (program == 39) re.ratio = 0.75;
 
-		if (program == 48) re.ratio = 0.4;
-		if (program == 49) re.ratio = 0.4;
-		if (program == 50) re.ratio = 0.5;
-		if (program == 51) re.ratio = 0.4;
+		if (program == 48) re.ratio = 0.25;
+		if (program == 49) re.ratio = 0.25;
+		if (program == 50) re.ratio = 0.33;
+		if (program == 51) re.ratio = 0.25;
 
 		if (program == 65) re.ratio = 0.99;
 
@@ -442,7 +451,7 @@ class FileLoaderAlpha {
 		//let imode = this.findModeInstrument(scoreTrack.playbackInfo.program);
 		let volume = 1;
 		let ivolume = Math.round(volume * 100) * idxRatio.ratio;
-		console.log(scoreTrack.playbackInfo.program,scoreTrack.name,idxRatio.ratio);
+		console.log(scoreTrack.playbackInfo.program, scoreTrack.name, idxRatio.ratio);
 		//let util = new ChordPitchPerformerUtil();
 		//let idata = new ChordPitchPerformerUtil().dumpParameters(ivolume, iidx, imode);
 		let midiTitle = this.inames.tonechordinslist()[scoreTrack.playbackInfo.program];
@@ -507,7 +516,7 @@ class FileLoaderAlpha {
 		if (scoreTrack.playbackInfo.program == 29
 			|| scoreTrack.playbackInfo.program == 30) {
 			mzxbxTrack.performer.data = '' + ivolume + '/341/' + strummode;//'30/341';
-			palmMuteTrack.performer.data =  '' + (Math.round(volume * 100) * idxRatio.ratio*0.7) + '/323/0';//'29/323';
+			palmMuteTrack.performer.data = '' + (Math.round(volume * 100) * idxRatio.ratio * 0.7) + '/323/0';//'29/323';
 		}
 		let pmFlag = false;
 		let upFlag = false;

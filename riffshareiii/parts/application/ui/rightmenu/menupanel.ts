@@ -132,21 +132,21 @@ class RightMenuPanel {
 
 
 
-		this.menuUpButton = new IconLabelButton(false,[icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
+		this.menuUpButton = new IconLabelButton(false, [icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
-		this.menuToggleButton = new IconLabelButton(true,['']
+		this.menuToggleButton = new IconLabelButton(true, ['']
 			//, 'menuButtonCircle'
 			, 'menuTogglerFill'
 			, 'menuButtonLabel', (nn: number) => {
-			//console.log('locick');
-			if (globalCommandDispatcher.cfg().data.list) {
-				globalCommandDispatcher.hideRightMenu();
-			} else {
-				globalCommandDispatcher.showRightMenu();
-			}
-		});
+				//console.log('locick');
+				if (globalCommandDispatcher.cfg().data.list) {
+					globalCommandDispatcher.hideRightMenu();
+				} else {
+					globalCommandDispatcher.showRightMenu();
+				}
+			});
 
 
 		//this.layerCurrentTitle = { x: 2.5, y: 0, text: '', css: 'currentTitleLabel' };
@@ -161,10 +161,10 @@ class RightMenuPanel {
 			, content: [
 				//this.layerCurrentTitle
 				//, 
-				
+
 				this.listingShadow
 				, this.menuToggleButton.anchor
-				,this.backgroundRectangle
+				, this.backgroundRectangle
 
 			], id: 'rightMenuBackgroundAnchor'
 		};
@@ -866,9 +866,11 @@ class RightMenuPanel {
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 		let msz = 1.75;
 		if (globalCommandDispatcher.cfg().data.list) {
-			this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight / 2 - msz / 2, msz);
+			//this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight / 2 - msz / 2, msz);
+			this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
 		} else {
-			this.menuToggleButton.resize(this.shiftX - msz, viewHeight / 2 - msz / 2, msz);
+			//this.menuToggleButton.resize(this.shiftX - msz, viewHeight / 2 - msz / 2, msz);
+			this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
 		}
 		this.rerenderMenuContent(null);
 

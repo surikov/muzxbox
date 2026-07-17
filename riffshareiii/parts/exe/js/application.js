@@ -3260,10 +3260,10 @@ class RightMenuPanel {
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         let msz = 1.75;
         if (globalCommandDispatcher.cfg().data.list) {
-            this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight / 2 - msz / 2, msz);
+            this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
         }
         else {
-            this.menuToggleButton.resize(this.shiftX - msz, viewHeight / 2 - msz / 2, msz);
+            this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
         }
         this.rerenderMenuContent(null);
     }
@@ -3749,55 +3749,6 @@ function fillClipboardList() {
         }
     }
 }
-class DragMenuItemUtil {
-    constructor(dragItem, info, onDone, onDrag, onPluck) {
-        this.onPluck = null;
-        this.dragStarted = false;
-        this.dragItem = dragItem;
-        this.info = info;
-        this.onDone = onDone;
-        if (onPluck) {
-            this.onPluck = onPluck;
-        }
-        if (onDrag) {
-            this.onDrag = onDrag;
-        }
-    }
-    doDrag(x, y) {
-        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-        let ss = globalCommandDispatcher.renderer.menu.scrollY;
-        let tt = this.info.menuTop ? this.info.menuTop : 0;
-        let yy = (tt + ss - 0.0) * zz;
-        let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-        if (!this.dragStarted) {
-            this.dragStarted = true;
-            globalCommandDispatcher.hideRightMenu();
-            if (this.onPluck) {
-                this.onPluck(zz);
-            }
-            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
-        }
-        let pp = globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-        if (x == 0 && y == 0) {
-            this.dragStarted = false;
-            let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-            this.onDone(pos.x, pos.y);
-        }
-        else {
-            if (this.onDrag) {
-                let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
-                let point = globalCommandDispatcher.renderer.tiler.screen2view({
-                    x: globalCommandDispatcher.renderer.menu.dragItemX * tap,
-                    y: globalCommandDispatcher.renderer.menu.dragItemY * tap
-                });
-                let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-                let left = point.x - start;
-                let top = point.y - globalCommandDispatcher.cfg().gridTop();
-                this.onDrag(left, top);
-            }
-        }
-    }
-}
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
     menuPointActions.children = [];
@@ -3897,6 +3848,9 @@ function fillPluginsLists() {
                                 let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
                                 console.log('drag over', toPerformerTrack.title);
                             }
+                            else {
+                                console.log('drag anywhere');
+                            }
                         });
                     });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -3985,6 +3939,55 @@ function composeBaseMenu() {
             }
         ];
         return menuItemsData;
+    }
+}
+class DragMenuItemUtil {
+    constructor(dragItem, info, onDone, onDrag, onPluck) {
+        this.onPluck = null;
+        this.dragStarted = false;
+        this.dragItem = dragItem;
+        this.info = info;
+        this.onDone = onDone;
+        if (onPluck) {
+            this.onPluck = onPluck;
+        }
+        if (onDrag) {
+            this.onDrag = onDrag;
+        }
+    }
+    doDrag(x, y) {
+        let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+        let ss = globalCommandDispatcher.renderer.menu.scrollY;
+        let tt = this.info.menuTop ? this.info.menuTop : 0;
+        let yy = (tt + ss - 0.0) * zz;
+        let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
+        if (!this.dragStarted) {
+            this.dragStarted = true;
+            globalCommandDispatcher.hideRightMenu();
+            if (this.onPluck) {
+                this.onPluck(zz);
+            }
+            globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
+        }
+        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
+        if (x == 0 && y == 0) {
+            this.dragStarted = false;
+            let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
+            this.onDone(pos.x, pos.y);
+        }
+        else {
+            if (this.onDrag) {
+                let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
+                let point = globalCommandDispatcher.renderer.tiler.screen2view({
+                    x: globalCommandDispatcher.renderer.menu.dragItemX * tap,
+                    y: globalCommandDispatcher.renderer.menu.dragItemY * tap
+                });
+                let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                let left = point.x - start;
+                let top = point.y - globalCommandDispatcher.cfg().gridTop();
+                this.onDrag(left, top);
+            }
+        }
     }
 }
 class LeftPanel {

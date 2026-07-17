@@ -179,7 +179,7 @@ type MZXBX_FilterHolder = {
     description: string;
 };
 type MZXBX_PerformerSamplerHolder = {
-    plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
+    pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null;
     channel: MZXBX_Channel;
     kind: string;
     properties: string;
@@ -252,9 +252,9 @@ type MZXBX_Schedule = {
     filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
+    replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
     startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
-    startLoopTicks: (from: number, position: number, to: number) => string;
-    reconnectAllPlugins: (schedule: MZXBX_Schedule) => void;
+    startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void;
     cancel: () => void;
     allFilters(): MZXBX_FilterHolder[];
     allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
@@ -264,6 +264,7 @@ type MZXBX_Player = {
         play: boolean;
         loading: boolean;
     };
+    clearPluginsCache(): void;
 };
 type MZXBX_PluginRegistrationInformation = {
     label: string;
@@ -2795,7 +2796,7 @@ declare class AlphaTabImportMusicPlugin {
 declare class FileLoaderAlpha {
     inames: ChordPitchPerformerUtilMIDI;
     constructor(inputFile: any);
-    convertScore2Project(score: Score): void;
+    convertScore2Project(fname: string, score: Score): void;
     addRepeats(project: Zvoog_Project, score: Score): void;
     cloneAndRepeat(project: Zvoog_Project, start: number, altEnd: number, end: number, count: number): number;
     cloneOneMeasure(project: Zvoog_Project, from: number, to: number): void;

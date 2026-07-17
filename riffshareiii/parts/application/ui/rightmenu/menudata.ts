@@ -508,72 +508,7 @@ function fillClipboardList() {
 		}
 	}
 }
-class DragMenuItemUtil {
-	dragStarted: boolean;
-	dragItem: TileItem;
-	info: MenuInfo
-	onDone: (xx: number, yy: number) => void;
-	onDrag: null | ((xx: number, yy: number) => void);
-	onPluck: null | ((zz: number) => void) = null;
-	constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag?: (xx: number, yy: number) => void, onPluck?: (zz: number) => void) {
-		this.dragStarted = false;
-		this.dragItem = dragItem;
-		this.info = info;
-		this.onDone = onDone;
-		//console.log(this);
-		if (onPluck) {
-			this.onPluck = onPluck;
-		}
-		if (onDrag) {
-			this.onDrag = onDrag;
-		}
-	}
-	doDrag(x: number, y: number) {
-		//console.log();
-		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-		//let zidx = zoomIndexFromZoom(zz);
-		let ss = globalCommandDispatcher.renderer.menu.scrollY;
-		let tt = this.info.menuTop ? this.info.menuTop : 0;
-		let yy = (tt + ss - 0.0) * zz;
-		let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-		if (!this.dragStarted) {
 
-
-			this.dragStarted = true;
-			globalCommandDispatcher.hideRightMenu();
-			if (this.onPluck) {
-				this.onPluck(zz);
-			}
-			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
-
-		}
-		let pp = globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-		//let toPerformer = globalCommandDispatcher.cfg().dragFindPluginPerformerIcon(xx, yy, zidx);
-		//console.log('found performer', pp);
-		if (x == 0 && y == 0) {
-			this.dragStarted = false;
-			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-			//let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-			//let dx = globalCommandDispatcher.renderer.menu.dragItemX * zz;
-			//let dy = globalCommandDispatcher.renderer.menu.dragItemY * zz;
-			this.onDone(pos.x, pos.y);
-			//console.log('drag onDone', globalCommandDispatcher.renderer.menu.dragItemX, globalCommandDispatcher.renderer.menu.dragItemY, '/', zz, zidx);
-		} else {
-			if (this.onDrag) {
-				let tap = globalCommandDispatcher.renderer.tiler.tapPxSize();
-				let point: TilePoint = globalCommandDispatcher.renderer.tiler.screen2view({
-					x: globalCommandDispatcher.renderer.menu.dragItemX * tap
-					, y: globalCommandDispatcher.renderer.menu.dragItemY * tap
-				});
-				let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-				let left = point.x - start;
-				let top = point.y - globalCommandDispatcher.cfg().gridTop();
-				this.onDrag(left, top);
-			}
-		}
-
-	}
-}
 function fillPluginsLists() {
 	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
@@ -743,14 +678,16 @@ function fillPluginsLists() {
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
 						}
-						
+
 					}, (dx: number, dy: number) => {
 						refreshMixerItemFocus.start(200, () => {
 							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 							if (trackNo > -1) {
 								let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
 								console.log('drag over', toPerformerTrack.title);
-								
+
+							} else {
+								console.log('drag anywhere');
 							}
 						});
 						/*
