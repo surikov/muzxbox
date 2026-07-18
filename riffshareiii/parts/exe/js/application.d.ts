@@ -399,7 +399,7 @@ declare class RightMenuPanel {
     fillMenuItems(): void;
     setFocus(it: MenuInfo, infos: MenuInfo[]): void;
     fillMenuItemChildren(pad: number, infos: MenuInfo[]): void;
-    readCurrentSongData(project: Zvoog_Project): void;
+    readCurrentSongData767676(project: Zvoog_Project): void;
     rerenderMenuContent(folder: RightMenuItem | null): void;
     resizeMenu(viewWidth: number, viewHeight: number): void;
 }

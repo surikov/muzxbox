@@ -202,7 +202,7 @@ class UIRenderer {//} implements RenderedPart {
 		this.toolbar.resizeToolbar(vw, vh);
 
 		//this.menu.fillMenuItems();
-		this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
+		//this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
 		this.menu.resizeMenu(vw, vh);
 		//this.menu.rerenderContent();
 		//this.warning.resetDialogView(data);

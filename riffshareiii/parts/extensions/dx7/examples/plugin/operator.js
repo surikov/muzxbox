@@ -1,0 +1,71 @@
+var DX7Operator = /** @class */ (function () {
+    function DX7Operator(cntxt) {
+        this.audioContext = cntxt;
+        this.createNodes();
+        this.connectNodes();
+        this.setupNodes();
+    }
+    DX7Operator.prototype.setupNodes = function () {
+        this.output.gain.value = 0;
+        this.phaseDelay.delayTime.value = 0;
+        this.envelope.gain.value = 0;
+        this.compensateNegativeDelay.start(this.audioContext.currentTime);
+        this.carrier.start(this.audioContext.currentTime);
+    };
+    DX7Operator.prototype.connectNodes = function () {
+        this.envelope.connect(this.output);
+        this.phaseDelay.connect(this.envelope);
+        this.modulationLevel.connect(this.phaseDelay.delayTime);
+        this.compensateNegativeDelay.connect(this.phaseDelay.delayTime);
+        //this.feedbackLevel.connect(this.modulationLevel);
+        this.feedbackLevel.connect(this.phaseDelay.delayTime);
+        this.carrier.connect(this.phaseDelay);
+    };
+    DX7Operator.prototype.createNodes = function () {
+        this.output = this.audioContext.createGain();
+        this.modulationLevel = this.audioContext.createGain();
+        this.feedbackLevel = this.audioContext.createGain();
+        this.envelope = this.audioContext.createGain();
+        this.phaseDelay = this.audioContext.createDelay();
+        this.compensateNegativeDelay = this.audioContext.createConstantSource();
+        this.carrier = this.audioContext.createOscillator();
+    };
+    DX7Operator.prototype.rresetCarrier = function (when) {
+        /*
+        if (this.carrier) {
+            this.carrier.stop();
+            this.carrier.disconnect();
+        }
+        this.carrier = this.audioContext.createOscillator();
+        this.carrier.connect(this.phaseDelay);
+        this.carrier.start(when);
+        */
+    };
+    //resetEnvelope(attack: SynthSlope, decay: SynthSlope, sustain: SynthSlope, release: number, when: number, duration: number) {
+    DX7Operator.prototype.resetEnvelope = function (edata, when, duration) {
+        this.envelope.gain.setValueAtTime(0, when);
+        this.envelope.gain.setValueCurveAtTime(edata.attack.values, when, edata.attack.duration);
+        this.envelope.gain.setValueCurveAtTime(edata.decay.values, when + edata.attack.duration, edata.decay.duration);
+        this.envelope.gain.setValueCurveAtTime(edata.sustain.values, when + edata.attack.duration + edata.decay.duration, edata.sustain.duration);
+        this.envelope.gain.cancelAndHoldAtTime(when + duration);
+        this.envelope.gain.linearRampToValueAtTime(0, when + duration + edata.release);
+    };
+    DX7Operator.prototype.resetFrequency = function (when, frequency, modulationRatio, feedbackRatio) {
+        this.carrier.frequency.linearRampToValueAtTime(frequency, when);
+        //this.modulationLevel.gain.linearRampToValueAtTime(2.8 / frequency, when);
+        this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
+        this.compensateNegativeDelay.offset.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when); //2 * modulationRatio;
+        //this.feedbackLevel.gain.linearRampToValueAtTime(0.4 * feedbackRatio, when);
+        //this.feedbackLevel.gain.linearRampToValueAtTime(0.05 * feedbackRatio, when);
+        this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
+    };
+    DX7Operator.prototype.startPlayFrequency = function (info, when, duration, frequency, modulationRatio, feedbackRatio) {
+        //console.log('startPlayFrequency', frequency, feedbackRatio, info.volume);
+        //this.resetCarrier(when);
+        //this.resetEnvelope(info.attack, info.decay, info.sustain, info.release, when, duration);
+        this.resetEnvelope(info.envelope, when, duration);
+        this.resetFrequency(when, frequency, modulationRatio, feedbackRatio);
+        this.output.gain.value = info.volume;
+    };
+    return DX7Operator;
+}());

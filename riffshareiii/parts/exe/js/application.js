@@ -2411,7 +2411,6 @@ class UIRenderer {
         this.leftPanel.reFillLeftPanel();
         this.debug.resetDebugView();
         this.toolbar.resizeToolbar(vw, vh);
-        this.menu.readCurrentSongData(globalCommandDispatcher.cfg().data);
         this.menu.resizeMenu(vw, vh);
         this.warning.resizeDialog(vw, vh, () => {
             this.tiler.resetAnchor(this.warning.warningGroup, this.warning.warningAnchor, LevelModes.overlay);
@@ -3184,14 +3183,7 @@ class RightMenuPanel {
             }
         }
     }
-    readCurrentSongData(project) {
-        let solo = false;
-        for (let tt = 0; tt < project.tracks.length; tt++)
-            if (project.tracks[tt].performer.state == 2)
-                solo = true;
-        for (let tt = 0; tt < project.percussions.length; tt++)
-            if (project.percussions[tt].sampler.state == 2)
-                solo = true;
+    readCurrentSongData767676(project) {
     }
     rerenderMenuContent(folder) {
         this.contentAnchor.content = [];
