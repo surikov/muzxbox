@@ -606,36 +606,7 @@ function fillPluginsLists() {
 						, css: 'rectangleDragItem'
 					};
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
-						/*let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-						let zidx = zoomIndexFromZoom(zz);
-						let trackNo = 0;
-						let farNo = 0;
-						let toPerformerTrack: Zvoog_MusicTrack | null = null;
-						let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
-						for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
-							let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
-							if (plugin.iconPosition) {
-								if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
-									if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
-										trackNo = ii;
-										let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
-										for (let ff = 0; ff < farorder.length; ff++) {
-											if (farorder[ff] == trackNo) {
-												farNo = ff;
-												break;
-											}
-										}
-										toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[ii];
-										console.log('found track', plugin.iconPosition.x, plugin.iconPosition.y, 'at', dx, dy, 'zoom', zidx, zz);
-										break;
-									}
-								}
-							}
-						}
-						let xx = dx;
-						if (xx < globalCommandDispatcher.cfg().padGridFan) {
-							xx = globalCommandDispatcher.cfg().padGridFan;
-						}*/
+						
 						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 						if (trackNo > -1) {
 							let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
@@ -690,12 +661,7 @@ function fillPluginsLists() {
 								console.log('drag anywhere');
 							}
 						});
-						/*
-						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
-						if (trackNo > -1) {
-							let toPerformerTrack:Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
-							console.log('drag over', toPerformerTrack.title);
-						}*/
+						
 					});
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);

@@ -5,7 +5,8 @@ class DragMenuItemUtil {
 	onDone: (xx: number, yy: number) => void;
 	onDrag: null | ((xx: number, yy: number) => void);
 	onPluck: null | ((zz: number) => void) = null;
-	constructor(dragItem: TileItem, info: MenuInfo
+	constructor(dragItem: TileItem
+		, info: MenuInfo
 		, onDone: (xx: number, yy: number) => void
 		, onDrag?: (xx: number, yy: number) => void
 		, onPluck?: (zz: number) => void
