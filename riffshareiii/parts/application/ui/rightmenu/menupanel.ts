@@ -12,6 +12,8 @@ class RightMenuPanel {
 	dragItemX = 0;
 	dragItemY = 0;
 	dragAnchor: TileAnchor;
+
+	//dropFocusAnchor: TileAnchor;
 	
 	menuPanelBackground: SVGElement;
 	menuPanelContent: SVGElement;
@@ -26,6 +28,8 @@ class RightMenuPanel {
 	interAnchor: TileAnchor;
 	buttonsAnchor: TileAnchor;
 	dragHandler: TileRectangle;
+
+	//dropFocusHandler: TileRectangle;
 
 	contentAnchor: TileAnchor;
 	
@@ -104,6 +108,10 @@ class RightMenuPanel {
 
 		this.dragHandler = { x: 1, y: 1, w: 5, h: 5, css: 'transparentScroll', id: 'rightMenuDragHandler', draggable: true, activation: this.scrollListing.bind(this) };
 
+		//this.dropFocusHandler={ x: 1, y: 1, w: 5, h: 5, css: 'debug', id: 'rightMenudropFocusHandler', draggable: false};
+
+		
+		
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
 		
 		this.menuUpButton = new IconLabelButton(false, [icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
@@ -158,6 +166,7 @@ class RightMenuPanel {
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
+				//this.dropFocusHandler
 				this.dragHandler
 				, this.dragAnchor
 			]

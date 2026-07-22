@@ -728,6 +728,7 @@ class TileLevelRealTime {
         }
         else {
         }
+        this.allTilesOK = false;
     }
     ;
     resetAnchor(parentSVGGroup, anchor, layerMode) {

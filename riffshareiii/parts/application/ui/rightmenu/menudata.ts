@@ -606,7 +606,7 @@ function fillPluginsLists() {
 						, css: 'rectangleDragItem'
 					};
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
-						
+
 						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 						if (trackNo > -1) {
 							let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
@@ -649,19 +649,37 @@ function fillPluginsLists() {
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
 						}
-
+square.css='rectangleDragItem';
+								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
 					}, (dx: number, dy: number) => {
 						refreshMixerItemFocus.start(200, () => {
 							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 							if (trackNo > -1) {
 								let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
 								console.log('drag over', toPerformerTrack.title);
-
+								/*globalCommandDispatcher.renderer.menu.dropFocusHandler.x = dx;
+								globalCommandDispatcher.renderer.menu.dropFocusHandler.y = dy;
+								globalCommandDispatcher.renderer.menu.dropFocusHandler.w = 3;
+								globalCommandDispatcher.renderer.menu.dropFocusHandler.h = 3;*/
+								square.css='rectangleDragFocus';
+								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.interAnchor);
+								/*globalCommandDispatcher.resetAnchor(
+									globalCommandDispatcher.renderer.menu.menuPanelInteraction
+									, globalCommandDispatcher.renderer.menu.interAnchor
+									, LevelModes.overlay);
+									*/
+								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.interAnchor);
+								//globalCommandDispatcher.renderer.tiler.
+								//console.log(globalCommandDispatcher.renderer.menu.dropFocusHandler);
 							} else {
 								console.log('drag anywhere');
+								
+								square.css='rectangleDragItem';
+								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
 							}
 						});
-						
+
 					});
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);

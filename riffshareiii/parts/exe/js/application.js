@@ -3833,15 +3833,21 @@ function fillPluginsLists() {
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
                         }
+                        square.css = 'rectangleDragItem';
+                        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
                     }, (dx, dy) => {
                         refreshMixerItemFocus.start(200, () => {
                             let trackNo = findPerformerIdxByXYcurZ(dx, dy);
                             if (trackNo > -1) {
                                 let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
                                 console.log('drag over', toPerformerTrack.title);
+                                square.css = 'rectangleDragFocus';
+                                globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
                             }
                             else {
                                 console.log('drag anywhere');
+                                square.css = 'rectangleDragItem';
+                                globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
                             }
                         });
                     });
