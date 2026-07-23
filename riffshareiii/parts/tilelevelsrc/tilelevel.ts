@@ -820,7 +820,7 @@ class TileLevelRealTime implements TileLevelBase {
 			//console.log('not found', gid,element);
 		}
 		//console.log(element);
-		this.allTilesOK = false;
+		//this.allTilesOK = false;
 	};
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes
 	) {

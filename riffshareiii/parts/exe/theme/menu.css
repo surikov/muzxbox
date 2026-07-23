@@ -9,13 +9,17 @@
     stroke-width: 0.01cm;
 }
 .rectangleDragFocus {
-    fill: var(--click-color);
-	stroke: var(--main-color);
-    stroke-width: 0.1cm;
+    fill: none;
+	stroke: var(--line-color30);
+    stroke-width: 0.05cm;
 }
 
 .pasteDragItem {
     fill: var(--drag-color50);
+
+}
+.pasteDragFocus {
+    fill: var(--main-color50);
 
 }
 

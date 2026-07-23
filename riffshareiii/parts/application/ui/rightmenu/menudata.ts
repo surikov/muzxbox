@@ -317,6 +317,7 @@ function fillClipboardList() {
 				if (!empty) {
 					let info: MenuInfo = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
 					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
+					//let focustri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragFocus' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (xx: number, yy: number) => {
 						let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 						let mm: Zvoog_MetreMathType = MMUtil();
@@ -370,6 +371,7 @@ function fillClipboardList() {
 				if (!empty) {
 					let info: MenuInfo = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle };
 					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
+					//let focustri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragFocus' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (xx: number, yy: number) => {
 						let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 						let mm: Zvoog_MetreMathType = MMUtil();
@@ -436,6 +438,7 @@ function fillClipboardList() {
 				if (!empty) {
 					let info: MenuInfo = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle };
 					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
+					//let focustri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragFocus' };
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (xx: number, yy: number) => {
 
 
@@ -527,6 +530,7 @@ function fillPluginsLists() {
 			if (purpose == 'Sampler') {
 				let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
 				let tri: TilePolygon = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
+				//let fotri: TilePolygon = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragFocus' };
 				let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (xx: number, yy: number) => {
 					//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
 					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
@@ -605,6 +609,12 @@ function fillPluginsLists() {
 						, rx: 1 / 20, ry: 1 / 20
 						, css: 'rectangleDragItem'
 					};
+					let focusSquare: TileRectangle = {
+						x: 0, y: 0
+						, w: 2, h: 2
+						, rx: 1 / 20, ry: 1 / 20
+						, css: 'rectangleDragFocus'
+					};
 					let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
 
 						let trackNo = findPerformerIdxByXYcurZ(dx, dy);
@@ -649,35 +659,54 @@ function fillPluginsLists() {
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
 						}
-square.css='rectangleDragItem';
-								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+						refreshMixerItemFocus.currentID = -1;
+						globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+						//square.css = 'rectangleDragItem';
+						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
 					}, (dx: number, dy: number) => {
 						refreshMixerItemFocus.start(200, () => {
 							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 							if (trackNo > -1) {
 								let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
-								console.log('drag over', toPerformerTrack.title);
-								/*globalCommandDispatcher.renderer.menu.dropFocusHandler.x = dx;
-								globalCommandDispatcher.renderer.menu.dropFocusHandler.y = dy;
-								globalCommandDispatcher.renderer.menu.dropFocusHandler.w = 3;
-								globalCommandDispatcher.renderer.menu.dropFocusHandler.h = 3;*/
-								square.css='rectangleDragFocus';
-								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
-								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.interAnchor);
-								/*globalCommandDispatcher.resetAnchor(
-									globalCommandDispatcher.renderer.menu.menuPanelInteraction
-									, globalCommandDispatcher.renderer.menu.interAnchor
-									, LevelModes.overlay);
-									*/
-								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.interAnchor);
-								//globalCommandDispatcher.renderer.tiler.
-								//console.log(globalCommandDispatcher.renderer.menu.dropFocusHandler);
+								let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+								//console.log('drag over', toPerformerTrack.title);
+								//console.log('xyz', globalCommandDispatcher.renderer.tiler.getCurrentPointPosition());
+								//console.log('icon', toPerformerTrack.performer.iconPosition);
+								let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+								//focusSquare.css = 'rectangleDragFocus';
+								let sz = globalCommandDispatcher.cfg().fanPluginIconSize
+									(zoomIndexFromZoom
+										(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+									/ xyz.z;
+								let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+								//console.log('left', left * globalCommandDispatcher.renderer.tiler.tapPxSize());
+								let top = globalCommandDispatcher.cfg().gridTop();
+								//console.log(window.innerHeight / tapPx, globalCommandDispatcher.cfg().wholeHeight() / xyz.z);
+								if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+									//console.log('reset top');
+									top = top +xyz.z* (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+								}
+								let fx = left + toPerformerTrack.performer.iconPosition.x + xyz.x / tapPx;
+								let fy = top + toPerformerTrack.performer.iconPosition.y + xyz.y / tapPx;
+								globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [focusSquare];
+								focusSquare.x = fx / xyz.z - sz * 0.75;
+								focusSquare.y = fy / xyz.z - sz * 0.75;
+								focusSquare.w = sz * 1.5;
+								focusSquare.h = sz * 1.5;
+								focusSquare.rx = sz * 1.5 / 20;
+								focusSquare.ry = sz * 1.5 / 20
+								//console.log(focusSquare);
 							} else {
-								console.log('drag anywhere');
-								
-								square.css='rectangleDragItem';
-								globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+								//console.log('drag anywhere');
+								//focusSquare.css = 'rectangleDragItem';
+								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+								globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
 							}
+
+							globalCommandDispatcher.renderer.tiler.resetAnchor(
+								globalCommandDispatcher.renderer.menu.menuPanelInteraction
+								, globalCommandDispatcher.renderer.menu.focusTargetAnchor
+								, LevelModes.overlay);
 						});
 
 					});
@@ -687,6 +716,7 @@ square.css='rectangleDragItem';
 					if (purpose == 'Filter') {
 						let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
 						let circle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
+						//let focuscircle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragFocus' };
 						let dragger: DragMenuItemUtil = new DragMenuItemUtil(circle, info, (xx: number, yy: number) => {
 							//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
 							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {

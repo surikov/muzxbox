@@ -381,6 +381,7 @@ declare class RightMenuPanel {
     interLayer: TileLayerDefinition;
     buttonsLayer: TileLayerDefinition;
     interAnchor: TileAnchor;
+    focusTargetAnchor: TileAnchor;
     buttonsAnchor: TileAnchor;
     dragHandler: TileRectangle;
     contentAnchor: TileAnchor;
@@ -467,7 +468,7 @@ declare class DragMenuItemUtil {
     onDrag: null | ((xx: number, yy: number) => void);
     onPluck: null | ((zz: number) => void);
     constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag?: (xx: number, yy: number) => void, onPluck?: (zz: number) => void);
-    doDrag(x: number, y: number): void;
+    doDrag(dx: number, dy: number): void;
 }
 declare class LeftPanel {
     leftLayer: TileLayerDefinition;

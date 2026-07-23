@@ -1,20 +1,20 @@
 class RightMenuPanel {
 	menuUpButton: IconLabelButton;
 	menuToggleButton: IconLabelButton;
-	
+
 	lastWidth: number = 0;
 	lastHeight: number = 0;
 
 	backgroundRectangle: TileRectangle;
 	listingShadow: TileRectangle;
 	backgroundAnchor: TileAnchor;
-	
+
 	dragItemX = 0;
 	dragItemY = 0;
 	dragAnchor: TileAnchor;
 
 	//dropFocusAnchor: TileAnchor;
-	
+
 	menuPanelBackground: SVGElement;
 	menuPanelContent: SVGElement;
 	menuPanelInteraction: SVGElement;
@@ -26,13 +26,14 @@ class RightMenuPanel {
 	buttonsLayer: TileLayerDefinition;
 
 	interAnchor: TileAnchor;
+	focusTargetAnchor: TileAnchor;
 	buttonsAnchor: TileAnchor;
 	dragHandler: TileRectangle;
 
 	//dropFocusHandler: TileRectangle;
 
 	contentAnchor: TileAnchor;
-	
+
 	items: RightMenuItem[] = [];
 
 	scrollY: number = 0;
@@ -57,8 +58,8 @@ class RightMenuPanel {
 
 
 
-	showDragMenuItem(dx: number, dy: number, dragContent: TileItem) {
-		this.dragAnchor.content = [dragContent];
+	showDragMenuItem(dx: number, dy: number, dragContent: TileItem/*, dragFocus: TileItem*/) {
+		this.dragAnchor.content = [/*dragFocus, */dragContent];
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		this.dragItemX = dx / zz;
 		this.dragItemY = dy / zz;
@@ -85,7 +86,7 @@ class RightMenuPanel {
 		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 		let left = point.x - start;
 		let top = point.y - globalCommandDispatcher.cfg().gridTop();
-		
+
 		this.dragAnchor.css = 'noDragDropMixerItem';
 		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(this.dragAnchor);
 		return { x: left, y: top };
@@ -110,19 +111,19 @@ class RightMenuPanel {
 
 		//this.dropFocusHandler={ x: 1, y: 1, w: 5, h: 5, css: 'debug', id: 'rightMenudropFocusHandler', draggable: false};
 
-		
-		
+
+
 		this.listingShadow = { x: 0, y: 0, w: 5, h: 5, css: 'fillShadow' };
-		
+
 		this.menuUpButton = new IconLabelButton(false, [icon_moveup], 'menuButtonCircle', 'menuButtonLabel', (nn: number) => {
 			this.scrollY = 0;
 			this.contentAnchor.translation = { x: this.shiftX, y: this.scrollY };
 		});
 		this.menuToggleButton = new IconLabelButton(true, ['']
-			
+
 			, 'menuTogglerFill'
 			, 'menuButtonLabel', (nn: number) => {
-				
+
 				if (globalCommandDispatcher.cfg().data.list) {
 					globalCommandDispatcher.hideRightMenu();
 				} else {
@@ -139,7 +140,7 @@ class RightMenuPanel {
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
-				
+
 				this.listingShadow
 				, this.menuToggleButton.anchor
 				, this.backgroundRectangle
@@ -171,19 +172,27 @@ class RightMenuPanel {
 				, this.dragAnchor
 			]
 		};
+		this.focusTargetAnchor = {
+			xx: 0, yy: 111, ww: 111, hh: 0
+			, minZoom: zoomPrefixLevelsCSS[0].minZoom
+			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
+			, content: [
+				//
+			]
+		};
 		this.buttonsAnchor = {
 			xx: 0, yy: 111, ww: 111, hh: 0
 			, minZoom: zoomPrefixLevelsCSS[0].minZoom
 			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom
 			, content: [
-				 
+
 				this.menuUpButton.anchor
-				
+
 			]
 		};
 		this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
 		this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
-		this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
+		this.interLayer = { g: this.menuPanelInteraction, anchors: [this.focusTargetAnchor,this.interAnchor], mode: LevelModes.overlay };
 		this.buttonsLayer = { g: this.menuPanelButtons, anchors: [this.buttonsAnchor], mode: LevelModes.overlay };
 
 		return [this.bgLayer
@@ -226,17 +235,17 @@ class RightMenuPanel {
 		this.rerenderMenuContent(null);
 
 	}
-	
+
 	fillMenuItemChildren(pad: number, infos: MenuInfo[]): void {
-		
+
 		if (globalCommandDispatcher.cfg()) {
-			
+
 			if (globalCommandDispatcher.cfg().data.menuPlugins) {
 				menuPointAddPlugin.itemKind = kindOpenedFolder;
 			} else {
 				menuPointAddPlugin.itemKind = kindClosedFolder;
 			}
-			
+
 			if (globalCommandDispatcher.cfg().data.menuActions) {
 				menuPointActions.itemKind = kindOpenedFolder;
 			} else {
@@ -267,9 +276,9 @@ class RightMenuPanel {
 
 			switch (it.itemKind) {
 				case kindOpenedFolder: {
-					
+
 					let so: RightMenuItem = new RightMenuItem(kindOpenedFolder, it, pad, () => {
-						
+
 						if (it.onFolderCloseOpen) {
 							it.onFolderCloseOpen();
 						}
@@ -283,17 +292,17 @@ class RightMenuPanel {
 					if (children) {
 						this.fillMenuItemChildren(pad + 0.5, children);
 					}
-					
+
 					break;
 				}
 				case kindClosedFolder: {
-					
+
 					let si: RightMenuItem = new RightMenuItem(kindClosedFolder, it, pad, () => {
-						
+
 						if (it.onFolderCloseOpen) {
 							it.onFolderCloseOpen();
 						}
-						
+
 						it.focused = true;
 						it.itemKind = kindOpenedFolder;
 						me.rerenderMenuContent(si);
@@ -301,7 +310,7 @@ class RightMenuPanel {
 					});
 					this.items.push(si);
 					it.menuTop = this.items.length - 1;
-					
+
 					break;
 				}
 				case kindDraggableCircle: {
@@ -409,18 +418,18 @@ class RightMenuPanel {
 					break;
 				}
 			}
-			
+
 		}
 	}
 	readCurrentSongData767676(project: Zvoog_Project) {
 		//let solo = false;
 		//for (let tt = 0; tt < project.tracks.length; tt++) if (project.tracks[tt].performer.state == 2) solo = true;
 		//for (let tt = 0; tt < project.percussions.length; tt++) if (project.percussions[tt].sampler.state == 2) solo = true;
-		
+
 
 	}
 	rerenderMenuContent(folder: RightMenuItem | null) {
-		
+
 		this.contentAnchor.content = [];
 		this.fillMenuItems();
 
@@ -489,6 +498,11 @@ class RightMenuPanel {
 		this.interAnchor.ww = viewWidth;
 		this.interAnchor.hh = viewHeight;
 
+		this.focusTargetAnchor.xx = 0;
+		this.focusTargetAnchor.yy = 0;
+		this.focusTargetAnchor.ww = viewWidth;
+		this.focusTargetAnchor.hh = viewHeight;
+
 		this.buttonsAnchor.xx = 0;
 		this.buttonsAnchor.yy = 0;
 		this.buttonsAnchor.ww = viewWidth;
@@ -504,13 +518,13 @@ class RightMenuPanel {
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 		let msz = 1.75;
 		if (globalCommandDispatcher.cfg().data.list) {
-			
+
 			this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
 		} else {
-			
+
 			this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
 		}
 		this.rerenderMenuContent(null);
-}
+	}
 
 }

@@ -2961,6 +2961,12 @@ class RightMenuPanel {
                 this.dragAnchor
             ]
         };
+        this.focusTargetAnchor = {
+            xx: 0, yy: 111, ww: 111, hh: 0,
+            minZoom: zoomPrefixLevelsCSS[0].minZoom,
+            beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length - 1].minZoom,
+            content: []
+        };
         this.buttonsAnchor = {
             xx: 0, yy: 111, ww: 111, hh: 0,
             minZoom: zoomPrefixLevelsCSS[0].minZoom,
@@ -2971,7 +2977,7 @@ class RightMenuPanel {
         };
         this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
         this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
-        this.interLayer = { g: this.menuPanelInteraction, anchors: [this.interAnchor], mode: LevelModes.overlay };
+        this.interLayer = { g: this.menuPanelInteraction, anchors: [this.focusTargetAnchor, this.interAnchor], mode: LevelModes.overlay };
         this.buttonsLayer = { g: this.menuPanelButtons, anchors: [this.buttonsAnchor], mode: LevelModes.overlay };
         return [this.bgLayer,
             this.interLayer,
@@ -3240,6 +3246,10 @@ class RightMenuPanel {
         this.interAnchor.yy = 0;
         this.interAnchor.ww = viewWidth;
         this.interAnchor.hh = viewHeight;
+        this.focusTargetAnchor.xx = 0;
+        this.focusTargetAnchor.yy = 0;
+        this.focusTargetAnchor.ww = viewWidth;
+        this.focusTargetAnchor.hh = viewHeight;
         this.buttonsAnchor.xx = 0;
         this.buttonsAnchor.yy = 0;
         this.buttonsAnchor.ww = viewWidth;
@@ -3789,6 +3799,12 @@ function fillPluginsLists() {
                         rx: 1 / 20, ry: 1 / 20,
                         css: 'rectangleDragItem'
                     };
+                    let focusSquare = {
+                        x: 0, y: 0,
+                        w: 2, h: 2,
+                        rx: 1 / 20, ry: 1 / 20,
+                        css: 'rectangleDragFocus'
+                    };
                     let dragger = new DragMenuItemUtil(square, info, (dx, dy) => {
                         let trackNo = findPerformerIdxByXYcurZ(dx, dy);
                         if (trackNo > -1) {
@@ -3833,22 +3849,37 @@ function fillPluginsLists() {
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
                         }
-                        square.css = 'rectangleDragItem';
+                        refreshMixerItemFocus.currentID = -1;
+                        globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
                         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
                     }, (dx, dy) => {
                         refreshMixerItemFocus.start(200, () => {
                             let trackNo = findPerformerIdxByXYcurZ(dx, dy);
                             if (trackNo > -1) {
                                 let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
-                                console.log('drag over', toPerformerTrack.title);
-                                square.css = 'rectangleDragFocus';
-                                globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+                                let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+                                let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+                                let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zoomIndexFromZoom(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+                                    / xyz.z;
+                                let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                                let top = globalCommandDispatcher.cfg().gridTop();
+                                if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+                                    top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+                                }
+                                let fx = left + toPerformerTrack.performer.iconPosition.x + xyz.x / tapPx;
+                                let fy = top + toPerformerTrack.performer.iconPosition.y + xyz.y / tapPx;
+                                globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [focusSquare];
+                                focusSquare.x = fx / xyz.z - sz * 0.75;
+                                focusSquare.y = fy / xyz.z - sz * 0.75;
+                                focusSquare.w = sz * 1.5;
+                                focusSquare.h = sz * 1.5;
+                                focusSquare.rx = sz * 1.5 / 20;
+                                focusSquare.ry = sz * 1.5 / 20;
                             }
                             else {
-                                console.log('drag anywhere');
-                                square.css = 'rectangleDragItem';
-                                globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+                                globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
                             }
+                            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.menu.menuPanelInteraction, globalCommandDispatcher.renderer.menu.focusTargetAnchor, LevelModes.overlay);
                         });
                     });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -3953,7 +3984,7 @@ class DragMenuItemUtil {
             this.onDrag = onDrag;
         }
     }
-    doDrag(x, y) {
+    doDrag(dx, dy) {
         let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
         let ss = globalCommandDispatcher.renderer.menu.scrollY;
         let tt = this.info.menuTop ? this.info.menuTop : 0;
@@ -3967,8 +3998,8 @@ class DragMenuItemUtil {
             }
             globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
         }
-        globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-        if (x == 0 && y == 0) {
+        globalCommandDispatcher.renderer.menu.moveDragMenuItem(dx, dy);
+        if (dx == 0 && dy == 0) {
             this.dragStarted = false;
             let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
             this.onDone(pos.x, pos.y);

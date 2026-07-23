@@ -1,17 +1,20 @@
 class DragMenuItemUtil {
 	dragStarted: boolean;
 	dragItem: TileItem;
+	//focusTarget: TileItem;
 	info: MenuInfo
 	onDone: (xx: number, yy: number) => void;
 	onDrag: null | ((xx: number, yy: number) => void);
 	onPluck: null | ((zz: number) => void) = null;
 	constructor(dragItem: TileItem
+		//, focusTarget: TileItem
 		, info: MenuInfo
 		, onDone: (xx: number, yy: number) => void
 		, onDrag?: (xx: number, yy: number) => void
 		, onPluck?: (zz: number) => void
 	) {
 		this.dragStarted = false;
+		//this.focusTarget = focusTarget;
 		this.dragItem = dragItem;
 		this.info = info;
 		this.onDone = onDone;
@@ -22,7 +25,7 @@ class DragMenuItemUtil {
 			this.onDrag = onDrag;
 		}
 	}
-	doDrag(x: number, y: number) {
+	doDrag(dx: number, dy: number) {
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		let ss = globalCommandDispatcher.renderer.menu.scrollY;
 		let tt = this.info.menuTop ? this.info.menuTop : 0;
@@ -34,11 +37,11 @@ class DragMenuItemUtil {
 			if (this.onPluck) {
 				this.onPluck(zz);
 			}
-			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);
+			globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, this.dragItem);//, this.focusTarget);
 
 		}
-		globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-		if (x == 0 && y == 0) {
+		globalCommandDispatcher.renderer.menu.moveDragMenuItem(dx, dy);
+		if (dx == 0 && dy == 0) {
 			this.dragStarted = false;
 			let pos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
 			this.onDone(pos.x, pos.y);
