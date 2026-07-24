@@ -623,6 +623,7 @@ function fillPluginsLists() {
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								toPerformerTrack.performer.kind = MZXBX_currentPlugins()[ii].kind;
 								toPerformerTrack.performer.data = '';
+								toPerformerTrack.performer.id='' + Math.random();
 							});
 							let farNo = 0;
 							let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
