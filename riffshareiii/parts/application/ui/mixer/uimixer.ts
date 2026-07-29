@@ -145,10 +145,10 @@ class MixerUI {
 		if (mark) {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
-			let bar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
+			let cubar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
 			for (let ii = 0; ii < mark.barIdx; ii++) {
-				bar = globalCommandDispatcher.cfg().data.timeline[ii];
-				barX = barX + mm.set(bar.metre).duration(bar.tempo)
+				cubar = globalCommandDispatcher.cfg().data.timeline[ii];
+				barX = barX + mm.set(cubar.metre).duration(cubar.tempo)
 					* globalCommandDispatcher.cfg().widthDurationRatio
 					;
 			}
@@ -156,9 +156,11 @@ class MixerUI {
 			let top = globalCommandDispatcher.cfg().gridTop()
 				+ globalCommandDispatcher.cfg().gridHeight()
 				- mark.pitch;
+			let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
 			let rr = globalCommandDispatcher.cfg().notePathHeight;
-			let skipX = mm.set(mark.skip).duration(bar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
-			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX - rr / 2;
+			let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
+			//this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX - rr / 2;
+			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
 			this.markAnchor.yy = top - rr / 2;
 			this.markAnchor.ww = rr;
 			this.markAnchor.hh = rr;
@@ -169,7 +171,7 @@ class MixerUI {
 			this.markRectangle.rx = rr;
 			this.markRectangle.ry = rr;
 			this.markRectangle.css = 'markPointFill';
-			//console.log(globalCommandDispatcher.cfg().editmark, this.markAnchor, globalCommandDispatcher.cfg().leftPad, skipX);
+			//console.log('resetEditMark x', this.markRectangle.x, 'bar', barX, markbar, 'skip', skipX, mark.skip);
 		} else {
 			this.markRectangle.css = 'markPointNone';
 		}

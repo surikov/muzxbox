@@ -49,7 +49,7 @@ class ActionPluginDialog {
 					, screenData: null
 					, langID: labelLocaleDictionary
 				};
-				console.log('from host to plugin', message);
+				//console.log('from host to plugin', message);
 				pluginFrame.contentWindow.postMessage(message, '*');
 			}
 

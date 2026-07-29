@@ -18,13 +18,13 @@ abstract class MZXBX_Plugin_UI {
 			, done: done
 			, screenWait: screenWait
 		};
-		console.log('_sendMessageToHost', message);
+		console.log('MZXBX_Plugin_UI._sendMessageToHost', message);
 		window.parent.postMessage(message, '*');
 
 	}
 	_receiveHostMessage(messageEvent: MessageEvent) {
 		let message: MZXBX_MessageToPlugin = messageEvent.data;
-		console.log('_receiveHostMessage', message);
+		console.log('MZXBX_Plugin_UI._receiveHostMessage', message);
 		if (message) {
 			if (this.dialogId) {
 				this.hostData = message.hostData;

@@ -19,12 +19,12 @@ class MZXBX_Plugin_UI {
             done: done,
             screenWait: screenWait
         };
-        console.log('_sendMessageToHost', message);
+        console.log('MZXBX_Plugin_UI._sendMessageToHost', message);
         window.parent.postMessage(message, '*');
     }
     _receiveHostMessage(messageEvent) {
         let message = messageEvent.data;
-        console.log('_receiveHostMessage', message);
+        console.log('MZXBX_Plugin_UI._receiveHostMessage', message);
         if (message) {
             if (this.dialogId) {
                 this.hostData = message.hostData;
@@ -44,7 +44,7 @@ class MZXBX_Plugin_UI {
         }
     }
 }
-console.log('BarTimeEdit v1.0.1');
+console.log('BarTimeEdit v1.0.3');
 class BarTimeEdit extends MZXBX_Plugin_UI {
     constructor() {
         super(false);
@@ -208,6 +208,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
             for (let nn = 0; nn < this.currentProject.tracks.length; nn++) {
                 let trackBar = this.currentProject.tracks[nn].measures[ii];
                 for (let kk = 0; kk < trackBar.chords.length; kk++) {
+                    console.log(ii, 'track', nn, 'from', JSON.stringify(trackBar.chords[kk].skip));
                     trackBar.chords[kk].skip = shiftDuration.plus(trackBar.chords[kk].skip).metre();
                 }
             }
@@ -364,7 +365,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
                 let trackBar = currentProject.tracks[nn].measures[ii];
                 for (let kk = 0; kk < trackBar.chords.length; kk++) {
                     let chord = trackBar.chords[kk];
-                    if (barMetre.less(chord.skip)) {
+                    if (!barMetre.more(chord.skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
                             trackBar.chords.splice(kk, 1);
@@ -383,7 +384,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
                 let percuBar = currentProject.percussions[nn].measures[ii];
                 for (let kk = 0; kk < percuBar.skips.length; kk++) {
                     let skip = percuBar.skips[kk];
-                    if (barMetre.less(skip)) {
+                    if (!barMetre.more(skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
                             percuBar.skips.splice(kk, 1);
@@ -402,7 +403,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
                 let autoBar = currentProject.filters[nn].automation[ii];
                 for (let kk = 0; kk < autoBar.changes.length; kk++) {
                     let change = autoBar.changes[kk];
-                    if (barMetre.less(change.skip)) {
+                    if (!barMetre.more(change.skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
                             autoBar.changes.splice(kk, 1);
@@ -420,7 +421,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
             let textBar = currentProject.comments[ii];
             for (let kk = 0; kk < textBar.points.length; kk++) {
                 let point = textBar.points[kk];
-                if (barMetre.less(point.skip)) {
+                if (!barMetre.more(point.skip)) {
                     if (ii + 1 < currentProject.timeline.length) {
                         point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
                         textBar.points.splice(kk, 1);
