@@ -1,0 +1,27 @@
+<html style='background: grey;'>
+volume
+<input type='range' id='volumerange' min='0' max='100' />
+<br />
+<input type='radio' name='kind' id='kindsine' />sine
+<br />
+<input type='radio' name='kind' id='kindsquare' />square
+<br />
+<input type='radio' name='kind' id='kindsawtooth' checked />sawtootk
+<br />
+<input type='radio' name='kind' id='kindtriangle' />triangle
+<script>
+	let dialogId = null;
+
+	function onReceiveHostMessage(messageEvent) {
+		console.log(messageEvent);
+		if (dialogId) {
+			let data = messageEvent.data.hostData;
+		} else {
+			dialogId = messageEvent.data.hostData;
+		}
+	}
+	window.addEventListener('message', onReceiveHostMessage, false);
+	window.parent.postMessage('', '*');
+</script>
+
+</html>

@@ -1,0 +1,9 @@
+{
+	"label": "Test Performer Plugin 1",
+	"purpose": "Performer",
+	"kind": "simplePerformerPluginTest",
+	"ui": "http://127.0.0.1:8080/testperformerui1.html",
+	"evaluate": "createSimpleBeeperPlugin1",
+	"script": "http://127.0.0.1:8080/performer1plugin.js"
+}
+
