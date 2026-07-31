@@ -1,0 +1,22 @@
+type DrumEngineProps808 = {
+    f0: number;
+    f1: number;
+    drop: number;
+    dur: number;
+    click: number;
+    clickWave: string;
+    clickF: number;
+    drive: number;
+    wave: string;
+    level: number;
+    skin: number;
+    skinF: number;
+    skinDur: any;
+};
+declare function startTest(): void;
+declare const NOISE_SECONDS = 2;
+declare const NOISE_DATA: Float32Array<ArrayBuffer>;
+declare function fillFrom(dst: any, src: any): void;
+declare function noiseBuf(ac: AudioContext): AudioBuffer;
+declare function noiseSrc(ac: AudioContext): AudioBufferSourceNode;
+declare function tomEng(ctx: AudioContext, when: number, out: AudioNode, p: number, o: DrumEngineProps808): void;
