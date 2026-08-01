@@ -261,10 +261,8 @@ function make808Kit(ac: AudioContext): KIT808 {
 		, drive: number
 		, wave: string
 		, level: number
-		,skin:number
-		,skinF:number
-		,skinDur
 	};
+
 	// pitched drum: sine/tri drop + optional drive + optional click
 	function drumEng(t: number, out: AudioNode, p: number, o: DrumEngineProps808) {
 		const osc = trackSource(ctx.createOscillator());
@@ -298,9 +296,15 @@ function make808Kit(ac: AudioContext): KIT808 {
 			c.stop(t + 0.03);
 		}
 	}
-
+	type SnareEngineProps808 = {
+		toneDur: number
+		, noise: number
+		, nDur: number
+		, nFreq: number
+		, tones: number[][]
+	};
 	// snare family: tone pair + filtered noise
-	function snareEng(t, out, p, o) {
+	function snareEng(t: number, out: AudioNode, p: number, o: SnareEngineProps808) {
 		(o.tones || []).forEach(pair => {
 			const osc = trackSource(ctx.createOscillator());
 			const g = ctx.createGain();
@@ -325,9 +329,14 @@ function make808Kit(ac: AudioContext): KIT808 {
 			n.stop(t + o.nDur + 0.02);
 		}
 	}
-
+	type ClapEngineProps808 = {
+		freq: number
+		, bursts: number[]
+		, q: number
+		, tail: number
+	};
 	// clap family: noise bursts through a bandpass, then a tail
-	function clapEng(t, out, p, o) {
+	function clapEng(t: number, out: AudioNode, p: number, o: ClapEngineProps808) {
 		const n = noiseSrc();
 		const bp = ctx.createBiquadFilter();
 		bp.type = 'bandpass';
@@ -346,9 +355,16 @@ function make808Kit(ac: AudioContext): KIT808 {
 		n.start(t);
 		n.stop(t + last + o.tail + 0.02);
 	}
-
+	type HatEngineProps808 = {
+		level: number
+		, bpF: number
+		, hpF: number
+		, decay: number
+		, fScale: number
+		, wash: number
+	};
 	// hat family: six metallic squares + filters, optional noisy crash wash
-	function hatEng(t, out, p, o) {
+	function hatEng(t: number, out: AudioNode, p: number, o: HatEngineProps808) {
 		const freqs = [263, 400, 421, 474, 587, 845];
 		const bp = ctx.createBiquadFilter();
 		bp.type = 'bandpass';
@@ -382,9 +398,17 @@ function make808Kit(ac: AudioContext): KIT808 {
 			n.stop(t + o.decay + 0.02);
 		}
 	}
+	type CowbellEngineProps808 = {
 
+		level: number
+		, dur: number
+		, freqs: number[]
+		, bpF: number
+		, strike: number
+		, q: number
+	};
 	// cowbell family: square partials through a bandpass, optional strike noise
-	function bellEng(t, out, p, o) {
+	function bellEng(t: number, out: AudioNode, p: number, o: CowbellEngineProps808) {
 		o.freqs.forEach(f => {
 			const osc = trackSource(ctx.createOscillator());
 			const bp = ctx.createBiquadFilter();
@@ -414,9 +438,21 @@ function make808Kit(ac: AudioContext): KIT808 {
 			n.stop(t + 0.05);
 		}
 	}
+	type TomEngineProps808 = {
+		f0: number,
+		f1: number,
+		drop: number,
+		dur: number,
 
+		wave: string
+
+		, skin: number
+		, skinF: number
+		, skinDur: number
+
+	};
 	// tom family: pitched drop + optional "skin" noise attack
-	function tomEng(t, out, p, o:DrumEngineProps808) {
+	function tomEng(t: number, out: AudioNode, p: number, o: TomEngineProps808) {
 		const osc = trackSource(ctx.createOscillator());
 		const g = ctx.createGain();
 		osc.type = o.wave || 'sine';
@@ -459,7 +495,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, drive: 0
 					, wave: ''
 					, level: 0
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 80,
@@ -473,7 +509,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, drive: 0
 					, wave: ''
 					, level: 0
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 100,
@@ -487,7 +523,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					clickF: 400
 					//
 					, wave: ''
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 140,
@@ -501,7 +537,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, level: 0
 					, clickWave: '',
 					clickF: 0
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 			],
 		},
@@ -520,7 +556,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, level: 0
 					, clickWave: '',
 					clickF: 0
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 190,
@@ -534,7 +570,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, drive: 0
 					, level: 0
 					, clickWave: ''
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 210,
@@ -548,7 +584,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					//
 					, wave: ''
 					, clickWave: ''
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 				(t, o, p) => drumEng(t, o, p, {
 					f0: 170,
@@ -562,7 +598,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					, level: 0
 					, clickWave: '',
 					clickF: 0
-					,skin:0 ,skinF:0 ,skinDur:0
+
 				}),
 			],
 		},
@@ -616,7 +652,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 				(t, o, p) => clapEng(t, o, p, {
 					freq: 1200,
 					bursts: [0, 0.011, 0.022],
-					tail: 0.6
+					tail: 0.6, q: 0
 				}),
 				(t, o, p) => clapEng(t, o, p, {
 					freq: 1600,
@@ -627,7 +663,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 				(t, o, p) => clapEng(t, o, p, {
 					freq: 1200,
 					bursts: [0, 0.011, 0.022, 0.09, 0.101],
-					tail: 0.45
+					tail: 0.45, q: 0
 				}),
 				(t, o, p) => clapEng(t, o, p, {
 					freq: 1000,
@@ -645,22 +681,22 @@ function make808Kit(ac: AudioContext): KIT808 {
 					bpF: 6500,
 					hpF: 4500,
 					level: 0.5,
-					decay: 0.2
+					decay: 0.2, wash: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					level: 0.5,
-					decay: 0.15
+					decay: 0.15, wash: 0, fScale: 0, bpF: 0, hpF: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					fScale: 1.3,
 					level: 0.45,
-					decay: 0.09
+					decay: 0.09, wash: 0, hpF: 0, bpF: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					fScale: 1.6,
 					hpF: 9000,
 					level: 0.4,
-					decay: 0.05
+					decay: 0.05, wash: 0, bpF: 0
 				}),
 			],
 		},
@@ -670,20 +706,20 @@ function make808Kit(ac: AudioContext): KIT808 {
 				(t, o, p) => hatEng(t, o, p, {
 					level: 0.5,
 					decay: 2.5,
-					wash: 0.3
+					wash: 0.3, fScale: 0, bpF: 0, hpF: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					level: 0.45,
-					decay: 1.2
+					decay: 1.2, wash: 0.0, fScale: 0, bpF: 0, hpF: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					level: 0.45,
-					decay: 0.7
+					decay: 0.7, wash: 0.0, fScale: 0, bpF: 0, hpF: 0
 				}),
 				(t, o, p) => hatEng(t, o, p, {
 					fScale: 1.3,
 					level: 0.4,
-					decay: 0.35
+					decay: 0.35, wash: 0.0, bpF: 0, hpF: 0
 				}),
 			],
 		},
@@ -692,7 +728,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 			engineFunctions: [
 				(t, o, p) => bellEng(t, o, p, {
 					freqs: [540, 800],
-					dur: 0.7
+					dur: 0.7, bpF: 0, q: 0, level: 0, strike: 0
 				}),
 				(t, o, p) => bellEng(t, o, p, {
 					freqs: [562, 845, 1102, 1460],
@@ -705,13 +741,13 @@ function make808Kit(ac: AudioContext): KIT808 {
 				(t, o, p) => bellEng(t, o, p, {
 					freqs: [405, 600],
 					bpF: 550,
-					dur: 0.9
+					dur: 0.9, q: 0, level: 0, strike: 0
 				}),
 				(t, o, p) => bellEng(t, o, p, {
 					freqs: [880, 1320],
 					bpF: 1200,
 					dur: 0.25,
-					level: 0.35
+					level: 0.35, q: 0, strike: 0
 				}),
 			],
 		},
@@ -723,14 +759,14 @@ function make808Kit(ac: AudioContext): KIT808 {
 					f1: 110,
 					dur: 0.85,
 					skin: 0.15
-					, drop:0, click:0, clickWave:'', clickF:0,drive:0, wave:'', level:0, skinF:0, skinDur:0
+					, drop: 0, wave: '', skinF: 0, skinDur: 0
 				}),
 				(t, o, p) => tomEng(t, o, p, {
 					f0: 300,
 					f1: 90,
 					drop: 0.3,
 					dur: 1.0
-					, click:0, clickWave:'', clickF:0,drive:0, wave:'', level:0, skinF:0, skinDur:0,skin:0
+					, wave: '', skinF: 0, skinDur: 0, skin: 0
 				}),
 				(t, o, p) => tomEng(t, o, p, {
 					f0: 185,
@@ -741,7 +777,7 @@ function make808Kit(ac: AudioContext): KIT808 {
 					skin: 0.3,
 					skinF: 1200,
 					skinDur: 0.08
-					, click:0, clickWave:'', clickF:0,drive:0, level:0, 
+
 				}),
 				(t, o, p) => tomEng(t, o, p, {
 					f0: 220,
@@ -749,12 +785,12 @@ function make808Kit(ac: AudioContext): KIT808 {
 					drop: 0.05,
 					dur: 0.25,
 					skin: 0.2
-					, click:0, clickWave:'', clickF:0,drive:0, wave:'', level:0, skinF:0, skinDur:0
+					, wave: '', skinF: 0, skinDur: 0
 				}),
 			],
 		},
 	};
-
+console.log(KIT);
 	return KIT;
 }
 const workGlobalKIT: KIT808 = make808Kit(ctx);

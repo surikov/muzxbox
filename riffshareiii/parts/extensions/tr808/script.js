@@ -358,8 +358,7 @@ function make808Kit(ac) {
                     clickF: 400,
                     drive: 0,
                     wave: '',
-                    level: 0,
-                    skin: 0, skinF: 0, skinDur: 0
+                    level: 0
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 80,
@@ -371,8 +370,7 @@ function make808Kit(ac) {
                     clickF: 300,
                     drive: 0,
                     wave: '',
-                    level: 0,
-                    skin: 0, skinF: 0, skinDur: 0
+                    level: 0
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 100,
@@ -384,8 +382,7 @@ function make808Kit(ac) {
                     click: 0.2,
                     clickWave: 'triangle',
                     clickF: 400,
-                    wave: '',
-                    skin: 0, skinF: 0, skinDur: 0
+                    wave: ''
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 140,
@@ -397,8 +394,7 @@ function make808Kit(ac) {
                     wave: '',
                     level: 0,
                     clickWave: '',
-                    clickF: 0,
-                    skin: 0, skinF: 0, skinDur: 0
+                    clickF: 0
                 }),
             ],
         },
@@ -415,8 +411,7 @@ function make808Kit(ac) {
                     wave: '',
                     level: 0,
                     clickWave: '',
-                    clickF: 0,
-                    skin: 0, skinF: 0, skinDur: 0
+                    clickF: 0
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 190,
@@ -428,8 +423,7 @@ function make808Kit(ac) {
                     clickF: 1100,
                     drive: 0,
                     level: 0,
-                    clickWave: '',
-                    skin: 0, skinF: 0, skinDur: 0
+                    clickWave: ''
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 210,
@@ -441,8 +435,7 @@ function make808Kit(ac) {
                     click: 0.35,
                     clickF: 1400,
                     wave: '',
-                    clickWave: '',
-                    skin: 0, skinF: 0, skinDur: 0
+                    clickWave: ''
                 }),
                 (t, o, p) => drumEng(t, o, p, {
                     f0: 170,
@@ -454,8 +447,7 @@ function make808Kit(ac) {
                     wave: '',
                     level: 0,
                     clickWave: '',
-                    clickF: 0,
-                    skin: 0, skinF: 0, skinDur: 0
+                    clickF: 0
                 }),
             ],
         },
@@ -509,7 +501,7 @@ function make808Kit(ac) {
                 (t, o, p) => clapEng(t, o, p, {
                     freq: 1200,
                     bursts: [0, 0.011, 0.022],
-                    tail: 0.6
+                    tail: 0.6, q: 0
                 }),
                 (t, o, p) => clapEng(t, o, p, {
                     freq: 1600,
@@ -520,7 +512,7 @@ function make808Kit(ac) {
                 (t, o, p) => clapEng(t, o, p, {
                     freq: 1200,
                     bursts: [0, 0.011, 0.022, 0.09, 0.101],
-                    tail: 0.45
+                    tail: 0.45, q: 0
                 }),
                 (t, o, p) => clapEng(t, o, p, {
                     freq: 1000,
@@ -538,22 +530,22 @@ function make808Kit(ac) {
                     bpF: 6500,
                     hpF: 4500,
                     level: 0.5,
-                    decay: 0.2
+                    decay: 0.2, wash: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     level: 0.5,
-                    decay: 0.15
+                    decay: 0.15, wash: 0, fScale: 0, bpF: 0, hpF: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     fScale: 1.3,
                     level: 0.45,
-                    decay: 0.09
+                    decay: 0.09, wash: 0, hpF: 0, bpF: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     fScale: 1.6,
                     hpF: 9000,
                     level: 0.4,
-                    decay: 0.05
+                    decay: 0.05, wash: 0, bpF: 0
                 }),
             ],
         },
@@ -563,20 +555,20 @@ function make808Kit(ac) {
                 (t, o, p) => hatEng(t, o, p, {
                     level: 0.5,
                     decay: 2.5,
-                    wash: 0.3
+                    wash: 0.3, fScale: 0, bpF: 0, hpF: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     level: 0.45,
-                    decay: 1.2
+                    decay: 1.2, wash: 0.0, fScale: 0, bpF: 0, hpF: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     level: 0.45,
-                    decay: 0.7
+                    decay: 0.7, wash: 0.0, fScale: 0, bpF: 0, hpF: 0
                 }),
                 (t, o, p) => hatEng(t, o, p, {
                     fScale: 1.3,
                     level: 0.4,
-                    decay: 0.35
+                    decay: 0.35, wash: 0.0, bpF: 0, hpF: 0
                 }),
             ],
         },
@@ -585,7 +577,7 @@ function make808Kit(ac) {
             engineFunctions: [
                 (t, o, p) => bellEng(t, o, p, {
                     freqs: [540, 800],
-                    dur: 0.7
+                    dur: 0.7, bpF: 0, q: 0, level: 0, strike: 0
                 }),
                 (t, o, p) => bellEng(t, o, p, {
                     freqs: [562, 845, 1102, 1460],
@@ -598,13 +590,13 @@ function make808Kit(ac) {
                 (t, o, p) => bellEng(t, o, p, {
                     freqs: [405, 600],
                     bpF: 550,
-                    dur: 0.9
+                    dur: 0.9, q: 0, level: 0, strike: 0
                 }),
                 (t, o, p) => bellEng(t, o, p, {
                     freqs: [880, 1320],
                     bpF: 1200,
                     dur: 0.25,
-                    level: 0.35
+                    level: 0.35, q: 0, strike: 0
                 }),
             ],
         },
@@ -616,14 +608,14 @@ function make808Kit(ac) {
                     f1: 110,
                     dur: 0.85,
                     skin: 0.15,
-                    drop: 0, click: 0, clickWave: '', clickF: 0, drive: 0, wave: '', level: 0, skinF: 0, skinDur: 0
+                    drop: 0, wave: '', skinF: 0, skinDur: 0
                 }),
                 (t, o, p) => tomEng(t, o, p, {
                     f0: 300,
                     f1: 90,
                     drop: 0.3,
                     dur: 1.0,
-                    click: 0, clickWave: '', clickF: 0, drive: 0, wave: '', level: 0, skinF: 0, skinDur: 0, skin: 0
+                    wave: '', skinF: 0, skinDur: 0, skin: 0
                 }),
                 (t, o, p) => tomEng(t, o, p, {
                     f0: 185,
@@ -633,8 +625,7 @@ function make808Kit(ac) {
                     dur: 0.5,
                     skin: 0.3,
                     skinF: 1200,
-                    skinDur: 0.08,
-                    click: 0, clickWave: '', clickF: 0, drive: 0, level: 0,
+                    skinDur: 0.08
                 }),
                 (t, o, p) => tomEng(t, o, p, {
                     f0: 220,
@@ -642,11 +633,12 @@ function make808Kit(ac) {
                     drop: 0.05,
                     dur: 0.25,
                     skin: 0.2,
-                    click: 0, clickWave: '', clickF: 0, drive: 0, wave: '', level: 0, skinF: 0, skinDur: 0
+                    wave: '', skinF: 0, skinDur: 0
                 }),
             ],
         },
     };
+    console.log(KIT);
     return KIT;
 }
 const workGlobalKIT = make808Kit(ctx);
