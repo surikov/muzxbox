@@ -11,6 +11,10 @@ function startTest() {
     snareEng(audioContext, when + 5 * 0.5, audioContext.destination, 1, snareInfos[1].snareprops);
     snareEng(audioContext, when + 6 * 0.5, audioContext.destination, 1, snareInfos[2].snareprops);
     snareEng(audioContext, when + 7 * 0.5, audioContext.destination, 1, snareInfos[3].snareprops);
+    clapEng(audioContext, when + 8 * 0.5, audioContext.destination, 1, clapInfos[0].clapprops);
+    clapEng(audioContext, when + 9 * 0.5, audioContext.destination, 1, clapInfos[1].clapprops);
+    clapEng(audioContext, when + 10 * 0.5, audioContext.destination, 1, clapInfos[2].clapprops);
+    clapEng(audioContext, when + 11 * 0.5, audioContext.destination, 1, clapInfos[3].clapprops);
 }
 const NOISE_SECONDS = 2;
 const NOISE_DATA = (() => {
@@ -62,6 +66,12 @@ let snareInfos = [
     { snarename: 'RIM', snareprops: { tones: [[440, 0.5], [660, 0.2]], toneDur: 0.06, noise: 0.25, nFreq: 2400, nDur: 0.07 } },
     { snarename: 'BIG', snareprops: { tones: [[150, 0.45], [270, 0.3]], toneDur: 0.4, noise: 0.55, nFreq: 1100, nDur: 0.8 } },
     { snarename: 'NOISE', snareprops: { tones: [[185, 0.15]], toneDur: 0.1, noise: 0.8, nFreq: 800, nDur: 0.5 } }
+];
+let clapInfos = [
+    { clapname: '808', clapprops: { freq: 1200, bursts: [0, 0.011, 0.022], tail: 0.6, q: 0 } },
+    { clapname: '505', clapprops: { freq: 1600, q: 2, bursts: [0, 0.009], tail: 0.2 } },
+    { clapname: 'DOUBLE', clapprops: { freq: 1200, bursts: [0, 0.011, 0.022, 0.09, 0.101], tail: 0.45, q: 0 } },
+    { clapname: 'ROOM', clapprops: { freq: 1000, q: 1, bursts: [0, 0.011, 0.022], tail: 1.0 } }
 ];
 function drumEng(ctx, t, out, p, o) {
     const osc = trackSource(ctx.createOscillator());

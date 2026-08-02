@@ -35,14 +35,19 @@ type Snare808info = {
     snareprops: SnareEngineProps808;
 };
 declare let snareInfos: Snare808info[];
-declare function drumEng(ctx: AudioContext, t: number, out: AudioNode, p: number, o: DrumEngineProps808): void;
-declare function snareEng(ctx: AudioContext, t: number, out: AudioNode, p: number, o: SnareEngineProps808): void;
 type ClapEngineProps808 = {
     freq: number;
     bursts: number[];
     q: number;
     tail: number;
 };
+type Clap808info = {
+    clapname: string;
+    clapprops: ClapEngineProps808;
+};
+declare let clapInfos: Clap808info[];
+declare function drumEng(ctx: AudioContext, t: number, out: AudioNode, p: number, o: DrumEngineProps808): void;
+declare function snareEng(ctx: AudioContext, t: number, out: AudioNode, p: number, o: SnareEngineProps808): void;
 declare function clapEng(ctx: AudioContext, t: number, out: AudioNode, p: number, o: ClapEngineProps808): void;
 type HatEngineProps808 = {
     level: number;
