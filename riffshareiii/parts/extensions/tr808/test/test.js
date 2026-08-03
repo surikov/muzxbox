@@ -15,6 +15,26 @@ function startTest() {
     clapEng(audioContext, when + 9 * 0.5, audioContext.destination, 1, clapInfos[1].clapprops);
     clapEng(audioContext, when + 10 * 0.5, audioContext.destination, 1, clapInfos[2].clapprops);
     clapEng(audioContext, when + 11 * 0.5, audioContext.destination, 1, clapInfos[3].clapprops);
+    hatEng(audioContext, when + 12 * 0.5, audioContext.destination, 1, hatInfos[0].hatprops);
+    hatEng(audioContext, when + 13 * 0.5, audioContext.destination, 1, hatInfos[1].hatprops);
+    hatEng(audioContext, when + 14 * 0.5, audioContext.destination, 1, hatInfos[2].hatprops);
+    hatEng(audioContext, when + 15 * 0.5, audioContext.destination, 1, hatInfos[3].hatprops);
+    bellEng(audioContext, when + 16 * 0.5, audioContext.destination, 1, cowbellInfos[0].cowbellprops);
+    bellEng(audioContext, when + 17 * 0.5, audioContext.destination, 1, cowbellInfos[1].cowbellprops);
+    bellEng(audioContext, when + 18 * 0.5, audioContext.destination, 1, cowbellInfos[2].cowbellprops);
+    bellEng(audioContext, when + 19 * 0.5, audioContext.destination, 1, cowbellInfos[3].cowbellprops);
+    tomEng(audioContext, when + 20 * 0.5, audioContext.destination, 1, tomInfos[0].tomprops);
+    tomEng(audioContext, when + 21 * 0.5, audioContext.destination, 1, tomInfos[1].tomprops);
+    tomEng(audioContext, when + 22 * 0.5, audioContext.destination, 1, tomInfos[2].tomprops);
+    tomEng(audioContext, when + 23 * 0.5, audioContext.destination, 1, tomInfos[3].tomprops);
+    drumEng(audioContext, when + 24 * 0.5, audioContext.destination, 1, kickInfos[0].drumprops);
+    drumEng(audioContext, when + 25 * 0.5, audioContext.destination, 1, kickInfos[1].drumprops);
+    drumEng(audioContext, when + 26 * 0.5, audioContext.destination, 1, kickInfos[2].drumprops);
+    drumEng(audioContext, when + 27 * 0.5, audioContext.destination, 1, kickInfos[3].drumprops);
+    hatEng(audioContext, when + 28 * 0.5, audioContext.destination, 1, ohatInfos[0].hatprops);
+    hatEng(audioContext, when + 29 * 0.5, audioContext.destination, 1, ohatInfos[1].hatprops);
+    hatEng(audioContext, when + 30 * 0.5, audioContext.destination, 1, ohatInfos[2].hatprops);
+    hatEng(audioContext, when + 31 * 0.5, audioContext.destination, 1, ohatInfos[3].hatprops);
 }
 const NOISE_SECONDS = 2;
 const NOISE_DATA = (() => {
@@ -56,10 +76,16 @@ function trackSource(node) {
     return node;
 }
 let drumInfos = [
-    { drumname: '808 SUB', drumprops: { f0: 110, f1: 34, drop: 0.28, dur: 4.5, click: 0.2, clickWave: 'triangle', clickF: 400, drive: 0, wave: '', level: 0 } },
-    { drumname: 'DEEP', drumprops: { f0: 80, f1: 28, drop: 0.4, dur: 6.0, click: 0.1, clickWave: 'triangle', clickF: 300, drive: 0, wave: '', level: 0 } },
-    { drumname: 'DIRTY', drumprops: { f0: 100, f1: 32, drop: 0.3, dur: 4.0, drive: 3, level: 0.8, click: 0.2, clickWave: 'triangle', clickF: 400, wave: '' } },
-    { drumname: 'PUNCH', drumprops: { f0: 140, f1: 40, drop: 0.15, dur: 2.0, click: 0.3, drive: 0, wave: '', level: 0, clickWave: '', clickF: 0 } }
+    { drumname: '808 SUB', drumprops: { f0: 110, f1: 34, drop: 0.28, dur: 4.5, click: 0.2, clickWave: 'triangle', drive: 0, clickF: 400, wave: '', level: 0 } },
+    { drumname: 'DEEP', drumprops: { f0: 80, f1: 28, drop: 0.4, dur: 6.0, click: 0.1, clickWave: 'triangle', drive: 0, clickF: 300, wave: '', level: 0 } },
+    { drumname: 'DIRTY', drumprops: { f0: 100, f1: 32, drop: 0.3, dur: 4.0, click: 0.2, clickWave: 'triangle', drive: 3, clickF: 400, wave: '', level: 0.8 } },
+    { drumname: 'PUNCH', drumprops: { f0: 140, f1: 40, drop: 0.15, dur: 2.0, click: 0.3, clickWave: '', drive: 0, clickF: 0, wave: '', level: 0 } }
+];
+let kickInfos = [
+    { drumname: '808', drumprops: { f0: 160, f1: 48, drop: 0.09, dur: 0.9, click: 0.25, drive: 0, wave: '', level: 0, clickWave: '', clickF: 0 } },
+    { drumname: '707', drumprops: { f0: 190, f1: 62, drop: 0.05, dur: 0.35, wave: 'triangle', click: 0.3, clickF: 1100, drive: 0, level: 0, clickWave: '' } },
+    { drumname: '909', drumprops: { f0: 210, f1: 52, drop: 0.07, dur: 0.5, drive: 2.2, level: 0.85, click: 0.35, clickF: 1400, wave: '', clickWave: '' } },
+    { drumname: 'TIGHT', drumprops: { f0: 170, f1: 55, drop: 0.04, dur: 0.2, click: 0.3, drive: 0, wave: '', level: 0, clickWave: '', clickF: 0 } }
 ];
 let snareInfos = [
     { snarename: 'CRISP', snareprops: { tones: [[185, 0.4], [330, 0.25]], toneDur: 0.18, noise: 0.6, nFreq: 1600, nDur: 0.28 } },
@@ -73,14 +99,38 @@ let clapInfos = [
     { clapname: 'DOUBLE', clapprops: { freq: 1200, bursts: [0, 0.011, 0.022, 0.09, 0.101], tail: 0.45, q: 0 } },
     { clapname: 'ROOM', clapprops: { freq: 1000, q: 1, bursts: [0, 0.011, 0.022], tail: 1.0 } }
 ];
-function drumEng(ctx, t, out, p, o) {
+let hatInfos = [
+    { hatname: 'LO METAL', hatprops: { fScale: 0.7, bpF: 6500, hpF: 4500, level: 0.5, decay: 0.2, wash: 0 } },
+    { hatname: 'CLASSIC', hatprops: { level: 0.5, decay: 0.15, wash: 0, fScale: 0, bpF: 0, hpF: 0 } },
+    { hatname: 'HIGH', hatprops: { fScale: 1.3, level: 0.45, decay: 0.09, wash: 0, hpF: 0, bpF: 0 } },
+    { hatname: 'TIGHT', hatprops: { fScale: 1.6, hpF: 9000, level: 0.4, decay: 0.05, wash: 0, bpF: 0 } }
+];
+let ohatInfos = [
+    { hatname: 'CRASH', hatprops: { level: 0.5, decay: 2.5, wash: 0.3, fScale: 0, bpF: 0, hpF: 0 } },
+    { hatname: 'LONG', hatprops: { level: 0.45, decay: 1.2, wash: 0.0, fScale: 0, bpF: 0, hpF: 0 } },
+    { hatname: 'MID', hatprops: { level: 0.45, decay: 0.7, wash: 0.0, fScale: 0, bpF: 0, hpF: 0 } },
+    { hatname: 'SHORT', hatprops: { fScale: 1.3, level: 0.4, decay: 0.35, wash: 0.0, bpF: 0, hpF: 0 } }
+];
+let cowbellInfos = [
+    { cowbellname: '808', cowbellprops: { freqs: [540, 800], dur: 0.7, bpF: 0, q: 0, level: 0, strike: 0 } },
+    { cowbellname: 'REAL', cowbellprops: { freqs: [562, 845, 1102, 1460], bpF: 1100, q: 0.9, level: 0.3, dur: 0.45, strike: 0.25 } },
+    { cowbellname: 'LOW', cowbellprops: { freqs: [405, 600], bpF: 550, dur: 0.9, q: 0, level: 0, strike: 0 } },
+    { cowbellname: 'PING', cowbellprops: { freqs: [880, 1320], bpF: 1200, dur: 0.25, level: 0.35, q: 0, strike: 0 } }
+];
+let tomInfos = [
+    { tomname: '808', tomprops: { f0: 200, f1: 110, dur: 0.85, skin: 0.15, drop: 0, wave: '', skinF: 0, skinDur: 0 } },
+    { tomname: 'ELECTRO', tomprops: { f0: 300, f1: 90, drop: 0.3, dur: 1.0, wave: '', skinF: 0, skinDur: 0, skin: 0 } },
+    { tomname: 'NATURAL', tomprops: { f0: 185, f1: 140, drop: 0.08, wave: 'triangle', dur: 0.5, skin: 0.3, skinF: 1200, skinDur: 0.08 } },
+    { tomname: 'TIGHT', tomprops: { f0: 220, f1: 160, drop: 0.05, dur: 0.25, skin: 0.2, wave: '', skinF: 0, skinDur: 0 } }
+];
+function drumEng(ctx, when, out, p, o) {
     const osc = trackSource(ctx.createOscillator());
     const g = ctx.createGain();
     osc.type = o.wave || 'sine';
-    osc.frequency.setValueAtTime(o.f0 * p, t);
-    osc.frequency.exponentialRampToValueAtTime(o.f1 * p, t + o.drop);
-    g.gain.setValueAtTime(o.level || 1.0, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
+    osc.frequency.setValueAtTime(o.f0 * p, when);
+    osc.frequency.exponentialRampToValueAtTime(o.f1 * p, when + o.drop);
+    g.gain.setValueAtTime(o.level || 1.0, when);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + o.dur);
     if (o.drive) {
         const d = ctx.createGain();
         d.gain.value = o.drive;
@@ -92,31 +142,31 @@ function drumEng(ctx, t, out, p, o) {
         osc.connect(g);
     }
     g.connect(out);
-    osc.start(t);
-    osc.stop(t + o.dur + 0.05);
+    osc.start(when);
+    osc.stop(when + o.dur + 0.05);
     if (o.click) {
         const c = trackSource(ctx.createOscillator());
         const cg = ctx.createGain();
         c.type = o.clickWave || 'square';
-        c.frequency.setValueAtTime((o.clickF || 900) * p, t);
-        cg.gain.setValueAtTime(o.click, t);
-        cg.gain.exponentialRampToValueAtTime(0.0001, t + 0.015);
+        c.frequency.setValueAtTime((o.clickF || 900) * p, when);
+        cg.gain.setValueAtTime(o.click, when);
+        cg.gain.exponentialRampToValueAtTime(0.0001, when + 0.015);
         c.connect(cg).connect(out);
-        c.start(t);
-        c.stop(t + 0.03);
+        c.start(when);
+        c.stop(when + 0.03);
     }
 }
-function snareEng(ctx, t, out, p, o) {
+function snareEng(ctx, when, out, p, o) {
     (o.tones || []).forEach(pair => {
         const osc = trackSource(ctx.createOscillator());
         const g = ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(pair[0] * p, t);
-        g.gain.setValueAtTime(pair[1], t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + o.toneDur);
+        osc.frequency.setValueAtTime(pair[0] * p, when);
+        g.gain.setValueAtTime(pair[1], when);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + o.toneDur);
         osc.connect(g).connect(out);
-        osc.start(t);
-        osc.stop(t + o.toneDur + 0.03);
+        osc.start(when);
+        osc.stop(when + o.toneDur + 0.03);
     });
     if (o.noise) {
         const n = noiseSrc(ctx);
@@ -124,33 +174,33 @@ function snareEng(ctx, t, out, p, o) {
         f.type = 'highpass';
         f.frequency.value = o.nFreq * p;
         const g = ctx.createGain();
-        g.gain.setValueAtTime(o.noise, t);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + o.nDur);
+        g.gain.setValueAtTime(o.noise, when);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + o.nDur);
         n.connect(f).connect(g).connect(out);
-        n.start(t);
-        n.stop(t + o.nDur + 0.02);
+        n.start(when);
+        n.stop(when + o.nDur + 0.02);
     }
 }
-function clapEng(ctx, t, out, p, o) {
+function clapEng(ctx, when, out, p, o) {
     const n = noiseSrc(ctx);
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
     bp.frequency.value = o.freq * p;
     bp.Q.value = o.q || 1.5;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(0.0001, t);
+    g.gain.setValueAtTime(0.0001, when);
     o.bursts.forEach(off => {
-        g.gain.setValueAtTime(0.9, t + off);
-        g.gain.exponentialRampToValueAtTime(0.12, t + off + 0.01);
+        g.gain.setValueAtTime(0.9, when + off);
+        g.gain.exponentialRampToValueAtTime(0.12, when + off + 0.01);
     });
     const last = o.bursts[o.bursts.length - 1];
-    g.gain.setValueAtTime(0.7, t + last + 0.011);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + last + o.tail);
+    g.gain.setValueAtTime(0.7, when + last + 0.011);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + last + o.tail);
     n.connect(bp).connect(g).connect(out);
-    n.start(t);
-    n.stop(t + last + o.tail + 0.02);
+    n.start(when);
+    n.stop(when + last + o.tail + 0.02);
 }
-function hatEng(ctx, t, out, p, o) {
+function hatEng(ctx, when, out, p, o) {
     const freqs = [263, 400, 421, 474, 587, 845];
     const bp = ctx.createBiquadFilter();
     bp.type = 'bandpass';
@@ -160,16 +210,16 @@ function hatEng(ctx, t, out, p, o) {
     hp.type = 'highpass';
     hp.frequency.value = (o.hpF || 7000) * p;
     const g = ctx.createGain();
-    g.gain.setValueAtTime(o.level, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + o.decay);
+    g.gain.setValueAtTime(o.level, when);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + o.decay);
     bp.connect(hp).connect(g).connect(out);
     freqs.forEach(f => {
         const osc = trackSource(ctx.createOscillator());
         osc.type = 'square';
         osc.frequency.value = f * (o.fScale || 1) * p;
         osc.connect(bp);
-        osc.start(t);
-        osc.stop(t + o.decay + 0.05);
+        osc.start(when);
+        osc.stop(when + o.decay + 0.05);
     });
     if (o.wash) {
         const n = noiseSrc(ctx);
@@ -177,14 +227,14 @@ function hatEng(ctx, t, out, p, o) {
         f.type = 'highpass';
         f.frequency.value = 5000 * p;
         const ng = ctx.createGain();
-        ng.gain.setValueAtTime(o.wash, t);
-        ng.gain.exponentialRampToValueAtTime(0.0001, t + o.decay);
+        ng.gain.setValueAtTime(o.wash, when);
+        ng.gain.exponentialRampToValueAtTime(0.0001, when + o.decay);
         n.connect(f).connect(ng).connect(out);
-        n.start(t);
-        n.stop(t + o.decay + 0.02);
+        n.start(when);
+        n.stop(when + o.decay + 0.02);
     }
 }
-function bellEng(ctx, t, out, p, o) {
+function bellEng(ctx, when, out, p, o) {
     o.freqs.forEach(f => {
         const osc = trackSource(ctx.createOscillator());
         const bp = ctx.createBiquadFilter();
@@ -194,12 +244,12 @@ function bellEng(ctx, t, out, p, o) {
         bp.type = 'bandpass';
         bp.frequency.value = (o.bpF || 700) * p;
         bp.Q.value = o.q || 1.2;
-        g.gain.setValueAtTime(o.level || 0.45, t);
-        g.gain.exponentialRampToValueAtTime(0.12, t + 0.03);
-        g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
+        g.gain.setValueAtTime(o.level || 0.45, when);
+        g.gain.exponentialRampToValueAtTime(0.12, when + 0.03);
+        g.gain.exponentialRampToValueAtTime(0.0001, when + o.dur);
         osc.connect(bp).connect(g).connect(out);
-        osc.start(t);
-        osc.stop(t + o.dur + 0.05);
+        osc.start(when);
+        osc.stop(when + o.dur + 0.05);
     });
     if (o.strike) {
         const n = noiseSrc(ctx);
@@ -207,35 +257,35 @@ function bellEng(ctx, t, out, p, o) {
         f.type = 'bandpass';
         f.frequency.value = 2500 * p;
         const ng = ctx.createGain();
-        ng.gain.setValueAtTime(o.strike, t);
-        ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.03);
+        ng.gain.setValueAtTime(o.strike, when);
+        ng.gain.exponentialRampToValueAtTime(0.0001, when + 0.03);
         n.connect(f).connect(ng).connect(out);
-        n.start(t);
-        n.stop(t + 0.05);
+        n.start(when);
+        n.stop(when + 0.05);
     }
 }
-function tomEng(ctx, t, out, p, o) {
+function tomEng(ctx, when, out, p, o) {
     const osc = trackSource(ctx.createOscillator());
     const g = ctx.createGain();
     osc.type = o.wave || 'sine';
-    osc.frequency.setValueAtTime(o.f0 * p, t);
-    osc.frequency.exponentialRampToValueAtTime(o.f1 * p, t + (o.drop || 0.12));
-    g.gain.setValueAtTime(0.85, t);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + o.dur);
+    osc.frequency.setValueAtTime(o.f0 * p, when);
+    osc.frequency.exponentialRampToValueAtTime(o.f1 * p, when + (o.drop || 0.12));
+    g.gain.setValueAtTime(0.85, when);
+    g.gain.exponentialRampToValueAtTime(0.0001, when + o.dur);
     osc.connect(g).connect(out);
-    osc.start(t);
-    osc.stop(t + o.dur + 0.05);
+    osc.start(when);
+    osc.stop(when + o.dur + 0.05);
     if (o.skin) {
         const n = noiseSrc(ctx);
         const lp = ctx.createBiquadFilter();
         lp.type = 'lowpass';
         lp.frequency.value = (o.skinF || 800) * p;
         const ng = ctx.createGain();
-        ng.gain.setValueAtTime(o.skin, t);
-        ng.gain.exponentialRampToValueAtTime(0.0001, t + (o.skinDur || 0.05));
+        ng.gain.setValueAtTime(o.skin, when);
+        ng.gain.exponentialRampToValueAtTime(0.0001, when + (o.skinDur || 0.05));
         n.connect(lp).connect(ng).connect(out);
-        n.start(t);
-        n.stop(t + (o.skinDur || 0.05) + 0.02);
+        n.start(when);
+        n.stop(when + (o.skinDur || 0.05) + 0.02);
     }
 }
 //# sourceMappingURL=test.js.map
