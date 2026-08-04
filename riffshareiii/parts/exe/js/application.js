@@ -1741,16 +1741,11 @@ class CommandDispatcher {
         this.resetProject();
     }
     tryFullScreen() {
-        var elem = document.documentElement;
-        console.log('root', elem);
-        if (elem.requestFullscreen) {
-            elem.requestFullscreen();
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
         }
-        else if (elem.webkitRequestFullscreen) {
-            elem.webkitRequestFullscreen();
-        }
-        else if (elem.msRequestFullscreen) {
-            elem.msRequestFullscreen();
+        else if (document.exitFullscreen) {
+            document.exitFullscreen();
         }
     }
     resetProject() {

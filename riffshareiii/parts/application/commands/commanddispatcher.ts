@@ -466,7 +466,7 @@ class CommandDispatcher {
 		}
 		//let me = this;
 		let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
-		console.log('after setupPlugins',this.lastUsedSchedule);
+		console.log('after setupPlugins', this.lastUsedSchedule);
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;
@@ -656,19 +656,24 @@ class CommandDispatcher {
 	}
 	tryFullScreen() {
 		//var elem = document.getElementById('fsbodyroot') as any;
-		var elem = document.documentElement as any;
-		console.log('root', elem);
+		//var elem = document.documentElement as any;
+		//console.log('root', elem);
 		/* When the openFullscreen() function is executed, open the video in fullscreen.
 		Note that we must include prefixes for different browsers, as they don't support the requestFullscreen method yet */
-
-		if (elem.requestFullscreen) {
-			elem.requestFullscreen();
-		} else if (elem.webkitRequestFullscreen) { /* Safari */
-			elem.webkitRequestFullscreen();
-		} else if (elem.msRequestFullscreen) { /* IE11 */
-			elem.msRequestFullscreen();
+		/*
+				if (elem.requestFullscreen) {
+					elem.requestFullscreen();
+				} else if (elem.webkitRequestFullscreen) { / Safari /
+					elem.webkitRequestFullscreen();
+				} else if (elem.msRequestFullscreen) { / IE11 /
+					elem.msRequestFullscreen();
+				}
+		*/
+		if (!document.fullscreenElement) {
+			document.documentElement.requestFullscreen();
+		} else if (document.exitFullscreen) {
+			document.exitFullscreen();
 		}
-
 	}
 
 
