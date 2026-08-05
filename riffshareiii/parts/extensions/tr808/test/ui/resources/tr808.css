@@ -1,3 +1,7 @@
+:root {
+	--bg-color: #866;
+}
+
 .rakesink {
 	background: #ff00ff00;
 	border: 0.1cm solid #000;
@@ -10,37 +14,35 @@
 }
 
 body {
-	margin: 0.3cm;
-	min-height2: 100vh;
-	display2: grid;
-	place-items2: center;
+	margin: 0cm;
+	padding: 0;
+user-select: none;
+	display: grid;
+	place-items: center;
 	color: #ffe;
 	font-family: Verdana, sans-serif;
 	background:
 		radial-gradient(at 0 0, #fff6, #fff0),
 		radial-gradient(at 100% 100%, #000f, #0000),
-		#100;
+		#110000;
 }
 
-[type="range"].volume {
-	font-size: 1em;
-	width: 20.2em;
-	border: 0.25em solid #544;
-	border-left-width: 0.15em;
-	border-right-width: 0.15em;
-	border-radius: 0.25em;
+[type="range"].volumelevel {
+	font-size: 1cm;
+	width: 6cm;
+	border: none;
+
+	border-radius: 0.01cm;
 	appearance: none;
-	height:1.5cm;
+	height: 1.0cm;
 	background:
-		repeating-linear-gradient(90deg, #544 0 0.1em, #0000 0 0.9em, #544 0 1em),
-		radial-gradient(#fff5, #fff0) 0 0 / 1em 100%,
-		linear-gradient(90deg, #29ee01 70%, #ffd308 0 80%, #e00 0),
-		#f005;
+		repeating-linear-gradient(90deg, var(--bg-color) 0 0.02cm, #0000 0 0.48cm, var(--bg-color) 0 0.5cm), radial-gradient(#fff5, #fff0) 0 0 / 1cm 100%, linear-gradient(90deg, #29ee01 3.5cm, #ffd308 0 5cm, #e00 0), #f005;
+
 	overflow: hidden;
 	box-shadow:
 		0 -1px 1px #fff3,
-		0 0 2em #0003,
-		inset 0 0 1em #0003;
+		0 0 2cm #0003,
+		inset 0 0 1cm #0003;
 
 }
 
@@ -57,42 +59,293 @@ body {
 	}
 }
 
-[type="range"].volume::-webkit-slider-thumb {
+[type="range"].volumelevel::-webkit-slider-thumb {
 	appearance: none;
-	width: 0.9em;
-	height: 1.5cm;
+	width: 0.5cm;
+	height: 1.0cm;
 	animation: blink 0.7s infinite;
-	color: #000a;
+	color: #0009;
 	border: 0;
 	border-radius: 0;
 	background: #fff2;
 	box-shadow:
-		0 0 0.5em #fff8,
-		1em 0, 2em 0, 3em 0, 4em 0, 5em 0, 6em 0, 7em 0,
-		8em 0, 9em 0, 10em 0, 11em 0, 12em 0, 13em 0,
-		14em 0, 15em 0, 16em 0, 17em 0, 18em 0, 19em 0;
+		0 0 0.5cm #fff8, 0.5cm 0, 1cm 0, 1.5cm 0, 2cm 0, 2.5cm 0, 3cm 0, 3.5cm 0, 4cm 0, 4.5cm 0, 5cm 0, 5.5cm 0;
 }
 
-[type="range"].volume::-moz-range-thumb {
+[type="range"].volumelevel::-moz-range-thumb {
 	appearance: none;
-	width: 0.9em;
-	height: 1.5cm;
+	width: 0.5cm;
+	height: 1.0cm;
 	animation: blink 0.7s infinite;
-	color: #000a;
+	color: #0009;
 	border: 0;
 	border-radius: 0;
+	background: #fff2;
 	box-shadow:
-		1em 0, 2em 0, 3em 0, 4em 0, 5em 0, 6em 0, 7em 0,
-		8em 0, 9em 0, 10em 0, 11em 0, 12em 0, 13em 0,
-		14em 0, 15em 0, 16em 0, 17em 0, 18em 0, 19em 0;
+		0 0 0.5cm #fff8, 0.5cm 0, 1cm 0, 1.5cm 0, 2cm 0, 2.5cm 0, 3cm 0, 3.5cm 0, 4cm 0, 4.5cm 0, 5cm 0, 5.5cm 0;
 }
 
 @media (prefers-reduced-motion) {
-	[type="range"].volume::-webkit-slider-thumb {
+	[type="range"].volumelevel::-webkit-slider-thumb {
 		animation: none;
 	}
 
-	[type="range"].volume::-moz-range-thumb {
+	[type="range"].volumelevel::-moz-range-thumb {
 		animation: none;
 	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************/
+/* SCROLLER */
+/* horizontal scroll snap */
+.carousel {
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	overscroll-behavior-x: contain;
+
+	@media (prefers-reduced-motion: no-preference) {
+		scroll-behavior: smooth;
+	}
+
+	/* snap to center */
+	& li {
+		scroll-snap-align: center;
+	}
+}
+
+
+/* SCROLL BUTTONS */
+/* create buttons by selecting them and adding content */
+.carousel {
+	&::scroll-button(*) {
+		/* make them round and easy to press */
+		inline-size: 48px;
+		aspect-ratio: 1;
+		border-radius: 1e3px;
+		border: 2px solid #999;
+
+		/* space from content */
+		margin: 5px;
+	}
+
+	&::scroll-button(*):focus-visible {
+		outline-offset: 5px;
+	}
+
+	&::scroll-button(*):not(:disabled):is(:hover, :active) {
+		background-color: Canvas;
+	}
+
+	&::scroll-button(*):not(:disabled):active {
+		scale: 90%;
+	}
+
+	&::scroll-button(left) {
+		content: "<" / "Scroll Left";
+		grid-area: left;
+		/* place markers in parent grid area */
+	}
+
+	&::scroll-button(right) {
+		content: ">" / "Scroll Right";
+		grid-area: right;
+	}
+}
+
+
+
+
+/* SCROLL MARKERS */
+/* create marker group */
+/* create markers for each item */
+.carousel {
+	/* create markers 'after' scroller */
+	scroll-marker-group: after;
+
+	/* create markers container and own dots layout */
+	&::scroll-marker-group {
+		grid-area: markers;
+		/* place markers in parent grid area */
+
+		/* 15px by 15px horizontal grid - size of dots */
+		display: grid;
+		place-content: safe center;
+		grid: 30px / auto-flow 30px;
+		gap: 15px;
+		padding: 15px;
+		scroll-padding: 15px;
+
+		/* handle overflow */
+		overflow: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+		scroll-snap-type: x mandatory;
+
+		@media (prefers-reduced-motion: no-preference) {
+			scroll-behavior: smooth;
+		}
+	}
+
+	/* a marker for each <li> */
+	&>.content>li {
+
+		/* create by adding content */
+		&::scroll-marker {
+			content: " ";
+			/* empty content is fine, just like ::before */
+
+			/* style it as you need */
+			border: 1px solid #bbb;
+			border-radius: 50%;
+			outline-offset: 4px;
+			-webkit-tap-highlight-color: transparent;
+
+			/* snap if group is overflowing */
+			scroll-snap-align: center;
+		}
+
+		&::scroll-marker:is(:hover, :focus-visible) {
+			border-color: LinkText;
+		}
+
+		&::scroll-marker:target-current {
+			background: LinkText;
+			border-color: LinkText;
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@layer support.items {
+
+
+
+	.scroll-layout {
+
+		display: grid;
+		/*     border: 1px dashed gray; */
+
+		/* try a different layout =) */
+		grid-template-areas:
+			"left scroll right"
+			". markers .";
+
+		/* just place items in the grid */
+		grid-template-areas:
+			"scroll scroll scroll"
+			"left markers right";
+
+		grid-template-columns: auto 1fr auto;
+
+		.carousel {
+			grid-area: scroll;
+		}
+	}
+
+	.carousel {
+		max-inline-size: 80cqi;
+		max-inline-size: 100%;
+		overscroll-behavior-x: contain;
+		scroll-behavior: smooth;
+		scrollbar-width: none;
+	}
+
+	.content {
+		display: grid;
+		grid: 50vmin / auto-flow 50vmin;
+		gap: 0.5cm;
+		padding: 0;
+		margin: 0;
+		padding-right: 0.5cm;
+		margin-right: 0.5cm;
+
+		>li {
+			list-style-type: none;
+			border: 3px solid #888;
+		}
+	}
+}
+
+:root {
+	color-scheme: light dark;
+}
+
+.spotDrum {
+	border: 0.1cm solid #000;
+	border-left-color: #00000033;
+	border-top-color: #00000033;
+	border-bottom-color: #ffffff33;
+	border-right-color: #ffffff33;
+	border-radius: 0.1cm;
+	display: flex;
+  align-items: center; /* Centers text vertically */
+  justify-content: center; /* Optional: Centers text horizontally */
+}
+
+.kickSpot {
+	 background: radial-gradient(#f003, #f000, #f000);
+}
+.snareSpot {
+	 background: radial-gradient(#0f03, #0f00, #0f00);
+}
+.clapSpot {
+	 background: radial-gradient(#00f6, #00f0, #00f0);
+}
+.hiSpot {
+	 background: radial-gradient(#f0f3, #f0f0, #f0f0);
+}
+.hatSpot {
+	 background: radial-gradient(#ff03, #ff00, #ff00);
+}
+.cowbellSpot {
+	 background: radial-gradient(#0ff3, #0ff0, #0ff0);
+}
+.tomSpot {
+	 background: radial-gradient(#fff6, #fff0, #fff0);
 }
