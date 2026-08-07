@@ -165,11 +165,11 @@ body {
 		margin-top: 0.2cm;
 	}
 
-	
 
-	
 
-/*
+
+
+	/*
 	&::scroll-button(left) {
 		content: "🡰" / "Scroll Left";
 		grid-area: left;
@@ -205,7 +205,7 @@ body {
 		/* 15px by 15px horizontal grid - size of dots */
 		display: grid;
 		place-content: safe center;
-		
+
 		grid: 1cm / auto-flow 1cm;
 		gap: 0.1cm;
 		padding: 15px;
@@ -342,43 +342,115 @@ body {
 .kickSpot {
 	background: radial-gradient(#f003, #f000, #f000);
 }
+
 .kickFocus {
-	background: radial-gradient(#f000,#f000,#f006, #f000, #f000);
+	background: radial-gradient(#f000, #f000, #f006, #f000, #f000);
 }
 
 .snareSpot {
 	background: radial-gradient(#0f03, #0f00, #0f00);
 }
+
 .snareFocus {
-	background: radial-gradient(#f000,#f000,#0f06, #0f00, #0f00);
+	background: radial-gradient(#f000, #f000, #0f06, #0f00, #0f00);
 }
+
 .clapSpot {
 	background: radial-gradient(#00f6, #00f0, #00f0);
 }
+
 .clapFocus {
-	background: radial-gradient(#f000,#f000,#00f9, #00f0, #00f0);
+	background: radial-gradient(#f000, #f000, #00f9, #00f0, #00f0);
 }
+
 .hiSpot {
 	background: radial-gradient(#f0f3, #f0f0, #f0f0);
 }
+
 .hiFocus {
-	background: radial-gradient(#f000,#f000,#f0f6, #f0f0, #f0f0);
+	background: radial-gradient(#f000, #f000, #f0f6, #f0f0, #f0f0);
 }
+
 .hatSpot {
 	background: radial-gradient(#ff03, #ff00, #ff00);
 }
+
 .hatFocus {
-	background: radial-gradient(#f000,#f000,#ff06, #ff00, #ff00);
+	background: radial-gradient(#f000, #f000, #ff06, #ff00, #ff00);
 }
+
 .cowbellSpot {
 	background: radial-gradient(#0ff3, #0ff0, #0ff0);
 }
+
 .cowbellFocus {
-	background: radial-gradient(#f000,#f000,#0ff6, #0ff0, #0ff0);
+	background: radial-gradient(#f000, #f000, #0ff6, #0ff0, #0ff0);
 }
+
 .tomSpot {
 	background: radial-gradient(#fff6, #fff0, #fff0);
 }
+
 .tomFocus {
-	background: radial-gradient(#f000,#f000,#fff9, #fff0, #fff0);
+	background: radial-gradient(#f000, #f000, #fff9, #fff0, #fff0);
+}
+
+
+
+
+
+
+
+
+
+
+/*------------------------------------------------------*/
+#freqRatio[type="range"]{
+  -webkit-appearance:none;
+  width:6cm;
+  height:1.2cm;
+  margin:0px;
+  background: linear-gradient(to right, #f00 0%, #0f0 50%,#00f 100%);
+  background-size:6cm 0.03cm;
+  background-position:center;
+  background-repeat:no-repeat;
+  overflow:hidden;
+  outline: none;
+}
+
+#freqRatio[type="range"]:first-of-type{
+  margin-top:0.005cm;
+}
+
+#freqRatio[type="range"]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  width:1cm;
+  height:1cm;
+  background2:#ffe;
+    background: linear-gradient(
+    45deg,
+    #999 5%,
+    #fff 10%,
+    #ccc 30%,
+    #ddd 50%,
+    #ccc 70%,
+    #fff 80%,
+    #999 95%
+  );
+  border-radius: 50%;
+  position:relative;
+  z-index:3;
+  box-shadow:0 0 0.1cm 0.05cm #000;
+}
+
+#freqRatio2[type="range"]::-webkit-slider-thumb:after{
+  content:" ";
+  width:160px;
+  height:10px;
+  position:absolute;
+  z-index:1;
+  right:20px;
+  top:5px;
+  background: #ff5b32;
+  background: linear-gradient(to right, #f088fc 1%, #AC6CFF 70%);
 }
