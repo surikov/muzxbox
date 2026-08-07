@@ -1,0 +1,73 @@
+<html>
+
+<head>
+	<meta charset='UTF-8'>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0' />
+	<title>TR-808</title>
+	<!-- The line below connects your CSS file -->
+	<link rel='stylesheet' href='resources/tr808.css'>
+</head>
+
+<body>
+<div>
+		<input type="range" id="freqRatio" value="0" min="-11" max="11"  />
+	</div>
+	<div>
+		<div class='rakesink'><input type='range' id='rangeforvolume808' class='volumelevel' min='1' max='12' value='5' step='1' /></div>
+	</div>
+	
+	<div>
+
+		<div class="scrollListLayout">
+			<div class="carouselItems">
+				<ul class="listItems" id='listItemsUL'>
+					<li id='drum0' class='spotDrum kickSpot' onclick='spotClicked(0);'>Kick 808 SUB</li>
+					<li id='drum1' class='spotDrum kickSpot' onclick='spotClicked(1);'>Kick DEEP</li>
+					<li id='drum2' class='spotDrum kickFocus' onclick='spotClicked(2);'>Kick DIRTY</li>
+					<li id='drum3' class='spotDrum kickSpot' onclick='spotClicked(3);'>Kick PUNCH</li>
+					<li id='drum4' class='spotDrum kickSpot' onclick='spotClicked(4);'>Kick 808</li>
+					<li id='drum5' class='spotDrum kickSpot' onclick='spotClicked(5);'>Kick 707</li>
+					<li id='drum6' class='spotDrum kickSpot' onclick='spotClicked(6);'>Kick 909</li>
+					<li id='drum7' class='spotDrum kickSpot' onclick='spotClicked(7);'>Kick TIGHT</li>
+
+					<li id='drum8' class='spotDrum snareSpot' onclick='spotClicked(8);'>Snare CRISP</li>
+					<li id='drum9' class='spotDrum snareSpot' onclick='spotClicked(9);'>Snare RIM</li>
+					<li id='drum10' class='spotDrum snareSpot' onclick='spotClicked(10);'>Snare BIG</li>
+					<li id='drum11' class='spotDrum snareSpot' onclick='spotClicked(11);'>Snare NOISE</li>
+
+					<li id='drum12' class='spotDrum clapSpot' onclick='spotClicked(12);'>Clap 808</li>
+					<li id='drum13' class='spotDrum clapSpot' onclick='spotClicked(13);'>Clap 505</li>
+					<li id='drum14' class='spotDrum clapSpot' onclick='spotClicked(14);'>Clap DOUBLE</li>
+					<li id='drum15' class='spotDrum clapSpot' onclick='spotClicked(15);'>Clap ROOM</li>
+
+					<li id='drum16' class='spotDrum hiSpot' onclick='spotClicked(16);'>HiHat LO METAL</li>
+					<li id='drum17' class='spotDrum hiSpot' onclick='spotClicked(17);'>HiHat CLASSIC</li>
+					<li id='drum18' class='spotDrum hiSpot' onclick='spotClicked(18);'>HiHat HIGH</li>
+					<li id='drum19' class='spotDrum hiSpot' onclick='spotClicked(19);'>HiHat TIGHT</li>
+
+					<li id='drum20' class='spotDrum hatSpot' onclick='spotClicked(20);'>Hat CRASH</li>
+					<li id='drum21' class='spotDrum hatSpot' onclick='spotClicked(21);'>Hat LONG</li>
+					<li id='drum22' class='spotDrum hatSpot' onclick='spotClicked(22);'>Hat MID</li>
+					<li id='drum23' class='spotDrum hatSpot' onclick='spotClicked(23);'>Hat SHORT</li>
+
+					<li id='drum24' class='spotDrum cowbellSpot' onclick='spotClicked(24);'>Cowbell 808</li>
+					<li id='drum25' class='spotDrum cowbellSpot' onclick='spotClicked(25);'>Cowbell REAL</li>
+					<li id='drum26' class='spotDrum cowbellSpot' onclick='spotClicked(26);'>Cowbell LOW</li>
+					<li id='drum27' class='spotDrum cowbellSpot' onclick='spotClicked(27);'>Cowbell PING</li>
+
+					<li id='drum28' class='spotDrum tomSpot' onclick='spotClicked(28);'>Tom 808</li>
+					<li id='drum29' class='spotDrum tomSpot' onclick='spotClicked(29);'>Tom ELECTRO</li>
+					<li id='drum30' class='spotDrum tomSpot' onclick='spotClicked(30);'>Tom NATURAL</li>
+					<li id='drum31' class='spotDrum tomSpot' onclick='spotClicked(31);'>Tom TIGHT</li>
+
+				</ul>
+			</div>
+		</div>
+
+	</div>
+</body>
+
+
+<script src='resources/tr808.js'></script>
+
+</html>
