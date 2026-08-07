@@ -16,7 +16,7 @@
 body {
 	margin: 0cm;
 	padding: 0;
-user-select: none;
+	user-select: none;
 	display: grid;
 	place-items: center;
 	color: #ffe;
@@ -36,7 +36,7 @@ user-select: none;
 	appearance: none;
 	height: 1.0cm;
 	background:
-		repeating-linear-gradient(90deg, var(--bg-color) 0 0.02cm, #0000 0 0.48cm, var(--bg-color) 0 0.5cm), radial-gradient(#fff5, #fff0) 0 0 / 1cm 100%, linear-gradient(90deg, #29ee01 3.5cm, #ffd308 0 5cm, #e00 0), #f005;
+		repeating-linear-gradient(90deg, var(--bg-color) 0 0.04cm, #0000 0 0.46cm, var(--bg-color) 0 0.5cm), radial-gradient(#fff5, #fff0) 0 0 / 1cm 100%, linear-gradient(90deg, #29ee01 3.5cm, #ffd308 0 5cm, #e00 0), #f005;
 
 	overflow: hidden;
 	box-shadow:
@@ -131,10 +131,13 @@ user-select: none;
 /**********************************************************************/
 /* SCROLLER */
 /* horizontal scroll snap */
-.carousel {
+.carouselItems {
 	overflow-x: auto;
 	scroll-snap-type: x mandatory;
 	overscroll-behavior-x: contain;
+
+	padding: 0px;
+	margin: 0px;
 
 	@media (prefers-reduced-motion: no-preference) {
 		scroll-behavior: smooth;
@@ -149,40 +152,39 @@ user-select: none;
 
 /* SCROLL BUTTONS */
 /* create buttons by selecting them and adding content */
-.carousel {
+.carouselItems {
 	&::scroll-button(*) {
+		padding: 0px;
+		margin: 0px;
+		background-color: #00000001;
+		color: #ffe;
 		/* make them round and easy to press */
-		inline-size: 48px;
+		inline-size: 1.5cm;
 		aspect-ratio: 1;
-		border-radius: 1e3px;
-		border: 2px solid #999;
 
-		/* space from content */
-		margin: 5px;
+		margin-top: 0.2cm;
 	}
 
-	&::scroll-button(*):focus-visible {
-		outline-offset: 5px;
-	}
+	
 
-	&::scroll-button(*):not(:disabled):is(:hover, :active) {
-		background-color: Canvas;
-	}
+	
 
-	&::scroll-button(*):not(:disabled):active {
-		scale: 90%;
-	}
-
+/*
 	&::scroll-button(left) {
-		content: "<" / "Scroll Left";
+		content: "🡰" / "Scroll Left";
 		grid-area: left;
-		/* place markers in parent grid area */
+		border: none;
+		border-right: 1px solid #ffe;
+		// place markers in parent grid area //
 	}
 
 	&::scroll-button(right) {
-		content: ">" / "Scroll Right";
+		content: "🡲" / "Scroll Right";
+		border: none;
+		border-left: 1px solid #ffe;
 		grid-area: right;
 	}
+	*/
 }
 
 
@@ -191,20 +193,21 @@ user-select: none;
 /* SCROLL MARKERS */
 /* create marker group */
 /* create markers for each item */
-.carousel {
+.carouselItems {
 	/* create markers 'after' scroller */
 	scroll-marker-group: after;
 
 	/* create markers container and own dots layout */
 	&::scroll-marker-group {
-		grid-area: markers;
+		grid-area: markersGridArea;
 		/* place markers in parent grid area */
 
 		/* 15px by 15px horizontal grid - size of dots */
 		display: grid;
 		place-content: safe center;
-		grid: 30px / auto-flow 30px;
-		gap: 15px;
+		
+		grid: 1cm / auto-flow 1cm;
+		gap: 0.1cm;
 		padding: 15px;
 		scroll-padding: 15px;
 
@@ -220,30 +223,36 @@ user-select: none;
 	}
 
 	/* a marker for each <li> */
-	&>.content>li {
+	&>.listItems>li {
 
 		/* create by adding content */
 		&::scroll-marker {
 			content: " ";
 			/* empty content is fine, just like ::before */
-
+			padding: 0px;
+			margin: 0px;
 			/* style it as you need */
-			border: 1px solid #bbb;
-			border-radius: 50%;
+			border2: 1px solid #ffe;
+			border-radius2: 50%;
+			background: radial-gradient(#ffe6, #f000, #f000);
 			outline-offset: 4px;
 			-webkit-tap-highlight-color: transparent;
 
 			/* snap if group is overflowing */
 			scroll-snap-align: center;
+
+			width: 1cm;
+			height: 1cm;
 		}
 
 		&::scroll-marker:is(:hover, :focus-visible) {
-			border-color: LinkText;
+			border-color2: #ff0;
 		}
 
 		&::scroll-marker:target-current {
-			background: LinkText;
-			border-color: LinkText;
+			background2: #ffe3;
+			border-color2: #ffe;
+			background: radial-gradient(#ffe, #f000, #f000);
 		}
 	}
 }
@@ -266,7 +275,7 @@ user-select: none;
 
 
 
-	.scroll-layout {
+	.scrollListLayout {
 
 		display: grid;
 		/*     border: 1px dashed gray; */
@@ -274,21 +283,21 @@ user-select: none;
 		/* try a different layout =) */
 		grid-template-areas:
 			"left scroll right"
-			". markers .";
+			". markersGridArea .";
 
 		/* just place items in the grid */
 		grid-template-areas:
 			"scroll scroll scroll"
-			"left markers right";
+			"left markersGridArea right";
 
 		grid-template-columns: auto 1fr auto;
 
-		.carousel {
+		.carouselItems {
 			grid-area: scroll;
 		}
 	}
 
-	.carousel {
+	.carouselItems {
 		max-inline-size: 80cqi;
 		max-inline-size: 100%;
 		overscroll-behavior-x: contain;
@@ -296,7 +305,7 @@ user-select: none;
 		scrollbar-width: none;
 	}
 
-	.content {
+	.listItems {
 		display: grid;
 		grid: 50vmin / auto-flow 50vmin;
 		gap: 0.5cm;
@@ -324,28 +333,52 @@ user-select: none;
 	border-right-color: #ffffff33;
 	border-radius: 0.1cm;
 	display: flex;
-  align-items: center; /* Centers text vertically */
-  justify-content: center; /* Optional: Centers text horizontally */
+	align-items: center;
+	/* Centers text vertically */
+	justify-content: center;
+	/* Optional: Centers text horizontally */
 }
 
 .kickSpot {
-	 background: radial-gradient(#f003, #f000, #f000);
+	background: radial-gradient(#f003, #f000, #f000);
 }
+.kickFocus {
+	background: radial-gradient(#f000,#f000,#f006, #f000, #f000);
+}
+
 .snareSpot {
-	 background: radial-gradient(#0f03, #0f00, #0f00);
+	background: radial-gradient(#0f03, #0f00, #0f00);
+}
+.snareFocus {
+	background: radial-gradient(#f000,#f000,#0f06, #0f00, #0f00);
 }
 .clapSpot {
-	 background: radial-gradient(#00f6, #00f0, #00f0);
+	background: radial-gradient(#00f6, #00f0, #00f0);
+}
+.clapFocus {
+	background: radial-gradient(#f000,#f000,#00f9, #00f0, #00f0);
 }
 .hiSpot {
-	 background: radial-gradient(#f0f3, #f0f0, #f0f0);
+	background: radial-gradient(#f0f3, #f0f0, #f0f0);
+}
+.hiFocus {
+	background: radial-gradient(#f000,#f000,#f0f6, #f0f0, #f0f0);
 }
 .hatSpot {
-	 background: radial-gradient(#ff03, #ff00, #ff00);
+	background: radial-gradient(#ff03, #ff00, #ff00);
+}
+.hatFocus {
+	background: radial-gradient(#f000,#f000,#ff06, #ff00, #ff00);
 }
 .cowbellSpot {
-	 background: radial-gradient(#0ff3, #0ff0, #0ff0);
+	background: radial-gradient(#0ff3, #0ff0, #0ff0);
+}
+.cowbellFocus {
+	background: radial-gradient(#f000,#f000,#0ff6, #0ff0, #0ff0);
 }
 .tomSpot {
-	 background: radial-gradient(#fff6, #fff0, #fff0);
+	background: radial-gradient(#fff6, #fff0, #fff0);
+}
+.tomFocus {
+	background: radial-gradient(#f000,#f000,#fff9, #fff0, #fff0);
 }
