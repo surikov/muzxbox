@@ -461,10 +461,16 @@ body {
 			#eee 335deg,
 			#ddd 360deg);
 	;
+	
 	border-radius: 50%;
 	position: relative;
 	z-index: 3;
 	box-shadow: 0 0 0.1cm 0.05cm #000;
+	border:0.06cm solid #f00;
+	border-left-color: #999;
+	border-top-color: #999;
+	border-right-color: #666;
+	;border-bottom-color: #666
 }
 
 #freqRatio2[type="range"]::-webkit-slider-thumb:after {
