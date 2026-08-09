@@ -56,9 +56,14 @@ function showVolume(percents) {
 }
 
 function setupVolumeRange() {
-	let rangeforvolume808 = document.querySelector("#rangeforvolume808");
+	let freqShiftrangeforvolume808 = document.querySelector("#rangeforvolume808");
 	rangeforvolume808.addEventListener("change", (event) => {
 		console.log('rangeforvolume808', rangeforvolume808.value);
+	});
+	let freqRatio = document.querySelector("#freqRatio");
+	console.log(freqRatio);
+	freqRatio.addEventListener("change", (event) => {
+		console.log('freqRatio', freqRatio.value);
 	});
 }
 showVolume(20);

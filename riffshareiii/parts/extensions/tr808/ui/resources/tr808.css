@@ -321,7 +321,7 @@ body {
 	}
 }
 
-:root {
+:root2 {
 	color-scheme: light dark;
 }
 
@@ -412,12 +412,20 @@ body {
 	margin: 0px;
 	padding-left: 0.15cm;
 	padding-right: 0.15cm;
-	background: linear-gradient(to right, #f00 0%, #0f0 50%, #00f 100%);
-	background-size: 6cm 0.03cm;
+	background: linear-gradient(0deg, #fff0 0%, #fff3 20%, #000f 40%, #000f 60%, #0006 80%, #0000 100%);
+	background-size: 6cm 0.2cm;
 	background-position: center;
 	background-repeat: no-repeat;
 	overflow: hidden;
 	outline: none;
+	/*
+	border: 0.1cm solid #000;
+	border-left-color: #00000033;
+	border-top-color: #00000033;
+	border-bottom-color: #ffffff33;
+	border-right-color: #ffffff33;
+	border-radius: 0.8;
+	*/
 }
 
 #freqRatio[type="range"]:first-of-type {
@@ -429,18 +437,40 @@ body {
 	width: 1cm;
 	height: 1cm;
 	background2: #ffe;
-	background: linear-gradient(45deg,
+	background:
+		/*linear-gradient(45deg,
 			#999 5%,
 			#fff 10%,
 			#ccc 30%,
 			#ddd 50%,
 			#ccc 70%,
 			#fff 80%,
-			#999 95%);
+			#999 95%),*/
+		/*conic-gradient(in hsl longer hue,
+			hsl(360 100% 50%),
+			hsl(0 100% 50%))
+			*/
+		conic-gradient(from 0deg at 50% 50%,
+			#ddd 0deg,
+			#eee 45deg,
+			#777 120deg,
+			#eee 145deg,
+			#999 190deg,
+			#eee 225deg,
+			#666 280deg,
+			#eee 335deg,
+			#ddd 360deg);
+	;
+	
 	border-radius: 50%;
 	position: relative;
 	z-index: 3;
 	box-shadow: 0 0 0.1cm 0.05cm #000;
+	border:0.06cm solid #f00;
+	border-left-color: #999;
+	border-top-color: #999;
+	border-right-color: #666;
+	;border-bottom-color: #666
 }
 
 #freqRatio2[type="range"]::-webkit-slider-thumb:after {
@@ -453,4 +483,10 @@ body {
 	top: 5px;
 	background: #ff5b32;
 	background: linear-gradient(to right, #f088fc 1%, #AC6CFF 70%);
+}
+
+.labeltext {
+	padding:0;
+	margin:0;
+	font-size: 0.3cm;
 }
