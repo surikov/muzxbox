@@ -320,9 +320,9 @@ function drawStat3(svg: SVGElement, rows: BallsRow[]) {
 					let szz = cellSize / 3 - 0.5;
 					let clr = '#ff0000';
 					if (rowNum == 0) {
-						topy = topy - 1.5 * cellSize;
-						szz = cellSize / 3 - 0.5
-						clr = '#00ff00ff';
+						//topy = topy - 1.5 * cellSize;
+						//szz = cellSize / 3 - 0.5
+						//clr = '#00ff00ff';
 					}
 					if (rowNum > 0 || showFirstRow) {
 						addCircle(svg

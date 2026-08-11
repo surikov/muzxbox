@@ -4,5 +4,5 @@
     , "kind": "tr808drums"
     , "ui": "http://127.0.0.1:8080/gui/pitchui.html"
     , "evaluate": "createNewTR808synth"
-    , "script": "http://127.0.0.1:8080/audio/strum_plugin.js"
+    , "script": "plugins/samplers/tr808drums/audio/tr808drumsBase.js"
 }
