@@ -297,140 +297,30 @@ declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];
-declare let drumInfos: Drum808info[];
-declare let kickInfos: Drum808info[];
-declare let snareInfos: Snare808info[];
-declare let clapInfos: Clap808info[];
-declare let hatInfos: Hat808info[];
-declare let ohatInfos: Hat808info[];
-declare let cowbellInfos: Cowbell808info[];
-declare let tomInfos: Tom808info[];
-declare class TR808Synth implements MZXBX_AudioSamplerPlugin {
-    audioContext: AudioContext;
-    drumOutput: GainNode;
-    drumsCache: DrumCacheItem[];
-    parameters: BoomParameters;
-    currentDuration: number;
-    takeEngine(kind: number): DrumCacheItem;
-    launch(context: AudioContext, parameters: string): number;
-    busy(): null | string;
-    start(when: number, tempo: number): void;
-    cancel(): void;
-    output(): AudioNode | null;
-    duration(): number;
+declare abstract class MZXBX_Plugin_UI {
+    dialogId: string;
+    hostData: any;
+    constructor(screenWait: boolean);
+    closeDialog(data: any): void;
+    updateHostData(data: any): void;
+    _sendMessageToHost(data: any, done: boolean, screenWait: boolean): void;
+    _receiveHostMessage(messageEvent: MessageEvent): void;
+    abstract onMessageFromHost(message: MZXBX_MessageToPlugin): void;
+    abstract onLanguaga(enruzhId: string): void;
 }
-type DrumEngineProps808 = {
-    startFrequency: number;
-    nextFrequency: number;
-    freqChangeDuration: number;
-    duration: number;
-    clickLevel: number;
-    clickWave: string;
-    clickFrequency: number;
-    driveLevel: number;
-    baseWave: string;
-    baselevel: number;
-};
-type SnareEngineProps808 = {
-    toneDur: number;
-    noiseLevel: number;
-    noiceDur: number;
-    noiseFreq: number;
-    tones: {
-        frequency: number;
-        volume: number;
-    }[];
-};
-type ClapEngineProps808 = {
-    freq: number;
-    bursts: number[];
-    qualityFactor: number;
-    tail: number;
-};
-type HatEngineProps808 = {
-    level: number;
-    bandFiFreq: number;
-    highFiFreq: number;
-    decay: number;
-    freqScale: number;
-    washVolume: number;
-};
-type CowbellEngineProps808 = {
-    bellLevel: number;
-    duration: number;
-    freqs: number[];
-    bpFilterFreq: number;
-    strikeVolume: number;
-    qualityFilter: number;
-};
-type TomEngineProps808 = {
-    startFreq: number;
-    nextFreq: number;
-    drop: number;
-    duration: number;
-    tomwave: string;
-    skinLevel: number;
-    skinFreq: number;
-    skinDur: number;
-};
-type Drum808info = {
-    drumname: string;
-    drumprops: DrumEngineProps808;
-};
-type Snare808info = {
-    snarename: string;
-    snareprops: SnareEngineProps808;
-};
-type Clap808info = {
-    clapname: string;
-    clapprops: ClapEngineProps808;
-};
-type Hat808info = {
-    hatname: string;
-    hatprops: HatEngineProps808;
-};
-type Cowbell808info = {
-    cowbellname: string;
-    cowbellprops: CowbellEngineProps808;
-};
-type Tom808info = {
-    tomname: string;
-    tomprops: TomEngineProps808;
-};
-type DrumCacheItem = {
-    kind: number;
-    drum: BoomDrum;
-};
-type BoomDrum = {
-    start: (when: number, pitchRatio: number, propertyId: number) => void;
-    cancel: () => void;
-    duration: () => number;
-    endTime: () => number;
-    output: () => AudioNode;
-};
-type BoomParameters = {
+type UI808Parameters = {
     volume: number;
     ratio: number;
     nn: number;
 };
-declare class VoiceKick implements BoomDrum {
-    lastWhen: number;
-    wholeDuration: number;
-    baseOscillator: OscillatorNode;
-    baseGain: GainNode;
-    outGain: GainNode;
-    clickOscillator: OscillatorNode;
-    driveGain: GainNode;
-    clickGain: GainNode;
-    waveShaper: WaveShaperNode;
-    audioContext: AudioContext;
-    drumProperties: DrumEngineProps808;
-    constructor(context: AudioContext, propertyId: number);
-    start(when: number, pitchRatio: number): void;
-    cancel(): void;
-    duration(): number;
-    endTime(): number;
-    curveArray(): Float32Array<ArrayBuffer>;
-    output(): GainNode;
+declare class UI808 extends MZXBX_Plugin_UI {
+    onMessageFromHost(message: MZXBX_MessageToPlugin): void;
+    onLanguaga(enruzhId: string): void;
 }
-declare function createNewTR808synth(): MZXBX_AudioSamplerPlugin;
+declare let ui808: UI808;
+declare function spotClicked(num: any): void;
+declare function showSpotFocus(nn: any): void;
+declare function clearFocus(): void;
+declare function cssFocusClassName(nn: any): string;
+declare function cssSpotClassName(nn: any): string;
+declare function resetSpotClass(nn: any): void;

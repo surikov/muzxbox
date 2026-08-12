@@ -169,22 +169,24 @@ body {
 
 
 
-	/*
+	
 	&::scroll-button(left) {
 		content: "🡰" / "Scroll Left";
+		color:#ffffff33;
 		grid-area: left;
 		border: none;
-		border-right: 1px solid #ffe;
-		// place markers in parent grid area //
+		border-right: 1px solid #ffffff33;
+		/* place markers in parent grid area */
 	}
 
 	&::scroll-button(right) {
 		content: "🡲" / "Scroll Right";
+		color:#ffffff33;
 		border: none;
-		border-left: 1px solid #ffe;
+		border-left: 1px solid #ffffff33;
 		grid-area: right;
 	}
-	*/
+	
 }
 
 

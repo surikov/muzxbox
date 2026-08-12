@@ -42,7 +42,7 @@ function showSpotFocus(nn) {
 	spot.classList.add(cssFocusClassName(nn));
 	//let spot = document.querySelector('#drum' + num);
 	spot.scrollIntoView();
-}
+	console.log('spot',spot);
 
 function spotClicked(num) {
 	console.log('spotClicked', num);

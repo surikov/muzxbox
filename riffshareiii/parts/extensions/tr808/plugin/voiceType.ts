@@ -62,7 +62,7 @@ type Hat808info = { hatname: string, hatprops: HatEngineProps808 };
 type Cowbell808info = { cowbellname: string, cowbellprops: CowbellEngineProps808 };
 type Tom808info = { tomname: string, tomprops: TomEngineProps808 };
 
-type DrumCache = {
+type DrumCacheItem = {
 	kind: number;
 	drum: BoomDrum;
 };

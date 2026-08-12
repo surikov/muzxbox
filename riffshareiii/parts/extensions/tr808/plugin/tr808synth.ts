@@ -1,24 +1,31 @@
 class TR808Synth implements MZXBX_AudioSamplerPlugin {
 	audioContext: AudioContext;
 	drumOutput: GainNode;
-	drumsCache: DrumCache[] = [];
+	drumsCache: DrumCacheItem[] = [];
 	parameters: BoomParameters;
 	currentDuration = 0;
-	takeEngine(kind: number): DrumCache {
+	takeEngine(kind: number): DrumCacheItem {
 		for (let ii = 0; ii < this.drumsCache.length; ii++) {
 			if (this.drumsCache[ii].kind == kind && this.drumsCache[ii].drum.endTime() < this.audioContext.currentTime) {
+				//console.log('reuse',ii);
 				return this.drumsCache[ii];
 			}
 		}
 		let drum = new VoiceKick(this.audioContext, kind);
 		drum.output().connect(this.drumOutput);
-		let cache: DrumCache = { kind: kind, drum: drum };
+		let cache: DrumCacheItem = { kind: kind, drum: drum };
 		this.drumsCache.push(cache);
+		//console.log('create',this.drumsCache.length);
 		return cache;
 	}
 	launch(context: AudioContext, parameters: string): number {
-		this.audioContext = context;
-		this.drumOutput = this.audioContext.createGain();
+		//console.log('launch',parameters);
+		if (this.audioContext) {
+			//
+		} else {
+			this.audioContext = context;
+			this.drumOutput = this.audioContext.createGain();
+		}
 		if (parameters) {
 			let parsed = JSON.parse(parameters);
 			this.parameters = parsed;
@@ -29,16 +36,16 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 				, nn: 0
 			};
 		}
-		this.takeEngine(this.parameters.nn);
+		let boom = this.takeEngine(this.parameters.nn);
+		this.currentDuration = boom.drum.duration();
 		return 0;
 	}
 	busy(): null | string {
 		return null;
 	}
 	start(when: number, tempo: number): void {
-		let drum = this.takeEngine(this.parameters.nn);
-		this.currentDuration = drum.drum.duration();
-		drum.drum.start(when, this.parameters.ratio, this.parameters.nn);
+		let boom = this.takeEngine(this.parameters.nn);
+		boom.drum.start(when, this.parameters.ratio, this.parameters.nn);
 	}
 	cancel(): void {
 		for (let ii = 0; ii < this.drumsCache.length; ii++) {
@@ -49,11 +56,6 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 		return this.drumOutput;
 	}
 	duration(): number {
-		/*if (this.currentDuration > 1) {
-			return 1;
-		} else {
-			return this.currentDuration;
-		}*/
 		return this.currentDuration;
 	}
 }	

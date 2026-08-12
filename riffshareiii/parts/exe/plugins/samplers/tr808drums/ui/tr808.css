@@ -1,0 +1,494 @@
+:root {
+	--bg-color: #866;
+}
+
+.rakesink {
+	background: #ff00ff00;
+	border: 0.1cm solid #000;
+	border-left-color: #00000033;
+	border-top-color: #00000033;
+	border-bottom-color: #ffffff33;
+	border-right-color: #ffffff33;
+	display: inline-block;
+	border-radius: 0.1cm;
+}
+
+body {
+	margin: 0cm;
+	padding: 0;
+	user-select: none;
+	display: grid;
+	place-items: center;
+	color: #ffe;
+	font-family: Verdana, sans-serif;
+	background:
+		radial-gradient(at 0 0, #fff6, #fff0),
+		radial-gradient(at 100% 100%, #000f, #0000),
+		#110000;
+}
+
+[type="range"].volumelevel {
+	font-size: 1cm;
+	width: 6cm;
+	border: none;
+
+	border-radius: 0.01cm;
+	appearance: none;
+	height: 1.0cm;
+	background:
+		repeating-linear-gradient(90deg, var(--bg-color) 0 0.04cm, #0000 0 0.46cm, var(--bg-color) 0 0.5cm), radial-gradient(#fff5, #fff0) 0 0 / 1cm 100%, linear-gradient(90deg, #29ee01 3.5cm, #ffd308 0 5cm, #e00 0), #f005;
+
+	overflow: hidden;
+	box-shadow:
+		0 -1px 1px #fff3,
+		0 0 2cm #0003,
+		inset 0 0 1cm #0003;
+
+}
+
+@keyframes blink {
+
+	0%,
+	20%,
+	100% {
+		background: #0000;
+	}
+
+	50% {
+		background: #0002;
+	}
+}
+
+[type="range"].volumelevel::-webkit-slider-thumb {
+	appearance: none;
+	width: 0.5cm;
+	height: 1.0cm;
+	animation: blink 0.7s infinite;
+	color: #0009;
+	border: 0;
+	border-radius: 0;
+	background: #fff2;
+	box-shadow:
+		0 0 0.5cm #fff8, 0.5cm 0, 1cm 0, 1.5cm 0, 2cm 0, 2.5cm 0, 3cm 0, 3.5cm 0, 4cm 0, 4.5cm 0, 5cm 0, 5.5cm 0;
+}
+
+[type="range"].volumelevel::-moz-range-thumb {
+	appearance: none;
+	width: 0.5cm;
+	height: 1.0cm;
+	animation: blink 0.7s infinite;
+	color: #0009;
+	border: 0;
+	border-radius: 0;
+	background: #fff2;
+	box-shadow:
+		0 0 0.5cm #fff8, 0.5cm 0, 1cm 0, 1.5cm 0, 2cm 0, 2.5cm 0, 3cm 0, 3.5cm 0, 4cm 0, 4.5cm 0, 5cm 0, 5.5cm 0;
+}
+
+@media (prefers-reduced-motion) {
+	[type="range"].volumelevel::-webkit-slider-thumb {
+		animation: none;
+	}
+
+	[type="range"].volumelevel::-moz-range-thumb {
+		animation: none;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************/
+/* SCROLLER */
+/* horizontal scroll snap */
+.carouselItems {
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	overscroll-behavior-x: contain;
+
+	padding: 0px;
+	margin: 0px;
+
+	@media (prefers-reduced-motion: no-preference) {
+		scroll-behavior: smooth;
+	}
+
+	/* snap to center */
+	& li {
+		scroll-snap-align: center;
+	}
+}
+
+
+/* SCROLL BUTTONS */
+/* create buttons by selecting them and adding content */
+.carouselItems {
+	&::scroll-button(*) {
+		padding: 0px;
+		margin: 0px;
+		background-color: #00000001;
+		color: #ffe;
+		/* make them round and easy to press */
+		inline-size: 1.5cm;
+		aspect-ratio: 1;
+
+		margin-top: 0.2cm;
+	}
+
+
+
+
+
+	
+	&::scroll-button(left) {
+		content: "🡰" / "Scroll Left";
+		color:#ffffff33;
+		grid-area: left;
+		border: none;
+		border-right: 1px solid #ffffff33;
+		/* place markers in parent grid area */
+	}
+
+	&::scroll-button(right) {
+		content: "🡲" / "Scroll Right";
+		color:#ffffff33;
+		border: none;
+		border-left: 1px solid #ffffff33;
+		grid-area: right;
+	}
+	
+}
+
+
+
+
+/* SCROLL MARKERS */
+/* create marker group */
+/* create markers for each item */
+.carouselItems {
+	/* create markers 'after' scroller */
+	scroll-marker-group: after;
+
+	/* create markers container and own dots layout */
+	&::scroll-marker-group {
+		grid-area: markersGridArea;
+		/* place markers in parent grid area */
+
+		/* 15px by 15px horizontal grid - size of dots */
+		display: grid;
+		place-content: safe center;
+
+		grid: 1cm / auto-flow 1cm;
+		gap: 0.1cm;
+		padding: 15px;
+		scroll-padding: 15px;
+
+		/* handle overflow */
+		overflow: auto;
+		overscroll-behavior-x: contain;
+		scrollbar-width: none;
+		scroll-snap-type: x mandatory;
+
+		@media (prefers-reduced-motion: no-preference) {
+			scroll-behavior: smooth;
+		}
+	}
+
+	/* a marker for each <li> */
+	&>.listItems>li {
+
+		/* create by adding content */
+		&::scroll-marker {
+			content: " ";
+			/* empty content is fine, just like ::before */
+			padding: 0px;
+			margin: 0px;
+			/* style it as you need */
+			border2: 1px solid #ffe;
+			border-radius2: 50%;
+			background: radial-gradient(#ffe6, #f000, #f000);
+			outline-offset: 4px;
+			-webkit-tap-highlight-color: transparent;
+
+			/* snap if group is overflowing */
+			scroll-snap-align: center;
+
+			width: 1cm;
+			height: 1cm;
+		}
+
+		&::scroll-marker:is(:hover, :focus-visible) {
+			border-color2: #ff0;
+		}
+
+		&::scroll-marker:target-current {
+			background2: #ffe3;
+			border-color2: #ffe;
+			background: radial-gradient(#ffe, #f000, #f000);
+		}
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@layer support.items {
+
+
+
+	.scrollListLayout {
+
+		display: grid;
+		/*     border: 1px dashed gray; */
+
+		/* try a different layout =) */
+		grid-template-areas:
+			"left scroll right"
+			". markersGridArea .";
+
+		/* just place items in the grid */
+		grid-template-areas:
+			"scroll scroll scroll"
+			"left markersGridArea right";
+
+		grid-template-columns: auto 1fr auto;
+
+		.carouselItems {
+			grid-area: scroll;
+		}
+	}
+
+	.carouselItems {
+		max-inline-size: 80cqi;
+		max-inline-size: 100%;
+		overscroll-behavior-x: contain;
+		scroll-behavior: smooth;
+		scrollbar-width: none;
+	}
+
+	.listItems {
+		display: grid;
+		grid: 50vmin / auto-flow 50vmin;
+		gap: 0.5cm;
+		padding: 0;
+		margin: 0;
+		padding-right: 0.5cm;
+		margin-right: 0.5cm;
+
+		>li {
+			list-style-type: none;
+			border: 3px solid #888;
+		}
+	}
+}
+
+:root2 {
+	color-scheme: light dark;
+}
+
+.spotDrum {
+	border: 0.1cm solid #000;
+	border-left-color: #00000033;
+	border-top-color: #00000033;
+	border-bottom-color: #ffffff33;
+	border-right-color: #ffffff33;
+	border-radius: 0.1cm;
+	display: flex;
+	align-items: center;
+	/* Centers text vertically */
+	justify-content: center;
+	/* Optional: Centers text horizontally */
+}
+
+.kickSpot {
+	background: radial-gradient(#f003, #f000, #f000);
+}
+
+.kickFocus {
+	background: radial-gradient(#f000, #f000, #f006, #f000, #f000);
+}
+
+.snareSpot {
+	background: radial-gradient(#0f03, #0f00, #0f00);
+}
+
+.snareFocus {
+	background: radial-gradient(#f000, #f000, #0f06, #0f00, #0f00);
+}
+
+.clapSpot {
+	background: radial-gradient(#00f6, #00f0, #00f0);
+}
+
+.clapFocus {
+	background: radial-gradient(#f000, #f000, #00f9, #00f0, #00f0);
+}
+
+.hiSpot {
+	background: radial-gradient(#f0f3, #f0f0, #f0f0);
+}
+
+.hiFocus {
+	background: radial-gradient(#f000, #f000, #f0f6, #f0f0, #f0f0);
+}
+
+.hatSpot {
+	background: radial-gradient(#ff03, #ff00, #ff00);
+}
+
+.hatFocus {
+	background: radial-gradient(#f000, #f000, #ff06, #ff00, #ff00);
+}
+
+.cowbellSpot {
+	background: radial-gradient(#0ff3, #0ff0, #0ff0);
+}
+
+.cowbellFocus {
+	background: radial-gradient(#f000, #f000, #0ff6, #0ff0, #0ff0);
+}
+
+.tomSpot {
+	background: radial-gradient(#fff6, #fff0, #fff0);
+}
+
+.tomFocus {
+	background: radial-gradient(#f000, #f000, #fff9, #fff0, #fff0);
+}
+
+
+
+
+
+
+
+
+
+
+/*------------------------------------------------------*/
+#freqRatio[type="range"] {
+	-webkit-appearance: none;
+	width: 6cm;
+	height: 1.2cm;
+	margin: 0px;
+	padding-left: 0.15cm;
+	padding-right: 0.15cm;
+	background: linear-gradient(0deg, #fff0 0%, #fff3 20%, #000f 40%, #000f 60%, #0006 80%, #0000 100%);
+	background-size: 6cm 0.2cm;
+	background-position: center;
+	background-repeat: no-repeat;
+	overflow: hidden;
+	outline: none;
+	/*
+	border: 0.1cm solid #000;
+	border-left-color: #00000033;
+	border-top-color: #00000033;
+	border-bottom-color: #ffffff33;
+	border-right-color: #ffffff33;
+	border-radius: 0.8;
+	*/
+}
+
+#freqRatio[type="range"]:first-of-type {
+	margin-top: 0.005cm;
+}
+
+#freqRatio[type="range"]::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 1cm;
+	height: 1cm;
+	background2: #ffe;
+	background:
+		/*linear-gradient(45deg,
+			#999 5%,
+			#fff 10%,
+			#ccc 30%,
+			#ddd 50%,
+			#ccc 70%,
+			#fff 80%,
+			#999 95%),*/
+		/*conic-gradient(in hsl longer hue,
+			hsl(360 100% 50%),
+			hsl(0 100% 50%))
+			*/
+		conic-gradient(from 0deg at 50% 50%,
+			#ddd 0deg,
+			#eee 45deg,
+			#777 120deg,
+			#eee 145deg,
+			#999 190deg,
+			#eee 225deg,
+			#666 280deg,
+			#eee 335deg,
+			#ddd 360deg);
+	;
+	
+	border-radius: 50%;
+	position: relative;
+	z-index: 3;
+	box-shadow: 0 0 0.1cm 0.05cm #000;
+	border:0.06cm solid #f00;
+	border-left-color: #999;
+	border-top-color: #999;
+	border-right-color: #666;
+	;border-bottom-color: #666
+}
+
+#freqRatio2[type="range"]::-webkit-slider-thumb:after {
+	content: " ";
+	width: 160px;
+	height: 10px;
+	position: absolute;
+	z-index: 1;
+	right: 20px;
+	top: 5px;
+	background: #ff5b32;
+	background: linear-gradient(to right, #f088fc 1%, #AC6CFF 70%);
+}
+
+.labeltext {
+	padding:0;
+	margin:0;
+	font-size: 0.3cm;
+}

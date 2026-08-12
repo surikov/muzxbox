@@ -110,7 +110,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
     "label": "Roland TR-808"
     , "purpose": "Sampler"
     , "kind": "tr808drums"
-    , "ui": "http://127.0.0.1:8080/gui/pitchui.html"
+    , "ui": "plugins/samplers/tr808drums/ui/tr808ui.html"
     , "evaluate": "createNewTR808synth"
     , "script": "plugins/samplers/tr808drums/audio/tr808drumsBase.js"
 }

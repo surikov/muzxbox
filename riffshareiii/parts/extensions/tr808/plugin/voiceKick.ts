@@ -3,7 +3,7 @@ class VoiceKick implements BoomDrum {
 	wholeDuration: number;
 	baseOscillator: OscillatorNode;
 	baseGain: GainNode;
-	out: GainNode;
+	outGain: GainNode;
 	clickOscillator: OscillatorNode;
 	driveGain: GainNode;
 	clickGain: GainNode;
@@ -13,7 +13,7 @@ class VoiceKick implements BoomDrum {
 	constructor(context: AudioContext, propertyId: number) {
 		this.audioContext = context;
 		this.baseGain = this.audioContext.createGain();
-		this.out = this.audioContext.createGain();
+		this.outGain = this.audioContext.createGain();
 		this.driveGain = this.audioContext.createGain();
 		this.clickGain = this.audioContext.createGain();
 		this.waveShaper = this.audioContext.createWaveShaper();
@@ -25,48 +25,46 @@ class VoiceKick implements BoomDrum {
 		this.waveShaper.curve = this.curveArray();
 		this.driveGain.connect(this.waveShaper);
 		this.waveShaper.connect(this.baseGain);
-		this.baseGain.connect(this.out);
-		this.clickGain.connect(this.out);
+		this.baseGain.connect(this.outGain);
+		this.clickGain.connect(this.outGain);
 		this.wholeDuration = this.drumProperties.duration + 0.05;
+		//if (this.wholeDuration > 0.99) this.wholeDuration = 0.99;
+		//console.log('VoiceKick', propertyId, this.drumProperties);
 	}
 
 	start(when: number, pitchRatio: number) {
+		//console.log('start', when, pitchRatio, this.drumProperties);
+		if (this.baseOscillator) this.baseOscillator.disconnect();
+		this.baseOscillator = this.audioContext.createOscillator();
+		this.baseOscillator.type = this.drumProperties.baseWave as any;
+		if (this.drumProperties.driveLevel) {
+			this.baseOscillator.connect(this.driveGain);
+		} else {
+			this.baseOscillator.connect(this.baseGain);
+		}
+		this.baseOscillator.frequency.setValueAtTime(this.drumProperties.startFrequency * pitchRatio, when);
+		this.baseOscillator.frequency.exponentialRampToValueAtTime(this.drumProperties.nextFrequency * pitchRatio, when + this.drumProperties.freqChangeDuration);
+		this.baseOscillator.start(when);
+		this.baseOscillator.stop(when + this.drumProperties.duration + 0.05);
 		if (this.clickOscillator) this.clickOscillator.disconnect();
 		this.clickOscillator = this.audioContext.createOscillator();
 		this.clickOscillator.type = this.drumProperties.clickWave as any;
 		this.clickOscillator.connect(this.clickGain);
-
-		if (this.baseOscillator) this.baseOscillator.disconnect();
-		this.baseOscillator = this.audioContext.createOscillator();
-		this.baseOscillator.type = this.drumProperties.baseWave as any;
-		this.baseOscillator.connect(this.driveGain);
-
-		this.driveGain.gain.value = this.drumProperties.driveLevel;
-		this.baseOscillator.frequency.setValueAtTime(this.drumProperties.startFrequency * pitchRatio, when);
-		this.baseOscillator.frequency.exponentialRampToValueAtTime(this.drumProperties.nextFrequency * pitchRatio, when + this.drumProperties.freqChangeDuration);
-		this.baseGain.gain.setValueAtTime(this.drumProperties.baselevel, when);
-		this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.duration);
-		this.baseOscillator.start(when);
-		this.baseOscillator.stop(when + this.drumProperties.duration + 0.05);
 		this.clickOscillator.frequency.setValueAtTime(this.drumProperties.clickFrequency * pitchRatio, when);
-		this.clickGain.gain.setValueAtTime(this.drumProperties.clickLevel, when);
-		this.clickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.015);
 		this.clickOscillator.start(when);
 		this.clickOscillator.stop(when + 0.03);
-		this.out.gain.setValueAtTime(1, when);
+		this.driveGain.gain.value = this.drumProperties.driveLevel;
+		this.baseGain.gain.setValueAtTime(this.drumProperties.baselevel, when);
+		this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.duration);
+		this.clickGain.gain.setValueAtTime(this.drumProperties.clickLevel, when);
+		this.clickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.015);
 		this.lastWhen = when;
-/*
-		let oo = this.audioContext.createOscillator();
-		oo.frequency.value = 440;
-		oo.connect(this.out);
-		oo.start(when);
-		oo.stop(when + 1);*/
+		this.outGain.gain.setValueAtTime(1,when);
 	}
 	cancel() {
-		this.out.gain.setValueAtTime(0, 0);
+		this.outGain.gain.setValueAtTime(0, 0);
 	}
 	duration() {
-		console.log('duration', this.wholeDuration);
 		return this.wholeDuration;
 	}
 	endTime() {
@@ -82,6 +80,6 @@ class VoiceKick implements BoomDrum {
 		return cu;
 	}
 	output() {
-		return this.out;
+		return this.outGain;
 	}
 };
