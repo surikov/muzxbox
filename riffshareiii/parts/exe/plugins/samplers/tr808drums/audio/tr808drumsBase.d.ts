@@ -402,7 +402,7 @@ type DrumCacheItem = {
     drum: BoomDrum;
 };
 type BoomDrum = {
-    start: (when: number, pitchRatio: number, propertyId: number) => void;
+    start: (when: number, pitchRatio: number, volume: number) => void;
     cancel: () => void;
     duration: () => number;
     endTime: () => number;
@@ -426,11 +426,37 @@ declare class VoiceKick implements BoomDrum {
     audioContext: AudioContext;
     drumProperties: DrumEngineProps808;
     constructor(context: AudioContext, propertyId: number);
-    start(when: number, pitchRatio: number): void;
+    start(when: number, pitchRatio: number, volume: number): void;
     cancel(): void;
     duration(): number;
     endTime(): number;
     curveArray(): Float32Array<ArrayBuffer>;
     output(): GainNode;
+}
+type SnareTone = {
+    osc: OscillatorNode;
+    baseGain: GainNode;
+};
+declare class VoiceSnare implements BoomDrum {
+    lastWhen: number;
+    wholeDuration: number;
+    outGain: GainNode;
+    audioContext: AudioContext;
+    drumProperties: SnareEngineProps808;
+    tones: SnareTone[];
+    NOISE_SECONDS: number;
+    NOISE_DATA: Float32Array;
+    fillNoiseData(): Float32Array<ArrayBuffer>;
+    fillFrom(dst: any, src: any): void;
+    noiseBuf(ac: any): any;
+    noiseSrc(ac: any): any;
+    constructor(context: AudioContext, propertyId: number);
+    start(when: number, pitchRatio: number, volume: number): void;
+    cancel(): void;
+    duration(): number;
+    endTime(): number;
+    output(): GainNode;
+    takeTone(from: number): SnareTone;
+    snareEng(ctx: any, when: any, out: any, pitchRatio: any, props: SnareEngineProps808): void;
 }
 declare function createNewTR808synth(): MZXBX_AudioSamplerPlugin;

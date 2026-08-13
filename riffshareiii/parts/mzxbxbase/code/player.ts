@@ -87,7 +87,7 @@ class SchedulePlayer implements MZXBX_Player {
 			return null;
 		} catch (xx) {
 			let ermsg = 'Can not launch [' + trackName + '] due';
-			//console.log(ermsg, xx);
+			console.log(ermsg, xx);
 			return ermsg + ' ' + xx;
 		}
 	}

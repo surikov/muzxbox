@@ -67,7 +67,7 @@ type DrumCacheItem = {
 	drum: BoomDrum;
 };
 type BoomDrum = {
-	start: (when: number, pitchRatio: number, propertyId: number) => void;
+	start: (when: number, pitchRatio: number, volume: number) => void;
 	cancel: () => void;
 	duration: () => number;
 	endTime: () => number;

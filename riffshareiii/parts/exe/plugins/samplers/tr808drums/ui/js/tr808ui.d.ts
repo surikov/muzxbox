@@ -314,9 +314,14 @@ type UI808Parameters = {
     nn: number;
 };
 declare class UI808 extends MZXBX_Plugin_UI {
+    currentParameters: UI808Parameters;
+    constructor(screenWait: boolean);
     onMessageFromHost(message: MZXBX_MessageToPlugin): void;
+    sendProps(): void;
     onLanguaga(enruzhId: string): void;
 }
+declare function showVolumeFreq(percents: any, ratio: any): void;
+declare function setupVolumeRange(): void;
 declare function spotClicked(num: any): void;
 declare function showSpotFocus(nn: any): void;
 declare function clearFocus(): void;

@@ -4514,6 +4514,9 @@ class MixerBar {
             for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
                 let drum = globalCommandDispatcher.cfg().data.percussions[pp];
                 let durationLen = this.findDurationOfSample(drum.sampler.id) * globalCommandDispatcher.cfg().widthDurationRatio;
+                if (!(durationLen > 0)) {
+                    durationLen = 1;
+                }
                 if (drum) {
                     let measure = drum.measures[barIdx];
                     if (measure) {

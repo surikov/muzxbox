@@ -32,7 +32,7 @@ class VoiceKick implements BoomDrum {
 		//console.log('VoiceKick', propertyId, this.drumProperties);
 	}
 
-	start(when: number, pitchRatio: number) {
+	start(when: number, pitchRatio: number, volume: number) {
 		//console.log('start', when, pitchRatio, this.drumProperties);
 		if (this.baseOscillator) this.baseOscillator.disconnect();
 		this.baseOscillator = this.audioContext.createOscillator();
@@ -59,7 +59,7 @@ class VoiceKick implements BoomDrum {
 		this.clickGain.gain.setValueAtTime(this.drumProperties.clickLevel, when);
 		this.clickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.015);
 		this.lastWhen = when;
-		this.outGain.gain.setValueAtTime(1,when);
+		this.outGain.gain.setValueAtTime(volume, when);
 	}
 	cancel() {
 		this.outGain.gain.setValueAtTime(0, 0);

@@ -46,23 +46,66 @@ class MZXBX_Plugin_UI {
 }
 console.log('UI 808');
 class UI808 extends MZXBX_Plugin_UI {
+    constructor(screenWait) {
+        super(screenWait);
+        this.currentParameters = {
+            volume: 100,
+            ratio: 0,
+            nn: 70
+        };
+        setupVolumeRange();
+    }
     onMessageFromHost(message) {
         if (message.hostData) {
             let props = JSON.parse(message.hostData);
-            showSpotFocus(props.nn);
+            this.currentParameters = {
+                volume: props.volume,
+                ratio: props.ratio,
+                nn: props.nn
+            };
         }
+        showSpotFocus(this.currentParameters.nn);
+        showVolumeFreq(this.currentParameters.volume, this.currentParameters.ratio);
+    }
+    sendProps() {
+        this.updateHostData(JSON.stringify(this.currentParameters));
     }
     onLanguaga(enruzhId) {
     }
 }
+function showVolumeFreq(percents, ratio) {
+    let rangeforvolume808 = document.querySelector("#rangeforvolume808");
+    if (rangeforvolume808) {
+        rangeforvolume808.value = Math.round(percents / 10);
+    }
+    let freqRatio = document.querySelector("#freqRatio");
+    if (freqRatio) {
+        freqRatio.value = Math.round(ratio);
+    }
+}
+function setupVolumeRange() {
+    let rangeforvolume808 = document.querySelector("#rangeforvolume808");
+    if (rangeforvolume808) {
+        rangeforvolume808.addEventListener("change", (event) => {
+            console.log('rangeforvolume808', rangeforvolume808.value);
+            ui808.currentParameters.volume = 10 * rangeforvolume808.value;
+            ui808.sendProps();
+        });
+    }
+    let freqRatio = document.querySelector("#freqRatio");
+    if (freqRatio) {
+        freqRatio.addEventListener("change", (event) => {
+            console.log('freqRatio', freqRatio.value);
+            ui808.currentParameters.ratio = 1 * freqRatio.value;
+            ui808.sendProps();
+        });
+    }
+}
 function spotClicked(num) {
+    console.log('spotClicked', num);
     showSpotFocus(num);
-    let par = {
-        volume: 100,
-        ratio: 1,
-        nn: 1 * num
-    };
-    ui808.updateHostData(JSON.stringify(par));
+    ui808.currentParameters.nn = 1 * num;
+    ui808.sendProps();
 }
 function showSpotFocus(nn) {
     clearFocus();
@@ -72,12 +115,8 @@ function showSpotFocus(nn) {
         spot.classList.remove(cssSpotClassName(nn));
         spot.classList.add(cssFocusClassName(nn));
         spot.scrollIntoView();
-        console.log('spot', spot);
-        let carouselItemsDiv = document.querySelector('#carouselItemsDiv');
-        console.log('carouselItemsDiv', carouselItemsDiv);
-        let markers = document.querySelector('::scroll-marker-group');
-        console.log('markers', markers);
     }
+    console.log('showSpotFocus', nn, spot);
 }
 function clearFocus() {
     for (let ii = 0; ii < 32; ii++) {

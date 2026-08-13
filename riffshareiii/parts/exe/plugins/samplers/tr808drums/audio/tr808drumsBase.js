@@ -58,7 +58,13 @@ class TR808Synth {
                 return this.drumsCache[ii];
             }
         }
-        let drum = new VoiceKick(this.audioContext, kind);
+        let drum;
+        if (kind < 8) {
+            drum = new VoiceKick(this.audioContext, kind);
+        }
+        else {
+            drum = new VoiceSnare(this.audioContext, kind - 8);
+        }
         drum.output().connect(this.drumOutput);
         let cache = { kind: kind, drum: drum };
         this.drumsCache.push(cache);
@@ -77,7 +83,7 @@ class TR808Synth {
         }
         else {
             this.parameters = {
-                volume: 100,
+                volume: 70,
                 ratio: 1,
                 nn: 0
             };
@@ -91,7 +97,7 @@ class TR808Synth {
     }
     start(when, tempo) {
         let boom = this.takeEngine(this.parameters.nn);
-        boom.drum.start(when, this.parameters.ratio, this.parameters.nn);
+        boom.drum.start(when, 1 + this.parameters.ratio / 10, this.parameters.volume / 100);
     }
     cancel() {
         for (let ii = 0; ii < this.drumsCache.length; ii++) {
@@ -128,7 +134,7 @@ class VoiceKick {
         this.clickGain.connect(this.outGain);
         this.wholeDuration = this.drumProperties.duration + 0.05;
     }
-    start(when, pitchRatio) {
+    start(when, pitchRatio, volume) {
         if (this.baseOscillator)
             this.baseOscillator.disconnect();
         this.baseOscillator = this.audioContext.createOscillator();
@@ -157,7 +163,7 @@ class VoiceKick {
         this.clickGain.gain.setValueAtTime(this.drumProperties.clickLevel, when);
         this.clickGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.015);
         this.lastWhen = when;
-        this.outGain.gain.setValueAtTime(1, when);
+        this.outGain.gain.setValueAtTime(volume, when);
     }
     cancel() {
         this.outGain.gain.setValueAtTime(0, 0);
@@ -179,6 +185,106 @@ class VoiceKick {
     }
     output() {
         return this.outGain;
+    }
+}
+;
+class VoiceSnare {
+    fillNoiseData() {
+        const d = new Float32Array(96000 * this.NOISE_SECONDS);
+        for (let i = 0; i < d.length; i++)
+            d[i] = Math.random() * 2 - 1;
+        return d;
+    }
+    fillFrom(dst, src) {
+        const step = src.length / dst.length;
+        for (let i = 0; i < dst.length; i++)
+            dst[i] = src[Math.floor(i * step)];
+    }
+    ;
+    noiseBuf(ac) {
+        const len = Math.floor(ac.sampleRate * this.NOISE_SECONDS);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        this.fillFrom(buf.getChannelData(0), this.NOISE_DATA);
+        return buf;
+    }
+    noiseSrc(ac) {
+        const s = ac.createBufferSource();
+        s.buffer = this.noiseBuf(ac);
+        s.loop = true;
+        s.loopStart = Math.random() * 1.0;
+        return s;
+    }
+    constructor(context, propertyId) {
+        this.lastWhen = 0;
+        this.tones = [];
+        this.NOISE_SECONDS = 2;
+        this.audioContext = context;
+        this.drumProperties = snareInfos[propertyId].snareprops;
+        this.outGain = this.audioContext.createGain();
+        this.wholeDuration = Math.max(this.drumProperties.toneDur + 0.03, this.drumProperties.noiceDur + 0.02);
+        this.NOISE_DATA = this.fillNoiseData();
+        console.log('VoiceSnare', this.drumProperties);
+    }
+    start(when, pitchRatio, volume) {
+        this.snareEng(this.audioContext, when, this.outGain, pitchRatio, this.drumProperties);
+        this.lastWhen = when;
+        this.outGain.gain.setValueAtTime(volume, when);
+    }
+    cancel() {
+        this.outGain.gain.setValueAtTime(0, 0);
+    }
+    duration() {
+        return this.wholeDuration;
+    }
+    endTime() {
+        return this.lastWhen + this.wholeDuration;
+    }
+    output() {
+        return this.outGain;
+    }
+    takeTone(from) {
+        if (from < this.tones.length) {
+            let tone = this.tones[from];
+            tone.osc.disconnect();
+            tone.osc = this.audioContext.createOscillator();
+            tone.osc.connect(tone.baseGain);
+            tone.osc.type = 'triangle';
+            return tone;
+        }
+        else {
+            let toneSnare = {
+                osc: this.audioContext.createOscillator(),
+                baseGain: this.audioContext.createGain()
+            };
+            toneSnare.baseGain.connect(this.outGain);
+            this.tones.push(toneSnare);
+            return toneSnare;
+        }
+    }
+    snareEng(ctx, when, out, pitchRatio, props) {
+        for (let ii = 0; ii < props.tones.length; ii++) {
+            let pair = props.tones[ii];
+            let tone = this.takeTone(ii);
+            tone.osc.frequency.setValueAtTime(pair.frequency * pitchRatio, when);
+            tone.baseGain.gain.setValueAtTime(pair.volume, when);
+            tone.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.toneDur);
+            tone.osc.start(when);
+            tone.osc.stop(when + props.toneDur + 0.03);
+        }
+        if (props.noiseLevel) {
+            const noiseSourceBuffer = this.noiseSrc(ctx);
+            const bqFilter = ctx.createBiquadFilter();
+            bqFilter.type = 'highpass';
+            bqFilter.frequency.value = props.noiseFreq * pitchRatio;
+            const noiseGain = ctx.createGain();
+            noiseGain.gain.setValueAtTime(props.noiseLevel, when);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.noiceDur);
+            noiseSourceBuffer.connect(bqFilter);
+            bqFilter.connect(noiseGain);
+            noiseGain.connect(out);
+            noiseSourceBuffer.start(when);
+            noiseSourceBuffer.stop(when + props.noiceDur + 0.02);
+        }
     }
 }
 ;

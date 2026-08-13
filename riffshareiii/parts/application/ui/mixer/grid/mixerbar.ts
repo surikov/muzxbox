@@ -87,6 +87,10 @@ class MixerBar {
 			for (let pp = 0; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
 				let drum: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[pp];
 				let durationLen: number = this.findDurationOfSample(drum.sampler.id) * globalCommandDispatcher.cfg().widthDurationRatio;
+				if (!(durationLen > 0)) {
+					durationLen = 1;
+				}
+				//console.log('durationLen',durationLen,drum.sampler.id);
 				if (drum) {
 					let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 					if (measure) {
@@ -339,7 +343,7 @@ class MixerBar {
 				});
 				if (!drop) {
 					globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
-				}else{
+				} else {
 					globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 				}
 			}

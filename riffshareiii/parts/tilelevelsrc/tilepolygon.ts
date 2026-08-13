@@ -2,6 +2,7 @@ function tilePolygon(svgns: string, tapSize: number, g: SVGElement, x: number, y
 	let polygon: TileSVGElement = document.createElementNS(svgns, 'polygon') as TileSVGElement;
 	let points: string = '';
 	let dlmtr = '';
+	//console.log(dots);
 	for (let i = 0; i < dots.length; i = i + 2) {
 		points = points + dlmtr + dots[i] * tapSize + ',' + dots[i + 1] * tapSize;
 		dlmtr = ', ';

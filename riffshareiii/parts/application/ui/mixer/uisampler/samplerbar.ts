@@ -50,7 +50,7 @@ class SamplerBar {
 				, css: licss//'samplerDrumDotLine'
 			};
 			anchor.content.push(bgline);
-
+//console.log(bgline.dots[4],durationLen);
 			let ply: TilePolygon = {
 				dots: [xx, yy
 					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
@@ -59,6 +59,7 @@ class SamplerBar {
 				, css: cucss
 			};
 			anchor.content.push(ply);
+
 			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 				let yShift = 0.3;
 				if (zoomLevel < 2) yShift = 0.2;

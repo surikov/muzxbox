@@ -11,12 +11,19 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 				return this.drumsCache[ii];
 			}
 		}
-		let drum = new VoiceKick(this.audioContext, kind);
+		let drum: BoomDrum;
+		if (kind < 8) {
+			drum = new VoiceKick(this.audioContext, kind);
+
+		} else {
+			drum = new VoiceSnare(this.audioContext, kind - 8);
+
+		}
 		drum.output().connect(this.drumOutput);
 		let cache: DrumCacheItem = { kind: kind, drum: drum };
 		this.drumsCache.push(cache);
-		//console.log('create',this.drumsCache.length);
 		return cache;
+
 	}
 	launch(context: AudioContext, parameters: string): number {
 		//console.log('launch',parameters);
@@ -31,7 +38,7 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 			this.parameters = parsed;
 		} else {
 			this.parameters = {
-				volume: 100
+				volume: 70
 				, ratio: 1
 				, nn: 0
 			};
@@ -45,7 +52,7 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 	}
 	start(when: number, tempo: number): void {
 		let boom = this.takeEngine(this.parameters.nn);
-		boom.drum.start(when, this.parameters.ratio, this.parameters.nn);
+		boom.drum.start(when, 1 + this.parameters.ratio / 10, this.parameters.volume / 100);
 	}
 	cancel(): void {
 		for (let ii = 0; ii < this.drumsCache.length; ii++) {

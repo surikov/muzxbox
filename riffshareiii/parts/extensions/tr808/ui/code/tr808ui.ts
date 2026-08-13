@@ -5,34 +5,87 @@ type UI808Parameters = {
 	, nn: number
 };
 class UI808 extends MZXBX_Plugin_UI {
+	currentParameters: UI808Parameters = {
+		volume: 100
+		, ratio: 0
+		, nn: 70
+	};
+	constructor(screenWait: boolean) {
+		super(screenWait);
+		setupVolumeRange()
+	}
 	onMessageFromHost(message: MZXBX_MessageToPlugin) {
 		//console.log('message', message);
 		if (message.hostData) {
 			let props = JSON.parse(message.hostData) as UI808Parameters;
-			showSpotFocus(props.nn);
+
+			this.currentParameters = {
+				volume: props.volume
+				, ratio: props.ratio
+				, nn: props.nn
+			};
 		}
+		showSpotFocus(this.currentParameters.nn);
+		showVolumeFreq(this.currentParameters.volume, this.currentParameters.ratio);
+	}
+	sendProps() {
+		this.updateHostData(JSON.stringify(this.currentParameters));
 	}
 	onLanguaga(enruzhId: string) {
 
 	}
 }
-
-
+function showVolumeFreq(percents, ratio) {
+	let rangeforvolume808 = document.querySelector("#rangeforvolume808") as any;
+	if (rangeforvolume808) {
+		rangeforvolume808.value = Math.round(percents / 10);
+	}
+	let freqRatio = document.querySelector("#freqRatio") as any;
+	if (freqRatio) {
+		freqRatio.value = Math.round(ratio);
+	}
+}
+function setupVolumeRange() {
+	//let freqShiftrangeforvolume808 = document.querySelector("#rangeforvolume808");
+	let rangeforvolume808 = document.querySelector("#rangeforvolume808") as any;
+	if (rangeforvolume808) {
+		rangeforvolume808.addEventListener("change", (event) => {
+			console.log('rangeforvolume808', rangeforvolume808.value);
+			ui808.currentParameters.volume = 10 * rangeforvolume808.value;
+			ui808.sendProps();
+		});
+	}
+	let freqRatio = document.querySelector("#freqRatio") as any;
+	//console.log(freqRatio);
+	if (freqRatio) {
+		freqRatio.addEventListener("change", (event) => {
+			console.log('freqRatio', freqRatio.value);
+			ui808.currentParameters.ratio = 1 * freqRatio.value;
+			ui808.sendProps();
+		});
+		/*freqRatio.addEventListener("click", (event) => {
+			console.log('click freqRatio', freqRatio.value);
+		});*/
+	}
+}
 function spotClicked(num) {
-	//console.log('spotClicked', num);
+	console.log('spotClicked', num);
 	showSpotFocus(num);
-	let par: UI808Parameters = {
+	ui808.currentParameters.nn = 1 * num;
+	ui808.sendProps();
+	/*let par: UI808Parameters = {
 		volume: 100
 		, ratio: 1
 		, nn: 1 * num
 	};
 	ui808.updateHostData(JSON.stringify(par));
+	*/
 }
 function showSpotFocus(nn) {
 	clearFocus();
 	let id = '#drum' + nn;
 	let spot = document.querySelector(id);
-	
+
 	if (spot) {
 		spot.classList.remove(cssSpotClassName(nn));
 		spot.classList.add(cssFocusClassName(nn));
@@ -51,7 +104,7 @@ function showSpotFocus(nn) {
 		}*/
 
 	}
-	//console.log('showSpotFocus', nn, spot);
+	console.log('showSpotFocus', nn, spot);
 }
 function clearFocus() {
 	for (let ii = 0; ii < 32; ii++) {

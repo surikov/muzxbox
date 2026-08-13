@@ -146,6 +146,7 @@ class SchedulePlayer {
         }
         catch (xx) {
             let ermsg = 'Can not launch [' + trackName + '] due';
+            console.log(ermsg, xx);
             return ermsg + ' ' + xx;
         }
     }
