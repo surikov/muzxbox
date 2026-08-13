@@ -147,6 +147,7 @@ body {
 	& li {
 		scroll-snap-align: center;
 	}
+	
 }
 
 
@@ -159,10 +160,17 @@ body {
 		background-color: #00000001;
 		color: #ffe;
 		/* make them round and easy to press */
-		inline-size: 1.5cm;
+		inline-size: 1.0cm;
 		aspect-ratio: 1;
 
 		margin-top: 0.2cm;
+		margin-left: 0.25cm;
+		margin-right: 0.25cm;
+
+		position:relative;
+		top:-1.5cm;
+		background-color: #fff3;
+		border-radius: 50%;
 	}
 
 
@@ -172,18 +180,18 @@ body {
 	
 	&::scroll-button(left) {
 		content: "🡰" / "Scroll Left";
-		color:#ffffff33;
+		color:#ffffff66;
 		grid-area: left;
 		border: none;
-		border-right: 1px solid #ffffff33;
+		border-right2: 1px solid #ffffff66;
 		/* place markers in parent grid area */
 	}
 
 	&::scroll-button(right) {
 		content: "🡲" / "Scroll Right";
-		color:#ffffff33;
+		color:#ffffff66;
 		border: none;
-		border-left: 1px solid #ffffff33;
+		border-left2: 1px solid #ffffff66;
 		grid-area: right;
 	}
 	
@@ -195,7 +203,7 @@ body {
 /* SCROLL MARKERS */
 /* create marker group */
 /* create markers for each item */
-.carouselItems {
+.carouselItems2222 {
 	/* create markers 'after' scroller */
 	scroll-marker-group: after;
 
@@ -211,7 +219,7 @@ body {
 		grid: 1cm / auto-flow 1cm;
 		gap: 0.1cm;
 		padding: 15px;
-		scroll-padding: 15px;
+		scroll-padding: 5px;
 
 		/* handle overflow */
 		overflow: auto;
@@ -222,6 +230,8 @@ body {
 		@media (prefers-reduced-motion: no-preference) {
 			scroll-behavior: smooth;
 		}
+
+		
 	}
 
 	/* a marker for each <li> */

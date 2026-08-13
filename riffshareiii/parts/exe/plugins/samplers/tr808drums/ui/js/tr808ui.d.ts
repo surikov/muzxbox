@@ -317,10 +317,10 @@ declare class UI808 extends MZXBX_Plugin_UI {
     onMessageFromHost(message: MZXBX_MessageToPlugin): void;
     onLanguaga(enruzhId: string): void;
 }
-declare let ui808: UI808;
 declare function spotClicked(num: any): void;
 declare function showSpotFocus(nn: any): void;
 declare function clearFocus(): void;
 declare function cssFocusClassName(nn: any): string;
 declare function cssSpotClassName(nn: any): string;
 declare function resetSpotClass(nn: any): void;
+declare let ui808: UI808;

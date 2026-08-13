@@ -55,7 +55,6 @@ class UI808 extends MZXBX_Plugin_UI {
     onLanguaga(enruzhId) {
     }
 }
-let ui808 = new UI808(false);
 function spotClicked(num) {
     showSpotFocus(num);
     let par = {
@@ -73,6 +72,11 @@ function showSpotFocus(nn) {
         spot.classList.remove(cssSpotClassName(nn));
         spot.classList.add(cssFocusClassName(nn));
         spot.scrollIntoView();
+        console.log('spot', spot);
+        let carouselItemsDiv = document.querySelector('#carouselItemsDiv');
+        console.log('carouselItemsDiv', carouselItemsDiv);
+        let markers = document.querySelector('::scroll-marker-group');
+        console.log('markers', markers);
     }
 }
 function clearFocus() {
@@ -119,4 +123,5 @@ function resetSpotClass(nn) {
     spot.classList.remove(cssFocusClassName(nn));
     spot.classList.add(cssSpotClassName(nn));
 }
+let ui808 = new UI808(false);
 //# sourceMappingURL=tr808ui.js.map

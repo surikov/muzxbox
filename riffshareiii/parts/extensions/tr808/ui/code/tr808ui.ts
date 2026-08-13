@@ -17,7 +17,7 @@ class UI808 extends MZXBX_Plugin_UI {
 	}
 }
 
-let ui808 = new UI808(false);
+
 function spotClicked(num) {
 	//console.log('spotClicked', num);
 	showSpotFocus(num);
@@ -32,11 +32,24 @@ function showSpotFocus(nn) {
 	clearFocus();
 	let id = '#drum' + nn;
 	let spot = document.querySelector(id);
+	
 	if (spot) {
 		spot.classList.remove(cssSpotClassName(nn));
 		spot.classList.add(cssFocusClassName(nn));
 		//let spot = document.querySelector('#drum' + num);
 		spot.scrollIntoView();
+		/*console.log('spot', spot);
+		let carouselItemsDiv = document.querySelector('#carouselItemsDiv');//scrollListLayoutDiv");
+		console.log('carouselItemsDiv', carouselItemsDiv);
+		let markers = document.querySelector(
+			'#carouselItemsDiv::scroll-marker-group'
+		);
+		console.log('markers', markers);
+		*/
+		/*if (div) {
+			div.scrollTo({ left: 3500, top: 0 });
+		}*/
+
 	}
 	//console.log('showSpotFocus', nn, spot);
 }
@@ -72,3 +85,4 @@ function resetSpotClass(nn) {
 	spot.classList.remove(cssFocusClassName(nn));
 	spot.classList.add(cssSpotClassName(nn));
 }
+let ui808 = new UI808(false);
