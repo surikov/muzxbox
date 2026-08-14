@@ -27,7 +27,7 @@
 }
 .samplerDrumDotLine{
 	fill: var(--main-color);
-	fill-opacity33:95%;
+	fill-opacity:75%;
     stroke: none;
 	pointer-events: none;
 }

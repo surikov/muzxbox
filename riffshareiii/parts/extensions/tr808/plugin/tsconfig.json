@@ -27,8 +27,9 @@
 		"tr808list.ts",
 		"tr808synth.ts",
 		"voiceType.ts",
-		"voiceKick.ts",
-		"voiceSnare.ts",
+		"voices/voiceKick.ts",
+		"voices/voiceSnare.ts",
+		"voices/voiceClap.ts",
 		"tr808plugin.ts"
 	]
 }

@@ -446,10 +446,13 @@ declare class VoiceSnare implements BoomDrum {
     tones: SnareTone[];
     NOISE_SECONDS: number;
     NOISE_DATA: Float32Array;
+    noiseSourceBuffer: AudioBufferSourceNode;
+    bqFilter: BiquadFilterNode;
+    noiseGain: GainNode;
     fillNoiseData(): Float32Array<ArrayBuffer>;
-    fillFrom(dst: any, src: any): void;
-    noiseBuf(ac: any): any;
-    noiseSrc(ac: any): any;
+    fillFrom(dst: Float32Array, src: Float32Array): void;
+    noiseBuf(ac: AudioContext): AudioBuffer;
+    noiseSrc(ac: AudioContext): AudioBufferSourceNode;
     constructor(context: AudioContext, propertyId: number);
     start(when: number, pitchRatio: number, volume: number): void;
     cancel(): void;
@@ -457,6 +460,27 @@ declare class VoiceSnare implements BoomDrum {
     endTime(): number;
     output(): GainNode;
     takeTone(from: number): SnareTone;
-    snareEng(ctx: any, when: any, out: any, pitchRatio: any, props: SnareEngineProps808): void;
+}
+declare class VoiceClap implements BoomDrum {
+    lastWhen: number;
+    wholeDuration: number;
+    outGain: GainNode;
+    audioContext: AudioContext;
+    drumProperties: ClapEngineProps808;
+    NOISE_SECONDS: number;
+    NOISE_DATA: Float32Array;
+    noiseBufferSource: AudioBufferSourceNode;
+    biFilter: BiquadFilterNode;
+    baseGain: GainNode;
+    constructor(context: AudioContext, propertyId: number);
+    fillNoiseData(): Float32Array<ArrayBuffer>;
+    fillFrom(dst: Float32Array, src: Float32Array): void;
+    noiseBuf(ac: AudioContext): AudioBuffer;
+    noiseSrc(ac: AudioContext): AudioBufferSourceNode;
+    start(when: number, pitchRatio: number, volume: number): void;
+    cancel(): void;
+    duration(): number;
+    endTime(): number;
+    output(): GainNode;
 }
 declare function createNewTR808synth(): MZXBX_AudioSamplerPlugin;

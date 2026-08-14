@@ -4227,22 +4227,26 @@ class SamplerBar {
         for (let ss = 0; ss < measure.skips.length; ss++) {
             let skip = measure.skips[ss];
             let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-            let bgline = {
-                dots: [xx, yy,
-                    xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
-                    xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
-                ],
-                css: licss
-            };
-            anchor.content.push(bgline);
-            let ply = {
-                dots: [xx, yy,
-                    xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
-                    xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
-                ],
-                css: cucss
-            };
-            anchor.content.push(ply);
+            if (durationLen > 0.01) {
+                let bgline = {
+                    dots: [xx, yy,
+                        xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
+                        xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
+                    ],
+                    css: licss
+                };
+                anchor.content.push(bgline);
+            }
+            else {
+                let ply = {
+                    dots: [xx, yy,
+                        xx, yy + globalCommandDispatcher.cfg().samplerDotHeight,
+                        xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
+                    ],
+                    css: cucss
+                };
+                anchor.content.push(ply);
+            }
             if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
                 let yShift = 0.3;
                 if (zoomLevel < 2)

@@ -12,31 +12,36 @@ class VoiceSnare implements BoomDrum {
 	tones: SnareTone[] = [];
 	NOISE_SECONDS = 2;
 	NOISE_DATA: Float32Array;
+	noiseSourceBuffer: AudioBufferSourceNode;
+	bqFilter: BiquadFilterNode;
+	noiseGain: GainNode;
 	fillNoiseData() {
 		const d = new Float32Array(96000 * this.NOISE_SECONDS);
 		for (let i = 0; i < d.length; i++)
 			d[i] = Math.random() * 2 - 1;
 		return d;
 	}
-	fillFrom(dst, src) {
+	fillFrom(dst: Float32Array, src: Float32Array) {
+		//console.log('dst',dst);
+		//console.log('src', src);
 		const step = src.length / dst.length;
 		for (let i = 0; i < dst.length; i++)
 			dst[i] = src[Math.floor(i * step)];
 	}
 	;
-	noiseBuf(ac) {
+	noiseBuf(ac: AudioContext) {
 		const len = Math.floor(ac.sampleRate * this.NOISE_SECONDS);
-		const buf = ac.createBuffer(1, len, ac.sampleRate);
+		const buf: AudioBuffer = ac.createBuffer(1, len, ac.sampleRate);
 		this.fillFrom(buf.getChannelData(0), this.NOISE_DATA);
 		return buf;
 	}
 
-	noiseSrc(ac) {
-		const s = ac.createBufferSource();
-		s.buffer = this.noiseBuf(ac);
-		s.loop = true;
-		s.loopStart = Math.random() * 1.0;
-		return s;
+	noiseSrc(ac: AudioContext) {
+		const ss: AudioBufferSourceNode = ac.createBufferSource();
+		ss.buffer = this.noiseBuf(ac);
+		ss.loop = true;
+		ss.loopStart = Math.random() * 1.0;
+		return ss;
 	}
 
 	constructor(context: AudioContext, propertyId: number) {
@@ -44,14 +49,46 @@ class VoiceSnare implements BoomDrum {
 		this.drumProperties = snareInfos[propertyId].snareprops;
 		this.outGain = this.audioContext.createGain();
 		//
-		this.wholeDuration = Math.max(this.drumProperties.toneDur + 0.03, this.drumProperties.noiceDur + 0.02);
 		this.NOISE_DATA = this.fillNoiseData();
-		console.log('VoiceSnare', this.drumProperties);
+		this.noiseGain = this.audioContext.createGain();
+
+		this.wholeDuration = Math.max(this.drumProperties.toneDur + 0.03, this.drumProperties.noiceDur + 0.02);
+
+		this.bqFilter = this.audioContext.createBiquadFilter();
+		this.bqFilter.type = 'highpass';
+
+		this.bqFilter.connect(this.noiseGain);
+		this.noiseGain.connect(this.outGain);
+		
 	}
 
 	start(when: number, pitchRatio: number, volume: number) {
-		this.snareEng(this.audioContext, when, this.outGain, pitchRatio, this.drumProperties);
+		//this.snareEng(this.audioContext, when, this.outGain, pitchRatio, this.drumProperties);
+		for (let ii = 0; ii < this.drumProperties.tones.length; ii++) {
+			let pair = this.drumProperties.tones[ii];
+			let tone = this.takeTone(ii);
+			tone.osc.frequency.setValueAtTime(pair.frequency * pitchRatio, when);
+			tone.baseGain.gain.setValueAtTime(pair.volume, when);
+			tone.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.toneDur);
+			tone.osc.start(when);
+			tone.osc.stop(when + this.drumProperties.toneDur + 0.03);
+		}
+		if (this.drumProperties.noiseLevel) {
+			//const noiseSourceBuffer = this.noiseSrc(this.audioContext);
+			//const bqFilter = this.audioContext.createBiquadFilter();
 
+			this.bqFilter.frequency.value = this.drumProperties.noiseFreq * pitchRatio;
+			//const noiseGain = this.audioContext.createGain();
+			this.noiseGain.gain.setValueAtTime(this.drumProperties.noiseLevel, when);
+			this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.noiceDur);
+			if (this.noiseSourceBuffer) {
+				this.noiseSourceBuffer.disconnect();
+			}
+			this.noiseSourceBuffer = this.noiseSrc(this.audioContext);
+			this.noiseSourceBuffer.connect(this.bqFilter);
+			this.noiseSourceBuffer.start(when);
+			this.noiseSourceBuffer.stop(when + this.drumProperties.noiceDur + 0.02);
+		}
 		//
 		this.lastWhen = when;
 		this.outGain.gain.setValueAtTime(volume, when);
@@ -86,7 +123,7 @@ class VoiceSnare implements BoomDrum {
 			return toneSnare;
 		}
 	}
-	snareEng(ctx, when, out, pitchRatio, props: SnareEngineProps808) {
+	/*snareEng(ctx, when, out, pitchRatio, props: SnareEngineProps808) {
 		for (let ii = 0; ii < props.tones.length; ii++) {
 			let pair = props.tones[ii];
 			let tone = this.takeTone(ii);
@@ -110,7 +147,7 @@ class VoiceSnare implements BoomDrum {
 			noiseSourceBuffer.start(when);
 			noiseSourceBuffer.stop(when + props.noiceDur + 0.02);
 		}
-	}
+	}*/
 };
 ///
 

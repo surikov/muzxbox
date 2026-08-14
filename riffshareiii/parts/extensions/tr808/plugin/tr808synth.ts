@@ -14,10 +14,12 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 		let drum: BoomDrum;
 		if (kind < 8) {
 			drum = new VoiceKick(this.audioContext, kind);
-
 		} else {
-			drum = new VoiceSnare(this.audioContext, kind - 8);
-
+			if (kind < 12) {
+				drum = new VoiceSnare(this.audioContext, kind - 8);
+			} else {
+				drum = new VoiceClap(this.audioContext, kind - 12);
+			}
 		}
 		drum.output().connect(this.drumOutput);
 		let cache: DrumCacheItem = { kind: kind, drum: drum };

@@ -63,7 +63,12 @@ class TR808Synth {
             drum = new VoiceKick(this.audioContext, kind);
         }
         else {
-            drum = new VoiceSnare(this.audioContext, kind - 8);
+            if (kind < 12) {
+                drum = new VoiceSnare(this.audioContext, kind - 8);
+            }
+            else {
+                drum = new VoiceClap(this.audioContext, kind - 12);
+            }
         }
         drum.output().connect(this.drumOutput);
         let cache = { kind: kind, drum: drum };
@@ -208,11 +213,11 @@ class VoiceSnare {
         return buf;
     }
     noiseSrc(ac) {
-        const s = ac.createBufferSource();
-        s.buffer = this.noiseBuf(ac);
-        s.loop = true;
-        s.loopStart = Math.random() * 1.0;
-        return s;
+        const ss = ac.createBufferSource();
+        ss.buffer = this.noiseBuf(ac);
+        ss.loop = true;
+        ss.loopStart = Math.random() * 1.0;
+        return ss;
     }
     constructor(context, propertyId) {
         this.lastWhen = 0;
@@ -221,12 +226,36 @@ class VoiceSnare {
         this.audioContext = context;
         this.drumProperties = snareInfos[propertyId].snareprops;
         this.outGain = this.audioContext.createGain();
-        this.wholeDuration = Math.max(this.drumProperties.toneDur + 0.03, this.drumProperties.noiceDur + 0.02);
         this.NOISE_DATA = this.fillNoiseData();
-        console.log('VoiceSnare', this.drumProperties);
+        this.noiseGain = this.audioContext.createGain();
+        this.wholeDuration = Math.max(this.drumProperties.toneDur + 0.03, this.drumProperties.noiceDur + 0.02);
+        this.bqFilter = this.audioContext.createBiquadFilter();
+        this.bqFilter.type = 'highpass';
+        this.bqFilter.connect(this.noiseGain);
+        this.noiseGain.connect(this.outGain);
     }
     start(when, pitchRatio, volume) {
-        this.snareEng(this.audioContext, when, this.outGain, pitchRatio, this.drumProperties);
+        for (let ii = 0; ii < this.drumProperties.tones.length; ii++) {
+            let pair = this.drumProperties.tones[ii];
+            let tone = this.takeTone(ii);
+            tone.osc.frequency.setValueAtTime(pair.frequency * pitchRatio, when);
+            tone.baseGain.gain.setValueAtTime(pair.volume, when);
+            tone.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.toneDur);
+            tone.osc.start(when);
+            tone.osc.stop(when + this.drumProperties.toneDur + 0.03);
+        }
+        if (this.drumProperties.noiseLevel) {
+            this.bqFilter.frequency.value = this.drumProperties.noiseFreq * pitchRatio;
+            this.noiseGain.gain.setValueAtTime(this.drumProperties.noiseLevel, when);
+            this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.noiceDur);
+            if (this.noiseSourceBuffer) {
+                this.noiseSourceBuffer.disconnect();
+            }
+            this.noiseSourceBuffer = this.noiseSrc(this.audioContext);
+            this.noiseSourceBuffer.connect(this.bqFilter);
+            this.noiseSourceBuffer.start(when);
+            this.noiseSourceBuffer.stop(when + this.drumProperties.noiceDur + 0.02);
+        }
         this.lastWhen = when;
         this.outGain.gain.setValueAtTime(volume, when);
     }
@@ -261,30 +290,81 @@ class VoiceSnare {
             return toneSnare;
         }
     }
-    snareEng(ctx, when, out, pitchRatio, props) {
-        for (let ii = 0; ii < props.tones.length; ii++) {
-            let pair = props.tones[ii];
-            let tone = this.takeTone(ii);
-            tone.osc.frequency.setValueAtTime(pair.frequency * pitchRatio, when);
-            tone.baseGain.gain.setValueAtTime(pair.volume, when);
-            tone.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.toneDur);
-            tone.osc.start(when);
-            tone.osc.stop(when + props.toneDur + 0.03);
+}
+;
+class VoiceClap {
+    ;
+    constructor(context, propertyId) {
+        this.lastWhen = 0;
+        this.NOISE_SECONDS = 2;
+        this.audioContext = context;
+        this.drumProperties = clapInfos[propertyId].clapprops;
+        this.outGain = this.audioContext.createGain();
+        this.wholeDuration = this.drumProperties.tail + 0.02;
+        this.NOISE_DATA = this.fillNoiseData();
+        this.biFilter = this.audioContext.createBiquadFilter();
+        this.biFilter.type = 'bandpass';
+        this.baseGain = this.audioContext.createGain();
+        this.biFilter.connect(this.baseGain);
+        this.baseGain.connect(this.outGain);
+    }
+    fillNoiseData() {
+        const dd = new Float32Array(96000 * this.NOISE_SECONDS);
+        for (let ii = 0; ii < dd.length; ii++)
+            dd[ii] = Math.random() * 2 - 1;
+        return dd;
+    }
+    fillFrom(dst, src) {
+        const step = src.length / dst.length;
+        for (let ii = 0; ii < dst.length; ii++)
+            dst[ii] = src[Math.floor(ii * step)];
+    }
+    ;
+    noiseBuf(ac) {
+        const len = Math.floor(ac.sampleRate * this.NOISE_SECONDS);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        this.fillFrom(buf.getChannelData(0), this.NOISE_DATA);
+        return buf;
+    }
+    noiseSrc(ac) {
+        const ss = ac.createBufferSource();
+        ss.buffer = this.noiseBuf(ac);
+        ss.loop = true;
+        ss.loopStart = Math.random() * 1.0;
+        return ss;
+    }
+    start(when, pitchRatio, volume) {
+        if (this.noiseBufferSource) {
+            this.noiseBufferSource.disconnect();
         }
-        if (props.noiseLevel) {
-            const noiseSourceBuffer = this.noiseSrc(ctx);
-            const bqFilter = ctx.createBiquadFilter();
-            bqFilter.type = 'highpass';
-            bqFilter.frequency.value = props.noiseFreq * pitchRatio;
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(props.noiseLevel, when);
-            noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.noiceDur);
-            noiseSourceBuffer.connect(bqFilter);
-            bqFilter.connect(noiseGain);
-            noiseGain.connect(out);
-            noiseSourceBuffer.start(when);
-            noiseSourceBuffer.stop(when + props.noiceDur + 0.02);
-        }
+        this.noiseBufferSource = this.noiseSrc(this.audioContext);
+        this.noiseBufferSource.connect(this.biFilter);
+        this.biFilter.frequency.value = this.drumProperties.freq * pitchRatio;
+        this.biFilter.Q.value = this.drumProperties.qualityFactor;
+        this.lastWhen = when;
+        this.outGain.gain.setValueAtTime(volume, when);
+        this.baseGain.gain.setValueAtTime(0.0001, when);
+        this.drumProperties.bursts.forEach(off => {
+            this.baseGain.gain.setValueAtTime(0.9, when + off);
+            this.baseGain.gain.exponentialRampToValueAtTime(0.12, when + off + 0.01);
+        });
+        const last = this.drumProperties.bursts[this.drumProperties.bursts.length - 1];
+        this.baseGain.gain.setValueAtTime(0.7, when + last + 0.011);
+        this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + last + this.drumProperties.tail);
+        this.noiseBufferSource.start(when);
+        this.noiseBufferSource.stop(when + last + this.drumProperties.tail + 0.02);
+    }
+    cancel() {
+        this.outGain.gain.setValueAtTime(0, 0);
+    }
+    duration() {
+        return this.wholeDuration;
+    }
+    endTime() {
+        return this.lastWhen + this.wholeDuration;
+    }
+    output() {
+        return this.outGain;
     }
 }
 ;

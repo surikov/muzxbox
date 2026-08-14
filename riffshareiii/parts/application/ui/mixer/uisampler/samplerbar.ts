@@ -41,25 +41,27 @@ class SamplerBar {
 		for (let ss = 0; ss < measure.skips.length; ss++) {
 			let skip: Zvoog_Metre = measure.skips[ss];
 			let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio
-
-			let bgline: TilePolygon = {
-				dots: [xx, yy
-					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
-					, xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
-				]
-				, css: licss//'samplerDrumDotLine'
-			};
-			anchor.content.push(bgline);
-//console.log(bgline.dots[4],durationLen);
-			let ply: TilePolygon = {
-				dots: [xx, yy
-					, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
-					, xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
-				]
-				, css: cucss
-			};
-			anchor.content.push(ply);
-
+			//console.log('durationLen',durationLen);
+			if (durationLen>0.01) {
+				let bgline: TilePolygon = {
+					dots: [xx, yy
+						, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
+						, xx + durationLen, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
+					]
+					, css: licss//'samplerDrumDotLine'
+				};
+				anchor.content.push(bgline);
+				//console.log(bgline.dots[4],durationLen);
+			} else {
+				let ply: TilePolygon = {
+					dots: [xx, yy
+						, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight
+						, xx + ww, yy + globalCommandDispatcher.cfg().samplerDotHeight / 2
+					]
+					, css: cucss
+				};
+				anchor.content.push(ply);
+			}
 			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
 				let yShift = 0.3;
 				if (zoomLevel < 2) yShift = 0.2;
