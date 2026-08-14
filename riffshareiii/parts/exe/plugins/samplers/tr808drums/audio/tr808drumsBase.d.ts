@@ -461,6 +461,35 @@ declare class VoiceSnare implements BoomDrum {
     output(): GainNode;
     takeTone(from: number): SnareTone;
 }
+declare class VoiceHat implements BoomDrum {
+    lastWhen: number;
+    wholeDuration: number;
+    outGain: GainNode;
+    audioContext: AudioContext;
+    drumProperties: HatEngineProps808;
+    NOISE_SECONDS: number;
+    NOISE_DATA: Float32Array;
+    noiseBufferSource: AudioBufferSourceNode;
+    biFilter: BiquadFilterNode;
+    baseGain: GainNode;
+    freqs: number[];
+    hipaFilter: BiquadFilterNode;
+    oscs: OscillatorNode[];
+    washFilter: BiquadFilterNode;
+    noiseGain: GainNode;
+    noiseSource: AudioBufferSourceNode;
+    constructor(context: AudioContext, propertyId: number);
+    fillNoiseData(): Float32Array<ArrayBuffer>;
+    fillFrom(dst: Float32Array, src: Float32Array): void;
+    noiseBuf(ac: AudioContext): AudioBuffer;
+    noiseSrc(ac: AudioContext): AudioBufferSourceNode;
+    start(when: number, pitchRatio: number, volume: number): void;
+    cancel(): void;
+    duration(): number;
+    endTime(): number;
+    output(): GainNode;
+    hatEng(ctx: any, when: any, out: any, pitchRatio: any, props: HatEngineProps808): void;
+}
 declare class VoiceClap implements BoomDrum {
     lastWhen: number;
     wholeDuration: number;

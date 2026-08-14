@@ -11,6 +11,7 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 				return this.drumsCache[ii];
 			}
 		}
+		//console.log('takeEngine',kind);
 		let drum: BoomDrum;
 		if (kind < 8) {
 			drum = new VoiceKick(this.audioContext, kind);
@@ -18,7 +19,19 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 			if (kind < 12) {
 				drum = new VoiceSnare(this.audioContext, kind - 8);
 			} else {
-				drum = new VoiceClap(this.audioContext, kind - 12);
+				if (kind < 16) {
+					drum = new VoiceClap(this.audioContext, kind - 12);
+				} else {
+					if (kind < 24) {
+						drum = new VoiceHat(this.audioContext, kind - 16);
+					} else {
+						if (kind < 28) {
+							drum = new VoiceKick(this.audioContext, 0);
+						} else {
+							drum = new VoiceKick(this.audioContext, 0);
+						}
+					}
+				}
 			}
 		}
 		drum.output().connect(this.drumOutput);
