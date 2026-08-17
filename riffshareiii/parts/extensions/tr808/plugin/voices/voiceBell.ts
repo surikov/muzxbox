@@ -22,7 +22,7 @@ class VoiceBell implements BoomDrum {
 
 	noiseGain: GainNode;
 	noiseSource: AudioBufferSourceNode;
-	bellEng(ctx, when, out, pitchRatio, props: CowbellEngineProps808) {
+	/*bellEng(ctx, when, out, pitchRatio, props: CowbellEngineProps808) {
 		props.freqs.forEach(bellFreq => {
 			const beep = ctx.createOscillator();
 			const biFilter = ctx.createBiquadFilter();
@@ -55,7 +55,7 @@ class VoiceBell implements BoomDrum {
 			noiseSource.start(when);
 			noiseSource.stop(when + 0.05);
 		}
-	}
+	}*/
 	constructor(context: AudioContext, propertyId: number) {
 		this.audioContext = context;
 		//this.drumProperties = hatInfos[propertyId].hatprops;

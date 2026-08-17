@@ -79,7 +79,7 @@ class TR808Synth {
                             drum = new VoiceBell(this.audioContext, kind - 24);
                         }
                         else {
-                            drum = new VoiceKick(this.audioContext, 0);
+                            drum = new VoiceTom(this.audioContext, kind - 28);
                         }
                     }
                 }
@@ -248,7 +248,6 @@ class VoiceSnare {
         this.bqFilter.type = 'highpass';
         this.bqFilter.connect(this.noiseGain);
         this.noiseGain.connect(this.outGain);
-        console.log(this.drumProperties);
     }
     start(when, pitchRatio, volume) {
         for (let ii = 0; ii < this.drumProperties.tones.length; ii++) {
@@ -306,6 +305,91 @@ class VoiceSnare {
             this.tones.push(toneSnare);
             return toneSnare;
         }
+    }
+}
+;
+class VoiceTom {
+    constructor(context, propertyId) {
+        this.lastWhen = 0;
+        this.NOISE_SECONDS = 2;
+        this.audioContext = context;
+        this.drumProperties = tomInfos[propertyId].tomprops;
+        this.outGain = this.audioContext.createGain();
+        this.wholeDuration = this.drumProperties.duration + 0.05;
+        this.NOISE_DATA = this.fillNoiseData();
+        this.noiseGain = this.audioContext.createGain();
+        this.loFilter = this.audioContext.createBiquadFilter();
+        this.baseGain = this.audioContext.createGain();
+        this.loFilter.type = 'lowpass';
+        this.loFilter.connect(this.noiseGain);
+        this.noiseGain.connect(this.outGain);
+        this.baseGain.connect(this.outGain);
+    }
+    fillNoiseData() {
+        const dd = new Float32Array(96000 * this.NOISE_SECONDS);
+        for (let ii = 0; ii < dd.length; ii++) {
+            dd[ii] = Math.random() * 2 - 1;
+        }
+        return dd;
+    }
+    fillFrom(dst, src) {
+        const step = src.length / dst.length;
+        for (let ii = 0; ii < dst.length; ii++)
+            dst[ii] = src[Math.floor(ii * step)];
+    }
+    ;
+    noiseBuf(ac) {
+        const len = Math.floor(ac.sampleRate * this.NOISE_SECONDS);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        this.fillFrom(buf.getChannelData(0), this.NOISE_DATA);
+        return buf;
+    }
+    noiseSrc(ac) {
+        const ss = ac.createBufferSource();
+        ss.buffer = this.noiseBuf(ac);
+        ss.loop = true;
+        ss.loopStart = Math.random() * 1.0;
+        return ss;
+    }
+    start(when, pitchRatio, volume) {
+        if (this.beep) {
+            this.beep.disconnect();
+        }
+        this.beep = this.audioContext.createOscillator();
+        this.beep.connect(this.baseGain);
+        this.beep.type = this.drumProperties.tomwave;
+        this.beep.frequency.setValueAtTime(this.drumProperties.startFreq * pitchRatio, when);
+        this.beep.frequency.exponentialRampToValueAtTime(this.drumProperties.nextFreq * pitchRatio, when + this.drumProperties.drop);
+        this.baseGain.gain.setValueAtTime(0.85, when);
+        this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.duration);
+        this.beep.start(when);
+        this.beep.stop(when + this.drumProperties.duration + 0.05);
+        if (this.drumProperties.skinLevel) {
+            this.loFilter.frequency.value = (this.drumProperties.skinFreq) * pitchRatio;
+            this.noiseGain.gain.setValueAtTime(this.drumProperties.skinLevel, when);
+            this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.skinDur);
+            if (this.noiseSource) {
+                this.noiseSource.disconnect();
+            }
+            this.noiseSource = this.noiseSrc(this.audioContext);
+            this.noiseSource.connect(this.loFilter);
+            this.noiseSource.start(when);
+            this.noiseSource.stop(when + this.drumProperties.skinDur + 0.02);
+        }
+        this.outGain.gain.setValueAtTime(volume, when);
+        this.lastWhen = when;
+    }
+    cancel() {
+        this.outGain.gain.setValueAtTime(0, 0);
+    }
+    duration() {
+        return this.wholeDuration;
+    }
+    endTime() {
+        return this.lastWhen + this.wholeDuration;
+    }
+    output() {
+        return this.outGain;
     }
 }
 ;
@@ -412,40 +496,6 @@ class VoiceHat {
 }
 ;
 class VoiceBell {
-    bellEng(ctx, when, out, pitchRatio, props) {
-        props.freqs.forEach(bellFreq => {
-            const beep = ctx.createOscillator();
-            const biFilter = ctx.createBiquadFilter();
-            const volumeGain = ctx.createGain();
-            beep.type = 'square';
-            beep.frequency.value = bellFreq * pitchRatio;
-            biFilter.type = 'bandpass';
-            biFilter.frequency.value = props.bpFilterFreq * pitchRatio;
-            biFilter.Q.value = props.qualityFilter;
-            volumeGain.gain.setValueAtTime(props.bellLevel, when);
-            volumeGain.gain.exponentialRampToValueAtTime(0.12, when + 0.03);
-            volumeGain.gain.exponentialRampToValueAtTime(0.0001, when + props.duration);
-            beep.connect(biFilter);
-            biFilter.connect(volumeGain);
-            volumeGain.connect(out);
-            beep.start(when);
-            beep.stop(when + props.duration + 0.05);
-        });
-        if (props.strikeVolume) {
-            const noiseSource = this.noiseSrc(ctx);
-            const passFilter = ctx.createBiquadFilter();
-            passFilter.type = 'bandpass';
-            passFilter.frequency.value = 2500 * pitchRatio;
-            const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(props.strikeVolume, when);
-            noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.03);
-            noiseSource.connect(passFilter);
-            passFilter.connect(noiseGain);
-            noiseGain.connect(out);
-            noiseSource.start(when);
-            noiseSource.stop(when + 0.05);
-        }
-    }
     constructor(context, propertyId) {
         this.lastWhen = 0;
         this.NOISE_SECONDS = 2;

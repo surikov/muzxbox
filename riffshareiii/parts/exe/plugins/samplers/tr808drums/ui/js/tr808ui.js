@@ -95,7 +95,6 @@ function setupVolumeRange() {
     let freqRatio = document.querySelector("#freqRatio");
     if (freqRatio) {
         freqRatio.addEventListener("change", (event) => {
-            console.log('freqRatio', freqRatio.value);
             ui808.currentParameters.ratio = 1 * freqRatio.value;
             ui808.sendProps();
         });

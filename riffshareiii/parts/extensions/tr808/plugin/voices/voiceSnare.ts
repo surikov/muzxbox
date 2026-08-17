@@ -60,7 +60,7 @@ class VoiceSnare implements BoomDrum {
 		this.bqFilter.connect(this.noiseGain);
 		this.noiseGain.connect(this.outGain);
 
-		console.log(this.drumProperties);
+		//console.log(this.drumProperties);
 
 	}
 
