@@ -79,43 +79,41 @@ class VoiceHat implements BoomDrum {
 	}
 
 	start(when: number, pitchRatio: number, volume: number) {
+		//console.log('start', when, pitchRatio, volume, this.drumProperties);
 		//this.hatEng(this.audioContext, when, this.outGain, pitchRatio, this.drumProperties);
 
 		this.biFilter.frequency.value = this.drumProperties.bandFiFreq * pitchRatio;
 		this.hipaFilter.frequency.value = this.drumProperties.highFiFreq * pitchRatio;
 		this.baseGain.gain.setValueAtTime(this.drumProperties.level, when);
 		this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.decay);
-		this.oscs.forEach((oo) => {
-			oo.disconnect();
+		this.oscs.forEach((singleOscillator) => {
+			singleOscillator.disconnect();
 		});
-		this.oscs = [];
+		//this.oscs = [];
 		this.freqs.forEach(freqVal => {
-			let osc: OscillatorNode = this.audioContext.createOscillator();
-			osc.type = 'square';
-			osc.frequency.value = freqVal * this.drumProperties.freqScale * pitchRatio;
-			osc.connect(this.biFilter);
-			osc.start(when);
-			osc.stop(when + this.drumProperties.decay + 0.05);
-			this.oscs.push(osc);
+			let subOscillator: OscillatorNode = this.audioContext.createOscillator();
+			subOscillator.type = 'square';
+			subOscillator.frequency.value = freqVal * this.drumProperties.freqScale * pitchRatio;
+			subOscillator.connect(this.biFilter);
+			//subOscillator.connect(this.outGain);
+			subOscillator.start(when);
+			subOscillator.stop(when + this.drumProperties.decay + 0.05);
+			this.oscs.push(subOscillator);
+			//console.log(subOscillator);
 		});
 		if (this.drumProperties.washVolume) {
-			//const noiseSource = this.noiseSrc(this.audioContext);
 			if (this.noiseSource) {
 				this.noiseSource.disconnect();
 			}
 			this.noiseSource = this.noiseSrc(this.audioContext);
-			//const washFilter = this.audioContext.createBiquadFilter();
-			//washFilter.type = 'highpass';
 			this.washFilter.frequency.value = 5000 * pitchRatio;
-			//const noiseGain = this.audioContext.createGain();
-			//noiseGain.gain.setValueAtTime(this.drumProperties.washVolume, when);
 			this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.decay);
 			this.noiseSource.connect(this.washFilter);
-			//this.washFilter.connect(this.noiseGain);
-			//this.noiseGain.connect(this.outGain);
 			this.noiseSource.start(when);
 			this.noiseSource.stop(when + this.drumProperties.decay + 0.02);
 		}
+		this.outGain.gain.setValueAtTime(volume, when);
+		this.lastWhen=when;
 	}
 	cancel() {
 		this.outGain.gain.setValueAtTime(0, 0);
@@ -130,44 +128,6 @@ class VoiceHat implements BoomDrum {
 		return this.outGain;
 	}
 
-	hatEng(ctx, when, out, pitchRatio, props: HatEngineProps808) {
-		//const freqs = [263, 400, 421, 474, 587, 845];
-		//const biFilter = ctx.createBiquadFilter();
-		//biFilter.type = 'bandpass';
-		//biFilter.frequency.value = props.bandFiFreq * pitchRatio;
-		//biFilter.Q.value = 0.8;
-		//const hipaFilter = ctx.createBiquadFilter();
-		//hipaFilter.type = 'highpass';
-		//hipaFilter.frequency.value = props.highFiFreq * pitchRatio;
-		//const baseGain = ctx.createGain();
-		//baseGain.gain.setValueAtTime(props.level, when);
-		//baseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.decay);
-		//biFilter.connect(hipaFilter);
-		//hipaFilter.connect(baseGain);
-		//baseGain.connect(out);
-		/*this.freqs.forEach(freqVal => {
-			const osc = ctx.createOscillator();
-			osc.type = 'square';
-			osc.frequency.value = freqVal * props.freqScale * pitchRatio;
-			osc.connect(biFilter);
-			osc.start(when);
-			osc.stop(when + props.decay + 0.05);
-		});*/
-		if (props.washVolume) {
-			const noiseSource = this.noiseSrc(ctx);
-			const washFilter = ctx.createBiquadFilter();
-			washFilter.type = 'highpass';
-			washFilter.frequency.value = 5000 * pitchRatio;
-			const noiseGain = ctx.createGain();
-			noiseGain.gain.setValueAtTime(props.washVolume, when);
-			noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.decay);
-			noiseSource.connect(washFilter);
-			washFilter.connect(noiseGain);
-			noiseGain.connect(out);
-			noiseSource.start(when);
-			noiseSource.stop(when + props.decay + 0.02);
-		}
-	}
 
 };
 ///

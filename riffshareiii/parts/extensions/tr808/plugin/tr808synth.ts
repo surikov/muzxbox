@@ -26,7 +26,7 @@ class TR808Synth implements MZXBX_AudioSamplerPlugin {
 						drum = new VoiceHat(this.audioContext, kind - 16);
 					} else {
 						if (kind < 28) {
-							drum = new VoiceKick(this.audioContext, 0);
+							drum = new VoiceBell(this.audioContext, kind - 24);
 						} else {
 							drum = new VoiceKick(this.audioContext, 0);
 						}

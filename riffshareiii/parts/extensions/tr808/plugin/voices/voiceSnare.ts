@@ -59,7 +59,9 @@ class VoiceSnare implements BoomDrum {
 
 		this.bqFilter.connect(this.noiseGain);
 		this.noiseGain.connect(this.outGain);
-		
+
+		console.log(this.drumProperties);
+
 	}
 
 	start(when: number, pitchRatio: number, volume: number) {
@@ -74,11 +76,7 @@ class VoiceSnare implements BoomDrum {
 			tone.osc.stop(when + this.drumProperties.toneDur + 0.03);
 		}
 		if (this.drumProperties.noiseLevel) {
-			//const noiseSourceBuffer = this.noiseSrc(this.audioContext);
-			//const bqFilter = this.audioContext.createBiquadFilter();
-
 			this.bqFilter.frequency.value = this.drumProperties.noiseFreq * pitchRatio;
-			//const noiseGain = this.audioContext.createGain();
 			this.noiseGain.gain.setValueAtTime(this.drumProperties.noiseLevel, when);
 			this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.noiceDur);
 			if (this.noiseSourceBuffer) {
@@ -111,13 +109,15 @@ class VoiceSnare implements BoomDrum {
 			tone.osc.disconnect();
 			tone.osc = this.audioContext.createOscillator();
 			tone.osc.connect(tone.baseGain);
-			tone.osc.type = 'triangle';
+			//tone.osc.type = 'triangle';
 			return tone;
 		} else {
 			let toneSnare: SnareTone = {
 				osc: this.audioContext.createOscillator()
 				, baseGain: this.audioContext.createGain()
 			};
+			toneSnare.osc.type = 'triangle';
+			toneSnare.osc.connect(toneSnare.baseGain);
 			toneSnare.baseGain.connect(this.outGain);
 			this.tones.push(toneSnare);
 			return toneSnare;

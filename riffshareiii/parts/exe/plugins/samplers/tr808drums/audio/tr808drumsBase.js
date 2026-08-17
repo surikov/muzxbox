@@ -76,7 +76,7 @@ class TR808Synth {
                     }
                     else {
                         if (kind < 28) {
-                            drum = new VoiceKick(this.audioContext, 0);
+                            drum = new VoiceBell(this.audioContext, kind - 24);
                         }
                         else {
                             drum = new VoiceKick(this.audioContext, 0);
@@ -248,6 +248,7 @@ class VoiceSnare {
         this.bqFilter.type = 'highpass';
         this.bqFilter.connect(this.noiseGain);
         this.noiseGain.connect(this.outGain);
+        console.log(this.drumProperties);
     }
     start(when, pitchRatio, volume) {
         for (let ii = 0; ii < this.drumProperties.tones.length; ii++) {
@@ -292,7 +293,6 @@ class VoiceSnare {
             tone.osc.disconnect();
             tone.osc = this.audioContext.createOscillator();
             tone.osc.connect(tone.baseGain);
-            tone.osc.type = 'triangle';
             return tone;
         }
         else {
@@ -300,6 +300,8 @@ class VoiceSnare {
                 osc: this.audioContext.createOscillator(),
                 baseGain: this.audioContext.createGain()
             };
+            toneSnare.osc.type = 'triangle';
+            toneSnare.osc.connect(toneSnare.baseGain);
             toneSnare.baseGain.connect(this.outGain);
             this.tones.push(toneSnare);
             return toneSnare;
@@ -369,18 +371,17 @@ class VoiceHat {
         this.hipaFilter.frequency.value = this.drumProperties.highFiFreq * pitchRatio;
         this.baseGain.gain.setValueAtTime(this.drumProperties.level, when);
         this.baseGain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.decay);
-        this.oscs.forEach((oo) => {
-            oo.disconnect();
+        this.oscs.forEach((singleOscillator) => {
+            singleOscillator.disconnect();
         });
-        this.oscs = [];
         this.freqs.forEach(freqVal => {
-            let osc = this.audioContext.createOscillator();
-            osc.type = 'square';
-            osc.frequency.value = freqVal * this.drumProperties.freqScale * pitchRatio;
-            osc.connect(this.biFilter);
-            osc.start(when);
-            osc.stop(when + this.drumProperties.decay + 0.05);
-            this.oscs.push(osc);
+            let subOscillator = this.audioContext.createOscillator();
+            subOscillator.type = 'square';
+            subOscillator.frequency.value = freqVal * this.drumProperties.freqScale * pitchRatio;
+            subOscillator.connect(this.biFilter);
+            subOscillator.start(when);
+            subOscillator.stop(when + this.drumProperties.decay + 0.05);
+            this.oscs.push(subOscillator);
         });
         if (this.drumProperties.washVolume) {
             if (this.noiseSource) {
@@ -393,6 +394,8 @@ class VoiceHat {
             this.noiseSource.start(when);
             this.noiseSource.stop(when + this.drumProperties.decay + 0.02);
         }
+        this.outGain.gain.setValueAtTime(volume, when);
+        this.lastWhen = when;
     }
     cancel() {
         this.outGain.gain.setValueAtTime(0, 0);
@@ -406,21 +409,142 @@ class VoiceHat {
     output() {
         return this.outGain;
     }
-    hatEng(ctx, when, out, pitchRatio, props) {
-        if (props.washVolume) {
+}
+;
+class VoiceBell {
+    bellEng(ctx, when, out, pitchRatio, props) {
+        props.freqs.forEach(bellFreq => {
+            const beep = ctx.createOscillator();
+            const biFilter = ctx.createBiquadFilter();
+            const volumeGain = ctx.createGain();
+            beep.type = 'square';
+            beep.frequency.value = bellFreq * pitchRatio;
+            biFilter.type = 'bandpass';
+            biFilter.frequency.value = props.bpFilterFreq * pitchRatio;
+            biFilter.Q.value = props.qualityFilter;
+            volumeGain.gain.setValueAtTime(props.bellLevel, when);
+            volumeGain.gain.exponentialRampToValueAtTime(0.12, when + 0.03);
+            volumeGain.gain.exponentialRampToValueAtTime(0.0001, when + props.duration);
+            beep.connect(biFilter);
+            biFilter.connect(volumeGain);
+            volumeGain.connect(out);
+            beep.start(when);
+            beep.stop(when + props.duration + 0.05);
+        });
+        if (props.strikeVolume) {
             const noiseSource = this.noiseSrc(ctx);
-            const washFilter = ctx.createBiquadFilter();
-            washFilter.type = 'highpass';
-            washFilter.frequency.value = 5000 * pitchRatio;
+            const passFilter = ctx.createBiquadFilter();
+            passFilter.type = 'bandpass';
+            passFilter.frequency.value = 2500 * pitchRatio;
             const noiseGain = ctx.createGain();
-            noiseGain.gain.setValueAtTime(props.washVolume, when);
-            noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + props.decay);
-            noiseSource.connect(washFilter);
-            washFilter.connect(noiseGain);
+            noiseGain.gain.setValueAtTime(props.strikeVolume, when);
+            noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.03);
+            noiseSource.connect(passFilter);
+            passFilter.connect(noiseGain);
             noiseGain.connect(out);
             noiseSource.start(when);
-            noiseSource.stop(when + props.decay + 0.02);
+            noiseSource.stop(when + 0.05);
         }
+    }
+    constructor(context, propertyId) {
+        this.lastWhen = 0;
+        this.NOISE_SECONDS = 2;
+        this.subfreqs = [];
+        this.audioContext = context;
+        this.drumProperties = cowbellInfos[propertyId].cowbellprops;
+        this.outGain = this.audioContext.createGain();
+        this.wholeDuration = this.drumProperties.duration + 0.05;
+        this.NOISE_DATA = this.fillNoiseData();
+        this.passFilter = this.audioContext.createBiquadFilter();
+        this.passFilter.type = 'bandpass';
+        this.noiseGain = this.audioContext.createGain();
+        this.passFilter.connect(this.noiseGain);
+        this.noiseGain.connect(this.outGain);
+    }
+    start(when, pitchRatio, volume) {
+        this.subfreqs.forEach((single) => {
+            single.beep.disconnect();
+        });
+        for (let ii = 0; ii < this.drumProperties.freqs.length; ii++) {
+            let bellFreq = this.drumProperties.freqs[ii];
+            if (ii < this.subfreqs.length) {
+                this.subfreqs[ii].beep.disconnect();
+                this.subfreqs[ii].beep = this.audioContext.createOscillator();
+                this.subfreqs[ii].beep.connect(this.subfreqs[ii].bifilter);
+            }
+            else {
+                let single = {
+                    beep: this.audioContext.createOscillator(),
+                    bifilter: this.audioContext.createBiquadFilter(),
+                    vogain: this.audioContext.createGain()
+                };
+                single.beep.type = 'square';
+                single.bifilter.type = 'bandpass';
+                single.beep.connect(single.bifilter);
+                single.bifilter.connect(single.vogain);
+                single.vogain.connect(this.outGain);
+                this.subfreqs.push(single);
+            }
+            let cur = this.subfreqs[ii];
+            cur.beep.frequency.value = bellFreq * pitchRatio;
+            cur.bifilter.frequency.value = this.drumProperties.bpFilterFreq * pitchRatio;
+            cur.bifilter.Q.value = this.drumProperties.qualityFilter;
+            cur.vogain.gain.setValueAtTime(this.drumProperties.bellLevel, when);
+            cur.vogain.gain.exponentialRampToValueAtTime(0.12, when + 0.03);
+            cur.vogain.gain.exponentialRampToValueAtTime(0.0001, when + this.drumProperties.duration);
+            cur.beep.start(when);
+            cur.beep.stop(when + this.drumProperties.duration + 0.05);
+        }
+        this.noiseGain.gain.setValueAtTime(this.drumProperties.strikeVolume, when);
+        this.noiseGain.gain.exponentialRampToValueAtTime(0.0001, when + 0.03);
+        this.passFilter.frequency.value = 2500 * pitchRatio;
+        if (this.noiseSource) {
+            this.noiseSource.disconnect();
+        }
+        this.noiseSource = this.noiseSrc(this.audioContext);
+        this.noiseSource.connect(this.passFilter);
+        this.noiseSource.start(when);
+        this.noiseSource.stop(when + 0.05);
+        this.outGain.gain.setValueAtTime(volume, when);
+        this.lastWhen = when;
+    }
+    cancel() {
+        this.outGain.gain.setValueAtTime(0, 0);
+    }
+    duration() {
+        return this.wholeDuration;
+    }
+    endTime() {
+        return this.lastWhen + this.wholeDuration;
+    }
+    output() {
+        return this.outGain;
+    }
+    fillNoiseData() {
+        const dd = new Float32Array(96000 * this.NOISE_SECONDS);
+        for (let ii = 0; ii < dd.length; ii++)
+            dd[ii] = Math.random() * 2 - 1;
+        return dd;
+    }
+    fillFrom(dst, src) {
+        const step = src.length / dst.length;
+        for (let ii = 0; ii < dst.length; ii++) {
+            dst[ii] = src[Math.floor(ii * step)];
+        }
+    }
+    ;
+    noiseBuf(ac) {
+        const len = Math.floor(ac.sampleRate * this.NOISE_SECONDS);
+        const buf = ac.createBuffer(1, len, ac.sampleRate);
+        this.fillFrom(buf.getChannelData(0), this.NOISE_DATA);
+        return buf;
+    }
+    noiseSrc(ac) {
+        const ss = ac.createBufferSource();
+        ss.buffer = this.noiseBuf(ac);
+        ss.loop = true;
+        ss.loopStart = Math.random() * 1.0;
+        return ss;
     }
 }
 ;

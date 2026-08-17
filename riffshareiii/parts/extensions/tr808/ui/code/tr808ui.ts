@@ -69,7 +69,7 @@ function setupVolumeRange() {
 	}
 }
 function spotClicked(num) {
-	console.log('spotClicked', num);
+	//console.log('spotClicked', num);
 	showSpotFocus(num);
 	ui808.currentParameters.nn = 1 * num;
 	ui808.sendProps();
@@ -104,7 +104,7 @@ function showSpotFocus(nn) {
 		}*/
 
 	}
-	console.log('showSpotFocus', nn, spot);
+	//console.log('showSpotFocus', nn, spot);
 }
 function clearFocus() {
 	for (let ii = 0; ii < 32; ii++) {

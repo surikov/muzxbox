@@ -30,6 +30,7 @@
 		"voices/voiceKick.ts",
 		"voices/voiceSnare.ts",
 		"voices/voiceHat.ts",
+		"voices/voiceBell.ts",
 		"voices/voiceClap.ts",
 		"tr808plugin.ts"
 	]
