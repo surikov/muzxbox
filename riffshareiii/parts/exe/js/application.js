@@ -3807,6 +3807,9 @@ function fillPluginsLists() {
                             let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zoomIndexFromZoom(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
                                 / xyz.z;
                             let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+                                left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+                            }
                             let top = globalCommandDispatcher.cfg().gridTop();
                             if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
                                 top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
@@ -3900,6 +3903,9 @@ function fillPluginsLists() {
                                 let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zoomIndexFromZoom(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
                                     / xyz.z;
                                 let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                                if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+                                    left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+                                }
                                 let top = globalCommandDispatcher.cfg().gridTop();
                                 if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
                                     top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;

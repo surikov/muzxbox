@@ -562,7 +562,7 @@ function fillPluginsLists() {
 							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 						}
 
-refreshMixerItemFocus.currentID = -1;
+						refreshMixerItemFocus.currentID = -1;
 						globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
 						//square.css = 'rectangleDragItem';
 						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
@@ -580,6 +580,9 @@ refreshMixerItemFocus.currentID = -1;
 									(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
 								/ xyz.z;
 							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+							if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+								left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+							}
 							let top = globalCommandDispatcher.cfg().gridTop();
 							if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
 								top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
@@ -593,13 +596,13 @@ refreshMixerItemFocus.currentID = -1;
 						} else {
 							globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
 						}
-						
+
 
 						globalCommandDispatcher.renderer.tiler.resetAnchor(
 							globalCommandDispatcher.renderer.menu.menuPanelInteraction
 							, globalCommandDispatcher.renderer.menu.focusTargetAnchor
 							, LevelModes.overlay);
-							
+
 					});
 				});
 				info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -685,6 +688,9 @@ refreshMixerItemFocus.currentID = -1;
 										(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
 									/ xyz.z;
 								let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+								if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+									left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+								}
 								//console.log('left', left * globalCommandDispatcher.renderer.tiler.tapPxSize());
 								let top = globalCommandDispatcher.cfg().gridTop();
 								//console.log(window.innerHeight / tapPx, globalCommandDispatcher.cfg().wholeHeight() / xyz.z);
