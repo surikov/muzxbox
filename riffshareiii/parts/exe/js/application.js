@@ -3763,22 +3763,65 @@ function fillPluginsLists() {
             if (purpose == 'Sampler') {
                 let info = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
                 let tri = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
+                let fotri = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
                 let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
                     globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                        globalCommandDispatcher.cfg().data.percussions.push({
-                            sampler: {
-                                id: '' + Math.random(),
-                                kind: MZXBX_currentPlugins()[ii].kind,
-                                data: '',
-                                outputs: [''],
-                                iconPosition: { x: xx, y: yy },
-                                state: 0,
-                                hint35_81: 0
-                            },
-                            measures: [],
-                            title: MZXBX_currentPlugins()[ii].label
-                        });
-                        globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        let samplerNo = findSamplerIdxByXYcurZ(xx, yy);
+                        if (samplerNo > -1) {
+                            let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+                            toSamplerTrack.sampler.kind = MZXBX_currentPlugins()[ii].kind;
+                            toSamplerTrack.sampler.data = '';
+                            toSamplerTrack.sampler.id = '' + Math.random();
+                            let info = globalCommandDispatcher.findPluginRegistrationByKind(toSamplerTrack.sampler.kind);
+                            globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(samplerNo, toSamplerTrack, info);
+                            globalCommandDispatcher.player.clearPluginsCache();
+                            globalCommandDispatcher.reStartPlayIfPlay();
+                        }
+                        else {
+                            globalCommandDispatcher.cfg().data.percussions.push({
+                                sampler: {
+                                    id: '' + Math.random(),
+                                    kind: MZXBX_currentPlugins()[ii].kind,
+                                    data: '',
+                                    outputs: [''],
+                                    iconPosition: { x: xx, y: yy },
+                                    state: 0,
+                                    hint35_81: 0
+                                },
+                                measures: [],
+                                title: MZXBX_currentPlugins()[ii].label
+                            });
+                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        }
+                        refreshMixerItemFocus.currentID = -1;
+                        globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+                        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+                    });
+                }, (dx, dy) => {
+                    refreshMixerItemFocus.start(200, () => {
+                        let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
+                        if (samplerNo > -1) {
+                            let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+                            let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+                            let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+                            let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zoomIndexFromZoom(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+                                / xyz.z;
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
+                            if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+                                top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+                            }
+                            let fx = left + toSamplerTrack.sampler.iconPosition.x + xyz.x / tapPx;
+                            let fy = top + toSamplerTrack.sampler.iconPosition.y + xyz.y / tapPx;
+                            globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [fotri];
+                            fotri.x = fx / xyz.z - sz * 0.75;
+                            fotri.y = fy / xyz.z - sz * 0.75;
+                            fotri.dots = [0 * sz, -0.5 * sz, 2 * sz, 0.75 * sz, 0 * sz, 2 * sz];
+                        }
+                        else {
+                            globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+                        }
+                        globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.menu.menuPanelInteraction, globalCommandDispatcher.renderer.menu.focusTargetAnchor, LevelModes.overlay);
                     });
                 });
                 info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -3916,6 +3959,22 @@ function findPerformerIdxByXYcurZ(dx, dy) {
     let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
     for (let ii = 0; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
         let plugin = globalCommandDispatcher.cfg().data.tracks[ii].performer;
+        if (plugin.iconPosition) {
+            if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+                if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+                    return ii;
+                }
+            }
+        }
+    }
+    return -1;
+}
+function findSamplerIdxByXYcurZ(dx, dy) {
+    let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+    let zidx = zoomIndexFromZoom(zz);
+    let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
+        let plugin = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
         if (plugin.iconPosition) {
             if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
                 if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {

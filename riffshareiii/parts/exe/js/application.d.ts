@@ -459,6 +459,7 @@ declare function findNearestFilterByKind(idx: number, kind: string): Zvoog_Filte
 declare function fillClipboardList(): void;
 declare function fillPluginsLists(): void;
 declare function findPerformerIdxByXYcurZ(dx: number, dy: number): number;
+declare function findSamplerIdxByXYcurZ(dx: number, dy: number): number;
 declare function composeBaseMenu(): MenuInfo[];
 declare class DragMenuItemUtil {
     dragStarted: boolean;
