@@ -1,0 +1,58 @@
+<html>
+
+<head>
+	<style>
+		body {
+			background: silver;
+		}
+	</style>
+</head>
+
+<body>
+	<p>volume</p>
+	<p><input type="range" id="volumeslider" min="0" max="120" step="10" onchange="setVolume(this.value);" /></p>
+	<p>wave</p>
+	<p>
+		<input type="radio" id="wave1" name="beepkind" onclick="setKind(0);" />sine
+		<br />
+		<input type="radio" id="wave2" name="beepkind" onclick="setKind(1);" />square
+		<br />
+		<input type="radio" id="wave3" name="beepkind" onclick="setKind(2);" />sawtooth
+		<br />
+		<input type="radio" id="wave4" name="beepkind" onclick="setKind(3);" />triangle
+	</p>
+</body>
+<script>
+	let dialigId = '';
+
+	function onHostMessage() {
+
+	}
+
+	function setKind(nn) {
+		console.log(nn);
+	}
+
+	function setVolume(nn) {
+		console.log(nn);
+	}
+
+	function onHostMessage(messageEvent) {
+
+		if (dialigId) {
+			console.log('onHostMessage .hostData', messageEvent.data.hostData);
+		} else {
+			console.log('onHostMessage dialig', messageEvent.data.hostData);
+			dialigId = messageEvent.data.hostData;
+		}
+	}
+	window.addEventListener('message', onHostMessage, false);
+	window.parent.postMessage({
+		dialogID: '',
+		pluginData: '',
+		done: false,
+		screenWait: false
+	}, '*');
+</script>
+
+</html>
