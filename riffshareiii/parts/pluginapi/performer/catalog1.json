@@ -2,7 +2,7 @@
 	"label": "Test Performer Plugin",
 	"purpose": "Performer",
 	"kind": "testPerformerPluginV1_0",
-	"ui": "http://127.0.0.1:8080/ui.html",
+	"ui": "http://127.0.0.1:8080/ui1.html",
 	"evaluate": "createNewTestPerformerPlugin",
-	"script": "http://127.0.0.1:8080/plugin.js"
+	"script": "http://127.0.0.1:8080/plugin1.js"
 }

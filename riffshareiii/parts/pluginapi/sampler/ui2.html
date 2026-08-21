@@ -9,28 +9,21 @@
 </head>
 
 <body>
+	<h1>Test Sampler Plugin</h1>
 	<p>Volume</p>
 	<p><input type="range" id="volumeslider" min="0" max="1" step="0.1" onchange="setVolume(this.value);" /></p>
-	<p>Wave type</p>
-	<p>
-		<input type="radio" id="wave1" name="beepkind" onclick="setKind('sine');" />Sine
-		<br />
-		<input type="radio" id="wave2" name="beepkind" onclick="setKind('square');" />Square
-		<br />
-		<input type="radio" id="wave3" name="beepkind" onclick="setKind('sawtooth');" />Sawtooth
-		<br />
-		<input type="radio" id="wave4" name="beepkind" onclick="setKind('triangle');" />Triangle
-	</p>
+	<p>Pitch ratio</p>
+	<p><input type="range" id="pitchslider" min="0.25" max="3" step="0.1" onchange="setRatio(this.value);" /></p>
 </body>
 <script>
 	let dialigId = '';
 	let properties = {
 		volume: 0.7,
-		kind: 'sine'
+		ratio: 1
 	};
 
-	function setKind(kind) {
-		properties.kind = kind;
+	function setRatio(rr) {
+		properties.ratio = rr;
 		postMessageToHost();
 	}
 
@@ -45,19 +38,7 @@
 				properties = JSON.parse(messageEvent.data.hostData);
 			}
 			document.getElementById('volumeslider').value = properties.volume;
-			switch (properties.kind) {
-				case 'sine':
-					document.getElementById('wave1').checked = true;
-					break;
-				case 'square':
-					document.getElementById('wave2').checked = true;
-					break;
-				case 'sawtooth':
-					document.getElementById('wave3').checked = true;
-					break;
-				default:
-					document.getElementById('wave4').checked = true;
-			}
+			document.getElementById('pitchslider').value = properties.ratio;
 		} else {
 			dialigId = messageEvent.data.hostData;
 		}
