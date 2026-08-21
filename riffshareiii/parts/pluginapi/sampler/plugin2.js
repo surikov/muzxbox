@@ -38,6 +38,7 @@ function createNewTestSamplerPlugin() {
 			boom.connect(outputVolume);
 			boom.start(when);
 			boom.stop(when + 0.25);
+			nodes.push(boom);
 		},
 		cancel: () => {
 			nodes.forEach((node) => {
