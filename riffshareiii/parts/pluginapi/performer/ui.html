@@ -9,50 +9,70 @@
 </head>
 
 <body>
-	<p>volume</p>
-	<p><input type="range" id="volumeslider" min="0" max="120" step="10" onchange="setVolume(this.value);" /></p>
-	<p>wave</p>
+	<p>Volume</p>
+	<p><input type="range" id="volumeslider" min="0" max="1" step="0.1" onchange="setVolume(this.value);" /></p>
+	<p>Wave type</p>
 	<p>
-		<input type="radio" id="wave1" name="beepkind" onclick="setKind(0);" />sine
+		<input type="radio" id="wave1" name="beepkind" onclick="setKind('sine');" />Sine
 		<br />
-		<input type="radio" id="wave2" name="beepkind" onclick="setKind(1);" />square
+		<input type="radio" id="wave2" name="beepkind" onclick="setKind('square');" />Square
 		<br />
-		<input type="radio" id="wave3" name="beepkind" onclick="setKind(2);" />sawtooth
+		<input type="radio" id="wave3" name="beepkind" onclick="setKind('sawtooth');" />Sawtooth
 		<br />
-		<input type="radio" id="wave4" name="beepkind" onclick="setKind(3);" />triangle
+		<input type="radio" id="wave4" name="beepkind" onclick="setKind('triangle');" />Triangle
 	</p>
 </body>
 <script>
 	let dialigId = '';
+	let properties = {
+		volume: 0.7,
+		kind: 'sine'
+	};
 
-	function onHostMessage() {
-
-	}
-
-	function setKind(nn) {
-		console.log(nn);
+	function setKind(kind) {
+		properties.kind = kind;
+		postMessageToHost();
 	}
 
 	function setVolume(nn) {
-		console.log(nn);
+		properties.volume = nn;
+		postMessageToHost();
 	}
 
 	function onHostMessage(messageEvent) {
-
 		if (dialigId) {
-			console.log('onHostMessage .hostData', messageEvent.data.hostData);
+			if (messageEvent.data.hostData) {
+				properties = JSON.parse(messageEvent.data.hostData);
+			}
+			document.getElementById('volumeslider').value = properties.volume;
+			switch (properties.kind) {
+				case 'sine':
+					document.getElementById('wave1').checked = true;
+					break;
+				case 'square':
+					document.getElementById('wave2').checked = true;
+					break;
+				case 'sawtooth':
+					document.getElementById('wave3').checked = true;
+					break;
+				default:
+					document.getElementById('wave4').checked = true;
+			}
 		} else {
-			console.log('onHostMessage dialig', messageEvent.data.hostData);
 			dialigId = messageEvent.data.hostData;
 		}
 	}
+
+	function postMessageToHost() {
+		window.parent.postMessage({
+			dialogID: dialigId,
+			pluginData: JSON.stringify(properties),
+			done: false,
+			screenWait: false
+		}, '*');
+	}
 	window.addEventListener('message', onHostMessage, false);
-	window.parent.postMessage({
-		dialogID: '',
-		pluginData: '',
-		done: false,
-		screenWait: false
-	}, '*');
+	postMessageToHost();
 </script>
 
 </html>
