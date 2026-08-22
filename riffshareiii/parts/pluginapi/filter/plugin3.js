@@ -8,45 +8,33 @@ function createNewTestFilterPlugin() {
 	};
 
 	function flangerNode(audioContext, fromNode, toNode) {
-		this.nodes = {
-			inputGainNode: audioContext.createGain(), // Create the input gain-node
-			wetGainNode: audioContext.createGain(), // Create the wetness controll gain-node
-			delayNode: audioContext.createDelay(), // Create the delay node
-			gainNode: audioContext.createGain(), // Create the gain controll gain-node
-			feedbackGainNode: audioContext.createGain(), // Create the feedback controll gain-node
-			oscillatorNode: audioContext.createOscillator() // Create the oscilator node
+		let inputGainNode = audioContext.createGain();
+		let wetGainNode = audioContext.createGain();
+		let delayNode = audioContext.createDelay();
+		let gainNode = audioContext.createGain();
+		let feedbackGainNode = audioContext.createGain();
+		let oscillatorNode = audioContext.createOscillator();
+
+		oscillatorNode.connect(gainNode);
+		gainNode.connect(delayNode.delayTime);
+		inputGainNode.connect(wetGainNode);
+		inputGainNode.connect(delayNode);
+		delayNode.connect(wetGainNode);
+		delayNode.connect(feedbackGainNode);
+		feedbackGainNode.connect(inputGainNode);
+
+		oscillatorNode.type = 'sine';
+		oscillatorNode.start(0);
+
+		this.reset = function (delay, depth, feedback, speed) {
+			delayNode.delayTime.value = delay;
+			gainNode.gain.value = depth;
+			feedbackGainNode.gain.value = feedback;
+			oscillatorNode.frequency.value = speed;
 		};
-		this.nodes['oscillatorNode'].connect(this.nodes['gainNode']);
-		this.nodes['gainNode'].connect(this.nodes['delayNode'].delayTime);
-		this.nodes['inputGainNode'].connect(this.nodes['wetGainNode']);
-		this.nodes['inputGainNode'].connect(this.nodes['delayNode']);
-		this.nodes['delayNode'].connect(this.nodes['wetGainNode']);
-		this.nodes['delayNode'].connect(this.nodes['feedbackGainNode']);
-		this.nodes['feedbackGainNode'].connect(this.nodes['inputGainNode']);
-		// Setup the oscillator
-		this.nodes['oscillatorNode'].type = 'sine';
-		this.nodes['oscillatorNode'].start(0);
-		// Set the input gain-node as the input-node.
-		this.node = this.nodes['inputGainNode'];
-		// Set the output gain-node as the output-node.
-		this.output = this.nodes['wetGainNode'];
-		// Set the default delay of 0.005 seconds
-		this.delay = 0.005;
-		// Set the default depth to 0.002;
-		this.depth = 0.01;//0.002;
-		// Set the default feedback to 0.5
-		this.feedback = 0.5;
-		// Set the default speed to 0.25Hz
-		this.speed = 0.25;
-		this.reset = function () {
-			this.nodes['delayNode'].delayTime.value = this.delay;
-			this.nodes['gainNode'].gain.value = this.depth;
-			this.nodes['feedbackGainNode'].gain.value = this.feedback;
-			this.nodes['oscillatorNode'].frequency.value = this.speed;
-		};
-		fromNode.connect(this.node);
-		this.output.connect(toNode);
-		this.reset();
+		fromNode.connect(inputGainNode);
+		wetGainNode.connect(toNode);
+		this.reset(0.005, 0.01, 0.5, 0.25);
 		return this;
 	}
 	return {
@@ -57,9 +45,11 @@ function createNewTestFilterPlugin() {
 				inputGainNode = audioContext.createGain();
 				outputGainNode = audioContext.createGain();
 				flanger = flangerNode(audioContext, inputGainNode, outputGainNode);
+
 			}
 			if (parameters) {
 				properties = JSON.parse(parameters);
+				flanger.reset(0.005, 0.01, 0.5, properties.speed);
 			}
 		},
 		busy: () => {
@@ -68,8 +58,8 @@ function createNewTestFilterPlugin() {
 		schedule: (when, tempo, parameters) => {
 			if (parameters) {
 				let point = JSON.parse(parameters);
-				flanger.speed=properties.speed * 60 / tempo;
-				
+				flanger.speed = point.speed;
+				flanger.reset(0.005, 0.01, 0.5, point.speed);
 			}
 		},
 		output: () => {
