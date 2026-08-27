@@ -48,7 +48,7 @@ function createNewTestFilterPlugin() {
 
 			}
 			if (parameters) {
-				properties = JSON.parse(parameters);
+				properties = parameters;
 				flanger.reset(0.005, 0.01, 0.5, properties.speed);
 			}
 		},
@@ -57,7 +57,7 @@ function createNewTestFilterPlugin() {
 		},
 		schedule: (when, tempo, parameters) => {
 			if (parameters) {
-				let point = JSON.parse(parameters);
+				let point = parameters;
 				flanger.speed = point.speed;
 				flanger.reset(0.005, 0.01, 0.5, point.speed);
 			}

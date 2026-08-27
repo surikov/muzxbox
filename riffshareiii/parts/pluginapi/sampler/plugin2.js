@@ -19,7 +19,7 @@ function createNewTestSamplerPlugin() {
 				}
 			}
 			if (parameters) {
-				properties = JSON.parse(parameters);
+				properties = parameters;
 			}
 			outputVolume.gain.value = properties.volume;
 		},

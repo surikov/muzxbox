@@ -35,7 +35,7 @@
 	function onHostMessage(messageEvent) {
 		if (dialigId) {
 			if (messageEvent.data.hostData) {
-				properties = JSON.parse(messageEvent.data.hostData);
+				properties = messageEvent.data.hostData;
 			}
 			document.getElementById('volumeslider').value = properties.volume;
 			document.getElementById('pitchslider').value = properties.ratio;
@@ -47,7 +47,7 @@
 	function postMessageToHost() {
 		window.parent.postMessage({
 			dialogID: dialigId,
-			pluginData: JSON.stringify(properties),
+			pluginData: properties,
 			done: false,
 			screenWait: false
 		}, '*');
