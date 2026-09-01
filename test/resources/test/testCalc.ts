@@ -1,4 +1,4 @@
-
+//tsc testCalc.ts --lib es2015,dom
 
 let skipRowsCount = 0;
 
@@ -1156,12 +1156,36 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 			, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
 	}
 	if (rowIdx == 0) {
-		let txt = '';
+		//console.log('row',rows[rowIdx].balls);
+		let txt = 'color index ';
+		let zeroCell=0;
+		let zeroBall=0;
 		for (let ii = 0; ii < cellColors.length; ii++) {
 			if (ballExists(ii + 1, rows[rowIdx])) {
 				txt = txt + ' ' + cellColors[ii].v;
+				if(cellColors[ii].v<2){
+					zeroBall++;
+				}
+			}
+			if(cellColors[ii].v<2){
+				zeroCell++;
 			}
 		}
+		//console.log('balls',rows[rowIdx].balls,txt,'zero',zeroBall,'/',zeroCell,'=',zeroBall/zeroCell);
+		let sorted=cellColors.sort((a, b) => b.v - a.v);
+		let firstLimit=5;
+		let firstCount=0;
+		
+		for(let bb=0;bb<rows[rowIdx].balls.length;bb++){
+			for(let kk=0;kk<firstLimit;kk++){
+				if(sorted[kk].b==rows[rowIdx].balls[bb]){
+					firstCount++;
+				}
+			}
+		}
+		//console.log(''+firstCount+' in first '+firstLimit,'balls',rows[rowIdx].balls,txt,'zero',zeroBall,'/',zeroCell,'=',zeroBall/zeroCell);
+		console.log(zeroCell,'*',zeroBall/zeroCell,'=',zeroBall);
+		//,sorted.map((it)=>{return ''+it.b+':'+it.v}));
 		/*for (let ff = 0; ff < cellColors.length; ff++) {
 			firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] ? firstCellColors[cellColors[ff].b] : 0;
 			firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] + cellColors[ff].v;
@@ -1169,7 +1193,7 @@ function paintCellsGreen(svg: SVGElement, rowIdx: number, rows: BallsRow[]) {
 		}
 		console.log('naritg', firstCellColors);*/
 		//console.log(cellColors,rows[rowIdx].balls);
-		console.log(txt, cellColors.sort((a, b) => b.v - a.v), rows[rowIdx].balls);
+		//console.log(txt, cellColors.sort((a, b) => b.v - a.v), rows[rowIdx].balls);
 		//console.log( txt, cellColors,cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
 		//console.log( txt, cellColors,rows[rowIdx].balls);//, rows[rowIdx]);
 	}

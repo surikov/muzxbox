@@ -1,39 +1,40 @@
-let skipRowsCount = 0;
+//tsc testCalc.ts --lib es2015,dom
+var skipRowsCount = 0;
 var levelA;
 var linesLevel;
 var dataBalls;
 var datarows;
-let showFirstRow = true;
-let sversion = 'v1.143 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
-let markX = -1;
-let markY = -1;
-let cellSize = 12;
+var showFirstRow = true;
+var sversion = 'v1.143 ' + dataName + ': ' + ballsInRow + '/' + rowLen;
+var markX = -1;
+var markY = -1;
+var cellSize = 12;
 //let topShift = cellSize * 21;
-let topShift = cellSize * 5;
-let rowsVisibleCount = 101;
-let rowsAvgCount = 5;
-let rowsSliceCount = rowsVisibleCount + rowsAvgCount;
-let reduceRatio = 1;
-let highLightMode = 1;
+var topShift = cellSize * 5;
+var rowsVisibleCount = 101;
+var rowsAvgCount = 5;
+var rowsSliceCount = rowsVisibleCount + rowsAvgCount;
+var reduceRatio = 1;
+var highLightMode = 1;
 var calcLen = 32;
-let diffWide = 5;
-let blueNotGree = true;
-let lastfirst;
-let wideRange = false;
-let mxdata = [];
-let mindata = [];
-let mincopy = [];
-let sortedBlue = [];
-let sortedGreen = [];
-let sortedGrey = [];
-let markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
+var diffWide = 5;
+var blueNotGree = true;
+var lastfirst;
+var wideRange = false;
+var mxdata = [];
+var mindata = [];
+var mincopy = [];
+var sortedBlue = [];
+var sortedGreen = [];
+var sortedGrey = [];
+var markLines = []; //{ fromX: 5, fromY: 6, toX: 33, toY: 22 }];
 function dumpInfo(r) {
     var msgp = document.getElementById('msgp');
     msgp.innerText = sversion + ': ' + r;
 }
 function sliceRows(rows, firstRowNum, lastRowNum) {
     var sliced = [];
-    let nn = firstRowNum;
+    var nn = firstRowNum;
     for (var i = firstRowNum; i <= lastRowNum; i++) {
         sliced.push(rows[nn]);
         nn = nn + reduceRatio;
@@ -41,12 +42,12 @@ function sliceRows(rows, firstRowNum, lastRowNum) {
     return sliced;
 }
 function readParseStat(dataBalls) {
-    let dlmtr = '  ';
+    var dlmtr = '  ';
     var rows = [{
             balls: [],
             key: 'next'
         }];
-    for (let i = 0; i < ballsInRow; i++) {
+    for (var i_1 = 0; i_1 < ballsInRow; i_1++) {
         rows[0].balls.push(0);
     }
     for (var i = 0; i < dataBalls.length; i++) {
@@ -61,7 +62,7 @@ function readParseStat(dataBalls) {
                 var ballnum = 1 * arr[k];
                 row.balls.push(ballnum);
             }
-            row.balls.sort((a, b) => a - b);
+            row.balls.sort(function (a, b) { return a - b; });
             row.key = dataBalls[i - 1].trim();
             row.key = row.key.replace(':00', ':00 #');
             row.key = row.key.replace(':30', ':30 #');
@@ -208,8 +209,8 @@ function clickClearLines() {
     drawLines();
 }
 function clearNonManual() {
-    let newarr = [];
-    for (let ii = 0; ii < markLines.length; ii++) {
+    var newarr = [];
+    for (var ii = 0; ii < markLines.length; ii++) {
         if (markLines[ii].manual) {
             newarr.push(markLines[ii]);
         }
@@ -217,11 +218,11 @@ function clearNonManual() {
     markLines = newarr;
 }
 function clickFog(vnt) {
-    let xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
-    let yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
+    var xx = Math.round((vnt.offsetX - 0.5 * cellSize) / cellSize);
+    var yy = skipRowsCount + Math.round((vnt.offsetY - 0.5 * cellSize) / cellSize);
     if (markX < 0) {
-        let exists = false;
-        for (let i = 0; i < markLines.length; i++) {
+        var exists = false;
+        for (var i = 0; i < markLines.length; i++) {
             if ((xx == markLines[i].fromX && yy == markLines[i].fromY) || (xx == markLines[i].toX && yy == markLines[i].toY)) {
                 markLines.splice(i, 1);
                 exists = true;
@@ -240,7 +241,7 @@ function clickFog(vnt) {
         markX = -1;
         markY = -1;
     }
-    let mark = document.getElementById('lineMark');
+    var mark = document.getElementById('lineMark');
     mark.setAttribute('width', cellSize * 1.5);
     mark.setAttribute('height', cellSize * 1.5);
     mark.setAttribute('x', cellSize * markX - 0.25 * cellSize);
@@ -249,8 +250,8 @@ function clickFog(vnt) {
 }
 function drawLines() {
     clearSVGgroup(linesLevel);
-    let strokeWidth = cellSize / 0.99;
-    for (let i = 0; i < markLines.length; i++) {
+    var strokeWidth = cellSize / 0.99;
+    for (var i = 0; i < markLines.length; i++) {
         if (markLines[i].light) {
             strokeWidth = 4;
         }
@@ -263,7 +264,7 @@ function drawLines() {
         }
     }
     strokeWidth = cellSize / 2.99;
-    for (let i = 0; i < markLines.length; i++) {
+    for (var i = 0; i < markLines.length; i++) {
         if (markLines[i].manual) {
             composeLine(linesLevel, markLines[i].fromX * cellSize + 0.5 * cellSize, (markLines[i].fromY - skipRowsCount) * cellSize + 0.5 * cellSize, markLines[i].toX * cellSize + 0.5 * cellSize, (markLines[i].toY - skipRowsCount) * cellSize + 0.5 * cellSize, strokeWidth //, cellSize / 0.99
             , markLines[i].color); //'#00ff0066');
@@ -273,14 +274,14 @@ function drawLines() {
 function drawStat3(svg, rows) {
     drawLines();
     addRect(svg, rowLen * cellSize + cellSize / 2, 0, rowLen * cellSize, cellSize, '#eee');
-    for (let rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
+    for (var rowNum = 0; rowNum < rowsVisibleCount; rowNum++) {
         if (rows[rowNum]) {
             addSmallText(svg, 2 * rowLen * cellSize + 2, topShift + (1 + rowNum) * cellSize - 2, rows[rowNum].key);
-            for (let colNum = 1; colNum <= rowLen; colNum++) {
+            for (var colNum = 1; colNum <= rowLen; colNum++) {
                 if (ballExists(colNum, rows[rowNum])) {
-                    let topy = topShift + 0.5 * cellSize + rowNum * cellSize;
-                    let szz = cellSize / 3 - 0.5;
-                    let clr = '#ff0000';
+                    var topy = topShift + 0.5 * cellSize + rowNum * cellSize;
+                    var szz = cellSize / 3 - 0.5;
+                    var clr = '#ff0000';
                     if (rowNum == 0) {
                         //topy = topy - 1.5 * cellSize;
                         //szz = cellSize / 3 - 0.5
@@ -298,7 +299,7 @@ function drawStat3(svg, rows) {
             }
         }
     }
-    for (let colNum = 1; colNum <= rowLen; colNum++) {
+    for (var colNum = 1; colNum <= rowLen; colNum++) {
         if (colNum % 10 == 0) {
             addBigText(svg, colNum * cellSize - cellSize * 0.8, topShift - 2, "" + colNum);
             addBigText(svg, (colNum + rowLen) * cellSize - cellSize * 0.8, topShift - 5, "" + colNum);
@@ -318,8 +319,8 @@ function triadFills(ball, rowNum, dx1, dx2, rows) {
     return ballExists(ball + dx1, rows[rowNum + 1]) && ballExists(ball + dx2, rows[rowNum + 2]);
 }
 function calcTriads(rowNum, dx1, dx2, rows) {
-    let cnt = 0;
-    for (let ii = 0; ii < rowLen; ii++) {
+    var cnt = 0;
+    for (var ii = 0; ii < rowLen; ii++) {
         if (triadExists(ii + 1, rowNum, dx1, dx2, rows)) {
             cnt++;
         }
@@ -327,24 +328,24 @@ function calcTriads(rowNum, dx1, dx2, rows) {
     return cnt;
 }
 function calcRowPatterns(rowNum, rows) {
-    let cnts = [];
-    for (let dx1 = 0; dx1 < rowLen; dx1++) {
-        for (let dx2 = 0; dx2 < rowLen; dx2++) {
+    var cnts = [];
+    for (var dx1 = 0; dx1 < rowLen; dx1++) {
+        for (var dx2 = 0; dx2 < rowLen; dx2++) {
             cnts.push(calcTriads(rowNum, dx1, dx2, rows));
         }
     }
     return cnts;
 }
 function calculateBallTriadChain(rowNum, rows, counts) {
-    let resu = [];
-    for (let nn = 0; nn < rowLen; nn++) {
-        let one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+    var resu = [];
+    for (var nn = 0; nn < rowLen; nn++) {
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
-        for (let dx1 = 0; dx1 < rowLen; dx1++) {
-            for (let dx2 = 0; dx2 < rowLen; dx2++) {
+        for (var dx1 = 0; dx1 < rowLen; dx1++) {
+            for (var dx2 = 0; dx2 < rowLen; dx2++) {
                 if (triadFills(one.ball, rowNum, dx1, dx2, rows)) {
                     one.fills.push({ dx1: dx1, dx2: dx2 });
-                    let cc = counts[dx1 * rowLen + dx2];
+                    var cc = counts[dx1 * rowLen + dx2];
                     one.summ = one.summ + cc;
                 }
             }
@@ -354,9 +355,9 @@ function calculateBallTriadChain(rowNum, rows, counts) {
     return resu;
 }
 function calculateBallFrequency(rowNum, rows) {
-    let resu = [];
-    for (let nn = 0; nn < rowLen; nn++) {
-        let one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
+    var resu = [];
+    for (var nn = 0; nn < rowLen; nn++) {
+        var one = { ball: nn + 1, fills: [], summ: 0, logr: 0 };
         resu.push(one);
         for (var rr = rowNum + 1; rr < rowNum + 1 + calcLen; rr++) {
             if (ballExists(nn + 1, rows[rr])) {
@@ -365,7 +366,7 @@ function calculateBallFrequency(rowNum, rows) {
             }
             one.summ++;
         }
-        let cntbl = 1;
+        var cntbl = 1;
         for (var rr = rowNum + 1; rr < rowNum + 1 + 50; rr++) {
             if (ballExists(nn + 1, rows[rr])) {
                 cntbl++;
@@ -376,9 +377,9 @@ function calculateBallFrequency(rowNum, rows) {
     return resu;
 }
 function calcEmptyLineDuration(shift, ball, from, rows) {
-    let row = from;
-    let count = 0;
-    let balColumn = ball;
+    var row = from;
+    var count = 0;
+    var balColumn = ball;
     while ((!ballExists(balColumn, rows[row])) && row + 2 < rows.length) {
         count++;
         balColumn = balColumn + shift;
@@ -391,35 +392,35 @@ function dumpInfo2(id, text) {
     span.innerText = text;
 }
 function countInfo(inrows) {
-    let diff = 7;
+    var diff = 7;
     console.log('countInfo', diff, inrows[0]);
-    let smm = [];
-    for (let ii = 0; ii < rowLen; ii++) {
-        let cc = 0;
-        for (let shift = -diff; shift <= diff; shift++) {
+    var smm = [];
+    for (var ii = 0; ii < rowLen; ii++) {
+        var cc = 0;
+        for (var shift = -diff; shift <= diff; shift++) {
             cc = cc + calcEmptyLineDuration(shift, ii + 1, 1, inrows);
         }
-        let fl = '   ';
+        var fl = '   ';
         if (ballExists(ii + 1, inrows[0])) {
             fl = ' * ';
         }
         smm.push({ ball: ii + 1, sm: cc, xst: fl, sh: diff });
     }
-    for (let kk = 0; kk < smm.length; kk++) {
-        let len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
-        let fl = '  ';
+    for (var kk = 0; kk < smm.length; kk++) {
+        var len = Math.round(5 * smm[kk].sm / (diff + diff + 1));
+        var fl = '  ';
         if (showFirstRow) {
             if (ballExists(smm[kk].ball, inrows[0])) {
                 fl = '* ';
             }
         }
-        for (let nn = 0; nn < len; nn++) {
+        for (var nn = 0; nn < len; nn++) {
             fl = fl + '-';
         }
         fl = fl + ' ' + len + ':' + smm[kk].ball;
         console.log(fl);
     }
-    smm.sort((a, b) => {
+    smm.sort(function (a, b) {
         return a.sm - b.sm;
     });
     console.log(smm);
@@ -435,44 +436,44 @@ function dumpRowFills(inrows) {
     }
 }
 function dumpRowWaitColor(rows, color, shiftX) {
-    let lbl = '';
+    var lbl = '';
     //greyStat = [];
-    let grey2 = '#33333333';
-    let grey = '#333333ff';
-    for (let rr = 0; rr < rowsVisibleCount; rr++) {
-        let arr = [];
-        for (let nn = 0; nn < rowLen; nn++) {
-            let one = { ball: nn + 1, summ: 0 };
+    var grey2 = '#33333333';
+    var grey = '#333333ff';
+    for (var rr = 0; rr < rowsVisibleCount; rr++) {
+        var arr = [];
+        for (var nn = 0; nn < rowLen; nn++) {
+            var one = { ball: nn + 1, summ: 0 };
             arr.push(one);
-            for (let shift = -diffWide; shift <= diffWide; shift++) {
+            for (var shift = -diffWide; shift <= diffWide; shift++) {
                 one.summ = one.summ + calcEmptyLineDuration(shift, nn + 1, rr + 1, rows);
             }
         }
         makeWader(arr);
-        let mx = 0;
-        let min = 98765;
+        var mx = 0;
+        var min = 98765;
         //console.log(rr,arr);
-        for (let bb = 0; bb < rowLen; bb++) {
+        for (var bb = 0; bb < rowLen; bb++) {
             if (mx < arr[bb].summ)
                 mx = arr[bb].summ;
             if (min > arr[bb].summ)
                 min = arr[bb].summ;
         }
-        let hr = (mx - min) / (topShift / cellSize - 2);
-        let prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
-        let first = arr.map((x) => x);
-        first.sort((aa, bb) => { return bb.summ - aa.summ; });
+        var hr = (mx - min) / (topShift / cellSize - 2);
+        var prehh = (mx - min - (arr[rowLen - 1].summ - min)) / hr;
+        var first = arr.map(function (x) { return x; });
+        first.sort(function (aa, bb) { return bb.summ - aa.summ; });
         if (rr == 0) {
             sortedGrey = [];
-            for (let ff = 0; ff < first.length; ff++) {
+            for (var ff = 0; ff < first.length; ff++) {
                 sortedGrey[ff] = first[ff].ball;
             }
         }
-        let begin = -1;
-        let end = -1;
-        let begin2 = -1;
-        let end2 = -1;
-        for (let kk = 0; kk < first.length; kk++) {
+        var begin = -1;
+        var end = -1;
+        var begin2 = -1;
+        var end2 = -1;
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     //lbl = lbl + padLen('[' + first[kk].ball+']',4);
@@ -492,7 +493,7 @@ function dumpRowWaitColor(rows, color, shiftX) {
                 lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
             }
         }
-        for (let kk = 0; kk < first.length; kk++) {
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     if (kk < end)
@@ -508,8 +509,8 @@ function dumpRowWaitColor(rows, color, shiftX) {
             //console.log(lbl);
             dumpInfo2('statgrey', lbl);
         }
-        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-        let xxx = 2 * rowLen / 2;
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 2 * rowLen / 2;
         if (showFirstRow || rr > 0) {
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: grey2, manual: false });
             markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: grey2, manual: false });
@@ -520,9 +521,9 @@ function dumpRowWaitColor(rows, color, shiftX) {
 }
 function makeWader(ballFills) {
     if (wideRange) {
-        let mx = 0;
-        let min = 987654321;
-        for (let bb = 0; bb < rowLen; bb++) {
+        var mx = 0;
+        var min = 987654321;
+        for (var bb = 0; bb < rowLen; bb++) {
             if (mx < ballFills[bb].summ) {
                 mx = ballFills[bb].summ;
             }
@@ -530,30 +531,30 @@ function makeWader(ballFills) {
                 min = ballFills[bb].summ;
             }
         }
-        let middle = (mx - min) / 2 + min;
-        let sorted = ballFills.map((x) => x);
-        sorted.sort((aa, bb) => { return bb.summ - aa.summ; });
-        let center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
-        for (let bb = 0; bb < rowLen; bb++) {
+        var middle = (mx - min) / 2 + min;
+        var sorted = ballFills.map(function (x) { return x; });
+        sorted.sort(function (aa, bb) { return bb.summ - aa.summ; });
+        var center = sorted[Math.round((sorted.length - 1) / 2)].summ - min;
+        for (var bb = 0; bb < rowLen; bb++) {
             ballFills[bb].summ = ballFills[bb].summ - center;
-            let sig = ballFills[bb].summ > 0 ? 1 : -1;
+            var sig = ballFills[bb].summ > 0 ? 1 : -1;
             ballFills[bb].summ = sig * ballFills[bb].summ * ballFills[bb].summ;
         }
     }
 }
 function dumpRowFillsColor(rows, color, shiftX) {
-    let green2 = '#00990033';
-    let green = '#009900ff';
-    let lbl = '';
+    var green2 = '#00990033';
+    var green = '#009900ff';
+    var lbl = '';
     //console.log(lbl);
     //greenStat = [];
-    for (let rr = 0; rr < rowsVisibleCount; rr++) {
-        let precounts = calcRowPatterns(rr + 1, rows);
-        let ballFills = calculateBallTriadChain(rr, rows, precounts);
+    for (var rr = 0; rr < rowsVisibleCount; rr++) {
+        var precounts = calcRowPatterns(rr + 1, rows);
+        var ballFills = calculateBallTriadChain(rr, rows, precounts);
         makeWader(ballFills);
-        let mx = 0;
-        let min = 987654321;
-        for (let bb = 0; bb < rowLen; bb++) {
+        var mx = 0;
+        var min = 987654321;
+        for (var bb = 0; bb < rowLen; bb++) {
             if (mx < ballFills[bb].summ) {
                 mx = ballFills[bb].summ;
             }
@@ -561,22 +562,22 @@ function dumpRowFillsColor(rows, color, shiftX) {
                 min = ballFills[bb].summ;
             }
         }
-        let hr = (mx - min) / (topShift / cellSize - 2);
-        let prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
+        var hr = (mx - min) / (topShift / cellSize - 2);
+        var prehh = (mx - min - (ballFills[rowLen - 1].summ - min)) / hr;
         //console.log(ballFills);
-        let first = ballFills.map((x) => x);
-        first.sort((aa, bb) => { return bb.summ - aa.summ; });
+        var first = ballFills.map(function (x) { return x; });
+        first.sort(function (aa, bb) { return bb.summ - aa.summ; });
         if (rr == 0) {
             sortedGreen = [];
-            for (let ff = 0; ff < first.length; ff++) {
+            for (var ff = 0; ff < first.length; ff++) {
                 sortedGreen[ff] = first[ff].ball;
             }
         }
-        let begin = -1;
-        let end = -1;
-        let begin2 = -1;
-        let end2 = -1;
-        for (let kk = 0; kk < first.length; kk++) {
+        var begin = -1;
+        var end = -1;
+        var begin2 = -1;
+        var end2 = -1;
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     //lbl = lbl + padLen('[' + first[kk].ball+']',4);
@@ -596,7 +597,7 @@ function dumpRowFillsColor(rows, color, shiftX) {
                 lbl = lbl + ' ' + pad0('' + first[kk].ball, 2) + ' ';
             }
         }
-        for (let kk = 0; kk < first.length; kk++) {
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     if (kk < end)
@@ -612,8 +613,8 @@ function dumpRowFillsColor(rows, color, shiftX) {
         if (rr == 0) {
             dumpInfo2('statgreen', lbl);
         }
-        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-        let xxx = 1 * rowLen / 2;
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 1 * rowLen / 2;
         //if (rr % 2) markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: '#00000011', manual: false });
         if (showFirstRow || rr > 0) {
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: green2, manual: false });
@@ -624,49 +625,49 @@ function dumpRowFillsColor(rows, color, shiftX) {
     }
 }
 function dumpTriads(svg, rows) {
-    let ratioPre = 0.99; //0.99;
-    let red = '#ff6633ff';
-    let red2 = '#ff663366';
-    let blue2 = '#3333ff33';
-    let blue = '#3333ffff';
-    let mgnt = '#ff00ffff';
-    let blueLeftRight = [];
-    for (let rr = 0; rr < rowsVisibleCount; rr++) {
+    var ratioPre = 0.99; //0.99;
+    var red = '#ff6633ff';
+    var red2 = '#ff663366';
+    var blue2 = '#3333ff33';
+    var blue = '#3333ffff';
+    var mgnt = '#ff00ffff';
+    var blueLeftRight = [];
+    for (var rr = 0; rr < rowsVisibleCount; rr++) {
         if (rr > rows.length - 6)
             break;
-        let calcs;
+        var calcs = void 0;
         if (highLightMode == 1) {
             calcs = calculateBallFrequency(rr, rows);
         }
         else {
-            let precounts = calcRowPatterns(rr + 1, rows);
+            var precounts = calcRowPatterns(rr + 1, rows);
             calcs = calculateBallTriadChain(rr, rows, precounts);
         }
         makeWader(calcs);
-        let minCnt = 99999;
-        let mxCount = 0;
-        for (let ii = 0; ii < rowLen; ii++) {
+        var minCnt = 99999;
+        var mxCount = 0;
+        for (var ii = 0; ii < rowLen; ii++) {
             if (calcs[ii].summ > mxCount)
                 mxCount = calcs[ii].summ;
             if (calcs[ii].summ < minCnt)
                 minCnt = calcs[ii].summ;
         }
-        let df = mxCount - minCnt;
-        let first = calcs.map((x) => x);
-        let lbl = "";
-        first.sort((aa, bb) => { return aa.logr - bb.logr; });
+        var df = mxCount - minCnt;
+        var first = calcs.map(function (x) { return x; });
+        var lbl = "";
+        first.sort(function (aa, bb) { return aa.logr - bb.logr; });
         if (rr == 0) {
             sortedBlue = [];
-            for (let ff = 0; ff < first.length; ff++) {
+            for (var ff = 0; ff < first.length; ff++) {
                 sortedBlue[ff] = first[ff].ball;
             }
         }
         lbl = '';
-        let begin1 = -1;
-        let end = -1;
-        let begin2 = -1;
-        let end2 = -1;
-        for (let kk = 0; kk < first.length; kk++) {
+        var begin1 = -1;
+        var end = -1;
+        var begin2 = -1;
+        var end2 = -1;
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     lbl = '[' + pad0('' + first[kk].ball, 2) + ']' + lbl;
@@ -683,7 +684,7 @@ function dumpTriads(svg, rows) {
                 lbl = ' ' + pad0('' + first[kk].ball, 2) + ' ' + lbl;
             }
         }
-        for (let kk = 0; kk < first.length; kk++) {
+        for (var kk = 0; kk < first.length; kk++) {
             if (ballExists(first[kk].ball, rows[rr])) {
                 if (showFirstRow || rr > 0) {
                     if (kk < end) {
@@ -718,10 +719,10 @@ function dumpTriads(svg, rows) {
                     console.log('preblue', leftStart, '>', rightEnd);
                 }
         */
-        let yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
-        let xxx = 0 * rowLen / 2;
+        var yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
+        var xxx = 0 * rowLen / 2;
         if (showFirstRow || rr > 0) {
-            let x2 = xxx + (rowLen - 1) / 2;
+            var x2 = xxx + (rowLen - 1) / 2;
             markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin2 / 2, toY: yyy, color: blue2, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: x2 - end2 / 2, toY: yyy, color: blue2, manual: false });
             markLines.push({ fromX: x2, fromY: yyy, toX: x2 - begin1 / 2, toY: yyy, color: blue, manual: false });
@@ -732,28 +733,28 @@ function dumpTriads(svg, rows) {
         if (showFirstRow || rr > 0) {
             begin1 = rowLen + 1;
             end = 0;
-            let begin2 = rowLen + 1;
-            let end2 = 0;
-            for (let kk = 0; kk < rows[rr].balls.length; kk++) {
+            var begin2_1 = rowLen + 1;
+            var end2_1 = 0;
+            for (var kk = 0; kk < rows[rr].balls.length; kk++) {
                 if (rows[rr].balls[kk] < begin1)
                     begin1 = rows[rr].balls[kk];
                 if (rows[rr].balls[kk] > end)
                     end = rows[rr].balls[kk];
             }
-            for (let kk = 0; kk < rows[rr].balls.length; kk++) {
-                if (rows[rr].balls[kk] < begin2 && rows[rr].balls[kk] > begin1)
-                    begin2 = rows[rr].balls[kk];
-                if (rows[rr].balls[kk] > end2 && rows[rr].balls[kk] < end)
-                    end2 = rows[rr].balls[kk];
+            for (var kk = 0; kk < rows[rr].balls.length; kk++) {
+                if (rows[rr].balls[kk] < begin2_1 && rows[rr].balls[kk] > begin1)
+                    begin2_1 = rows[rr].balls[kk];
+                if (rows[rr].balls[kk] > end2_1 && rows[rr].balls[kk] < end)
+                    end2_1 = rows[rr].balls[kk];
             }
             begin1--;
             end--;
-            begin2--;
-            end2--;
+            begin2_1--;
+            end2_1--;
             yyy = rowsVisibleCount + 22 + 0.66 * rr + skipRowsCount;
             xxx = 3 * rowLen / 2;
-            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2 / 2, toY: yyy, color: red2, manual: false });
-            markLines.push({ fromX: xxx + end2 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
+            markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin2_1 / 2, toY: yyy, color: red2, manual: false });
+            markLines.push({ fromX: xxx + end2_1 / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red2, manual: false });
             markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + begin1 / 2, toY: yyy, color: red, manual: false });
             markLines.push({ fromX: xxx + end / 2, fromY: yyy, toX: xxx + (rowLen - 1) / 2, toY: yyy, color: red, manual: false });
         }
@@ -786,11 +787,11 @@ function dumpTriads(svg, rows) {
         }
         //paintCellsGreen(ratioPre, calcs, minCnt, svg, df, rr, rows);
     }
-    let szDiff = 6;
-    for (let mmm = 0; mmm < 98 - szDiff; mmm++) {
-        let blueLeftDiffSumm = 0;
-        let blueRighDiffSumm = 0;
-        for (let ii = 1; ii < szDiff; ii++) {
+    var szDiff = 6;
+    for (var mmm = 0; mmm < 98 - szDiff; mmm++) {
+        var blueLeftDiffSumm = 0;
+        var blueRighDiffSumm = 0;
+        for (var ii = 1; ii < szDiff; ii++) {
             blueLeftDiffSumm = blueLeftDiffSumm + Math.abs(blueLeftRight[mmm + ii].left - blueLeftRight[mmm + ii + 1].left);
             blueRighDiffSumm = blueRighDiffSumm + Math.abs(blueLeftRight[mmm + ii].right - blueLeftRight[mmm + ii + 1].right);
         }
@@ -799,21 +800,21 @@ function dumpTriads(svg, rows) {
         //var span: HTMLElement = (document.getElementById('statdump') as any) as HTMLElement;
         //span.innerText = '' + szDiff + ": blue diff: " + Math.round(blueLeftDiffSumm) + ' | ' + Math.round(blueRighDiffSumm);
         //console.log(mmm, Math.round(blueLeftDiffSumm), Math.round(blueRighDiffSumm));
-        let yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount + 0.33;
-        let xxx = 0 * rowLen / 2;
-        let invLeftWidth = blueLeftDiffSumm * blueLeftDiffSumm / 10;
-        let invRightWidth = blueRighDiffSumm * blueRighDiffSumm / 10;
+        var yyy = rowsVisibleCount + 22 + 0.66 * mmm + skipRowsCount + 0.33;
+        var xxx = 0 * rowLen / 2;
+        var invLeftWidth = blueLeftDiffSumm * blueLeftDiffSumm / 10;
+        var invRightWidth = blueRighDiffSumm * blueRighDiffSumm / 10;
         //console.log(mmm, invLeftWidth, invRightWidth);
         markLines.push({ fromX: xxx, fromY: yyy, toX: xxx + invLeftWidth, toY: yyy, color: mgnt, manual: false, light: true });
         markLines.push({ fromX: xxx + rowLen / 2 - invRightWidth, fromY: yyy, toX: xxx + rowLen / 2, toY: yyy, color: mgnt, manual: false, light: true });
     }
 }
 function paintCellsBlue(ratioPre, calcs, minCnt, svg, df, rr) {
-    for (let ii = 0; ii < rowLen; ii++) {
-        let idx = ratioPre * (calcs[ii].summ - minCnt) / df;
+    for (var ii = 0; ii < rowLen; ii++) {
+        var idx = ratioPre * (calcs[ii].summ - minCnt) / df;
         //let color = 'rgba(0,0,255,' + idx + ')';
-        let colorP = Math.floor(255 * (1 - idx));
-        let color = 'rgba(' + colorP + ',' + colorP + ',255)';
+        var colorP = Math.floor(255 * (1 - idx));
+        var color = 'rgba(' + colorP + ',' + colorP + ',255)';
         //color='rgba(0,0,255,0.5)';
         addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
         , color);
@@ -849,17 +850,17 @@ x... x... x... x... x... x... x... x...
 */
 function rayPoints(len, raydegr) {
     raydegr = raydegr % 360;
-    let ray = raydegr - 180;
+    var ray = raydegr - 180;
     if (raydegr > 270)
         ray = 360 - raydegr;
-    let gr = Math.PI / 180;
+    var gr = Math.PI / 180;
     //console.log(raydegr, ray)
-    let points = [];
-    let preX = -1;
-    let preY = -1;
-    for (let st = 1; st <= len; st++) {
-        let xx = Math.round(st * Math.cos(ray * gr));
-        let yy = Math.round(st * Math.sin(ray * gr));
+    var points = [];
+    var preX = -1;
+    var preY = -1;
+    for (var st = 1; st <= len; st++) {
+        var xx = Math.round(st * Math.cos(ray * gr));
+        var yy = Math.round(st * Math.sin(ray * gr));
         if (preX == xx || preY == yy) {
             //
         }
@@ -873,20 +874,20 @@ function rayPoints(len, raydegr) {
         }
     }
     if (raydegr >= 90 && raydegr <= 270) {
-        for (let nn = 0; nn < points.length; nn++) {
+        for (var nn = 0; nn < points.length; nn++) {
             points[nn][0] = -points[nn][0];
         }
     }
     if (raydegr >= 180 && raydegr <= 360) {
-        for (let nn = 0; nn < points.length; nn++) {
+        for (var nn = 0; nn < points.length; nn++) {
             points[nn][1] = -points[nn][1];
         }
     }
     return points;
 }
 function ray2points(xx, points, rowIdx, rows) {
-    let found = [];
-    for (let pp = 0; pp < points.length; pp++) {
+    var found = [];
+    for (var pp = 0; pp < points.length; pp++) {
         if (ballExists(xx + 1 + points[pp][0], rows[rowIdx - points[pp][1]])) {
             found.push(pp);
         }
@@ -904,18 +905,18 @@ function rayConsistsPoints(ray, xx, rowIdx, rows) {
     return false;
 }
 function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, rowIdx, rows) {
-    let gr = Math.PI / 180;
-    let cnt = 0;
+    var gr = Math.PI / 180;
+    var cnt = 0;
     //let skipX: number[] = [];
     //let skipY: number[] = [];
-    let skippoints = [];
-    for (let distance = mindistance; distance <= maxdistance; distance++) {
-        for (let rr = minray; rr <= maxray; rr = rr + 1) {
-            let raydegr = rr % 360;
-            let ray = raydegr - 180;
+    var skippoints = [];
+    for (var distance = mindistance; distance <= maxdistance; distance++) {
+        var _loop_1 = function (rr) {
+            var raydegr = rr % 360;
+            var ray = raydegr - 180;
             if (raydegr > 270)
                 ray = 360 - raydegr;
-            let point = {
+            var point = {
                 px: Math.round(distance * Math.cos(ray * gr)),
                 py: Math.round(distance * Math.sin(ray * gr))
             };
@@ -923,7 +924,7 @@ function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, ro
                 point.px = -point.px;
             if (rr >= 180 && rr <= 360)
                 point.py = -point.py;
-            if (skippoints.filter((element, index, array) => { return element.px == point.px && element.py == point.py; }).length) {
+            if (skippoints.filter(function (element, index, array) { return element.px == point.px && element.py == point.py; }).length) {
                 //
             }
             else {
@@ -932,59 +933,47 @@ function sectorConsistsPointsAt(mindistance, maxdistance, minray, maxray, xx, ro
                     cnt++;
                 }
             }
-            /*let skip = false;
-            for (let ss = 0; ss < skipX.length; ss++) {
-                if (skipX[ss] == px && skipY[ss] == py) {
-                    skip = true;
-                    break;
-                }
-            }
-            if (skip) {
-                //
-            } else {
-                if (py < 0) {
-                    if (ballExists(xx + 1 + px, rows[rowIdx - py])) {
-                        skipX.push(px);
-                        skipY.push(py);
-                        cnt++;
-                    }
-                }
-            }*/
+        };
+        for (var rr = minray; rr <= maxray; rr = rr + 1) {
+            _loop_1(rr);
         }
     }
     return cnt;
 }
 function pointsInRay(start, end, raydegr) {
     raydegr = raydegr % 360;
-    let ray = raydegr - 180;
+    var ray = raydegr - 180;
     if (raydegr > 270)
         ray = 360 - raydegr;
-    let gr = Math.PI / 180;
-    let points = [];
-    for (let st = start; st <= end; st = st + 0.5) {
-        let xx = Math.floor(st * Math.cos(ray * gr));
-        let yy = Math.floor(st * Math.sin(ray * gr));
+    var gr = Math.PI / 180;
+    var points = [];
+    var _loop_2 = function (st) {
+        var xx = Math.floor(st * Math.cos(ray * gr));
+        var yy = Math.floor(st * Math.sin(ray * gr));
         if (yy > 0) {
-            if (points.find((xy) => xy.px == xx && xy.py == yy)) {
+            if (points.find(function (xy) { return xy.px == xx && xy.py == yy; })) {
                 //
             }
             else {
                 points.push({ px: xx, py: yy });
             }
         }
+    };
+    for (var st = start; st <= end; st = st + 0.5) {
+        _loop_2(st);
     }
     if (raydegr >= 90 && raydegr <= 270) {
-        points.forEach((xy) => xy.px = -xy.px);
+        points.forEach(function (xy) { return xy.px = -xy.px; });
     }
     if (raydegr >= 180 && raydegr <= 360) {
-        points.forEach((xy) => xy.py = -xy.py);
+        points.forEach(function (xy) { return xy.py = -xy.py; });
     }
     return points;
 }
 function rayBallCount(start, end, raydegr, xx, rowIdx, rows) {
-    let points = pointsInRay(start, end, raydegr);
-    let cnt = 0;
-    for (let ii = 0; ii < points.length; ii++) {
+    var points = pointsInRay(start, end, raydegr);
+    var cnt = 0;
+    for (var ii = 0; ii < points.length; ii++) {
         if (ballExists(xx + 1 + points[ii].px, rows[rowIdx - points[ii].py])) {
             cnt++;
         }
@@ -994,16 +983,16 @@ function rayBallCount(start, end, raydegr, xx, rowIdx, rows) {
 //let firstCellColors: { b: number, v: number }[] = [];
 //let firstCellColors: number[] = [];
 function paintCellsGreen(svg, rowIdx, rows) {
-    let cellColors = [];
-    for (let xx = 0; xx < rowLen; xx++) {
+    var cellColors = [];
+    for (var xx = 0; xx < rowLen; xx++) {
         //if (rowIdx == 4 && (xx + 1 == 5 || xx + 1 == 4)) {
         //cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : { b: xx + 1, v: 0 };
-        for (let rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
-            let aa = rayBallCount(1, 2, rr, xx, rowIdx, rows);
-            let bb = rayBallCount(2.5, 3.5, rr, xx, rowIdx, rows);
-            let cc = rayBallCount(4, 5.5, rr, xx, rowIdx, rows);
-            let dd = rayBallCount(6, 7.5, rr, xx, rowIdx, rows);
+        for (var rr = 270 - 60; rr <= 270 + 60; rr = rr + 5) {
+            var aa = rayBallCount(1, 2, rr, xx, rowIdx, rows);
+            var bb = rayBallCount(2.5, 3.5, rr, xx, rowIdx, rows);
+            var cc = rayBallCount(4, 5.5, rr, xx, rowIdx, rows);
+            var dd = rayBallCount(6, 7.5, rr, xx, rowIdx, rows);
             if (aa + bb + cc > 3) {
                 cellColors[xx].v = cellColors[xx].v + 16;
             }
@@ -1028,14 +1017,14 @@ function paintCellsGreen(svg, rowIdx, rows) {
             }
         }
     }
-    let max = 0;
-    for (let xx = 0; xx < rowLen; xx++) {
+    var max = 0;
+    for (var xx = 0; xx < rowLen; xx++) {
         if (max < cellColors[xx].v) {
             max = cellColors[xx].v;
         }
     }
-    for (let xx = 0; xx < rowLen; xx++) {
-        let idx = cellColors[xx].v / max;
+    for (var xx = 0; xx < rowLen; xx++) {
+        var idx = cellColors[xx].v / max;
         idx = (idx) ? idx : 0;
         if (idx > 1) {
             idx = 1;
@@ -1045,12 +1034,35 @@ function paintCellsGreen(svg, rowIdx, rows) {
         addRect(svg, xx * cellSize - 0 * cellSize + 1 * rowLen * cellSize, topShift + 0 * cellSize + rowIdx * cellSize, cellSize, cellSize, 'rgba(' + idx + ',' + idx + ',' + idx + ',1)');
     }
     if (rowIdx == 0) {
-        let txt = '';
-        for (let ii = 0; ii < cellColors.length; ii++) {
+        //console.log('row',rows[rowIdx].balls);
+        var txt = 'color index ';
+        var zeroCell = 0;
+        var zeroBall = 0;
+        for (var ii = 0; ii < cellColors.length; ii++) {
             if (ballExists(ii + 1, rows[rowIdx])) {
                 txt = txt + ' ' + cellColors[ii].v;
+                if (cellColors[ii].v < 2) {
+                    zeroBall++;
+                }
+            }
+            if (cellColors[ii].v < 2) {
+                zeroCell++;
             }
         }
+        //console.log('balls',rows[rowIdx].balls,txt,'zero',zeroBall,'/',zeroCell,'=',zeroBall/zeroCell);
+        var sorted = cellColors.sort(function (a, b) { return b.v - a.v; });
+        var firstLimit = 5;
+        var firstCount = 0;
+        for (var bb = 0; bb < rows[rowIdx].balls.length; bb++) {
+            for (var kk = 0; kk < firstLimit; kk++) {
+                if (sorted[kk].b == rows[rowIdx].balls[bb]) {
+                    firstCount++;
+                }
+            }
+        }
+        //console.log(''+firstCount+' in first '+firstLimit,'balls',rows[rowIdx].balls,txt,'zero',zeroBall,'/',zeroCell,'=',zeroBall/zeroCell);
+        console.log(zeroCell, '*', zeroBall / zeroCell, '=', zeroBall);
+        //,sorted.map((it)=>{return ''+it.b+':'+it.v}));
         /*for (let ff = 0; ff < cellColors.length; ff++) {
             firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] ? firstCellColors[cellColors[ff].b] : 0;
             firstCellColors[cellColors[ff].b] = firstCellColors[cellColors[ff].b] + cellColors[ff].v;
@@ -1058,20 +1070,20 @@ function paintCellsGreen(svg, rowIdx, rows) {
         }
         console.log('naritg', firstCellColors);*/
         //console.log(cellColors,rows[rowIdx].balls);
-        console.log(txt, cellColors.sort((a, b) => b.v - a.v), rows[rowIdx].balls);
+        //console.log(txt, cellColors.sort((a, b) => b.v - a.v), rows[rowIdx].balls);
         //console.log( txt, cellColors,cellColors.sort((a, b) => b - a),rows[rowIdx].balls);//, rows[rowIdx]);
         //console.log( txt, cellColors,rows[rowIdx].balls);//, rows[rowIdx]);
     }
 }
 function paintCellsGreen333(svg, rowIdx, rows) {
-    let cellColors = [];
-    for (let xx = 0; xx < rowLen; xx++) {
+    var cellColors = [];
+    for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = cellColors[xx] ? cellColors[xx] : 0.0;
         //if (rowIdx == 1 && xx == 4) {
-        for (let gg = 270 - 60; gg <= 270 + 60; gg = gg + 10) {
-            let left = sectorConsistsPointsAt(2, 8, gg - 15, gg - 5, xx, rowIdx, rows);
-            let center = sectorConsistsPointsAt(2, 8, gg - 5, gg + 5, xx, rowIdx, rows);
-            let right = sectorConsistsPointsAt(2, 8, gg + 5, gg + 15, xx, rowIdx, rows);
+        for (var gg = 270 - 60; gg <= 270 + 60; gg = gg + 10) {
+            var left = sectorConsistsPointsAt(2, 8, gg - 15, gg - 5, xx, rowIdx, rows);
+            var center = sectorConsistsPointsAt(2, 8, gg - 5, gg + 5, xx, rowIdx, rows);
+            var right = sectorConsistsPointsAt(2, 8, gg + 5, gg + 15, xx, rowIdx, rows);
             if (center >= 3 && (center > 2 * left || center > 2 * right)) {
                 if (sectorConsistsPointsAt(3, 3, gg - 5, gg + 5, xx, rowIdx, rows)) {
                     cellColors[xx] = cellColors[xx] + 2 * center;
@@ -1094,18 +1106,18 @@ function paintCellsGreen333(svg, rowIdx, rows) {
         }
         //}
     }
-    let max = 0;
-    for (let xx = 0; xx < rowLen; xx++) {
+    var max = 0;
+    for (var xx = 0; xx < rowLen; xx++) {
         if (max < cellColors[xx]) {
             max = cellColors[xx];
         }
     }
-    let m3 = Math.round(max / 3);
-    let cnt0 = 0;
-    let cnt1 = 0;
-    let cnt2 = 0;
-    let cnt3 = 0;
-    for (let xx = 0; xx < rowLen; xx++) {
+    var m3 = Math.round(max / 3);
+    var cnt0 = 0;
+    var cnt1 = 0;
+    var cnt2 = 0;
+    var cnt3 = 0;
+    for (var xx = 0; xx < rowLen; xx++) {
         cellColors[xx] = Math.round(cellColors[xx] / m3);
         if (cellColors[xx] == 0)
             cnt0++;
@@ -1122,8 +1134,8 @@ function paintCellsGreen333(svg, rowIdx, rows) {
         //, cellColors
         );
     }
-    for (let xx = 0; xx < rowLen; xx++) {
-        let idx = cellColors[xx] / max;
+    for (var xx = 0; xx < rowLen; xx++) {
+        var idx = cellColors[xx] / max;
         idx = (idx) ? idx : 0;
         if (idx > 1) {
             idx = 1;
@@ -1139,10 +1151,10 @@ function paintCellsGreen222(//ratioPre: number
 svg
 //, df: number
 , rr, rows) {
-    for (let ii = 0; ii < rowLen; ii++) {
-        let idx = 0;
-        let stepColor = 4 * ballsInRow;
-        for (let kk = 1; kk <= stepColor; kk++) {
+    for (var ii = 0; ii < rowLen; ii++) {
+        var idx = 0;
+        var stepColor = 4 * ballsInRow;
+        for (var kk = 1; kk <= stepColor; kk++) {
             if (ballExists(ii + 1, rows[rr + kk])) {
                 idx = idx + 4 * ballsInRow / kk;
             }
@@ -1159,7 +1171,7 @@ svg
             idx = 0;
         if (idx > 1)
             idx = 1;
-        let color = 'rgba(0,200,0,' + idx + ')';
+        var color = 'rgba(0,200,0,' + idx + ')';
         //color='rgba(0,0,255,0.5)';
         addRect(svg, ii * cellSize - 0 * cellSize + 0 * rowLen * cellSize, topShift + 0 * cellSize + rr * cellSize, cellSize, cellSize //- 0.1
         , color);
@@ -1172,10 +1184,10 @@ function roundDown(num, base) {
 }
 function fillCells() {
     clearSVGgroup(levelA);
-    let slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount + calcLen);
     dumpTriads(levelA, slicedrows);
     dumpInfo(skipRowsCount);
-    let len3 = 0.5 * rowLen * cellSize / 3;
+    var len3 = 0.5 * rowLen * cellSize / 3;
     addRect(levelA, len3, topShift + (1 + rowsVisibleCount) * cellSize, len3, rowsVisibleCount * cellSize, '#eee');
     addRect(levelA, rowLen * cellSize / 2 + len3, topShift + (1 + rowsVisibleCount) * cellSize, len3, rowsVisibleCount * cellSize, '#eee');
     addRect(levelA, rowLen * cellSize + len3, topShift + (1 + rowsVisibleCount) * cellSize, len3, rowsVisibleCount * cellSize, '#eee');
@@ -1206,7 +1218,7 @@ function clickGoSkip(nn) {
     if (skipRowsCount + nn * reduceRatio >= 0) {
         if (skipRowsCount + nn * reduceRatio < datarows.length - rowsVisibleCount * reduceRatio) {
             skipRowsCount = skipRowsCount + nn * reduceRatio;
-            for (let i = 0; i < markLines.length; i++) {
+            for (var i = 0; i < markLines.length; i++) {
                 markLines[i].fromY = markLines[i].fromY + nn * (reduceRatio - 1);
                 markLines[i].toY = markLines[i].toY + nn * (reduceRatio - 1);
             }
@@ -1254,54 +1266,54 @@ function lessWide() {
     addTails();
 }
 function sobstvennoe(balls) {
-    let pre = balls;
-    let nxt = [];
+    var pre = balls;
+    var nxt = [];
     while (1 == 1) {
         nxt = [];
-        for (let bb = 1; bb < pre.length; bb++) {
+        for (var bb = 1; bb < pre.length; bb++) {
             nxt.push(Math.abs(pre[bb - 1] - pre[bb]));
         }
         if (nxt.length < 2)
             break;
         pre = [];
-        for (let bb = 0; bb < nxt.length; bb++) {
+        for (var bb = 0; bb < nxt.length; bb++) {
             pre[bb] = nxt[bb];
         }
     }
-    let r0 = nxt[0];
+    var r0 = nxt[0];
     if (r0 < 2)
         r0 = -(pre[1] + pre[0]);
     return r0;
 }
 function padLen(txt, sz) {
-    let len = txt.length;
-    let add = 0;
+    var len = txt.length;
+    var add = 0;
     if (len < sz) {
         add = sz - len;
     }
-    let rez = txt;
-    for (let ii = 0; ii < add; ii++) {
+    var rez = txt;
+    for (var ii = 0; ii < add; ii++) {
         rez = rez + ' ';
     }
     //console.log(rez,add);
     return rez;
 }
 function pad0(txt, sz) {
-    let len = txt.length;
-    let add = 0;
+    var len = txt.length;
+    var add = 0;
     if (len < sz) {
         add = sz - len;
     }
-    let rez = '';
-    for (let ii = 0; ii < add; ii++) {
+    var rez = '';
+    for (var ii = 0; ii < add; ii++) {
         rez = rez + '0';
     }
     rez = rez + txt;
     return rez;
 }
 function resetNumbs() {
-    let lbl = ' ';
-    for (let ii = 0; ii < rowLen; ii++) {
+    var lbl = ' ';
+    for (var ii = 0; ii < rowLen; ii++) {
         lbl = lbl + pad0('' + (1 + ii), 2);
         lbl = lbl + '  ';
     }
@@ -1309,34 +1321,34 @@ function resetNumbs() {
 }
 function addTails() {
     clearNonManual();
-    let slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
+    var slicedrows = sliceRows(datarows, skipRowsCount, skipRowsCount + rowsSliceCount * 2);
     lastfirst = slicedrows[0];
     dumpRowFills(slicedrows);
     fillCells();
     mindata = [];
     mxdata = [];
-    for (let ii = 0; ii < rowLen; ii++) {
-        let blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
-        let green = sortedGreen.indexOf(ii + 1);
-        let black = sortedGrey.indexOf(ii + 1);
-        let blueGreenDiff = Math.abs(blue - green);
-        let greenBlackDiff = Math.abs(green - black);
-        let blackBlueDiff = Math.abs(black - blue);
-        let mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+    for (var ii = 0; ii < rowLen; ii++) {
+        var blue = rowLen - sortedBlue.indexOf(ii + 1) - 1;
+        var green = sortedGreen.indexOf(ii + 1);
+        var black = sortedGrey.indexOf(ii + 1);
+        var blueGreenDiff = Math.abs(blue - green);
+        var greenBlackDiff = Math.abs(green - black);
+        var blackBlueDiff = Math.abs(black - blue);
+        var mx = Math.max(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         mxdata.push({ ball: ii + 1, mx: mx });
-        let min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
+        var min = Math.min(blueGreenDiff, greenBlackDiff, blackBlueDiff);
         mindata.push({ ball: ii + 1, min: min, diff: 0 });
         if (ballExists(mindata[mindata.length - 1].ball, slicedrows[0])) {
             mindata[mindata.length - 1].exists = true;
         }
     }
-    let lbl = '';
-    mxdata.sort((a, b) => {
+    var lbl = '';
+    mxdata.sort(function (a, b) {
         return a.mx - b.mx;
     });
-    let begin = -1;
-    let end = -1;
-    for (let kk = 0; kk < mxdata.length; kk++) {
+    var begin = -1;
+    var end = -1;
+    for (var kk = 0; kk < mxdata.length; kk++) {
         if (ballExists(mxdata[kk].ball, slicedrows[0])) {
             if (showFirstRow) {
                 lbl = lbl + '[' + pad0('' + mxdata[kk].ball, 2) + ']';
@@ -1356,14 +1368,14 @@ function addTails() {
     dumpInfo2('statpurple', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): mx:', 20) + lbl);
     lbl = '';
     //let modidata=mindata.slice();
-    mindata.sort((a, b) => {
+    mindata.sort(function (a, b) {
         return a.min - b.min;
     });
     mincopy = mindata.slice();
     ;
     begin = -1;
     end = -1;
-    for (let kk = 0; kk < mindata.length; kk++) {
+    for (var kk = 0; kk < mindata.length; kk++) {
         if (ballExists(mindata[kk].ball, slicedrows[0])) {
             if (showFirstRow) {
                 lbl = lbl + '[' + pad0('' + mindata[kk].ball, 2) + ']';
@@ -1381,13 +1393,13 @@ function addTails() {
         }
     }
     dumpInfo2('statred', padLen('' + padLen('' + (0 + begin), 2) + ':' + padLen('' + end, 2) + '(' + padLen('' + (rowLen - end - 1), 2) + '): min:', 20) + lbl);
-    let minDist = 99;
-    let summDist = 0;
-    let maxDist = -1;
-    let purpleiff = padLen('', 21);
-    for (let kk = 0; kk < mxdata.length; kk++) {
-        let dist = 0;
-        for (let xx = 0; xx < mindata.length; xx++) {
+    var minDist = 99;
+    var summDist = 0;
+    var maxDist = -1;
+    var purpleiff = padLen('', 21);
+    for (var kk = 0; kk < mxdata.length; kk++) {
+        var dist = 0;
+        for (var xx = 0; xx < mindata.length; xx++) {
             if (mindata[xx].ball == mxdata[kk].ball) {
                 dist = xx - kk;
                 break;
@@ -1400,11 +1412,11 @@ function addTails() {
         if (maxDist < Math.abs(dist))
             maxDist = Math.abs(dist);
     }
-    let avgDist = Math.round(summDist / mindata.length);
-    let rediff = padLen('' + minDist + '/' + avgDist + '/' + maxDist, 21);
-    for (let kk = 0; kk < mindata.length; kk++) {
-        let dist = 0;
-        for (let xx = 0; xx < mxdata.length; xx++) {
+    var avgDist = Math.round(summDist / mindata.length);
+    var rediff = padLen('' + minDist + '/' + avgDist + '/' + maxDist, 21);
+    for (var kk = 0; kk < mindata.length; kk++) {
+        var dist = 0;
+        for (var xx = 0; xx < mxdata.length; xx++) {
             if (mxdata[xx].ball == mindata[kk].ball) {
                 dist = xx - kk;
                 break;
@@ -1417,7 +1429,7 @@ function addTails() {
     span.innerText = purpleiff;
     span = document.getElementById('infored');
     span.innerText = rediff;
-    mindata.sort((a, b) => {
+    mindata.sort(function (a, b) {
         return Math.abs(a.diff) - Math.abs(b.diff);
     });
     resetNumbs();
@@ -1426,8 +1438,8 @@ function addTails() {
     //dumpDiffStat();
 }
 function addTestLines1(data) {
-    let bas = 19;
-    for (let ii = 0; ii < data.length; ii++) {
+    var bas = 19;
+    for (var ii = 0; ii < data.length; ii++) {
         markLines.push({
             fromX: data[ii].ball - 1,
             fromY: skipRowsCount + 0.85 * (bas / data.length * ii),
@@ -1445,8 +1457,8 @@ function addTestLines1(data) {
     }
 }
 function addTestLines2(data) {
-    let bas = 19;
-    for (let ii = 0; ii < data.length; ii++) {
+    var bas = 19;
+    for (var ii = 0; ii < data.length; ii++) {
         markLines.push({
             fromX: data[ii].ball - 1,
             fromY: skipRowsCount + 0.85 * (bas - bas / data.length * ii),
@@ -1464,7 +1476,7 @@ function addTestLines2(data) {
     }
 }
 function arrHas0(arr) {
-    for (let ii = 1; ii < arr.length; ii++) {
+    for (var ii = 1; ii < arr.length; ii++) {
         if (arr[ii] == 0) {
             return true;
         }
@@ -1608,34 +1620,34 @@ function test4(){
 }
 */
 function yetAnotherStat() {
-    let cnts = [];
-    for (let ii = 1; ii < datarows.length; ii++) {
-        let nn = datarows[ii].balls[0];
+    var cnts = [];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var nn = datarows[ii].balls[0];
         if (!(cnts[nn]))
             cnts[nn] = 0;
         cnts[nn]++;
     }
     console.log('empty left', cnts);
-    for (let ii = 0; ii < cnts.length; ii++) {
+    for (var ii = 0; ii < cnts.length; ii++) {
         console.log(ii, cnts[ii] / datarows.length);
     }
 }
 function anotherStat() {
     //let randProbe:number[]=[];
-    let sz = 15;
-    let ln = 4321;
-    let sm0 = 0;
-    let sm1 = 0;
-    let sm2 = 0;
-    let sm3 = 0;
-    let sm4 = 0;
-    let sm5 = 0;
-    let sm6 = 0;
-    for (let rn = 1; rn < ln; rn++) {
+    var sz = 15;
+    var ln = 4321;
+    var sm0 = 0;
+    var sm1 = 0;
+    var sm2 = 0;
+    var sm3 = 0;
+    var sm4 = 0;
+    var sm5 = 0;
+    var sm6 = 0;
+    for (var rn = 1; rn < ln; rn++) {
         //let rn=1+Math.floor(Math.random()*datarows.length-1);
-        let hitCount = 0;
-        for (let ii = 0; ii < sz; ii++) {
-            let nxt = 1 + Math.floor(Math.random() * rowLen);
+        var hitCount = 0;
+        for (var ii = 0; ii < sz; ii++) {
+            var nxt = 1 + Math.floor(Math.random() * rowLen);
             //console.log(nxt);
             if (ballExists(nxt, datarows[rn])) {
                 hitCount++;
@@ -1678,17 +1690,17 @@ function testAbsDiff() {
     console.log(frstcnt);*/
 }
 function testDumpAbsDiff(strt) {
-    let count1 = 0;
-    let preDiffX = [];
-    let preDiffNo = [];
-    for (let ff = strt; ff < strt + 1000; ff++) {
+    var count1 = 0;
+    var preDiffX = [];
+    var preDiffNo = [];
+    for (var ff = strt; ff < strt + 1000; ff++) {
         //if (datarows[ff + 1].balls[0] >= maxpre) {
-        let sz = 6;
-        let smm = 0;
-        for (let ii = ff + 1; ii < ff + 1 + sz; ii++) {
+        var sz = 6;
+        var smm = 0;
+        for (var ii = ff + 1; ii < ff + 1 + sz; ii++) {
             smm = smm + Math.abs(datarows[ii].balls[0] - datarows[ii + 1].balls[0]);
         }
-        let avg = Math.round(1 * smm / sz);
+        var avg = Math.round(1 * smm / sz);
         //avg = datarows[ff].balls[0];
         preDiffX[avg] = preDiffX[avg] ? preDiffX[avg] : 0;
         preDiffNo[avg] = preDiffNo[avg] ? preDiffNo[avg] : 0;
@@ -1719,33 +1731,33 @@ function testDumpAbsDiff(strt) {
         }*/
     }
     console.log(count1, preDiffX, preDiffNo);
-    let end = Math.max(preDiffX.length, preDiffNo.length);
-    for (let ii = 0; ii < end; ii++) {
+    var end = Math.max(preDiffX.length, preDiffNo.length);
+    for (var ii = 0; ii < end; ii++) {
         console.log(ii, preDiffX[ii] / preDiffNo[ii], '' + preDiffX[ii] + '+' + preDiffNo[ii] + '=' + (preDiffX[ii] + preDiffNo[ii]));
     }
 }
 function test9() {
-    let counts = [];
-    for (let ii = 1; ii < datarows.length; ii++) {
-        let nn = datarows[ii].balls[0];
+    var counts = [];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var nn = datarows[ii].balls[0];
         counts[nn] = counts[nn] ? counts[nn] : 0;
         counts[nn]++;
     }
-    let last = 1;
-    let limit = 5;
-    let first = 6;
-    let freq = [];
-    let antifreq = [];
-    let found = 0;
-    for (let ii = 1; ii < datarows.length; ii++) {
-        let lastBall = datarows[ii].balls[0];
-        let cuarr = antifreq;
+    var last = 1;
+    var limit = 5;
+    var first = 6;
+    var freq = [];
+    var antifreq = [];
+    var found = 0;
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var lastBall = datarows[ii].balls[0];
+        var cuarr = antifreq;
         if (lastBall == last) {
             cuarr = freq;
         }
-        let lenCount = 0;
-        for (let kk = 1; ii + kk < datarows.length; kk++) {
-            let cuball = datarows[ii + kk].balls[0];
+        var lenCount = 0;
+        for (var kk = 1; ii + kk < datarows.length; kk++) {
+            var cuball = datarows[ii + kk].balls[0];
             if (cuball > limit) {
                 if (cuball > first) {
                     cuarr[lenCount] = cuarr[lenCount] ? cuarr[lenCount] : 0;
@@ -1762,15 +1774,15 @@ function test9() {
     console.log(antifreq);
 }
 function test10() {
-    let counts = [0];
-    for (let ii = 1; ii < datarows.length; ii++) {
-        let first = datarows[ii].balls[0];
+    var counts = [0];
+    for (var ii = 1; ii < datarows.length; ii++) {
+        var first = datarows[ii].balls[0];
         counts[first] = counts[first] ? counts[first] : 0;
         counts[first]++;
     }
     console.log(counts);
-    let min = 0;
-    for (let ii = 1; ii < counts.length; ii++) {
+    var min = 0;
+    for (var ii = 1; ii < counts.length; ii++) {
         console.log(ii, Math.round(100 - 100 * min / datarows.length) + '%');
         min = min + counts[ii];
     }
