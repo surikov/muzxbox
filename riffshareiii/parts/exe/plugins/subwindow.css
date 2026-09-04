@@ -172,7 +172,7 @@ input[type=text]:focus {
 
 .shorttextinput {
 	width: 2cm;
-
+text-align:center;
 }
 
 input[type=number] {
@@ -185,6 +185,7 @@ input[type=number] {
 	font-weight44: 400;
 	color: var(--main-color);
 	width: 2cm;
+	text-align:center;
 }
 
 input[type=number]:focus {

@@ -318,41 +318,50 @@ function fillClipboardList() {
 					let info: MenuInfo = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
 					let tri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
 					//let focustri: TileRectangle = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragFocus' };
-					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (xx: number, yy: number) => {
-						let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-						let mm: Zvoog_MetreMathType = MMUtil();
-						let barIdx: number = globalCommandDispatcher.cfg().data.timeline.length - 1;
-						let ww = 0;
-						for (let jj = 0; jj < globalCommandDispatcher.cfg().data.timeline.length; jj++) {
-							let timebar = globalCommandDispatcher.cfg().data.timeline[jj];
-							ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-							if (xx + startX < ww) {
-								barIdx = jj;
-								break;
+					let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info
+						//onDone
+						, (xx: number, yy: number) => {
+							//console.log('ondone', xx, yy);
+							let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+							let mm: Zvoog_MetreMathType = MMUtil();
+							let barIdx: number = globalCommandDispatcher.cfg().data.timeline.length - 1;
+							let ww = 0;
+							for (let jj = 0; jj < globalCommandDispatcher.cfg().data.timeline.length; jj++) {
+								let timebar = globalCommandDispatcher.cfg().data.timeline[jj];
+								ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+								if (xx + startX < ww) {
+									barIdx = jj;
+									break;
+								}
 							}
-						}
-						//console.log('dnd percussion', barIdx, yy);
-						let nearIdx = globalCommandDispatcher.cfg().data.farorder[0];
-						let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
-						globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
-							if (globalCommandDispatcher.clipboardData) {
+							//console.log('dnd percussion', barIdx, yy);
+							let nearIdx = globalCommandDispatcher.cfg().data.farorder[0];
+							let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
+							globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
+								if (globalCommandDispatcher.clipboardData) {
 
-								for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-									let from = track.measures[pp];
-									for (let tt = 0; tt < from.chords.length; tt++) {
-										if (from.chords[tt]) {
-											let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
-											to[barIdx].chords.push(fromChord);
+									for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+										let from = track.measures[pp];
+										for (let tt = 0; tt < from.chords.length; tt++) {
+											if (from.chords[tt]) {
+												let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
+												to[barIdx].chords.push(fromChord);
+											}
 										}
 									}
 								}
-							}
-							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-						});
-					}, (zz: number) => {
-						tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
-						tri.w = pasteWidth / zz;
-					});
+								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+							});
+						}
+						//onDrag
+						, (xx: number, yy: number, zz: number) => {
+							//console.log('onDrag', xx, yy, zz);
+							tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
+							tri.w = pasteWidth / zz;
+							//console.log('tri', tri);
+						}
+						, (zz: number) => { }
+					);
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 				}
@@ -408,10 +417,10 @@ function fillClipboardList() {
 							}
 							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 						});
-					}, (zz: number) => {
+					}, (xx: number, yy: number, zz: number) => {
 						tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
 						tri.w = pasteWidth / zz;
-					});
+					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 					/*menuPointClipboard.children.push({
@@ -500,10 +509,10 @@ function fillClipboardList() {
 
 
 
-					}, (zz: number) => {
+					}, (xx: number, yy: number, zz: number) => {
 						tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
 						tri.w = pasteWidth / zz;
-					});
+					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointClipboard.children.push(info);
 				}
@@ -568,7 +577,7 @@ function fillPluginsLists() {
 						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
 
 					});
-				}, (dx: number, dy: number) => {
+				}, (dx: number, dy: number, zz: number) => {
 					refreshMixerItemFocus.start(200, () => {
 						let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
 						if (samplerNo > -1) {
@@ -604,7 +613,7 @@ function fillPluginsLists() {
 							, LevelModes.overlay);
 
 					});
-				});
+				}, (zz: number) => { });
 				info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 				menuPointAddPlugin.children.push(info);
 			} else {
@@ -672,7 +681,7 @@ function fillPluginsLists() {
 						globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
 						//square.css = 'rectangleDragItem';
 						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
-					}, (dx: number, dy: number) => {
+					}, (dx: number, dy: number, zz: number) => {
 						refreshMixerItemFocus.start(200, () => {
 							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 							if (trackNo > -1) {
@@ -721,7 +730,7 @@ function fillPluginsLists() {
 								, LevelModes.overlay);
 						});
 
-					});
+					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					menuPointAddPlugin.children.push(info);
 				} else {
@@ -744,7 +753,7 @@ function fillPluginsLists() {
 								});
 								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
 							});
-						});
+						}, null, (zz: number) => { });
 						info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 						menuPointAddPlugin.children.push(info);
 						/*let dragStarted = false;

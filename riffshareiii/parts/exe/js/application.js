@@ -2338,6 +2338,49 @@ class CommandDispatcher {
         this.adjustTracksChords(project);
         this.adjustRemoveEmptyChords(project);
         this.adjustTimeLineLength(project);
+        this.dumpProjectNotes(project);
+    }
+    dumpProjectNotes(project) {
+        for (let ii = 0; ii < project.timeline.length; ii++) {
+            let notesCount = [];
+            for (let nn = 0; nn < project.tracks.length; nn++) {
+                let trackBar = project.tracks[nn].measures[ii];
+                for (let kk = 0; kk < trackBar.chords.length; kk++) {
+                    let checkChord = trackBar.chords[kk];
+                    let chordDuration = checkChord.slides.reduce((nn, ss) => { return nn + MMUtil().set(ss.duration).duration(120); }, 0);
+                    chordDuration = Math.round(100 * chordDuration);
+                    for (let pp = 0; pp < checkChord.pitches.length; pp++) {
+                        let pitch = checkChord.pitches[pp];
+                        let note = pitch % 12;
+                        notesCount[note] = notesCount[note] ? notesCount[note] : 0;
+                        notesCount[note] = notesCount[note] + chordDuration;
+                    }
+                }
+            }
+            let labels = [];
+            for (let zz = 0; zz < 12; zz++) {
+                notesCount[zz] = notesCount[zz] ? notesCount[zz] : 0;
+                let val = notesCount[zz];
+                let la = '---';
+                if (val > 0) {
+                    if (val < 10) {
+                        la = '  ' + val;
+                    }
+                    else {
+                        if (val < 100) {
+                            la = ' ' + val;
+                        }
+                        else {
+                            la = '' + val;
+                        }
+                    }
+                }
+                else {
+                    la = '   ';
+                }
+                labels.push(la);
+            }
+        }
     }
     resetPlayButtonState() {
         if (this.player)
@@ -3321,10 +3364,10 @@ class RightMenuPanel {
         this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
         let msz = 1.75;
         if (globalCommandDispatcher.cfg().data.list) {
-            this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
+            this.menuToggleButton.resize(this.shiftX - msz / 2, msz, msz);
         }
         else {
-            this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
+            this.menuToggleButton.resize(this.shiftX - msz, msz, msz);
         }
         this.rerenderMenuContent(null);
     }
@@ -3678,10 +3721,10 @@ function fillClipboardList() {
                             }
                             globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                         });
-                    }, (zz) => {
+                    }, (xx, yy, zz) => {
                         tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
                         tri.w = pasteWidth / zz;
-                    });
+                    }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
@@ -3735,10 +3778,10 @@ function fillClipboardList() {
                             }
                             globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                         });
-                    }, (zz) => {
+                    }, (xx, yy, zz) => {
                         tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
                         tri.w = pasteWidth / zz;
-                    });
+                    }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
@@ -3799,10 +3842,10 @@ function fillClipboardList() {
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
                         }
-                    }, (zz) => {
+                    }, (xx, yy, zz) => {
                         tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
                         tri.w = pasteWidth / zz;
-                    });
+                    }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointClipboard.children.push(info);
                 }
@@ -3862,7 +3905,7 @@ function fillPluginsLists() {
                         globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
                         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
                     });
-                }, (dx, dy) => {
+                }, (dx, dy, zz) => {
                     refreshMixerItemFocus.start(200, () => {
                         let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
                         if (samplerNo > -1) {
@@ -3891,7 +3934,7 @@ function fillPluginsLists() {
                         }
                         globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.menu.menuPanelInteraction, globalCommandDispatcher.renderer.menu.focusTargetAnchor, LevelModes.overlay);
                     });
-                });
+                }, (zz) => { });
                 info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                 menuPointAddPlugin.children.push(info);
             }
@@ -3958,7 +4001,7 @@ function fillPluginsLists() {
                         refreshMixerItemFocus.currentID = -1;
                         globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
                         globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
-                    }, (dx, dy) => {
+                    }, (dx, dy, zz) => {
                         refreshMixerItemFocus.start(200, () => {
                             let trackNo = findPerformerIdxByXYcurZ(dx, dy);
                             if (trackNo > -1) {
@@ -3990,7 +4033,7 @@ function fillPluginsLists() {
                             }
                             globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.menu.menuPanelInteraction, globalCommandDispatcher.renderer.menu.focusTargetAnchor, LevelModes.overlay);
                         });
-                    });
+                    }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     menuPointAddPlugin.children.push(info);
                 }
@@ -4012,7 +4055,7 @@ function fillPluginsLists() {
                                 });
                                 globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
                             });
-                        });
+                        }, null, (zz) => { });
                         info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                         menuPointAddPlugin.children.push(info);
                     }
@@ -4139,7 +4182,7 @@ class DragMenuItemUtil {
                 let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
                 let left = point.x - start;
                 let top = point.y - globalCommandDispatcher.cfg().gridTop();
-                this.onDrag(left, top);
+                this.onDrag(left, top, zz);
             }
         }
     }

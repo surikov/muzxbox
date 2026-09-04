@@ -4,14 +4,14 @@ class DragMenuItemUtil {
 	//focusTarget: TileItem;
 	info: MenuInfo
 	onDone: (xx: number, yy: number) => void;
-	onDrag: null | ((xx: number, yy: number) => void);
+	onDrag: null | ((xx: number, yy: number, zz: number) => void);
 	onPluck: null | ((zz: number) => void) = null;
 	constructor(dragItem: TileItem
 		//, focusTarget: TileItem
 		, info: MenuInfo
 		, onDone: (xx: number, yy: number) => void
-		, onDrag?: (xx: number, yy: number) => void
-		, onPluck?: (zz: number) => void
+		, onDrag: null | ((xx: number, yy: number, zz: number) => void)
+		, onPluck: null | ((zz: number) => void)
 	) {
 		this.dragStarted = false;
 		//this.focusTarget = focusTarget;
@@ -26,6 +26,7 @@ class DragMenuItemUtil {
 		}
 	}
 	doDrag(dx: number, dy: number) {
+		//console.log('DragMenuItemUtil doDrag', dx, dy);
 		let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
 		let ss = globalCommandDispatcher.renderer.menu.scrollY;
 		let tt = this.info.menuTop ? this.info.menuTop : 0;
@@ -55,7 +56,7 @@ class DragMenuItemUtil {
 				let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
 				let left = point.x - start;
 				let top = point.y - globalCommandDispatcher.cfg().gridTop();
-				this.onDrag(left, top);
+				this.onDrag(left, top, zz);
 			}
 		}
 

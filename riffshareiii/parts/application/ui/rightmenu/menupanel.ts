@@ -518,11 +518,11 @@ class RightMenuPanel {
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 		let msz = 1.75;
 		if (globalCommandDispatcher.cfg().data.list) {
-
-			this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
+this.menuToggleButton.resize(this.shiftX - msz / 2,  msz, msz);
+			//this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
 		} else {
-
-			this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
+this.menuToggleButton.resize(this.shiftX - msz,  msz, msz);
+			//this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
 		}
 		this.rerenderMenuContent(null);
 	}

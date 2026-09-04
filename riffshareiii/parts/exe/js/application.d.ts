@@ -235,6 +235,7 @@ declare class CommandDispatcher {
     adjustTracksChords(project: Zvoog_Project): void;
     adjustContentByMeter(currentProject: Zvoog_Project): void;
     adjustTimelineContent(project: Zvoog_Project): void;
+    dumpProjectNotes(project: Zvoog_Project): void;
     resetPlayButtonState(): void;
 }
 declare let globalCommandDispatcher: CommandDispatcher;
@@ -468,9 +469,9 @@ declare class DragMenuItemUtil {
     dragItem: TileItem;
     info: MenuInfo;
     onDone: (xx: number, yy: number) => void;
-    onDrag: null | ((xx: number, yy: number) => void);
+    onDrag: null | ((xx: number, yy: number, zz: number) => void);
     onPluck: null | ((zz: number) => void);
-    constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag?: (xx: number, yy: number) => void, onPluck?: (zz: number) => void);
+    constructor(dragItem: TileItem, info: MenuInfo, onDone: (xx: number, yy: number) => void, onDrag: null | ((xx: number, yy: number, zz: number) => void), onPluck: null | ((zz: number) => void));
     doDrag(dx: number, dy: number): void;
 }
 declare class LeftPanel {

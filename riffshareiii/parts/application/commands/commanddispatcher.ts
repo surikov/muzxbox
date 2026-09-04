@@ -1280,8 +1280,9 @@ class CommandDispatcher {
 				mergedChords.push(checkChord);
 			}
 		}
-		trackBar.chords=mergedChords;
+		trackBar.chords = mergedChords;
 	}
+
 	____adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure) {
 		//if(this.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 		let mergedChords: Zvoog_Chord[] = [];
@@ -1526,6 +1527,62 @@ class CommandDispatcher {
 		//this.adjustLyricsPoints(project);
 
 		this.adjustTimeLineLength(project);
+		this.dumpProjectNotes(project);
+	}
+	dumpProjectNotes(project: Zvoog_Project) {
+		for (let ii = 0; ii < project.timeline.length; ii++) {
+			//let notesCount: string[] = ['   ', '   ', '   ', '   ', '   ', '   ', '   ', '   ', '   ', '   ', '   ', '   '];
+			let notesCount: number[] = [];
+			for (let nn = 0; nn < project.tracks.length; nn++) {
+				let trackBar = project.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					let checkChord: Zvoog_Chord = trackBar.chords[kk];
+					let chordDuration = checkChord.slides.reduce(
+						(nn, ss: Zvoog_Slide) => { return nn + MMUtil().set(ss.duration).duration(120); },
+						0);
+					chordDuration = Math.round(100 * chordDuration);
+					for (let pp = 0; pp < checkChord.pitches.length; pp++) {
+						let pitch = checkChord.pitches[pp];
+						let note = pitch % 12;
+						notesCount[note] = notesCount[note] ? notesCount[note] : 0;
+						notesCount[note] = notesCount[note] + chordDuration;
+						//if (notesCount[note] == '   ') notesCount[note] = '0';
+						/*let nn = parseInt(notesCount[note].trim()) + chordDuration;
+						if (nn < 100) {
+							notesCount[note] = ' ' + nn;
+						} else {
+							if (nn < 10) {
+								notesCount[note] = '  ' + nn;
+							} else {
+								notesCount[note] = '' + nn;
+							};
+						};*/
+
+					}
+				}
+			}
+			let labels: string[] = [];
+			for (let zz = 0; zz < 12; zz++) {
+				notesCount[zz] = notesCount[zz] ? notesCount[zz] : 0;
+				let val = notesCount[zz];
+				let la = '---';
+				if (val > 0) {
+					if (val < 10) {
+						la = '  ' + val;
+					} else {
+						if (val < 100) {
+							la = ' ' + val;
+						} else {
+							la = '' + val;
+						}
+					}
+				} else {
+					la = '   ';
+				}
+				labels.push(la);
+			}
+			//console.log(labels, notesCount);
+		}
 	}
 	resetPlayButtonState() {
 		//console.log('resetPlayButtonState', this.player.playState());
