@@ -1259,6 +1259,30 @@ class CommandDispatcher {
 		return false;
 	}
 	adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure) {
+		let mergedChords: Zvoog_Chord[] = [];
+		for (let kk = 0; kk < trackBar.chords.length; kk++) {
+			let checkChord: Zvoog_Chord = trackBar.chords[kk];
+			let xsts = false;
+			for (let mm = 0; mm < mergedChords.length; mm++) {
+				let existedChord: Zvoog_Chord = mergedChords[mm];
+				if (MMUtil().set(existedChord.skip).equals(checkChord.skip)) {
+					xsts = true;
+					for (let pp = 0; pp < checkChord.pitches.length; pp++) {
+						let pitch = checkChord.pitches[pp];
+						if (existedChord.pitches.indexOf(pitch) == -1) {
+							existedChord.pitches.push(pitch);
+						}
+					}
+					break;
+				}
+			}
+			if (!xsts) {
+				mergedChords.push(checkChord);
+			}
+		}
+		trackBar.chords=mergedChords;
+	}
+	____adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure) {
 		//if(this.cfg().data.tracks[0].measures.length>33) console.log('1',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 		let mergedChords: Zvoog_Chord[] = [];
 		for (let kk = 0; kk < trackBar.chords.length; kk++) {
@@ -1288,7 +1312,7 @@ class CommandDispatcher {
 		}
 		//if(this.cfg().data.tracks[0].measures.length>33) console.log('2',JSON.stringify(this.cfg().data.tracks[0].measures[33].chords[0]));
 	}
-	/*adjustTracksChords(project: Zvoog_Project) {
+	adjustTracksChords(project: Zvoog_Project) {
 		for (let nn = 0; nn < project.tracks.length; nn++) {
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				let barMetre = MMUtil().set(project.timeline[ii].metre);
@@ -1326,7 +1350,7 @@ class CommandDispatcher {
 				this.adjustMergeChordByTime(trackBar);
 			}
 		}
-	}*/
+	}
 	/*adjustSamplerSkips(project: Zvoog_Project) {
 		for (let ii = 0; ii < project.timeline.length; ii++) {
 			let barMetre = MMUtil().set(project.timeline[ii].metre);
@@ -1495,7 +1519,7 @@ class CommandDispatcher {
 		this.adjustTimeLineLength(project);
 		this.adjustContentByMeter(project);
 
-		//this.adjustTracksChords(project);
+		this.adjustTracksChords(project);
 		this.adjustRemoveEmptyChords(project);
 		//this.adjustSamplerSkips(project);
 		//this.adjustAutoPoints(project);

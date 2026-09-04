@@ -67,16 +67,11 @@ class ActionPluginDialog {
 					console.log('waitProjectCallback',message);
 					if (message.pluginData) {
 						let project: Zvoog_Project = message.pluginData as Zvoog_Project;
+						globalCommandDispatcher.adjustTimelineContent(project);
 						globalCommandDispatcher.exe.commitProjectChanges([], () => {
-							
-							//console.log('set 1',JSON.stringify(project.tracks[0].measures[33]));
-							
 							globalCommandDispatcher.registerWorkProject(project);
-							//console.log('set 2',JSON.stringify(project.tracks[0].measures[33]));
 							globalCommandDispatcher.resetProject();
-							//console.log('set 3',JSON.stringify(project.tracks[0].measures[33]));
 							globalCommandDispatcher.reStartPlayIfPlay();//false);
-							//console.log('set 33',project.tracks[0].measures[33],JSON.stringify(project.tracks[0].measures[33]));
 						});
 					}
 					if (message.done) {

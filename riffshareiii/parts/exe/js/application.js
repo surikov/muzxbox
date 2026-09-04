@@ -768,6 +768,7 @@ class ActionPluginDialog {
                     console.log('waitProjectCallback', message);
                     if (message.pluginData) {
                         let project = message.pluginData;
+                        globalCommandDispatcher.adjustTimelineContent(project);
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             globalCommandDispatcher.registerWorkProject(project);
                             globalCommandDispatcher.resetProject();
@@ -2168,6 +2169,30 @@ class CommandDispatcher {
             let xsts = false;
             for (let mm = 0; mm < mergedChords.length; mm++) {
                 let existedChord = mergedChords[mm];
+                if (MMUtil().set(existedChord.skip).equals(checkChord.skip)) {
+                    xsts = true;
+                    for (let pp = 0; pp < checkChord.pitches.length; pp++) {
+                        let pitch = checkChord.pitches[pp];
+                        if (existedChord.pitches.indexOf(pitch) == -1) {
+                            existedChord.pitches.push(pitch);
+                        }
+                    }
+                    break;
+                }
+            }
+            if (!xsts) {
+                mergedChords.push(checkChord);
+            }
+        }
+        trackBar.chords = mergedChords;
+    }
+    ____adjustMergeChordByTime(trackBar) {
+        let mergedChords = [];
+        for (let kk = 0; kk < trackBar.chords.length; kk++) {
+            let checkChord = trackBar.chords[kk];
+            let xsts = false;
+            for (let mm = 0; mm < mergedChords.length; mm++) {
+                let existedChord = mergedChords[mm];
                 if (MMUtil().set(existedChord.skip).equals(checkChord.skip) && this.slidesEquals(existedChord.slides, checkChord.slides)) {
                     xsts = true;
                     let pitchcount = checkChord.pitches.length;
@@ -2185,6 +2210,45 @@ class CommandDispatcher {
             }
             if (!xsts) {
                 mergedChords.push(checkChord);
+            }
+        }
+    }
+    adjustTracksChords(project) {
+        for (let nn = 0; nn < project.tracks.length; nn++) {
+            for (let ii = 0; ii < project.timeline.length; ii++) {
+                let barMetre = MMUtil().set(project.timeline[ii].metre);
+                let trackBar = project.tracks[nn].measures[ii];
+                for (let kk = 0; kk < trackBar.chords.length; kk++) {
+                    let chord = trackBar.chords[kk];
+                    if (barMetre.less(chord.skip)) {
+                        if (ii >= project.timeline.length) {
+                        }
+                        chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy().metre();
+                        if (!(project.tracks[nn].measures[ii + 1].chords)) {
+                            project.tracks[nn].measures[ii + 1].chords = [];
+                        }
+                        project.tracks[nn].measures[ii + 1].chords.push(chord);
+                        trackBar.chords.splice(kk, 1);
+                        kk--;
+                    }
+                    else {
+                        if (chord.skip.count < 0) {
+                            if (ii > 0) {
+                                let preMetre = MMUtil().set(project.timeline[ii - 1].metre);
+                                chord.skip = preMetre.plus(chord.skip).simplyfy().metre();
+                                project.tracks[nn].measures[ii - 1].chords.push(chord);
+                            }
+                            trackBar.chords.splice(kk, 1);
+                            kk--;
+                        }
+                    }
+                }
+            }
+        }
+        for (let nn = 0; nn < project.tracks.length; nn++) {
+            for (let ii = 0; ii < project.timeline.length; ii++) {
+                let trackBar = project.tracks[nn].measures[ii];
+                this.adjustMergeChordByTime(trackBar);
             }
         }
     }
@@ -2271,6 +2335,7 @@ class CommandDispatcher {
     adjustTimelineContent(project) {
         this.adjustTimeLineLength(project);
         this.adjustContentByMeter(project);
+        this.adjustTracksChords(project);
         this.adjustRemoveEmptyChords(project);
         this.adjustTimeLineLength(project);
     }

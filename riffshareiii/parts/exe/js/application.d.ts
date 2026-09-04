@@ -231,6 +231,8 @@ declare class CommandDispatcher {
     adjustAppendBar(project: Zvoog_Project): void;
     slidesEquals(a1: Zvoog_Slide[], a2: Zvoog_Slide[]): boolean;
     adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
+    ____adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
+    adjustTracksChords(project: Zvoog_Project): void;
     adjustContentByMeter(currentProject: Zvoog_Project): void;
     adjustTimelineContent(project: Zvoog_Project): void;
     resetPlayButtonState(): void;
