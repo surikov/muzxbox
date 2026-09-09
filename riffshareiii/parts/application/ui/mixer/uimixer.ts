@@ -324,7 +324,7 @@ class MixerUI {
 
 			let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
 			if (!(timebar)) {
-				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+				timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
 			}
 
 			//let barwidth = MMUtil().set(globalCommandDispatcher.cfg().data.timeline[bb].metre).duration(globalCommandDispatcher.cfg().data.timeline[bb].tempo) * globalCommandDispatcher.cfg().widthDurationRatio;

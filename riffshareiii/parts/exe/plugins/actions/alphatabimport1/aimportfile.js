@@ -15856,7 +15856,7 @@ class EventsConverter {
                 meter.part = 4;
             }
             let barDurationMs = meter.duration(tempo) * 1000;
-            let nextBar = { tempo: tempo, metre: meter.metre() };
+            let nextBar = { tempo: tempo, metre: meter.metre(), modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
             project.timeline.push(nextBar);
             if (barDurationMs < 100)
                 barDurationMs = 100;
@@ -15940,7 +15940,7 @@ class EventsConverter {
                     drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
                 }
             }
-            if (allPercussions[ii].midiPitch < 27 || allPercussions[ii].midiPitch > 87) {
+            if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
                 insOut = [];
             }
             let pp = {
@@ -15956,6 +15956,7 @@ class EventsConverter {
                     hint35_81: 0
                 }
             };
+            console.log(pp.title, ':', pp.sampler.data, insOut, allPercussions[ii].midiPitch);
             for (let mm = 0; mm < project.timeline.length; mm++) {
                 pp.measures.push({ skips: [] });
             }
@@ -16340,7 +16341,7 @@ class EventsConverter {
         return allPercussions.length - 1;
     }
 }
-console.log('Alpha Tab Import *.mid v1.0.1');
+console.log('Alpha Tab Import *.mid v1.0.2');
 let parsedProject = null;
 class AlphaTabImportMusicPlugin {
     constructor() {
@@ -16481,6 +16482,7 @@ class FileLoaderAlpha {
                         }
                     }
                 }
+                me.dumpProjectInfo(parsedProject);
             }
         };
         fileReader.readAsArrayBuffer(file);
@@ -16511,6 +16513,7 @@ class FileLoaderAlpha {
             }
             let measure = {
                 tempo: tempo,
+                modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] },
                 metre: {
                     count: maBar.timeSignatureNumerator,
                     part: maBar.timeSignatureDenominator
@@ -16570,7 +16573,36 @@ class FileLoaderAlpha {
         this.arrangeDrums(project);
         this.arrangeFilters(project);
         parsedProject = project;
-        console.log(parsedProject);
+    }
+    dumpProjectInfo(project) {
+        console.log('dumpProjectInfo', project);
+        if (project) {
+            console.log('bars', project.timeline.length);
+            let allChordCount = project.tracks.reduce((sum, track, currentIndex, arr) => {
+                let trackChordCount = track.measures.reduce((ss, msr, idx, arr) => {
+                    return ss + msr.chords.length;
+                }, 0);
+                let usedMeasureSCount = track.measures.reduce((smm, curmsr, idx, arr) => {
+                    let nn = curmsr.chords.length > 0 ? 1 : 0;
+                    return smm + nn;
+                }, 0);
+                console.log(trackChordCount, '/', usedMeasureSCount, '=', Math.round(trackChordCount / usedMeasureSCount), track.title);
+                return sum + trackChordCount;
+            }, 0);
+            console.log('all chords', allChordCount);
+            let allDrumCount = project.percussions.reduce((sum, track, currentIndex, arr) => {
+                let drm = track.measures.reduce((ss, msr, idx, arr) => {
+                    return ss + msr.skips.length;
+                }, 0);
+                let usdr = track.measures.reduce((ss, msr, idx, arr) => {
+                    let dnu = msr.skips.length > 0 ? 1 : 0;
+                    return ss + dnu;
+                }, 0);
+                console.log(drm, '/', usdr, '=', Math.round(drm / usdr), track.title);
+                return sum + drm;
+            }, 0);
+            console.log('all drums', allDrumCount);
+        }
     }
     addRepeats(project, score) {
         let startLoop = -1;

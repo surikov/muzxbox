@@ -88,7 +88,7 @@ class FileLoaderAlpha {
 						}
 					}
 				}
-
+				me.dumpProjectInfo(parsedProject);
 
 				//let proj = new Projectr();
 				//me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
@@ -117,13 +117,16 @@ class FileLoaderAlpha {
 		let tempo = 120;
 		for (let bb = 0; bb < score.masterBars.length; bb++) {
 			let maBar = score.masterBars[bb];
+
 			if (maBar.tempoAutomation) {
+
 				if (maBar.tempoAutomation.value > 0) {
 					tempo = maBar.tempoAutomation.value;
 				}
 			}
 			let measure: Zvoog_SongMeasure = {
 				tempo: tempo
+				, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 				, metre: {
 					count: maBar.timeSignatureNumerator
 					, part: maBar.timeSignatureDenominator
@@ -189,7 +192,43 @@ class FileLoaderAlpha {
 
 
 		parsedProject = project;
-		console.log(parsedProject);
+
+
+	}
+	dumpProjectInfo(project: Zvoog_Project | null) {
+		console.log('dumpProjectInfo', project);
+		if (project) {
+			console.log(//'tracks', project.tracks.length, 
+				'bars', project.timeline.length);
+
+			let allChordCount = project.tracks.reduce((sum: number, track, currentIndex: number, arr: Zvoog_MusicTrack[]) => {
+				let trackChordCount = track.measures.reduce((ss, msr, idx, arr) => {
+					return ss + msr.chords.length;
+				}, 0);
+				let usedMeasureSCount = track.measures.reduce((smm, curmsr, idx, arr) => {
+					let nn = curmsr.chords.length > 0 ? 1 : 0;
+					//console.log( idx,smm,curmsr.chords.length,nn);
+					return smm + nn;
+				}, 0);
+				console.log(trackChordCount, '/', usedMeasureSCount, '=', Math.round(trackChordCount / usedMeasureSCount), track.title);
+				return sum + trackChordCount;
+			}, 0);
+
+			console.log('all chords', allChordCount);
+			let allDrumCount = project.percussions.reduce((sum: number, track, currentIndex: number, arr: Zvoog_PercussionTrack[]) => {
+				let drm = track.measures.reduce((ss, msr, idx, arr) => {
+					return ss + msr.skips.length;
+				}, 0);
+				let usdr = track.measures.reduce((ss, msr, idx, arr) => {
+					let dnu = msr.skips.length > 0 ? 1 : 0;
+					return ss + dnu;
+				}, 0);
+				console.log(drm, '/', usdr, '=',Math.round( drm / usdr), track.title);
+				return sum + drm;
+			}, 0);
+
+			console.log('all drums', allDrumCount);
+		}
 	}
 
 

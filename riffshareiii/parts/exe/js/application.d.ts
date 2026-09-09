@@ -33,6 +33,55 @@ declare function setupHomeBackURL(): void;
 declare function getNavigatorLanguage(): string;
 declare function saveProjectState(): void;
 declare function startLoadCSSfile(cssurl: string): void;
+declare let icon_play: string;
+declare let icon_pause: string;
+declare let icon_hor_menu: string;
+declare let icon_ver_menu: string;
+declare let icon_closemenu: string;
+declare let icon_closedbranch: string;
+declare let icon_openedbranch: string;
+declare let icon_blackfolder: string;
+declare let icon_whitefolder: string;
+declare let icon_openleft: string;
+declare let icon_closeleft: string;
+declare let icon_moveup: string;
+declare let icon_movedown: string;
+declare let icon_moveleft: string;
+declare let icon_moveright: string;
+declare let icon_warningPlay: string;
+declare let icon_gear: string;
+declare let icon_sound_low: string;
+declare let icon_sound_middle: string;
+declare let icon_sound_loud: string;
+declare let icon_sound_none: string;
+declare let icon_sound_surround: string;
+declare let icon_sound_speaker: string;
+declare let icon_hide: string;
+declare let icon_flash: string;
+declare let icon_close: string;
+declare let icon_refresh: string;
+declare let icon_search: string;
+declare let icon_splitfan: string;
+declare let icon_undo: string;
+declare let icon_redo: string;
+declare let icon_forward: string;
+declare let icon_block: string;
+declare let icon_equalizer: string;
+declare let icon_sliders: string;
+declare let icon_play_circle: string;
+declare let icon_close_circle: string;
+declare let icon_delete: string;
+declare let icon_power: string;
+declare let icon_leftright: string;
+declare let icon_leftrightupdown: string;
+declare let icon_addbars: string;
+declare let icon_deletebars: string;
+declare let icon_shiftbarcontent: string;
+declare let icon_mergebars: string;
+declare let icon_copybarcontent: string;
+declare let icon_home: string;
+declare let icon_time: string;
+declare let icon_hourglass: string;
 declare class Plugin__DialogPrompt2 {
 }
 declare class FilterPluginDialog {
@@ -654,55 +703,6 @@ declare class UnDoReDo {
     uiactions: UIAction[];
     doAction(actionID: string, data: string): boolean;
 }
-declare let icon_play: string;
-declare let icon_pause: string;
-declare let icon_hor_menu: string;
-declare let icon_ver_menu: string;
-declare let icon_closemenu: string;
-declare let icon_closedbranch: string;
-declare let icon_openedbranch: string;
-declare let icon_blackfolder: string;
-declare let icon_whitefolder: string;
-declare let icon_openleft: string;
-declare let icon_closeleft: string;
-declare let icon_moveup: string;
-declare let icon_movedown: string;
-declare let icon_moveleft: string;
-declare let icon_moveright: string;
-declare let icon_warningPlay: string;
-declare let icon_gear: string;
-declare let icon_sound_low: string;
-declare let icon_sound_middle: string;
-declare let icon_sound_loud: string;
-declare let icon_sound_none: string;
-declare let icon_sound_surround: string;
-declare let icon_sound_speaker: string;
-declare let icon_hide: string;
-declare let icon_flash: string;
-declare let icon_close: string;
-declare let icon_refresh: string;
-declare let icon_search: string;
-declare let icon_splitfan: string;
-declare let icon_undo: string;
-declare let icon_redo: string;
-declare let icon_forward: string;
-declare let icon_block: string;
-declare let icon_equalizer: string;
-declare let icon_sliders: string;
-declare let icon_play_circle: string;
-declare let icon_close_circle: string;
-declare let icon_delete: string;
-declare let icon_power: string;
-declare let icon_leftright: string;
-declare let icon_leftrightupdown: string;
-declare let icon_addbars: string;
-declare let icon_deletebars: string;
-declare let icon_shiftbarcontent: string;
-declare let icon_mergebars: string;
-declare let icon_copybarcontent: string;
-declare let icon_home: string;
-declare let icon_time: string;
-declare let icon_hourglass: string;
 declare class DebugLayerUI {
     debugRectangle: TileRectangle;
     debugAnchor: TileAnchor;
@@ -1053,9 +1053,19 @@ type Zvoog_TrackMeasure = {
 type Zvoog_PercussionMeasure = {
     skips: Zvoog_Metre[];
 };
+type Zvoog_ChordStep = {
+    step: number;
+    shift: number;
+};
+type Zvoog_ChordMode = {
+    mode: number[];
+    chord: Zvoog_ChordStep[];
+    tonic: Zvoog_ChordStep;
+};
 type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
+    modality: Zvoog_ChordMode;
 };
 type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
@@ -1112,7 +1122,7 @@ type Zvoog_UICommand = {
     actions: Zvoog_Action[];
 };
 type Zvoog_Project = {
-    versionCode: '1';
+    versionCode: '1' | '1.1';
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];

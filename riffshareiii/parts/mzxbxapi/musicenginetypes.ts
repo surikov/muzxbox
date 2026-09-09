@@ -85,9 +85,19 @@ type Zvoog_TrackMeasure = {
 type Zvoog_PercussionMeasure = {
 	skips: Zvoog_Metre[];
 };
+type Zvoog_ChordStep = {
+	step: number;
+	shift: number;
+};
+type Zvoog_ChordMode = {
+	mode: number[];
+	chord: Zvoog_ChordStep[];
+	tonic: Zvoog_ChordStep;
+};
 type Zvoog_SongMeasure = {
 	tempo: number;
 	metre: Zvoog_Metre;
+	modality: Zvoog_ChordMode;
 };
 /*
 type Zvoog_AutomationTrack = {
@@ -176,7 +186,7 @@ type Zvoog_UICommand = {
 };
 
 type Zvoog_Project = {
-	versionCode: '1'
+	versionCode: '1' | '1.1'
 	title: string;
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
@@ -324,7 +334,7 @@ type MZXBX_Schedule = {
 	filters: MZXBX_Filter[];
 };
 type MZXBX_Player = {
-	replaceCurrentSchedule(schedule: MZXBX_Schedule):void;
+	replaceCurrentSchedule(schedule: MZXBX_Schedule): void;
 	startSetupPlugins: (context: AudioContext, schedule: MZXBX_Schedule) => string | null;
 	//startLoopTicks: (from: number, position: number, to: number) => string;
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void;
@@ -334,7 +344,7 @@ type MZXBX_Player = {
 	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[];
 	position: number;
 	playState(): { connected: boolean, play: boolean, loading: boolean };
-	clearPluginsCache():void;
+	clearPluginsCache(): void;
 };
 /*
 type Zvoog_import = {

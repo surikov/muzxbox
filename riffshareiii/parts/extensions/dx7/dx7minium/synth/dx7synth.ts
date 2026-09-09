@@ -44,12 +44,13 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 		envelope: GainNode;
 		constructor(cntxt: AudioContext) {
 			this.audioContext = cntxt;
-			
+
 			this.operatorOut = this.audioContext.createGain();
 			this.modulationLevel = this.audioContext.createGain();
 			this.feedbackLevel = this.audioContext.createGain();
 			this.envelope = this.audioContext.createGain();
-			this.phaseDelay = this.audioContext.createDelay();
+			//this.phaseDelay = this.audioContext.createDelay();
+			this.phaseDelay = new DelayNode(this.audioContext, { delayTime: 0, maxDelayTime: 1.2 });
 			this.carrier = this.audioContext.createOscillator();
 
 			this.envelope.connect(this.operatorOut);
@@ -60,6 +61,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 
 			this.operatorOut.gain.value = 0;
 			this.phaseDelay.delayTime.value = 0;
+			//this.phaseDelay.delayTime.value = 0;
 			this.envelope.gain.value = 0;
 
 			this.carrier.start(this.audioContext.currentTime);
@@ -81,6 +83,7 @@ function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin {
 			this.carrier.frequency.value = frequency;
 			this.modulationLevel.gain.linearRampToValueAtTime(modulationRatio / frequency, when);
 			this.phaseDelay.delayTime.linearRampToValueAtTime(1.1 * modulationRatio / frequency, when);
+
 			this.feedbackLevel.gain.linearRampToValueAtTime(feedbackRatio / frequency, when);
 			this.operatorOut.gain.value = volume;
 		}

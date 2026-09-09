@@ -195,7 +195,7 @@ class MixerDataMathUtility {
 		}
 		return null;
 	}
-	
+
 	dragCollisionSpeaker(fanx: number, fany: number, outputs: string[]): boolean {
 		if (outputs.indexOf('', 0) > -1) {
 			return false;
@@ -227,7 +227,7 @@ class MixerDataMathUtility {
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
 			let timebar = this.data.timeline[ii];
 			if (!(timebar)) {
-				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+				timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
 			}
 			ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
 			//ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;

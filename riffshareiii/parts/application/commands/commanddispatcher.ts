@@ -466,7 +466,7 @@ class CommandDispatcher {
 		}
 		//let me = this;
 		let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
-		console.log('after setupPlugins', this.lastUsedSchedule);
+		//console.log('after setupPlugins', this.lastUsedSchedule);
 		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;
@@ -1236,6 +1236,7 @@ class CommandDispatcher {
 	adjustAppendBar(project: Zvoog_Project) {
 		project.timeline.push({
 			tempo: project.timeline[project.timeline.length - 1].tempo
+			, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			, metre: {
 				count: project.timeline[project.timeline.length - 1].metre.count
 				, part: project.timeline[project.timeline.length - 1].metre.part

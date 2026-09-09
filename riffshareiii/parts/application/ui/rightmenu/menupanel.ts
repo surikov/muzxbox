@@ -325,7 +325,11 @@ class RightMenuPanel {
 					break;
 				}
 				case kindDraggableSquare: {
-					this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x: number, y: number) => {
+					this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					 }, (x: number, y: number) => {
 						if (it.onMenuItemDrag) {
 							it.onMenuItemDrag(x, y);
 						}
@@ -336,7 +340,11 @@ class RightMenuPanel {
 					break;
 				}
 				case kindDraggableTriangle: {
-					this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x: number, y: number) => {
+					this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					 }, (x: number, y: number) => {
 						if (it.onMenuItemDrag) {
 							it.onMenuItemDrag(x, y);
 						}

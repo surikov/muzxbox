@@ -1,4 +1,4 @@
-console.log('Alpha Tab Import *.mid v1.0.1');
+console.log('Alpha Tab Import *.mid v1.0.2');
 let parsedProject: Zvoog_Project | null = null;
 class AlphaTabImportMusicPlugin {
 	callbackID = '';

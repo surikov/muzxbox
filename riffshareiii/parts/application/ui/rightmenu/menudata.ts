@@ -74,9 +74,15 @@ let menuPointSamplers: MenuInfo = {
 	}
 };*/
 let copyToClipboard: MenuInfo = {
-	text: localMenuCopySelection, onClick: () => {
+	text: localMenuCopySelection
+	, onClick: () => {
 		globalCommandDispatcher.copySelectionToClipboard()
-	}, itemKind: kindAction
+	}
+	, itemStates: [icon_sound_loud]
+	, onSubClick: () => {
+		console.log('whole clipboard');
+	}
+	, itemKind: kindAction2
 };
 let refreshMixerItemFocus: WaitDoIfNoOthers = new WaitDoIfNoOthers();
 let menuPointClipboard: MenuInfo = {
@@ -298,7 +304,7 @@ function fillClipboardList() {
 		for (let ii = 0; ii < globalCommandDispatcher.clipboardData.timeline.length; ii++) {
 			let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
 			if (!(timebar)) {
-				timebar = { tempo: 120, metre: { count: 4, part: 4 } }
+				timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
 			}
 			pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 		}
@@ -336,6 +342,8 @@ function fillClipboardList() {
 							}
 							//console.log('dnd percussion', barIdx, yy);
 							let nearIdx = globalCommandDispatcher.cfg().data.farorder[0];
+							nearIdx = nearIdx ? nearIdx : 0;
+							//console.log('nearIdx', nearIdx,'farorder',globalCommandDispatcher.cfg().data.farorder,'tracks',globalCommandDispatcher.cfg().data.tracks);
 							let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
 								if (globalCommandDispatcher.clipboardData) {
@@ -363,6 +371,11 @@ function fillClipboardList() {
 						, (zz: number) => { }
 					);
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+					info.itemStates = [icon_sound_low];
+					info.onSubClick = () => {
+						console.log('track', ii);
+					};
+
 					menuPointClipboard.children.push(info);
 				}
 			}
@@ -401,27 +414,34 @@ function fillClipboardList() {
 						if (startY > globalCommandDispatcher.cfg().data.percussions.length - 1) {
 							startY = globalCommandDispatcher.cfg().data.percussions.length - 1;
 						}
-						let to = globalCommandDispatcher.cfg().data.percussions[startY].measures;
-						globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
-							if (globalCommandDispatcher.clipboardData) {
+						//console.log(startY);
+						if (startY >= 0 && startY < globalCommandDispatcher.cfg().data.percussions.length) {
+							let to = globalCommandDispatcher.cfg().data.percussions[startY].measures;
+							globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
+								if (globalCommandDispatcher.clipboardData) {
 
-								for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-									let from = percussion.measures[pp];
-									for (let tt = 0; tt < from.skips.length; tt++) {
-										if (from.skips[tt]) {
-											let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
-											to[barIdx].skips.push(fromIt);
+									for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+										let from = percussion.measures[pp];
+										for (let tt = 0; tt < from.skips.length; tt++) {
+											if (from.skips[tt]) {
+												let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
+												to[barIdx].skips.push(fromIt);
+											}
 										}
 									}
 								}
-							}
-							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-						});
+								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+							});
+						}
 					}, (xx: number, yy: number, zz: number) => {
 						tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
 						tri.w = pasteWidth / zz;
 					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+					info.itemStates = [icon_sound_low];
+					info.onSubClick = () => {
+						console.log('drum', ii);
+					};
 					menuPointClipboard.children.push(info);
 					/*menuPointClipboard.children.push({
 						text: percussion.title

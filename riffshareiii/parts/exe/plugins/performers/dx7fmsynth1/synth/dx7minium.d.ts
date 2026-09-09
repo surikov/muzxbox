@@ -351,48 +351,4 @@ type FMParameter = {
     volume: number;
     preset: SynthPreset;
 };
-declare class DX7Loader {
-    scale99(nn: number): number;
-    durationDown(nn: number): number;
-    durationUp(nn: number): number;
-    levelRatio(nn: number): number;
-    slopeDuration(r99: number, from99: number, to99: number): {
-        from: number;
-        to: number;
-        duration: number;
-    };
-    convertDX7data(dx7preset: DX7PresetData): SynthPreset;
-    loadSyxFile(from: File, onDone: (dx7presets: DX7PresetData[]) => void): void;
-    loadTxtFile(from: File, onDone: (dx7preset: DX7PresetData) => void): void;
-    loadJSONFile(from: File, onDone: (preset: SynthPreset) => void): void;
-    parseSyxFile(from: File, onDone: (presets: SynthPreset[]) => void): void;
-    pow2x(x01: number, minx: number, maxx: number, yratio: number): number;
-    parseSysexData(bankData: string, patchId: number, filename: string): DX7PresetData;
-}
-declare let libForDX7list: DX7PresetData[];
-declare let allFMPresets: SynthPreset[];
-declare let loader: DX7Loader;
-declare class DX7UI {
-    id: string;
-    volumeValue: number;
-    volumeLabel: any;
-    transposeLabel: any;
-    preset: SynthPreset | null;
-    titleText: any;
-    fileInput: any;
-    constructor();
-    importSys(file: File): void;
-    importTxt(file: File): void;
-    importJson(file: File): void;
-    parseHostData(data: any): FMParameter | null;
-    receiveHostMessage(messageEvent: MessageEvent): void;
-    renderLibList(): void;
-    importFile(): void;
-    minusVolume(): void;
-    plusVolume(): void;
-    minusOctave(): void;
-    plusOctave(): void;
-    resetTransposeLabel(): void;
-    resetVolumeLabel(): void;
-    sendPresetToHost(par: FMParameter): void;
-}
+declare function newDX7FMSynth1(): MZXBX_AudioPerformerPlugin;

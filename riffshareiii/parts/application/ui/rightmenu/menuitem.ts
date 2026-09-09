@@ -124,19 +124,34 @@ class RightMenuItem {
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 		if (this.info.itemKind == kindAction2) {
-			let stateIicon = '?';
+			/*let stateIicon = '?';
 			let sel = this.info.selectedState ? this.info.selectedState : 0;
 			if (this.info.itemStates) {
 				if (this.info.itemStates.length > sel) {
 					stateIicon = this.info.itemStates[sel];
 				}
-			}
+			}*/
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			if (this.info.highlight) {
 				anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: this.info.highlight, css: 'rightMenuIconLabel' });
 				anchor.content.push({ x: 1 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 			} else {
 				anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
+			}
+			//anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
+			//anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
+			//spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
+		}
+		if (this.info.itemKind == kindAction2
+			|| this.info.itemKind == kindDraggableSquare
+			|| this.info.itemKind == kindDraggableTriangle
+		) {
+			let stateIicon = '?';
+			let sel = this.info.selectedState ? this.info.selectedState : 0;
+			if (this.info.itemStates) {
+				if (this.info.itemStates.length > sel) {
+					stateIicon = this.info.itemStates[sel];
+				}
 			}
 			anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
 			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });

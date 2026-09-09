@@ -389,6 +389,55 @@ function startLoadCSSfile(cssurl) {
     link.media = 'all';
     head.appendChild(link);
 }
+let icon_play = '&#xf3aa;';
+let icon_pause = '&#xf3a7;';
+let icon_hor_menu = '&#xf19c;';
+let icon_ver_menu = '&#xf247;';
+let icon_closemenu = '&#xf1ea;';
+let icon_closedbranch = '&#xf2f6;';
+let icon_openedbranch = '&#xf2f2;';
+let icon_blackfolder = '&#xf228;';
+let icon_whitefolder = '&#xf224;';
+let icon_openleft = '&#xf244;';
+let icon_closeleft = '&#xf243;';
+let icon_moveup = '&#xf2fc;';
+let icon_movedown = '&#xf2f9;';
+let icon_moveleft = '&#xf2fa;';
+let icon_moveright = '&#xf2fb;';
+let icon_warningPlay = '&#xf2f5;';
+let icon_gear = '&#xf1c6;';
+let icon_sound_low = '&#xf3ba;';
+let icon_sound_middle = '&#xf3b9;';
+let icon_sound_loud = '&#xf3bc;';
+let icon_sound_none = '&#xf3bb;';
+let icon_sound_surround = '&#xf3b7;';
+let icon_sound_speaker = '&#xf2d5;';
+let icon_hide = '&#xf15b;';
+let icon_flash = '&#xf166;';
+let icon_close = '&#xf136;';
+let icon_refresh = '&#xf1b9;';
+let icon_search = '&#xf1c3;';
+let icon_splitfan = '&#xf302;';
+let icon_undo = '&#xf258;';
+let icon_redo = '&#xf253;';
+let icon_forward = '&#xf2fd;';
+let icon_block = '&#xf119;';
+let icon_equalizer = '&#xf39e;';
+let icon_sliders = '&#xf3b8;';
+let icon_play_circle = '&#xf3a8;';
+let icon_close_circle = '&#xf134;';
+let icon_delete = '&#xf154;';
+let icon_power = '&#xf1af;';
+let icon_leftright = '&#xf30d';
+let icon_leftrightupdown = '&#xf2f0';
+let icon_addbars = '&#xf277';
+let icon_deletebars = '&#xf314';
+let icon_shiftbarcontent = '&#xf302';
+let icon_mergebars = '&#xf232';
+let icon_copybarcontent = '&#xf237';
+let icon_home = '&#xf175';
+let icon_time = '&#xf337';
+let icon_hourglass = '&#xf179';
 class Plugin__DialogPrompt2 {
 }
 class FilterPluginDialog {
@@ -1606,7 +1655,6 @@ class CommandDispatcher {
             }
         }
         let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
-        console.log('after setupPlugins', this.lastUsedSchedule);
         if (this.playPosition < from) {
             this.playPosition = from;
         }
@@ -2142,6 +2190,7 @@ class CommandDispatcher {
     adjustAppendBar(project) {
         project.timeline.push({
             tempo: project.timeline[project.timeline.length - 1].tempo,
+            modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] },
             metre: {
                 count: project.timeline[project.timeline.length - 1].metre.count,
                 part: project.timeline[project.timeline.length - 1].metre.part
@@ -3194,7 +3243,11 @@ class RightMenuPanel {
                     break;
                 }
                 case kindDraggableSquare: {
-                    this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => { }, (x, y) => {
+                    this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                    }, (x, y) => {
                         if (it.onMenuItemDrag) {
                             it.onMenuItemDrag(x, y);
                         }
@@ -3205,7 +3258,11 @@ class RightMenuPanel {
                     break;
                 }
                 case kindDraggableTriangle: {
-                    this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => { }, (x, y) => {
+                    this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                    }, (x, y) => {
                         if (it.onMenuItemDrag) {
                             it.onMenuItemDrag(x, y);
                         }
@@ -3436,13 +3493,6 @@ class RightMenuItem {
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
         if (this.info.itemKind == kindAction2) {
-            let stateIicon = '?';
-            let sel = this.info.selectedState ? this.info.selectedState : 0;
-            if (this.info.itemStates) {
-                if (this.info.itemStates.length > sel) {
-                    stateIicon = this.info.itemStates[sel];
-                }
-            }
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             if (this.info.highlight) {
                 anchor.content.push({ x: 0.5 + this.pad, y: itemTop + 0.7, text: this.info.highlight, css: 'rightMenuIconLabel' });
@@ -3450,6 +3500,17 @@ class RightMenuItem {
             }
             else {
                 anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
+            }
+        }
+        if (this.info.itemKind == kindAction2
+            || this.info.itemKind == kindDraggableSquare
+            || this.info.itemKind == kindDraggableTriangle) {
+            let stateIicon = '?';
+            let sel = this.info.selectedState ? this.info.selectedState : 0;
+            if (this.info.itemStates) {
+                if (this.info.itemStates.length > sel) {
+                    stateIicon = this.info.itemStates[sel];
+                }
             }
             anchor.content.push({ x: itemWidth - 1.1, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemActionBG' });
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
@@ -3523,9 +3584,15 @@ let menuPointActions = {
     itemKind: kindClosedFolder
 };
 let copyToClipboard = {
-    text: localMenuCopySelection, onClick: () => {
+    text: localMenuCopySelection,
+    onClick: () => {
         globalCommandDispatcher.copySelectionToClipboard();
-    }, itemKind: kindAction
+    },
+    itemStates: [icon_sound_loud],
+    onSubClick: () => {
+        console.log('whole clipboard');
+    },
+    itemKind: kindAction2
 };
 let refreshMixerItemFocus = new WaitDoIfNoOthers();
 let menuPointClipboard = {
@@ -3675,7 +3742,7 @@ function fillClipboardList() {
         for (let ii = 0; ii < globalCommandDispatcher.clipboardData.timeline.length; ii++) {
             let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
             }
             pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
         }
@@ -3706,6 +3773,7 @@ function fillClipboardList() {
                             }
                         }
                         let nearIdx = globalCommandDispatcher.cfg().data.farorder[0];
+                        nearIdx = nearIdx ? nearIdx : 0;
                         let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
                         globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
                             if (globalCommandDispatcher.clipboardData) {
@@ -3726,6 +3794,10 @@ function fillClipboardList() {
                         tri.w = pasteWidth / zz;
                     }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+                    info.itemStates = [icon_sound_low];
+                    info.onSubClick = () => {
+                        console.log('track', ii);
+                    };
                     menuPointClipboard.children.push(info);
                 }
             }
@@ -3763,26 +3835,32 @@ function fillClipboardList() {
                         if (startY > globalCommandDispatcher.cfg().data.percussions.length - 1) {
                             startY = globalCommandDispatcher.cfg().data.percussions.length - 1;
                         }
-                        let to = globalCommandDispatcher.cfg().data.percussions[startY].measures;
-                        globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
-                            if (globalCommandDispatcher.clipboardData) {
-                                for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-                                    let from = percussion.measures[pp];
-                                    for (let tt = 0; tt < from.skips.length; tt++) {
-                                        if (from.skips[tt]) {
-                                            let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
-                                            to[barIdx].skips.push(fromIt);
+                        if (startY >= 0 && startY < globalCommandDispatcher.cfg().data.percussions.length) {
+                            let to = globalCommandDispatcher.cfg().data.percussions[startY].measures;
+                            globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
+                                if (globalCommandDispatcher.clipboardData) {
+                                    for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+                                        let from = percussion.measures[pp];
+                                        for (let tt = 0; tt < from.skips.length; tt++) {
+                                            if (from.skips[tt]) {
+                                                let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
+                                                to[barIdx].skips.push(fromIt);
+                                            }
                                         }
                                     }
                                 }
-                            }
-                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-                        });
+                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                            });
+                        }
                     }, (xx, yy, zz) => {
                         tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
                         tri.w = pasteWidth / zz;
                     }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+                    info.itemStates = [icon_sound_low];
+                    info.onSubClick = () => {
+                        console.log('drum', ii);
+                    };
                     menuPointClipboard.children.push(info);
                 }
             }
@@ -5364,7 +5442,7 @@ class MixerUI {
             let css = 'mixFiller' + filIdx;
             let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
             }
             let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barLeft = barX;
@@ -5442,7 +5520,7 @@ class MixerZoomLevel {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
             let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
             }
             width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barGridAnchor = {
@@ -6714,55 +6792,6 @@ class UnDoReDo {
         return false;
     }
 }
-let icon_play = '&#xf3aa;';
-let icon_pause = '&#xf3a7;';
-let icon_hor_menu = '&#xf19c;';
-let icon_ver_menu = '&#xf247;';
-let icon_closemenu = '&#xf1ea;';
-let icon_closedbranch = '&#xf2f6;';
-let icon_openedbranch = '&#xf2f2;';
-let icon_blackfolder = '&#xf228;';
-let icon_whitefolder = '&#xf224;';
-let icon_openleft = '&#xf244;';
-let icon_closeleft = '&#xf243;';
-let icon_moveup = '&#xf2fc;';
-let icon_movedown = '&#xf2f9;';
-let icon_moveleft = '&#xf2fa;';
-let icon_moveright = '&#xf2fb;';
-let icon_warningPlay = '&#xf2f5;';
-let icon_gear = '&#xf1c6;';
-let icon_sound_low = '&#xf3ba;';
-let icon_sound_middle = '&#xf3b9;';
-let icon_sound_loud = '&#xf3bc;';
-let icon_sound_none = '&#xf3bb;';
-let icon_sound_surround = '&#xf3b7;';
-let icon_sound_speaker = '&#xf2d5;';
-let icon_hide = '&#xf15b;';
-let icon_flash = '&#xf166;';
-let icon_close = '&#xf136;';
-let icon_refresh = '&#xf1b9;';
-let icon_search = '&#xf1c3;';
-let icon_splitfan = '&#xf302;';
-let icon_undo = '&#xf258;';
-let icon_redo = '&#xf253;';
-let icon_forward = '&#xf2fd;';
-let icon_block = '&#xf119;';
-let icon_equalizer = '&#xf39e;';
-let icon_sliders = '&#xf3b8;';
-let icon_play_circle = '&#xf3a8;';
-let icon_close_circle = '&#xf134;';
-let icon_delete = '&#xf154;';
-let icon_power = '&#xf1af;';
-let icon_leftright = '&#xf30d';
-let icon_leftrightupdown = '&#xf2f0';
-let icon_addbars = '&#xf277';
-let icon_deletebars = '&#xf314';
-let icon_shiftbarcontent = '&#xf302';
-let icon_mergebars = '&#xf232';
-let icon_copybarcontent = '&#xf237';
-let icon_home = '&#xf175';
-let icon_time = '&#xf337';
-let icon_hourglass = '&#xf179';
 class DebugLayerUI {
     allLayers() {
         return [this.debugLayer];
@@ -6973,10 +7002,10 @@ function createNewEmptyProjectData() {
         selectedPart: { startMeasure: -1, endMeasure: -1 },
         position: { x: 0, y: -0, z: 33 },
         timeline: [
-            { tempo: 120, metre: { count: 4, part: 4 } },
-            { tempo: 120, metre: { count: 4, part: 4 } },
-            { tempo: 120, metre: { count: 4, part: 4 } },
-            { tempo: 120, metre: { count: 4, part: 4 } }
+            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
         ],
         tracks: [
             {
@@ -7000,16 +7029,16 @@ let _______mzxbxProjectForTesting2 = {
     selectedPart: { startMeasure: 1, endMeasure: 1 },
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
     timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 120, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } },
-        { tempo: 200, metre: { count: 3, part: 4 } },
-        { tempo: 180, metre: { count: 4, part: 4 } }
+        { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
+        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
     ],
     tracks: [
         {
@@ -7294,7 +7323,7 @@ class MixerDataMathUtility {
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
             let timebar = this.data.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 } };
+                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
             }
             ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
         }

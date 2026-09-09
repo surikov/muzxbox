@@ -174,7 +174,7 @@ class EventsConverter {
 				this.addTrackNote(project.tracks, project.timeline, allTracks, it);
 			}
 		}
-		
+
 
 		this.addMIDIComments(project);
 		this.arrangeIcons(project);
@@ -657,7 +657,7 @@ class EventsConverter {
 			}
 			//console.log(tempo, meter);
 			let barDurationMs = meter.duration(tempo) * 1000;
-			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre() };
+			let nextBar: Zvoog_SongMeasure = { tempo: tempo, metre: meter.metre(), modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
 			project.timeline.push(nextBar);
 			if (barDurationMs < 100) barDurationMs = 100;
 			let nearestDurationMs = this.findNearestPoint(wholeDurationMs + barDurationMs);
@@ -749,8 +749,8 @@ class EventsConverter {
 					drumData = '' + Math.round(volDrum.ratio * 100) + '/' + volDrum.idx;
 				}
 			}
-			//if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
-			if (allPercussions[ii].midiPitch < 27 || allPercussions[ii].midiPitch > 87) {
+			if (allPercussions[ii].midiPitch < 35 || allPercussions[ii].midiPitch > 81) {
+			//if (allPercussions[ii].midiPitch < 27 || allPercussions[ii].midiPitch > 87) {
 				/*
 				General MIDI 2 (Expanded Range)
 				27/Eb1 High Q
@@ -770,7 +770,7 @@ class EventsConverter {
 				*/
 				insOut = [];
 			}
-			//console.log(filterPitch);
+			
 			let pp: Zvoog_PercussionTrack = {
 				title: '' + perTrackTitle//(1 + ii) + '. ' + parsedMIDItrack.trackTitle
 				, measures: []
@@ -781,9 +781,10 @@ class EventsConverter {
 					, outputs: insOut//[compresID]
 					, iconPosition: { x: left, y: top }
 					, state: 0
-					,hint35_81:0
+					, hint35_81: 0
 				}
 			};
+			//console.log(pp.title,':',pp.sampler.data,insOut,allPercussions[ii].midiPitch);
 			for (let mm = 0; mm < project.timeline.length; mm++) {
 				pp.measures.push({ skips: [] });
 			}
@@ -886,7 +887,7 @@ class EventsConverter {
 					, outputs: insOut//[compresID]
 					, iconPosition: { x: ii * wwCell, y: ii * hhCell }
 					, state: 0
-					,hint1_128:0
+					, hint1_128: 0
 				}
 			};
 

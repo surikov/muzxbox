@@ -42,7 +42,7 @@ function newDX7FMSynth1() {
             this.modulationLevel = this.audioContext.createGain();
             this.feedbackLevel = this.audioContext.createGain();
             this.envelope = this.audioContext.createGain();
-            this.phaseDelay = this.audioContext.createDelay();
+            this.phaseDelay = new DelayNode(this.audioContext, { delayTime: 0, maxDelayTime: 1.2 });
             this.carrier = this.audioContext.createOscillator();
             this.envelope.connect(this.operatorOut);
             this.phaseDelay.connect(this.envelope);

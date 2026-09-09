@@ -1686,7 +1686,6 @@ class DX7UI {
         let loader = new DX7Loader();
         loader.loadSyxFile(file, (dx7presets) => {
             for (var ii = 0; ii < dx7presets.length; ii++) {
-                console.log(ii, dx7presets[ii]);
                 allFMPresets.splice(0, 0, loader.convertDX7data(dx7presets[ii]));
             }
             me.renderLibList();
@@ -1695,7 +1694,6 @@ class DX7UI {
     importTxt(file) {
         let loader = new DX7Loader();
         loader.loadTxtFile(file, (dx7preset) => {
-            console.log(dx7preset);
             allFMPresets.splice(0, 0, loader.convertDX7data(dx7preset));
             this.renderLibList();
         });
@@ -1703,7 +1701,6 @@ class DX7UI {
     importJson(file) {
         let loader = new DX7Loader();
         loader.loadJSONFile(file, (preset) => {
-            console.log(preset);
             allFMPresets.splice(0, 0, preset);
             this.renderLibList();
         });
@@ -1725,7 +1722,6 @@ class DX7UI {
         if (this.id) {
             let data = this.parseHostData(message.hostData);
             if (data) {
-                console.log('receiveHostMessage', data);
                 this.volumeValue = data.volume;
                 this.preset = data.preset;
                 this.titleText.innerHTML = this.preset.label;
@@ -1750,7 +1746,6 @@ class DX7UI {
                 let pid = ii;
                 li.onclick = () => {
                     let selectedPreset = allFMPresets[pid];
-                    console.log(pid, selectedPreset);
                     me.preset = selectedPreset;
                     let par = {
                         volume: me.volumeValue, preset: me.preset
@@ -1764,11 +1759,9 @@ class DX7UI {
         }
     }
     importFile() {
-        console.log('importFile');
         this.fileInput.click();
     }
     minusVolume() {
-        console.log('minusVolume', this.volumeValue);
         if (this.volumeValue < 10) {
             this.volumeValue = 10;
         }
@@ -1782,7 +1775,6 @@ class DX7UI {
         }
     }
     plusVolume() {
-        console.log('plusVolume', this.volumeValue);
         if (this.volumeValue > 140) {
             this.volumeValue = 140;
         }
@@ -1796,7 +1788,6 @@ class DX7UI {
         }
     }
     minusOctave() {
-        console.log('minusOctave');
         if (this.preset) {
             if (this.preset.transpose > -1) {
                 this.preset.transpose = this.preset.transpose - 1;
@@ -1809,7 +1800,6 @@ class DX7UI {
         }
     }
     plusOctave() {
-        console.log('plusOctave');
         if (this.preset) {
             if (this.preset.transpose < 1) {
                 this.preset.transpose = this.preset.transpose + 1;
@@ -1840,7 +1830,6 @@ class DX7UI {
         this.volumeLabel.innerText = '' + this.volumeValue;
     }
     sendPresetToHost(par) {
-        console.log('sendPresetToHost', par);
         var message = { dialogID: this.id, pluginData: par, done: false, screenWait: false };
         window.parent.postMessage(message, '*');
     }
