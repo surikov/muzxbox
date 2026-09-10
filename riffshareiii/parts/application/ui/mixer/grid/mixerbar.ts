@@ -234,8 +234,9 @@ class MixerBar {
 		let trMeasure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[barIdx];
 		let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
 		let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-		let cueditmark = globalCommandDispatcher.cfg().editmark;
+		let cueditmark = globalCommandDispatcher.cfg().editGridMark;
 		if (cueditmark) {
+			//console.log('trackCellClick finish');
 			let from = MMUtil().set(cueditmark.skip);
 			let toStart = MMUtil().set(info.start);
 			let toEnd = MMUtil().set(info.end);
@@ -284,12 +285,13 @@ class MixerBar {
 				chord.pitches.push(chordPitch + 11);
 				chord.slides = [{ duration: duration, delta: shift }];
 			});
-			globalCommandDispatcher.cfg().editmark = null;
+			globalCommandDispatcher.cfg().editGridMark = null;
 			//console.log('trackCellClick barIdx',barIdx);
-			globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+			//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 		} else {
 			let cuslidemark = globalCommandDispatcher.cfg().slidemark;
 			if (cuslidemark) {
+				//console.log('trackCellClick slie');
 				let from = MMUtil().set(cuslidemark.chord.skip);
 				let toStart = MMUtil().set(info.start);
 				let toEnd = MMUtil().set(info.end);
@@ -318,7 +320,7 @@ class MixerBar {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
 						if (cuslidemark) {
 							cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
-							console.log(cuslidemark, pitch);
+							//console.log(cuslidemark, pitch);
 						}
 					});
 					globalCommandDispatcher.cfg().slidemark = null;
@@ -342,12 +344,18 @@ class MixerBar {
 					}
 				});
 				if (!drop) {
-					globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
+					//console.log('trackCellClick new');
+					globalCommandDispatcher.cfg().editGridMark = { barIdx: barIdx, skip: muStart.metre(), pitch };
 				} else {
-					globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+					//console.log('trackCellClick drop');
+					//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 				}
+				//globalCommandDispatcher.renderer.mixer.resetEditMark();
 			}
 		}
-		globalCommandDispatcher.resetProject();
+		//globalCommandDispatcher.resetProject();
+		globalCommandDispatcher.renderer.mixer.resetEditMark();
+		globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 	}
+
 }

@@ -38,7 +38,7 @@ class UIToolbar {
 			if (globalCommandDispatcher.player.playState().play) {
 				globalCommandDispatcher.stopPlay();
 			} else {
-				globalCommandDispatcher.setupAndStartPlay();
+				globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.cfg().data);
 			}
 		});
 

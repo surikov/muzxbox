@@ -817,7 +817,7 @@ class ActionPluginDialog {
                     console.log('waitProjectCallback', message);
                     if (message.pluginData) {
                         let project = message.pluginData;
-                        globalCommandDispatcher.adjustTimelineContent(project);
+                        globalCommandDispatcher.fullProjectCheckUp(project);
                         globalCommandDispatcher.exe.commitProjectChanges([], () => {
                             globalCommandDispatcher.registerWorkProject(project);
                             globalCommandDispatcher.resetProject();
@@ -1323,9 +1323,12 @@ class CommandDispatcher {
         this.lastUsedSchedule = null;
         this.playPosition = 0;
         this.restartOnInitError = false;
+        this.lockPlayCallback = false;
         this.playCallback = (start, pos, end) => {
             this.playPosition = pos - 0.25;
-            this.reDrawPlayPosition();
+            if (!globalCommandDispatcher.lockPlayCallback) {
+                this.reDrawPlayPosition();
+            }
         };
         this.listener = null;
         this.exe = new CommandExe();
@@ -1398,7 +1401,32 @@ class CommandDispatcher {
             let txt = JSON.stringify(this.cfg().data);
             this.clipboardData = JSON.parse(txt);
             if (this.clipboardData) {
-                this.adjustContentByMeter(this.clipboardData);
+                let soloExists = false;
+                for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
+                    if (this.clipboardData.tracks[ii].performer.state == 2) {
+                        soloExists = true;
+                        break;
+                    }
+                }
+                if (!soloExists) {
+                    for (let ii = 0; ii < this.clipboardData.percussions.length; ii++) {
+                        if (this.clipboardData.percussions[ii].sampler.state == 2) {
+                            soloExists = true;
+                            break;
+                        }
+                    }
+                }
+                if (soloExists) {
+                    this.clipboardData.tracks = this.clipboardData.tracks.filter((it) => it.performer.state == 2);
+                    this.clipboardData.percussions = this.clipboardData.percussions.filter((it) => it.sampler.state == 2);
+                }
+                else {
+                    this.clipboardData.tracks = this.clipboardData.tracks.filter((it) => it.performer.state == 0);
+                    this.clipboardData.percussions = this.clipboardData.percussions.filter((it) => it.sampler.state == 0);
+                }
+                this.clipboardData.filters = this.clipboardData.filters.filter((it) => it.state == 0);
+                this.clipboardData.farorder = [];
+                this.fullProjectCheckUp(this.clipboardData);
                 this.clipboardData.timeline.splice(0, st);
                 this.clipboardData.timeline.splice(en - st + 1);
                 for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
@@ -1416,6 +1444,7 @@ class CommandDispatcher {
                 this.clipboardData.comments.splice(0, st);
                 this.clipboardData.comments.splice(en - st + 1);
             }
+            console.log('copySelectionToClipboard', this.clipboardData);
         }
         globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
         globalCommandDispatcher.resetProject();
@@ -1424,7 +1453,7 @@ class CommandDispatcher {
         var AudioContext = window.AudioContext;
         this.audioContext = new AudioContext();
         this.player = createSchedulePlayer(this.playCallback);
-        globalCommandDispatcher.setupAndStartPlay();
+        globalCommandDispatcher.setupAndStartPlay(this.cfg().data);
     }
     registerWorkProject(data) {
         this._mixerDataMathUtility = new MixerDataMathUtility(data);
@@ -1480,17 +1509,16 @@ class CommandDispatcher {
     }
     updateSingleBarPlayerSchedule(barNo) {
         if (this.player.playState().play) {
-            this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+            this.lastUsedSchedule = this.renderZvoogProjectForOutput(this.cfg().data);
             this.player.replaceCurrentSchedule(this.lastUsedSchedule);
         }
     }
-    renderCurrentProjectForOutput() {
+    renderZvoogProjectForOutput(prj) {
         let forOutput = {
             series: [],
             channels: [],
             filters: []
         };
-        let prj = this.cfg().data;
         let soloOnly = false;
         for (let ss = 0; ss < prj.percussions.length; ss++) {
             if (prj.percussions[ss].sampler.state == 2) {
@@ -1622,19 +1650,20 @@ class CommandDispatcher {
         if (globalCommandDispatcher.player.playState().play) {
             globalCommandDispatcher.stopPlay();
             setTimeout(() => {
-                globalCommandDispatcher.setupAndStartPlay();
+                globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.cfg().data);
             }, 123);
         }
     }
     stopPlay() {
+        this.lockPlayCallback = false;
         this.player.cancel();
         this.renderer.menu.rerenderMenuContent(null);
         this.setHiddenTimeMark();
         this.resetProject();
         globalCommandDispatcher.resetPlayButtonState();
     }
-    setupAndStartPlay() {
-        this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+    setupAndStartPlay(prj) {
+        this.lastUsedSchedule = this.renderZvoogProjectForOutput(prj);
         let from = 0;
         let to = 0;
         if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
@@ -1785,7 +1814,7 @@ class CommandDispatcher {
     newEmptyProject() {
         globalCommandDispatcher.exe.commitProjectChanges([], () => {
             this.registerWorkProject(createNewEmptyProjectData());
-            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+            globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
         });
         this.resetProject();
     }
@@ -1840,7 +1869,7 @@ class CommandDispatcher {
         this.renderer.timeselectbar.updateTimeSelectionBar();
         this.renderer.tiler.resetAnchor(this.renderer.timeselectbar.selectedTimeSVGGroup, this.renderer.timeselectbar.selectionAnchor, LevelModes.top);
         this.reDrawPlayPosition();
-        this.setupAndStartPlay();
+        this.setupAndStartPlay(globalCommandDispatcher.cfg().data);
     }
     setupSelectionBackground22(selectedPart) {
     }
@@ -2039,11 +2068,11 @@ class CommandDispatcher {
                 let newTempo = parseInt(txt);
                 if (newTempo > 20 && newTempo < 400) {
                     globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                        globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                         for (let ii = 0; ii < count; ii++) {
                             globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].tempo = newTempo;
                         }
-                        globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                        globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                     });
                     globalCommandDispatcher.resetProject();
                 }
@@ -2310,7 +2339,7 @@ class CommandDispatcher {
                 let trackBar = currentProject.tracks[nn].measures[ii];
                 for (let kk = 0; kk < trackBar.chords.length; kk++) {
                     let chord = trackBar.chords[kk];
-                    if (barMetre.less(chord.skip)) {
+                    if (!barMetre.more(chord.skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
                             trackBar.chords.splice(kk, 1);
@@ -2329,7 +2358,7 @@ class CommandDispatcher {
                 let percuBar = currentProject.percussions[nn].measures[ii];
                 for (let kk = 0; kk < percuBar.skips.length; kk++) {
                     let skip = percuBar.skips[kk];
-                    if (barMetre.less(skip)) {
+                    if (!barMetre.more(skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
                             percuBar.skips.splice(kk, 1);
@@ -2348,7 +2377,7 @@ class CommandDispatcher {
                 let autoBar = currentProject.filters[nn].automation[ii];
                 for (let kk = 0; kk < autoBar.changes.length; kk++) {
                     let change = autoBar.changes[kk];
-                    if (barMetre.less(change.skip)) {
+                    if (!barMetre.more(change.skip)) {
                         if (ii + 1 < currentProject.timeline.length) {
                             change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
                             autoBar.changes.splice(kk, 1);
@@ -2366,7 +2395,7 @@ class CommandDispatcher {
             let textBar = currentProject.comments[ii];
             for (let kk = 0; kk < textBar.points.length; kk++) {
                 let point = textBar.points[kk];
-                if (barMetre.less(point.skip)) {
+                if (!barMetre.more(point.skip)) {
                     if (ii + 1 < currentProject.timeline.length) {
                         point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
                         textBar.points.splice(kk, 1);
@@ -2381,7 +2410,7 @@ class CommandDispatcher {
             }
         }
     }
-    adjustTimelineContent(project) {
+    fullProjectCheckUp(project) {
         this.adjustTimeLineLength(project);
         this.adjustContentByMeter(project);
         this.adjustTracksChords(project);
@@ -2947,7 +2976,7 @@ class UIToolbar {
                 globalCommandDispatcher.stopPlay();
             }
             else {
-                globalCommandDispatcher.setupAndStartPlay();
+                globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.cfg().data);
             }
         });
         this.backHomeButton = new ToolBarButton([icon_home], 0, -1.5, (nn) => {
@@ -3590,7 +3619,15 @@ let copyToClipboard = {
     },
     itemStates: [icon_sound_loud],
     onSubClick: () => {
-        console.log('whole clipboard');
+        if (globalCommandDispatcher.clipboardData) {
+            globalCommandDispatcher.stopPlay();
+            setTimeout(() => {
+                if (globalCommandDispatcher.clipboardData) {
+                    globalCommandDispatcher.lockPlayCallback = true;
+                    globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.clipboardData);
+                }
+            }, 123);
+        }
     },
     itemKind: kindAction2
 };
@@ -3777,17 +3814,20 @@ function fillClipboardList() {
                         let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
                         globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
                             if (globalCommandDispatcher.clipboardData) {
+                                console.log(track.measures);
                                 for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
                                     let from = track.measures[pp];
                                     for (let tt = 0; tt < from.chords.length; tt++) {
-                                        if (from.chords[tt]) {
-                                            let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
-                                            to[barIdx].chords.push(fromChord);
+                                        if (barIdx + pp < to.length) {
+                                            if (from.chords[tt]) {
+                                                let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
+                                                to[barIdx + pp].chords.push(fromChord);
+                                            }
                                         }
                                     }
                                 }
                             }
-                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                            globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                         });
                     }, (xx, yy, zz) => {
                         tri.h = 12 * globalCommandDispatcher.cfg().notePathHeight * globalCommandDispatcher.cfg().octaveDrawCount / zz;
@@ -3796,7 +3836,18 @@ function fillClipboardList() {
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     info.itemStates = [icon_sound_low];
                     info.onSubClick = () => {
-                        console.log('track', ii);
+                        if (globalCommandDispatcher.clipboardData) {
+                            let cliproject = JSON.parse(JSON.stringify(globalCommandDispatcher.clipboardData));
+                            cliproject.percussions = [];
+                            cliproject.tracks = [cliproject.tracks[ii]];
+                            globalCommandDispatcher.stopPlay();
+                            setTimeout(() => {
+                                if (cliproject) {
+                                    globalCommandDispatcher.lockPlayCallback = true;
+                                    globalCommandDispatcher.setupAndStartPlay(cliproject);
+                                }
+                            }, 123);
+                        }
                     };
                     menuPointClipboard.children.push(info);
                 }
@@ -3844,12 +3895,12 @@ function fillClipboardList() {
                                         for (let tt = 0; tt < from.skips.length; tt++) {
                                             if (from.skips[tt]) {
                                                 let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
-                                                to[barIdx].skips.push(fromIt);
+                                                to[barIdx + pp].skips.push(fromIt);
                                             }
                                         }
                                     }
                                 }
-                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }
                     }, (xx, yy, zz) => {
@@ -3859,7 +3910,18 @@ function fillClipboardList() {
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
                     info.itemStates = [icon_sound_low];
                     info.onSubClick = () => {
-                        console.log('drum', ii);
+                        if (globalCommandDispatcher.clipboardData) {
+                            let cliproject = JSON.parse(JSON.stringify(globalCommandDispatcher.clipboardData));
+                            cliproject.tracks = [];
+                            cliproject.percussions = [cliproject.percussions[ii]];
+                            globalCommandDispatcher.stopPlay();
+                            setTimeout(() => {
+                                if (cliproject) {
+                                    globalCommandDispatcher.lockPlayCallback = true;
+                                    globalCommandDispatcher.setupAndStartPlay(cliproject);
+                                }
+                            }, 123);
+                        }
                     };
                     menuPointClipboard.children.push(info);
                 }
@@ -3912,12 +3974,12 @@ function fillClipboardList() {
                                         for (let tt = 0; tt < from.changes.length; tt++) {
                                             if (from.changes[tt]) {
                                                 let fromIt = JSON.parse(JSON.stringify(from.changes[tt]));
-                                                to[barIdx].changes.push(fromIt);
+                                                to[barIdx + pp].changes.push(fromIt);
                                             }
                                         }
                                     }
                                 }
-                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }
                     }, (xx, yy, zz) => {
@@ -3977,7 +4039,7 @@ function fillPluginsLists() {
                                 measures: [],
                                 title: MZXBX_currentPlugins()[ii].label
                             });
-                            globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                            globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                         }
                         refreshMixerItemFocus.currentID = -1;
                         globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
@@ -4073,7 +4135,7 @@ function fillPluginsLists() {
                                     measures: [],
                                     title: MZXBX_currentPlugins()[ii].label
                                 });
-                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }
                         refreshMixerItemFocus.currentID = -1;
@@ -4131,7 +4193,7 @@ function fillPluginsLists() {
                                     state: 0,
                                     title: MZXBX_currentPlugins()[ii].label
                                 });
-                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }, null, (zz) => { });
                         info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -4343,7 +4405,7 @@ class LeftPanel {
                         else {
                             globalCommandDispatcher.exe.commitProjectChanges([], () => {
                                 globalCommandDispatcher.cfg().data.title = newTitle;
-                                globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                             globalCommandDispatcher.resetProject();
                         }
@@ -4908,7 +4970,7 @@ class MixerBar {
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[barIdx];
         let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-        let cueditmark = globalCommandDispatcher.cfg().editmark;
+        let cueditmark = globalCommandDispatcher.cfg().editGridMark;
         if (cueditmark) {
             let from = MMUtil().set(cueditmark.skip);
             let toStart = MMUtil().set(info.start);
@@ -4958,8 +5020,7 @@ class MixerBar {
                 chord.pitches.push(chordPitch + 11);
                 chord.slides = [{ duration: duration, delta: shift }];
             });
-            globalCommandDispatcher.cfg().editmark = null;
-            globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+            globalCommandDispatcher.cfg().editGridMark = null;
         }
         else {
             let cuslidemark = globalCommandDispatcher.cfg().slidemark;
@@ -4992,7 +5053,6 @@ class MixerBar {
                     globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
                         if (cuslidemark) {
                             cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
-                            console.log(cuslidemark, pitch);
                         }
                     });
                     globalCommandDispatcher.cfg().slidemark = null;
@@ -5017,14 +5077,14 @@ class MixerBar {
                     }
                 });
                 if (!drop) {
-                    globalCommandDispatcher.cfg().editmark = { barIdx: barIdx, skip: muStart.metre(), pitch };
+                    globalCommandDispatcher.cfg().editGridMark = { barIdx: barIdx, skip: muStart.metre(), pitch };
                 }
                 else {
-                    globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
                 }
             }
         }
-        globalCommandDispatcher.resetProject();
+        globalCommandDispatcher.renderer.mixer.resetEditMark();
+        globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
     }
 }
 class TextCommentsBar {
@@ -5299,7 +5359,7 @@ class MixerUI {
         }
     }
     resetEditMark() {
-        let mark = globalCommandDispatcher.cfg().editmark;
+        let mark = globalCommandDispatcher.cfg().editGridMark;
         if (mark) {
             let mm = MMUtil();
             let barX = 0;
@@ -7211,7 +7271,7 @@ class MixerDataMathUtility {
         this.padGridFan = 15;
         this.zoomEditSLess = 3;
         this.zoomAuxLess = 1;
-        this.editmark = null;
+        this.editGridMark = null;
         this.slidemark = null;
         this.data = data;
         this.recalculateCommentMax();

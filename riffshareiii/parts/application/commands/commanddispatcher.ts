@@ -11,12 +11,14 @@ class CommandDispatcher {
 	//neeToStart = false;
 	playPosition = 0;
 	restartOnInitError = false;
+	lockPlayCallback = false;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos - 0.25;
-		//this.renderer.timeselectbar.positionTimeMark.x 
-		this.reDrawPlayPosition();
-
-		//console.log('play state', start, position, end);
+		
+		if (!globalCommandDispatcher.lockPlayCallback) {
+			
+			this.reDrawPlayPosition();
+		}
 	};
 
 	_mixerDataMathUtility: MixerDataMathUtility;
@@ -124,6 +126,15 @@ class CommandDispatcher {
 		}
 		this.resetProject();
 	}*/
+	/*playWholeClipboard() {
+		globalCommandDispatcher.stopPlay();
+		setTimeout(() => {
+			if (globalCommandDispatcher.clipboardData) {
+				globalCommandDispatcher.lockPlayCallback = true;
+				globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.clipboardData);
+			}
+		}, 123);
+	}*/
 	copySelectionToClipboard() {
 		//console.log('copySelectionToClipboard');
 		this.clipboardData = null;
@@ -133,7 +144,32 @@ class CommandDispatcher {
 			let txt = JSON.stringify(this.cfg().data);
 			this.clipboardData = JSON.parse(txt);
 			if (this.clipboardData) {
-				this.adjustContentByMeter(this.clipboardData);
+				let soloExists = false;
+				for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
+					if (this.clipboardData.tracks[ii].performer.state == 2) {
+						soloExists = true;
+						break;
+					}
+				}
+				if (!soloExists) {
+					for (let ii = 0; ii < this.clipboardData.percussions.length; ii++) {
+						if (this.clipboardData.percussions[ii].sampler.state == 2) {
+							soloExists = true;
+							break;
+						}
+					}
+				}
+				if (soloExists) {
+					this.clipboardData.tracks = this.clipboardData.tracks.filter((it) => it.performer.state == 2);
+					this.clipboardData.percussions = this.clipboardData.percussions.filter((it) => it.sampler.state == 2);
+				} else {
+					this.clipboardData.tracks = this.clipboardData.tracks.filter((it) => it.performer.state == 0);
+					this.clipboardData.percussions = this.clipboardData.percussions.filter((it) => it.sampler.state == 0);
+				}
+				this.clipboardData.filters = this.clipboardData.filters.filter((it) => it.state == 0);
+				this.clipboardData.farorder = [];
+
+				this.fullProjectCheckUp(this.clipboardData);
 				this.clipboardData.timeline.splice(0, st);
 				this.clipboardData.timeline.splice(en - st + 1);
 				for (let ii = 0; ii < this.clipboardData.tracks.length; ii++) {
@@ -151,6 +187,7 @@ class CommandDispatcher {
 				this.clipboardData.comments.splice(0, st);
 				this.clipboardData.comments.splice(en - st + 1);
 			}
+			console.log('copySelectionToClipboard', this.clipboardData);
 		}
 		//console.log(this.clipboard);
 		globalCommandDispatcher.renderer.menu.rerenderMenuContent(null);
@@ -161,7 +198,7 @@ class CommandDispatcher {
 		var AudioContext = window.AudioContext;// || window.webkitAudioContext;
 		this.audioContext = new AudioContext();
 		this.player = createSchedulePlayer(this.playCallback);
-		globalCommandDispatcher.setupAndStartPlay();
+		globalCommandDispatcher.setupAndStartPlay(this.cfg().data);
 	}
 	registerWorkProject(data: Zvoog_Project) {
 		//console.log('registerWorkProject', data)
@@ -221,18 +258,18 @@ class CommandDispatcher {
 	updateSingleBarPlayerSchedule(barNo: number) {
 		if (this.player.playState().play) {
 			//console.log('updateSingleBarPlayerSchedule', barNo);
-			this.lastUsedSchedule = this.renderCurrentProjectForOutput();
+			this.lastUsedSchedule = this.renderZvoogProjectForOutput(this.cfg().data);
 			this.player.replaceCurrentSchedule(this.lastUsedSchedule);
 		}
 	}
-	renderCurrentProjectForOutput(): MZXBX_Schedule {
-		//globalCommandDispatcher.adjustTimeline();
+	//renderCurrentProjectForOutput(): MZXBX_Schedule {
+	renderZvoogProjectForOutput(prj: Zvoog_Project): MZXBX_Schedule {
 		let forOutput: MZXBX_Schedule = {
 			series: []
 			, channels: []
 			, filters: []
 		};
-		let prj: Zvoog_Project = this.cfg().data;
+		//let prj: Zvoog_Project = this.cfg().data;
 
 		let soloOnly = false;
 		for (let ss = 0; ss < prj.percussions.length; ss++) {
@@ -251,9 +288,8 @@ class CommandDispatcher {
 			let sampler = prj.percussions[ss];
 			let mchannel: MZXBX_Channel = {
 				id: sampler.sampler.id
-				, outputs: []//sampler.sampler.outputs
+				, outputs: []
 				, performer: {
-					//id: sampler.sampler.id
 					kind: sampler.sampler.kind
 					, properties: sampler.sampler.data
 					, description: 'sampler ' + sampler.title
@@ -264,9 +300,8 @@ class CommandDispatcher {
 				(soloOnly && sampler.sampler.state != 2)
 				|| ((!soloOnly) && sampler.sampler.state == 1)
 			) {
-				//console.log('skip', sampler.title);
+				//
 			} else {
-				//console.log('add', sampler.title);
 				this.renderCurrentOutputs(sampler.sampler.id, mchannel.outputs, sampler.sampler.outputs);
 			}
 			forOutput.channels.push(mchannel);
@@ -276,9 +311,8 @@ class CommandDispatcher {
 			let track = prj.tracks[tt];
 			let mchannel: MZXBX_Channel = {
 				id: track.performer.id
-				, outputs: []//track.performer.outputs
+				, outputs: []
 				, performer: {
-					//id: track.performer.id
 					kind: track.performer.kind
 					, properties: track.performer.data
 					, description: 'track ' + track.title
@@ -289,14 +323,12 @@ class CommandDispatcher {
 				(soloOnly && track.performer.state != 2)
 				|| ((!soloOnly) && track.performer.state == 1)
 			) {
-				//console.log('skip', track.title);
+				//
 			} else {
-				//console.log('add', track.title);
 				this.renderCurrentOutputs(track.performer.id, mchannel.outputs, track.performer.outputs);
 			}
 			forOutput.channels.push(mchannel);
 		}
-
 		for (let ff = 0; ff < prj.filters.length; ff++) {
 			let filter = prj.filters[ff];
 			let outFilter: MZXBX_Filter = {
@@ -307,15 +339,11 @@ class CommandDispatcher {
 				, description: 'filter ' + filter.title
 			}
 			if (filter.state == 1) {
-				//outFilter.outputs = [];
-				//console.log('skip', filter.title);
 			} else {
-				//console.log('add', filter.title);
 				this.renderCurrentOutputs(filter.id, outFilter.outputs, filter.outputs);
 			}
 			forOutput.filters.push(outFilter);
 		}
-		//let cuStart = 0;
 		for (let mm = 0; mm < prj.timeline.length; mm++) {
 			let measure: Zvoog_SongMeasure = prj.timeline[mm];
 			let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
@@ -358,8 +386,6 @@ class CommandDispatcher {
 				if (trackBar) {
 					for (let ch = 0; ch < trackBar.chords.length; ch++) {
 						let chord = trackBar.chords[ch];
-						//for (let ski = 0; ski < trackBar.skips.length; ski++) {
-						//let askip = trackBar.skips[ski];
 						let start = MMUtil().set(chord.skip).duration(measure.tempo);
 						let it: MZXBX_PlayItem = { skip: start, channel: channel, pitches: chord.pitches, slides: [] };
 						singleSet.items.push(it);
@@ -367,7 +393,6 @@ class CommandDispatcher {
 							let one = chord.slides[kk];
 							it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
 						}
-						//}
 						if (it.pitches.length < 1) {
 							console.log('empty', it);
 						}
@@ -375,7 +400,6 @@ class CommandDispatcher {
 				}
 			}
 		}
-		//console.log('renderCurrentProjectForOutput', forOutput);
 		return forOutput;
 	}
 	/*reConnectPluginsIfPlay22222() {
@@ -390,7 +414,7 @@ class CommandDispatcher {
 		if (globalCommandDispatcher.player.playState().play) {
 			globalCommandDispatcher.stopPlay();
 			setTimeout(() => {
-				globalCommandDispatcher.setupAndStartPlay();
+				globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.cfg().data);
 			}, 123);
 
 		}
@@ -422,6 +446,7 @@ class CommandDispatcher {
 			this.onAir = false;
 			this.player.cancel();
 		}*/
+		this.lockPlayCallback = false;
 
 		this.player.cancel();
 		this.renderer.menu.rerenderMenuContent(null);
@@ -430,29 +455,16 @@ class CommandDispatcher {
 		globalCommandDispatcher.resetPlayButtonState();
 		//console.log('stopPlay done', this.player.playState());
 	}
-	setupAndStartPlay() {
-		//console.log('setupAndStartPlay');
-		//console.log(this.cfg().data.tracks[0].performer.state);
-		/*if (this.cfg().data.tracks[0].performer.state) {
-			this.cfg().data.tracks[0].performer.state = 0;
-		} else {
-			this.cfg().data.tracks[0].performer.state = 2;
-		}*/
-		//console.log(this.cfg().data.tracks[0].performer.state);
-		//this.onAir = true;
-		this.lastUsedSchedule = this.renderCurrentProjectForOutput();
-
-		//consol
+	setupAndStartPlay(prj: Zvoog_Project) {
+		//this.lastUsedSchedule = this.renderZvoogProjectForOutput(this.cfg().data);
+		this.lastUsedSchedule = this.renderZvoogProjectForOutput(prj);
 		let from = 0;
 		let to = 0;
 		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-			//console.log(globalCommandDispatcher.cfg().data.selectedPart.endMeasure);
-			//console.log(this.lastUsedSchedule.series.length);
 			let endbar = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
 			if (endbar > this.lastUsedSchedule.series.length - 1) {
 				endbar = this.lastUsedSchedule.series.length - 1;
 			}
-			//console.log(endbar);
 			for (let nn = 0; nn <= endbar; nn++) {
 				to = to + this.lastUsedSchedule.series[nn].duration;
 				if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
@@ -464,29 +476,19 @@ class CommandDispatcher {
 				to = to + this.lastUsedSchedule.series[nn].duration;
 			}
 		}
-		//let me = this;
 		let result = this.player.startSetupPlugins(this.audioContext, this.lastUsedSchedule);
-		//console.log('after setupPlugins', this.lastUsedSchedule);
-		//me.neeToStart = true;
 		if (this.playPosition < from) {
 			this.playPosition = from;
 		}
 		if (this.playPosition >= to) {
 			this.playPosition = to;
 		}
-
-
 		if (result != null) {
-			//this.onAir = false;
-			//this.neeToStart = false;
-			//this.renderer.warning.setIcon('S');
 			this.renderer.warning.showWarning('Start playing', result, 'Loading...', null);
 		} else {
-			//this.renderer.menu.rerenderMenuContent()
+			//
 		}
-		//
 		this.startPlayLoop(from, this.playPosition, to);
-
 	}
 	updatePluginHint(schedule: MZXBX_Schedule) {
 
@@ -650,7 +652,7 @@ class CommandDispatcher {
 		//this.registerWorkProject(createNewEmptyProjectData());
 		globalCommandDispatcher.exe.commitProjectChanges([], () => {
 			this.registerWorkProject(createNewEmptyProjectData());
-			globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+			globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 		});
 		this.resetProject();
 	}
@@ -813,7 +815,7 @@ class CommandDispatcher {
 			, this.renderer.timeselectbar.selectionAnchor
 			, LevelModes.top);
 		this.reDrawPlayPosition();
-		this.setupAndStartPlay();
+		this.setupAndStartPlay(globalCommandDispatcher.cfg().data);
 	}
 	setupSelectionBackground22(selectedPart: Zvoog_Selection) {
 		/*
@@ -1075,12 +1077,12 @@ class CommandDispatcher {
 				let newTempo = parseInt(txt);
 				if (newTempo > 20 && newTempo < 400) {
 					globalCommandDispatcher.exe.commitProjectChanges([], () => {
-						globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+						globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 						for (let ii = 0; ii < count; ii++) {
 							globalCommandDispatcher.cfg().data.timeline[startMeasure + ii].tempo = newTempo;
 							//console.log(ii, globalCommandDispatcher.cfg().data.timeline[ii]);
 						}
-						globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+						globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 					});
 					globalCommandDispatcher.resetProject();
 					//console.log(globalCommandDispatcher.cfg().data);
@@ -1452,7 +1454,7 @@ class CommandDispatcher {
 				let trackBar = currentProject.tracks[nn].measures[ii];
 				for (let kk = 0; kk < trackBar.chords.length; kk++) {
 					let chord = trackBar.chords[kk];
-					if (barMetre.less(chord.skip)) {
+					if (!barMetre.more(chord.skip)) {
 						if (ii + 1 < currentProject.timeline.length) {
 							chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
 							trackBar.chords.splice(kk, 1);
@@ -1469,7 +1471,7 @@ class CommandDispatcher {
 				let percuBar = currentProject.percussions[nn].measures[ii];
 				for (let kk = 0; kk < percuBar.skips.length; kk++) {
 					let skip = percuBar.skips[kk];
-					if (barMetre.less(skip)) {
+					if (!barMetre.more(skip)) {
 						if (ii + 1 < currentProject.timeline.length) {
 							let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
 							percuBar.skips.splice(kk, 1);
@@ -1486,7 +1488,7 @@ class CommandDispatcher {
 				let autoBar = currentProject.filters[nn].automation[ii];
 				for (let kk = 0; kk < autoBar.changes.length; kk++) {
 					let change = autoBar.changes[kk];
-					if (barMetre.less(change.skip)) {
+					if (!barMetre.more(change.skip)) {
 						if (ii + 1 < currentProject.timeline.length) {
 							change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
 							autoBar.changes.splice(kk, 1);
@@ -1502,7 +1504,7 @@ class CommandDispatcher {
 			let textBar = currentProject.comments[ii];
 			for (let kk = 0; kk < textBar.points.length; kk++) {
 				let point = textBar.points[kk];
-				if (barMetre.less(point.skip)) {
+				if (!barMetre.more(point.skip)) {
 					if (ii + 1 < currentProject.timeline.length) {
 						point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
 						textBar.points.splice(kk, 1);
@@ -1516,7 +1518,8 @@ class CommandDispatcher {
 			}
 		}
 	}
-	adjustTimelineContent(project: Zvoog_Project) {
+	//adjustTimelineContent(project: Zvoog_Project) {
+	fullProjectCheckUp(project: Zvoog_Project) {
 		//console.log('adjustTimelineContent');
 		this.adjustTimeLineLength(project);
 		this.adjustContentByMeter(project);

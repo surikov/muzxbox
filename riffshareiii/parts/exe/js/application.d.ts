@@ -207,6 +207,7 @@ declare class CommandDispatcher {
     lastUsedSchedule: MZXBX_Schedule | null;
     playPosition: number;
     restartOnInitError: boolean;
+    lockPlayCallback: boolean;
     playCallback: (start: number, position: number, end: number) => void;
     _mixerDataMathUtility: MixerDataMathUtility;
     listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any);
@@ -236,10 +237,10 @@ declare class CommandDispatcher {
     findCurrentFilter(id: string): null | Zvoog_FilterTarget;
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
     updateSingleBarPlayerSchedule(barNo: number): void;
-    renderCurrentProjectForOutput(): MZXBX_Schedule;
+    renderZvoogProjectForOutput(prj: Zvoog_Project): MZXBX_Schedule;
     reStartPlayIfPlay(): void;
     stopPlay(): void;
-    setupAndStartPlay(): void;
+    setupAndStartPlay(prj: Zvoog_Project): void;
     updatePluginHint(schedule: MZXBX_Schedule): void;
     startPlayLoop(from: number, position: number, to: number): void;
     realStartPlayLoop(from: number, position: number, to: number): void;
@@ -283,7 +284,7 @@ declare class CommandDispatcher {
     ____adjustMergeChordByTime(trackBar: Zvoog_TrackMeasure): void;
     adjustTracksChords(project: Zvoog_Project): void;
     adjustContentByMeter(currentProject: Zvoog_Project): void;
-    adjustTimelineContent(project: Zvoog_Project): void;
+    fullProjectCheckUp(project: Zvoog_Project): void;
     dumpProjectNotes(project: Zvoog_Project): void;
     resetPlayButtonState(): void;
 }
@@ -774,7 +775,7 @@ declare class MixerDataMathUtility {
     padGridFan: number;
     zoomEditSLess: number;
     zoomAuxLess: number;
-    editmark: null | {
+    editGridMark: null | {
         barIdx: number;
         skip: Zvoog_Metre;
         pitch: number;

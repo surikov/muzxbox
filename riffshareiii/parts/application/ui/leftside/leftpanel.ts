@@ -118,7 +118,7 @@ class LeftPanel {
 						} else {
 							globalCommandDispatcher.exe.commitProjectChanges([], () => {
 								globalCommandDispatcher.cfg().data.title = newTitle;
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 							globalCommandDispatcher.resetProject();
 						}

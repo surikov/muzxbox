@@ -67,7 +67,7 @@ class ActionPluginDialog {
 					console.log('waitProjectCallback',message);
 					if (message.pluginData) {
 						let project: Zvoog_Project = message.pluginData as Zvoog_Project;
-						globalCommandDispatcher.adjustTimelineContent(project);
+						globalCommandDispatcher.fullProjectCheckUp(project);
 						globalCommandDispatcher.exe.commitProjectChanges([], () => {
 							globalCommandDispatcher.registerWorkProject(project);
 							globalCommandDispatcher.resetProject();

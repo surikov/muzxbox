@@ -80,7 +80,17 @@ let copyToClipboard: MenuInfo = {
 	}
 	, itemStates: [icon_sound_loud]
 	, onSubClick: () => {
-		console.log('whole clipboard');
+		//console.log('whole clipboard');
+		if (globalCommandDispatcher.clipboardData) {
+			//	globalCommandDispatcher.playWholeClipboard();
+			globalCommandDispatcher.stopPlay();
+			setTimeout(() => {
+				if (globalCommandDispatcher.clipboardData) {
+					globalCommandDispatcher.lockPlayCallback = true;
+					globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.clipboardData);
+				}
+			}, 123);
+		}
 	}
 	, itemKind: kindAction2
 };
@@ -347,18 +357,21 @@ function fillClipboardList() {
 							let to = globalCommandDispatcher.cfg().data.tracks[nearIdx].measures;
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks', nearIdx], () => {
 								if (globalCommandDispatcher.clipboardData) {
-
+									console.log(track.measures);
 									for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
+
 										let from = track.measures[pp];
 										for (let tt = 0; tt < from.chords.length; tt++) {
-											if (from.chords[tt]) {
-												let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
-												to[barIdx].chords.push(fromChord);
+											if (barIdx + pp < to.length) {
+												if (from.chords[tt]) {
+													let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
+													to[barIdx + pp].chords.push(fromChord);
+												}
 											}
 										}
 									}
 								}
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 						}
 						//onDrag
@@ -373,7 +386,19 @@ function fillClipboardList() {
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					info.itemStates = [icon_sound_low];
 					info.onSubClick = () => {
-						console.log('track', ii);
+						//console.log('track', ii);
+						if (globalCommandDispatcher.clipboardData) {
+							let cliproject = JSON.parse(JSON.stringify(globalCommandDispatcher.clipboardData));
+							cliproject.percussions = [];
+							cliproject.tracks = [cliproject.tracks[ii]];
+							globalCommandDispatcher.stopPlay();
+							setTimeout(() => {
+								if (cliproject) {
+									globalCommandDispatcher.lockPlayCallback = true;
+									globalCommandDispatcher.setupAndStartPlay(cliproject);
+								}
+							}, 123);
+						}
 					};
 
 					menuPointClipboard.children.push(info);
@@ -425,12 +450,12 @@ function fillClipboardList() {
 										for (let tt = 0; tt < from.skips.length; tt++) {
 											if (from.skips[tt]) {
 												let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
-												to[barIdx].skips.push(fromIt);
+												to[barIdx + pp].skips.push(fromIt);
 											}
 										}
 									}
 								}
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 						}
 					}, (xx: number, yy: number, zz: number) => {
@@ -440,7 +465,19 @@ function fillClipboardList() {
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
 					info.itemStates = [icon_sound_low];
 					info.onSubClick = () => {
-						console.log('drum', ii);
+						//console.log('drum', ii);
+						if (globalCommandDispatcher.clipboardData) {
+							let cliproject = JSON.parse(JSON.stringify(globalCommandDispatcher.clipboardData));
+							cliproject.tracks = [];
+							cliproject.percussions = [cliproject.percussions[ii]];
+							globalCommandDispatcher.stopPlay();
+							setTimeout(() => {
+								if (cliproject) {
+									globalCommandDispatcher.lockPlayCallback = true;
+									globalCommandDispatcher.setupAndStartPlay(cliproject);
+								}
+							}, 123);
+						}
 					};
 					menuPointClipboard.children.push(info);
 					/*menuPointClipboard.children.push({
@@ -514,12 +551,12 @@ function fillClipboardList() {
 										for (let tt = 0; tt < from.changes.length; tt++) {
 											if (from.changes[tt]) {
 												let fromIt = JSON.parse(JSON.stringify(from.changes[tt]));
-												to[barIdx].changes.push(fromIt);
+												to[barIdx + pp].changes.push(fromIt);
 											}
 										}
 									}
 								}
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 
 						}
@@ -588,7 +625,7 @@ function fillPluginsLists() {
 								, measures: []
 								, title: MZXBX_currentPlugins()[ii].label
 							});
-							globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+							globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 						}
 
 						refreshMixerItemFocus.currentID = -1;
@@ -694,7 +731,7 @@ function fillPluginsLists() {
 									, measures: []
 									, title: MZXBX_currentPlugins()[ii].label
 								});
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 						}
 						refreshMixerItemFocus.currentID = -1;
@@ -771,7 +808,7 @@ function fillPluginsLists() {
 									, state: 0
 									, title: MZXBX_currentPlugins()[ii].label
 								});
-								globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
+								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
 						}, null, (zz: number) => { });
 						info.onMenuItemDrag = dragger.doDrag.bind(dragger);

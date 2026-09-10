@@ -140,8 +140,8 @@ class MixerUI {
 		}
 	}
 	resetEditMark() {
-		let mark = globalCommandDispatcher.cfg().editmark;
-		//console.log('resetEditMark', mark);
+		let mark = globalCommandDispatcher.cfg().editGridMark;
+		//console.log('resetEditMark', mark,Date.now()%10000);
 		if (mark) {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
@@ -175,6 +175,7 @@ class MixerUI {
 		} else {
 			this.markRectangle.css = 'markPointNone';
 		}
+		//console.log('done resetEditMark', mark,Date.now()%10000);
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;
