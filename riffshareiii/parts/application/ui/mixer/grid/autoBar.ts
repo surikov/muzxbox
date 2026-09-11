@@ -6,7 +6,7 @@ class AutomationBarContent {
 		let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
 		let top = globalCommandDispatcher.cfg().automationTop();
 
-		if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 
 			let interpane: TileRectangle = {
 				x: barOctaveAnchor.xx
@@ -49,7 +49,7 @@ class AutomationBarContent {
 						,css:css
 					};
 					barOctaveAnchor.content.push(aubtn);
-					if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+					if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 						let yShift = 2 * 0.4;
 						if (zIndex < 2) yShift = 2 * 0.27;
 						if (zIndex < 1) yShift = 2 * 0.20;

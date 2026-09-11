@@ -15,7 +15,7 @@ class MixerBar {
 		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
 		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
-		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 			let interpane: TileRectangle = {
 				x: gridZoomBarAnchor.xx
 				, y: globalCommandDispatcher.cfg().gridTop()
@@ -170,7 +170,7 @@ class MixerBar {
 
 			if (zoomInfo.gridLines.length > 0) {
 				let css = 'stepPartDelimiter';
-				if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+				if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 					css = 'interactiveTimeMeasureMark';
 				}
 				while (true) {
@@ -201,7 +201,7 @@ class MixerBar {
 						, h: globalCommandDispatcher.cfg().automationHeight()
 						, css: css
 					});
-					if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+					if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 						barOctaveAnchor.content.push({
 							x: xx
 							, y: globalCommandDispatcher.cfg().commentsTop()
@@ -215,7 +215,7 @@ class MixerBar {
 						lineCount = 0;
 					}
 				}
-				if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+				if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 					let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 					let line = zoomInfo.gridLines[lineCount];
 					barOctaveAnchor.content.push({

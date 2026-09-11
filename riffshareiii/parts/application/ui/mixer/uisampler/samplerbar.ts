@@ -24,7 +24,7 @@ class SamplerBar {
 			cucss = 'samplerDrumMuteBg';
 			licss = 'samplerDrumMuteLine';
 		}
-		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 
 			let interpane: TileRectangle = {
 				x: anchor.xx
@@ -62,7 +62,7 @@ class SamplerBar {
 				};
 				anchor.content.push(ply);
 			}
-			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+			if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 				let yShift = 0.3;
 				if (zoomLevel < 2) yShift = 0.2;
 				if (zoomLevel < 1) yShift = 0.15;

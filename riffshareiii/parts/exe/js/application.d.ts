@@ -773,8 +773,7 @@ declare class MixerDataMathUtility {
     speakerIconSize: number;
     speakerIconPad: number;
     padGridFan: number;
-    zoomEditSLess: number;
-    zoomAuxLess: number;
+    zoomEditZoomIdxLess: number;
     editGridMark: null | {
         barIdx: number;
         skip: Zvoog_Metre;

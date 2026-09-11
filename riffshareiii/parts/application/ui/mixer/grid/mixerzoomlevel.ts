@@ -97,6 +97,9 @@ class MixerZoomLevel {
 	}
 	addGridLines(barOctaveAnchor: TileAnchor) {
 		if (this.zoomLevelIndex < 6) {
+			let ph = globalCommandDispatcher.cfg().notePathHeight;
+			let lp = globalCommandDispatcher.cfg().leftPad;
+			let tw = globalCommandDispatcher.cfg().timelineWidth();
 			for (let octaveIdx = 0; octaveIdx < globalCommandDispatcher.cfg().drawOctaveCount(); octaveIdx++) {
 				let octaveY = globalCommandDispatcher.cfg().gridTop() + octaveIdx * 12 * globalCommandDispatcher.cfg().notePathHeight;
 				if (octaveIdx > 0) {
@@ -109,18 +112,28 @@ class MixerZoomLevel {
 					};
 					barOctaveAnchor.content.push(octaveBottomBorder);
 				}
-				if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-					for (let kk = 1; kk < 12; kk++) {
+				if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+					/*for (let kk = 1; kk < 12; kk++) {
 						let pitchY = octaveY + kk * globalCommandDispatcher.cfg().notePathHeight;
 						barOctaveAnchor.content.push({
 							x: globalCommandDispatcher.cfg().leftPad
-							, y: pitchY//globalCommandDispatcher.cfg().gridTop() + (octaveIdx * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
+							, y: pitchY +globalCommandDispatcher.cfg().notePathHeight*0.05//globalCommandDispatcher.cfg().gridTop() + (octaveIdx * 12 + kk) * globalCommandDispatcher.cfg().notePathHeight
 							, w: globalCommandDispatcher.cfg().timelineWidth()
-							, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+							//, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0
+							, h: globalCommandDispatcher.cfg().notePathHeight*0.9
 							, css: 'interActiveGridLine'
 						});
 						//console.log(this.zoomLevelIndex,octaveIdx,octaveY,kk,pitchY);
-					}
+					}*/
+
+					//let pitchY = octaveY + 0 * globalCommandDispatcher.cfg().notePathHeight;
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (0 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (2 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (4 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (6 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (7 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (9 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+					barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (11 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
 				}
 			}
 
@@ -142,7 +155,7 @@ class MixerZoomLevel {
 					, css: 'octaveBottomBorder'
 				});
 			}
-			if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+			if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 				for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
 					barOctaveAnchor.content.push({
 						x: globalCommandDispatcher.cfg().leftPad

@@ -4349,8 +4349,22 @@ class LeftPanel {
         for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
             this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().wholeHeight();
             this.leftZoomAnchors[zz].content = [];
-            for (let oo = 1; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
-                if (zz < 4) {
+            for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
+                if (zz < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+                    let octaveNum = globalCommandDispatcher.cfg().drawOctaveCount() - oo;
+                    let labelCSS = 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix;
+                    let xx = 0;
+                    let ph = globalCommandDispatcher.cfg().notePathHeight;
+                    let yy = globalCommandDispatcher.cfg().gridTop() + 12 * oo * ph;
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 1 * ph, text: 'B' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 3 * ph, text: 'A' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 5 * ph, text: 'G' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 7 * ph, text: 'F' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 8 * ph, text: 'E' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 10 * ph, text: 'D' + octaveNum, css: labelCSS });
+                    this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 12 * ph, text: 'C' + octaveNum, css: labelCSS });
+                }
+                if (zz < 5 && zz >= globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                     let olabel = '' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);
                     let nm3 = {
                         x: 1,
@@ -4359,34 +4373,6 @@ class LeftPanel {
                         css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(nm3);
-                    if (zz < 2) {
-                        nm3.x = 0.5;
-                        let nm2 = {
-                            x: 0.5,
-                            y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * globalCommandDispatcher.cfg().notePathHeight,
-                            text: olabel,
-                            css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
-                        };
-                        this.leftZoomAnchors[zz].content.push(nm2);
-                        if (zz < 1) {
-                            nm2.x = 0.25;
-                            nm3.x = 0.25;
-                            let nm = {
-                                x: 0.25,
-                                y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * globalCommandDispatcher.cfg().notePathHeight,
-                                text: olabel,
-                                css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
-                            };
-                            this.leftZoomAnchors[zz].content.push(nm);
-                            nm = {
-                                x: 0.25,
-                                y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * globalCommandDispatcher.cfg().notePathHeight,
-                                text: olabel,
-                                css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
-                            };
-                            this.leftZoomAnchors[zz].content.push(nm);
-                        }
-                    }
                 }
             }
             let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
@@ -4526,7 +4512,7 @@ class SamplerBar {
             cucss = 'samplerDrumMuteBg';
             licss = 'samplerDrumMuteLine';
         }
-        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
             let interpane = {
                 x: anchor.xx,
                 y: globalCommandDispatcher.cfg().samplerTop(),
@@ -4560,7 +4546,7 @@ class SamplerBar {
                 };
                 anchor.content.push(ply);
             }
-            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                 let yShift = 0.3;
                 if (zoomLevel < 2)
                     yShift = 0.2;
@@ -4711,7 +4697,7 @@ class OctaveContent {
                             y1 = y2;
                         }
                         if (interact) {
-                            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+                            if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                                 let yShift = 0.24;
                                 let xShift = 0.20;
                                 if (zoomLevel < 2) {
@@ -4772,7 +4758,7 @@ class MixerBar {
     constructor(barIdx, left, ww, zoomLevel, gridZoomBarAnchor, tracksZoomBarAnchor, firstZoomBarAnchor) {
         let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
         let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
-        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
             let interpane = {
                 x: gridZoomBarAnchor.xx,
                 y: globalCommandDispatcher.cfg().gridTop(),
@@ -4906,7 +4892,7 @@ class MixerBar {
             });
             if (zoomInfo.gridLines.length > 0) {
                 let css = 'stepPartDelimiter';
-                if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                     css = 'interactiveTimeMeasureMark';
                 }
                 while (true) {
@@ -4937,7 +4923,7 @@ class MixerBar {
                         h: globalCommandDispatcher.cfg().automationHeight(),
                         css: css
                     });
-                    if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                    if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                         barOctaveAnchor.content.push({
                             x: xx,
                             y: globalCommandDispatcher.cfg().commentsTop(),
@@ -4951,7 +4937,7 @@ class MixerBar {
                         lineCount = 0;
                     }
                 }
-                if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                     let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                     let line = zoomInfo.gridLines[lineCount];
                     barOctaveAnchor.content.push({
@@ -5109,7 +5095,7 @@ class TextCommentsBar {
                 barOctaveAnchor.content.push(tt);
             }
         }
-        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
             let interpane = {
                 x: barOctaveAnchor.xx,
                 y: globalCommandDispatcher.cfg().commentsTop(),
@@ -5193,7 +5179,7 @@ class AutomationBarContent {
     constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
         let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
         let top = globalCommandDispatcher.cfg().automationTop();
-        if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
             let interpane = {
                 x: barOctaveAnchor.xx,
                 y: globalCommandDispatcher.cfg().automationTop(),
@@ -5223,7 +5209,7 @@ class AutomationBarContent {
                         css: css
                     };
                     barOctaveAnchor.content.push(aubtn);
-                    if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+                    if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                         let yShift = 2 * 0.4;
                         if (zIndex < 2)
                             yShift = 2 * 0.27;
@@ -5612,6 +5598,9 @@ class MixerZoomLevel {
     }
     addGridLines(barOctaveAnchor) {
         if (this.zoomLevelIndex < 6) {
+            let ph = globalCommandDispatcher.cfg().notePathHeight;
+            let lp = globalCommandDispatcher.cfg().leftPad;
+            let tw = globalCommandDispatcher.cfg().timelineWidth();
             for (let octaveIdx = 0; octaveIdx < globalCommandDispatcher.cfg().drawOctaveCount(); octaveIdx++) {
                 let octaveY = globalCommandDispatcher.cfg().gridTop() + octaveIdx * 12 * globalCommandDispatcher.cfg().notePathHeight;
                 if (octaveIdx > 0) {
@@ -5624,17 +5613,14 @@ class MixerZoomLevel {
                     };
                     barOctaveAnchor.content.push(octaveBottomBorder);
                 }
-                if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
-                    for (let kk = 1; kk < 12; kk++) {
-                        let pitchY = octaveY + kk * globalCommandDispatcher.cfg().notePathHeight;
-                        barOctaveAnchor.content.push({
-                            x: globalCommandDispatcher.cfg().leftPad,
-                            y: pitchY,
-                            w: globalCommandDispatcher.cfg().timelineWidth(),
-                            h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 32.0,
-                            css: 'interActiveGridLine'
-                        });
-                    }
+                if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (0 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (2 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (4 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (6 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (7 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (9 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
+                    barOctaveAnchor.content.push({ x: lp, y: octaveY + ph * (11 + 0.05), w: tw, h: ph * 0.9, css: 'interActiveGridWhiteKey' });
                 }
             }
             for (let pp = 1; pp < globalCommandDispatcher.cfg().data.percussions.length; pp++) {
@@ -5655,7 +5641,7 @@ class MixerZoomLevel {
                     css: 'octaveBottomBorder'
                 });
             }
-            if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+            if (this.zoomLevelIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
                 for (let tt = 0; tt <= globalCommandDispatcher.cfg().maxCommentRowCount; tt++) {
                     barOctaveAnchor.content.push({
                         x: globalCommandDispatcher.cfg().leftPad,
@@ -7269,8 +7255,7 @@ class MixerDataMathUtility {
         this.speakerIconSize = 22;
         this.speakerIconPad = 44;
         this.padGridFan = 15;
-        this.zoomEditSLess = 3;
-        this.zoomAuxLess = 1;
+        this.zoomEditZoomIdxLess = 3;
         this.editGridMark = null;
         this.slidemark = null;
         this.data = data;

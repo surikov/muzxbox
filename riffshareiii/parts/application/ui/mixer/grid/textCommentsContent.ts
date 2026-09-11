@@ -30,7 +30,7 @@ class TextCommentsBar {
 				barOctaveAnchor.content.push(tt);
 			}
 		}
-		if (zIndex < globalCommandDispatcher.cfg().zoomEditSLess) {
+		if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 			let interpane: TileRectangle = {
 				x: barOctaveAnchor.xx
 				, y: globalCommandDispatcher.cfg().commentsTop()

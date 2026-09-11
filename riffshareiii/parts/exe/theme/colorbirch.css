@@ -4,6 +4,8 @@
 	--drag-color: #dd6;
 	--line-color: #003;
 	--click-color: #090;
+	
+	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color));
 }
 #tileLevelSVG {
 	background-image: url("bg/birch2.jpg");

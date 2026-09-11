@@ -143,19 +143,7 @@ class OctaveContent {
 							y1 = y2;
 						}
 						if (interact) {
-							if (zoomLevel < globalCommandDispatcher.cfg().zoomEditSLess) {
-								/*
-								let inetrDot: TileRectangle = {
-									x: xStart + globalCommandDispatcher.cfg().notePathHeight / 4
-									, y: yStart - globalCommandDispatcher.cfg().notePathHeight * 3 / 4
-									, w: globalCommandDispatcher.cfg().notePathHeight / 2
-									, h: globalCommandDispatcher.cfg().notePathHeight / 2
-									, rx: globalCommandDispatcher.cfg().notePathHeight / 4
-									, ry: globalCommandDispatcher.cfg().notePathHeight / 4
-									, css: 'mixDropNote'
-								};
-								barOctaveAnchor.content.push(inetrDot);
-								*/
+							if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 								let yShift = 0.24;
 								let xShift = 0.20;
 								if (zoomLevel < 2) {

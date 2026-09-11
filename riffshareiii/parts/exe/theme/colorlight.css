@@ -4,6 +4,8 @@
 	--drag-color: #fcf;
 	--line-color: #339;
 	--click-color: #6cf;
+	
+	--black-key-color: color-mix(in lab, transparent 85%, var(--click-color));
 }
 
 #tileLevelSVG {

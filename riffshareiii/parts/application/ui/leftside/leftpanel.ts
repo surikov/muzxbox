@@ -1,28 +1,13 @@
 class LeftPanel {
 	leftLayer: TileLayerDefinition;
-	//leftPanelAnchor: TileAnchor;
 	leftZoomAnchors: TileAnchor[] = [];
-	//trackTitleLabel: TileText[];
 	constructor() {
 
 	}
 	createLeftPanel(): TileLayerDefinition[] {
 		let leftsidebar = (document.getElementById("leftsidebar") as any) as SVGElement;
 		this.leftLayer = { g: leftsidebar, anchors: [], mode: LevelModes.left };
-		/*this.leftPanelAnchor = {
-			xx: 0, yy: 0, ww: 111, hh: 111
-			, minZoom: zoomPrefixLevelsCSS[0].minZoom
-			, beforeZoom: zoomPrefixLevelsCSS[zoomPrefixLevelsCSS.length-1].minZoom
-			, content: [
-			    
-			]
-		};
-		this.leftLayer.anchors.push(this.leftPanelAnchor);
-		this.leftPanelAnchor.content.push(
-			{ x: 0, y: 0, w: 100, h: 100, css: 'debug' }
-		);*/
 		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-
 			let zoomLeftLevelAnchor: TileAnchor = {
 				minZoom: zoomPrefixLevelsCSS[zz].minZoom
 				, beforeZoom: zoomPrefixLevelsCSS[zz + 1].minZoom
@@ -30,51 +15,53 @@ class LeftPanel {
 			};
 			this.leftZoomAnchors.push(zoomLeftLevelAnchor);
 			this.leftLayer.anchors.push(zoomLeftLevelAnchor);
-
-
 		}
 		return [this.leftLayer];
 	}
-	/*fillLeftBarPanel(){
-		console.log('fillLeftPanel');
-		for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
-
-		}
-	}*/
 	reFillLeftPanel() {
-		//console.log('reFillLeftPanel');
-		//let mixm: MixerDataMath = new MixerDataMath(data);
 		for (let zz = 0; zz < this.leftZoomAnchors.length; zz++) {
-			//this.leftZoomAnchors[zz].yy = globalCommandDispatcher.cfg().gridTop();
-			//this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().gridHeight();
 			this.leftZoomAnchors[zz].hh = globalCommandDispatcher.cfg().wholeHeight();
 			this.leftZoomAnchors[zz].content = [];
-			for (let oo = 1; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
-				if (zz < 4) {
-					/*
-					let octavemark: TileRectangle = {
-						x: 0
-						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo
-						, w: 2 * zoomPrefixLevelsCSS[zz].minZoom
-						, h: 0.5 * zoomPrefixLevelsCSS[zz].minZoom
-						, css: 'octaveMark'
-					};
-					this.leftZoomAnchors[zz].content.push(octavemark);
-					*/
-					let olabel = '' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);// + globalCommandDispatcher.cfg().transposeOctaveCount());
+			for (let oo = 0; oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
+				if (zz < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+					/*let olabel = 'x' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);
 					let nm3: TileText = {
 						x: 1
 						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
-						, text: olabel//'' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo + globalCommandDispatcher.cfg().transposeOctaveCount())
+						, text: olabel
 						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(nm3);
-					if (zz < 2) {
+*/
+					let octaveNum = globalCommandDispatcher.cfg().drawOctaveCount() - oo;
+					let labelCSS = 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix;
+					let xx = 0;//0.25;
+					let ph = globalCommandDispatcher.cfg().notePathHeight;
+					let yy = globalCommandDispatcher.cfg().gridTop() + 12 * oo * ph;// + 1 * zoomPrefixLevelsCSS[zz].minZoom;
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 1 * ph, text: 'B' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 3 * ph, text: 'A' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 5 * ph, text: 'G' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 7 * ph, text: 'F' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 8 * ph, text: 'E' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 10 * ph, text: 'D' + octaveNum, css: labelCSS });
+					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 12 * ph, text: 'C' + octaveNum, css: labelCSS });
+
+				}
+				if (zz < 5 && zz >=globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+					let olabel = '' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);
+					let nm3: TileText = {
+						x: 1
+						, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom
+						, text: olabel
+						, css: 'octaveLabel' + zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(nm3);
+					/*if (zz < 2) {
 						nm3.x = 0.5;
 						let nm2: TileText = {
 							x: 0.5
 							, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 6 * globalCommandDispatcher.cfg().notePathHeight
-							, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+							, text: olabel
 							, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 						};
 						this.leftZoomAnchors[zz].content.push(nm2);
@@ -84,21 +71,19 @@ class LeftPanel {
 							let nm: TileText = {
 								x: 0.25
 								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 3 * globalCommandDispatcher.cfg().notePathHeight
-								, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+								, text: olabel
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
 							nm = {
 								x: 0.25
 								, y: globalCommandDispatcher.cfg().gridTop() + 12 * oo * globalCommandDispatcher.cfg().notePathHeight + 1 * zoomPrefixLevelsCSS[zz].minZoom + 9 * globalCommandDispatcher.cfg().notePathHeight
-								, text: olabel//'' + (globalCommandDispatcher.cfg().octaveCount - oo + 0)
+								, text: olabel
 								, css: 'octaveSubLabel' + zoomPrefixLevelsCSS[zz].prefix
 							};
 							this.leftZoomAnchors[zz].content.push(nm);
-							//octavemark.w=4 * zoomPrefixLevelsCSS[zz].minZoom;
 						}
-					}
-
+					}*/
 				}
 			}
 			let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
@@ -109,7 +94,6 @@ class LeftPanel {
 				, rx: butsize / 2, ry: butsize / 2
 				, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
 				, activation: (x, y) => {
-					//console.log('title');
 					let old = globalCommandDispatcher.cfg().data.title;
 					let newTitle = prompt('', old);
 					if (newTitle) {
@@ -160,8 +144,6 @@ class LeftPanel {
 						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(trackLabel);
-					//for (let tr = 1; tr < globalCommandDispatcher.cfg().data.tracks.length; tr++) {
-
 					for (let farIdx = 1; farIdx < farorder.length; farIdx++) {
 						let tr = farorder[farIdx];
 						let preCSS = 'otherTrackLabel';
@@ -191,16 +173,12 @@ class LeftPanel {
 						, y: globalCommandDispatcher.cfg().samplerTop()
 							+ globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
 							- globalCommandDispatcher.cfg().samplerDotHeight * 0.3
-						//, css: 'samplerRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(samplerLabel);
-					//console.log('samplerLabel', samplerLabel);
 				}
 			}
 			if (zz < 5) {
-				//let yy = 0;
-
 				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 					let filter = globalCommandDispatcher.cfg().data.filters[ff];
 					let preCSS = 'autoRowLabel';
@@ -213,14 +191,9 @@ class LeftPanel {
 						, y: globalCommandDispatcher.cfg().automationTop()
 							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
 							- 0.3 * globalCommandDispatcher.cfg().autoPointHeight
-						//, css: 'autoRowLabel' + zoomPrefixLevelsCSS[zz].prefix
 						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(autoLabel);
-					//console.log('autoLabel', autoLabel);
-					//yy++;
-					//}
-					//console.log(ff, autoLabel);
 				}
 			}
 		}

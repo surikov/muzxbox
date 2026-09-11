@@ -4,6 +4,8 @@
 	--drag-color: #03f;
 	--line-color: #ffc;
 	--click-color: #c39;
+	
+	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color));
 }
 #tileLevelSVG {
 	background-image: url("bg/neon.png");

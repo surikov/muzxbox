@@ -242,7 +242,11 @@ cursor:col-resize;
     stroke: none;
     pointer-events: none;
 }
-
+.interActiveGridWhiteKey{
+	fill: var(--black-key-color);
+    stroke: none;
+    pointer-events: none;
+}
 
 .commentLineText025 {
     fill: var(--main-color);
