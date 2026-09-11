@@ -9,62 +9,62 @@
 
 .octaveLabel025 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*0.25*var(--tapSize));
 
 }
 
 .octaveLabel05 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*0.5*var(--tapSize));
 }
 
 .octaveLabel1 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*var(--tapSize));
 }
 
 .octaveLabel2 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*2*var(--tapSize));
 }
 
 .octaveLabel4 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*4*var(--tapSize));
 }
 
 .octaveLabel8 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*8*var(--tapSize));
 }
 
 .octaveLabel16 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*16*var(--tapSize));
 }
 
 .octaveLabel32 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*32*var(--tapSize));
 }
 
 .octaveLabel64 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*64*var(--tapSize));
 }
 
 .octaveLabel128 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*128*var(--tapSize));
 }
 
