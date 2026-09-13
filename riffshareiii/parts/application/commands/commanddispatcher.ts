@@ -14,9 +14,9 @@ class CommandDispatcher {
 	lockPlayCallback = false;
 	playCallback: (start: number, position: number, end: number) => void = (start: number, pos: number, end: number) => {
 		this.playPosition = pos - 0.25;
-		
+
 		if (!globalCommandDispatcher.lockPlayCallback) {
-			
+
 			this.reDrawPlayPosition();
 		}
 	};
@@ -228,6 +228,35 @@ class CommandDispatcher {
 		}
 		return null;
 	}
+	transposeSelection(halfTones: number) {
+		console.log('transposeSelection', halfTones);
+		this.exe.commitProjectChanges(['tracks'], () => {
+			let hasSolo: boolean = globalCommandDispatcher.cfg().data.tracks
+				.reduce((accumulator, currentValue) => {
+					return accumulator || (currentValue.performer.state == 2)
+				}, false);
+			for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
+				let track = this.cfg().data.tracks[tt];
+				if ((track.performer.state == 2
+					|| (track.performer.state == 0 && (!hasSolo)))) {
+					for (let ii = this.cfg().data.selectedPart.startMeasure
+						; ii <= this.cfg().data.selectedPart.endMeasure
+						; ii++) {
+						let bar = track.measures[ii];
+						for (let cc = 0; cc < bar.chords.length; cc++) {
+							let newPitches: number[] = [];
+							let chord = bar.chords[cc];
+							for (let pp = 0; pp < chord.pitches.length; pp++) {
+								newPitches.push(chord.pitches[pp] + halfTones);
+							}
+							chord.pitches = newPitches;
+						}
+					}
+				}
+			}
+		});
+
+	}
 	renderCurrentOutputs(id: string, result: string[], outputs: string[]) {
 		//console.log('renderCurrentOutputs', id, outputs);
 		for (let oo = 0; oo < outputs.length; oo++) {
@@ -255,7 +284,8 @@ class CommandDispatcher {
 			}
 		}
 	}
-	updateSingleBarPlayerSchedule(barNo: number) {
+	//updateSingleBarPlayerSchedule(barNo: number) {
+	updatePlayerSchedule() {
 		if (this.player.playState().play) {
 			//console.log('updateSingleBarPlayerSchedule', barNo);
 			this.lastUsedSchedule = this.renderZvoogProjectForOutput(this.cfg().data);
@@ -1052,6 +1082,11 @@ class CommandDispatcher {
 	}
 
 	calculateRealTrackFarOrder(): number[] {
+		if (this.cfg().data.farorder) {
+			//
+		} else {
+			this.cfg().data.farorder = [];
+		}
 		let realOrder: number[] = this.cfg().data.farorder.map((it) => it);
 		let trcnt = this.cfg().data.tracks.length;
 		for (let ii = 0; ii < trcnt; ii++) {

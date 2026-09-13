@@ -66,3 +66,6 @@ let icon_time = '&#xf337';
 
 
 let icon_hourglass= '&#xf179';
+
+let icon_valigntop= '&#xf252';
+let icon_valignbottom= '&#xf250';

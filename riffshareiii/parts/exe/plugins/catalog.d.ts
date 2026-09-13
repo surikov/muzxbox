@@ -83,9 +83,19 @@ type Zvoog_TrackMeasure = {
 type Zvoog_PercussionMeasure = {
     skips: Zvoog_Metre[];
 };
+type Zvoog_ChordStep = {
+    step: number;
+    shift: number;
+};
+type Zvoog_ChordMode = {
+    mode: number[];
+    chord: Zvoog_ChordStep[];
+    tonic: Zvoog_ChordStep;
+};
 type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
+    modality: Zvoog_ChordMode;
 };
 type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];
@@ -142,7 +152,7 @@ type Zvoog_UICommand = {
     actions: Zvoog_Action[];
 };
 type Zvoog_Project = {
-    versionCode: '1';
+    versionCode: '1' | '1.1';
     title: string;
     timeline: Zvoog_SongMeasure[];
     tracks: Zvoog_MusicTrack[];

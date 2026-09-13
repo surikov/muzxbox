@@ -234,8 +234,10 @@ class StateDiff {
     }
 }
 let goHomeBackURL = '';
+let applicationVersion = '1.8.3';
 function startApplication() {
-    console.log('startApplication v1.6.11');
+    console.log('startApplication v', applicationVersion);
+    document.title = 'Minium Studio ' + applicationVersion;
     setupHomeBackURL();
     globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
     let ui = new UIRenderer();
@@ -438,6 +440,8 @@ let icon_copybarcontent = '&#xf237';
 let icon_home = '&#xf175';
 let icon_time = '&#xf337';
 let icon_hourglass = '&#xf179';
+let icon_valigntop = '&#xf252';
+let icon_valignbottom = '&#xf250';
 class Plugin__DialogPrompt2 {
 }
 class FilterPluginDialog {
@@ -1482,6 +1486,32 @@ class CommandDispatcher {
         }
         return null;
     }
+    transposeSelection(halfTones) {
+        console.log('transposeSelection', halfTones);
+        this.exe.commitProjectChanges(['tracks'], () => {
+            let hasSolo = globalCommandDispatcher.cfg().data.tracks
+                .reduce((accumulator, currentValue) => {
+                return accumulator || (currentValue.performer.state == 2);
+            }, false);
+            for (let tt = 0; tt < this.cfg().data.tracks.length; tt++) {
+                let track = this.cfg().data.tracks[tt];
+                if ((track.performer.state == 2
+                    || (track.performer.state == 0 && (!hasSolo)))) {
+                    for (let ii = this.cfg().data.selectedPart.startMeasure; ii <= this.cfg().data.selectedPart.endMeasure; ii++) {
+                        let bar = track.measures[ii];
+                        for (let cc = 0; cc < bar.chords.length; cc++) {
+                            let newPitches = [];
+                            let chord = bar.chords[cc];
+                            for (let pp = 0; pp < chord.pitches.length; pp++) {
+                                newPitches.push(chord.pitches[pp] + halfTones);
+                            }
+                            chord.pitches = newPitches;
+                        }
+                    }
+                }
+            }
+        });
+    }
     renderCurrentOutputs(id, result, outputs) {
         for (let oo = 0; oo < outputs.length; oo++) {
             let cid = outputs[oo];
@@ -1507,7 +1537,7 @@ class CommandDispatcher {
             }
         }
     }
-    updateSingleBarPlayerSchedule(barNo) {
+    updatePlayerSchedule() {
         if (this.player.playState().play) {
             this.lastUsedSchedule = this.renderZvoogProjectForOutput(this.cfg().data);
             this.player.replaceCurrentSchedule(this.lastUsedSchedule);
@@ -2045,6 +2075,11 @@ class CommandDispatcher {
         };
     }
     calculateRealTrackFarOrder() {
+        if (this.cfg().data.farorder) {
+        }
+        else {
+            this.cfg().data.farorder = [];
+        }
         let realOrder = this.cfg().data.farorder.map((it) => it);
         let trcnt = this.cfg().data.tracks.length;
         for (let ii = 0; ii < trcnt; ii++) {
@@ -2855,7 +2890,7 @@ class TimeSelectBar {
         };
         measureAnchor.content.push(bpm);
     }
-    addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, labelCSS, action) {
+    ___addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, labelCSS, action) {
         let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
         let opt1 = {
             x: left,
@@ -2876,7 +2911,7 @@ class TimeSelectBar {
         };
         selectLevelAnchor.content.push(nm);
     }
-    fillSelectionMenu(zz, selectLevelAnchor) {
+    __fillSelectionMenu(zz, selectLevelAnchor) {
         if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
             let left = globalCommandDispatcher.cfg().leftPad;
             for (let ii = 0; ii < globalCommandDispatcher.cfg().data.selectedPart.startMeasure; ii++) {
@@ -2918,6 +2953,7 @@ class TimeSelectBar {
                         this.createBarMark(kk, barLeft, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, zz);
                         this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
                     }
+                    this.addTransposeButtons(kk, barLeft + barWidth, zoomPrefixLevelsCSS[zz].minZoom * 1.5, measureAnchor, zz);
                     let zoomInfo = zoomPrefixLevelsCSS[zz];
                     if (zoomInfo.gridLines.length > 0) {
                         let lineCount = 0;
@@ -2955,10 +2991,55 @@ class TimeSelectBar {
                     barTime = barTime + curMeasureMeter.duration(curBar.tempo);
                 }
             }
-            this.fillSelectionMenu(zz, selectLevelAnchor);
         }
         this.selectBarAnchor.content = this.zoomAnchors;
         this.updateTimeSelectionBar();
+    }
+    addTransposeButtons(barIdx, barLeft, size, measureAnchor, zz) {
+        if (globalCommandDispatcher.cfg().data.selectedPart.endMeasure == barIdx) {
+            if (zz < 6) {
+                let mark = {
+                    x: barLeft - size,
+                    y: 0,
+                    w: size,
+                    h: size,
+                    rx: size / 2, ry: size / 2,
+                    css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
+                    activation: (x, y) => {
+                        globalCommandDispatcher.transposeSelection(-1);
+                        globalCommandDispatcher.updatePlayerSchedule();
+                    }
+                };
+                measureAnchor.content.push(mark);
+                let mark2 = {
+                    x: barLeft - size - size,
+                    y: 0,
+                    w: size,
+                    h: size,
+                    rx: size / 2, ry: size / 2,
+                    css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
+                    activation: (x, y) => {
+                        globalCommandDispatcher.transposeSelection(1);
+                        globalCommandDispatcher.updatePlayerSchedule();
+                    }
+                };
+                measureAnchor.content.push(mark2);
+                let nm = {
+                    x: barLeft - 0.5 * size - size,
+                    y: zoomPrefixLevelsCSS[zz].minZoom * 1,
+                    text: icon_valigntop,
+                    css: 'selectionTransposeLabel' + zoomPrefixLevelsCSS[zz].prefix
+                };
+                measureAnchor.content.push(nm);
+                let nm2 = {
+                    x: barLeft - 0.5 * size,
+                    y: zoomPrefixLevelsCSS[zz].minZoom * 1,
+                    text: icon_valignbottom,
+                    css: 'selectionTransposeLabel' + zoomPrefixLevelsCSS[zz].prefix
+                };
+                measureAnchor.content.push(nm2);
+            }
+        }
     }
 }
 class UIToolbar {
@@ -4588,7 +4669,7 @@ class SamplerBar {
                 drum.measures[barIdx].skips.push(muStart.metre());
             }
         });
-        globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+        globalCommandDispatcher.updatePlayerSchedule();
     }
 }
 class BarOctaveRender {
@@ -5070,7 +5151,7 @@ class MixerBar {
             }
         }
         globalCommandDispatcher.renderer.mixer.resetEditMark();
-        globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+        globalCommandDispatcher.updatePlayerSchedule();
     }
 }
 class TextCommentsBar {

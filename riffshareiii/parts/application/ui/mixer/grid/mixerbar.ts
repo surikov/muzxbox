@@ -355,7 +355,8 @@ class MixerBar {
 		}
 		//globalCommandDispatcher.resetProject();
 		globalCommandDispatcher.renderer.mixer.resetEditMark();
-		globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+		//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+		globalCommandDispatcher.updatePlayerSchedule();
 	}
 
 }

@@ -28,6 +28,7 @@ declare class StateDiff {
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 declare let goHomeBackURL: string;
+declare let applicationVersion: string;
 declare function startApplication(): void;
 declare function setupHomeBackURL(): void;
 declare function getNavigatorLanguage(): string;
@@ -82,6 +83,8 @@ declare let icon_copybarcontent: string;
 declare let icon_home: string;
 declare let icon_time: string;
 declare let icon_hourglass: string;
+declare let icon_valigntop: string;
+declare let icon_valignbottom: string;
 declare class Plugin__DialogPrompt2 {
 }
 declare class FilterPluginDialog {
@@ -235,8 +238,9 @@ declare class CommandDispatcher {
     hideRightMenu(): void;
     showRightMenu(): void;
     findCurrentFilter(id: string): null | Zvoog_FilterTarget;
+    transposeSelection(halfTones: number): void;
     renderCurrentOutputs(id: string, result: string[], outputs: string[]): void;
-    updateSingleBarPlayerSchedule(barNo: number): void;
+    updatePlayerSchedule(): void;
     renderZvoogProjectForOutput(prj: Zvoog_Project): MZXBX_Schedule;
     reStartPlayIfPlay(): void;
     stopPlay(): void;
@@ -390,9 +394,10 @@ declare class TimeSelectBar {
     updateTimeSelectionBar(): void;
     createBarMark(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number): void;
     createBarNumber(barLeft: number, barnum: number, zz: number, curBar: Zvoog_SongMeasure, measureAnchor: TileAnchor, barTime: number, size: number): void;
-    addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void): void;
-    fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor): void;
+    ___addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void): void;
+    __fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor): void;
     fillTimeBar(): void;
+    addTransposeButtons(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number): void;
 }
 declare class UIToolbar {
     toolBarAnchor: TileAnchor;

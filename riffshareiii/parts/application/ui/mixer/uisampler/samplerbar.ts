@@ -105,6 +105,7 @@ class SamplerBar {
 				drum.measures[barIdx].skips.push(muStart.metre());
 			}
 		});
-		globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+		//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+		globalCommandDispatcher.updatePlayerSchedule();
 	}
 }

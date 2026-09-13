@@ -2,8 +2,10 @@
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 let goHomeBackURL: string = '';
+let applicationVersion='1.8.3';
 function startApplication() {
-	console.log('startApplication v1.6.11');
+	console.log('startApplication v',applicationVersion);
+	document.title = 'Minium Studio '+applicationVersion;
 	//let commands = new CommandDispatcher();
 	setupHomeBackURL();
 

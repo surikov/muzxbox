@@ -111,6 +111,51 @@
 
 }
 
+
+.selectionTransposeLabel025 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.2*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel05 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.4*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel1 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.8*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel2 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(1.6*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel4 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(3.2*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel8 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(6.4*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+
+
 .timeBarNum025 {
 	fill: var(--line-color);
 	fill-opacity: 90%;

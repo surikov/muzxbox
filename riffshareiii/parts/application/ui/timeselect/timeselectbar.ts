@@ -152,9 +152,6 @@ class TimeSelectBar {
 			, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
 			, activation: (x, y) => {
 				let toIdx = barIdx;
-				//console.log('bar click', barIdx, globalCommandDispatcher.cfg().data.selectedPart);
-
-				//expandTimeLineSelection(barIdx);
 				if (zz > 4) {
 					if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure < barIdx
 						&& globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1
@@ -163,10 +160,9 @@ class TimeSelectBar {
 						toIdx = barIdx - 1;
 					}
 				} else {
-
+					//
 				}
 				globalCommandDispatcher.timeSelectChange(toIdx);
-				//console.log(globalCommandDispatcher.cfg().data.selectedPart);
 			}
 		};
 		measureAnchor.content.push(mark);
@@ -203,7 +199,7 @@ class TimeSelectBar {
 		measureAnchor.content.push(bpm);
 
 	}
-	addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void) {
+	___addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void) {
 		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
 
 		let opt1: TileRectangle = {
@@ -229,7 +225,7 @@ class TimeSelectBar {
 		//console.log('addSelectionMenuButton', zz, label);
 
 	}
-	fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor) {
+	__fillSelectionMenu(zz: number, selectLevelAnchor: TileAnchor) {
 		if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
 			//let zz = zoomPrefixLevelsCSS.length - 1;
 			//for (let zz = 0; zz < zoomPrefixLevelsCSS.length - 1; zz++) {
@@ -257,6 +253,8 @@ class TimeSelectBar {
 	}
 
 	fillTimeBar() {
+
+
 		this.selectBarAnchor.ww = globalCommandDispatcher.cfg().wholeWidth();
 		this.selectBarAnchor.hh = globalCommandDispatcher.cfg().wholeHeight();
 		this.zoomAnchors = [];
@@ -291,6 +289,11 @@ class TimeSelectBar {
 						);
 						this.createBarNumber(barLeft, kk, zz, curBar, measureAnchor, barTime, zoomPrefixLevelsCSS[zz].minZoom * 1.5);
 					}
+					this.addTransposeButtons(kk
+						, barLeft + barWidth
+						, zoomPrefixLevelsCSS[zz].minZoom * 1.5
+						, measureAnchor
+						, zz);
 					let zoomInfo = zoomPrefixLevelsCSS[zz];
 					if (zoomInfo.gridLines.length > 0) {
 						let lineCount = 0;
@@ -329,11 +332,66 @@ class TimeSelectBar {
 					barTime = barTime + curMeasureMeter.duration(curBar.tempo);
 				}
 			}
-			this.fillSelectionMenu(zz, selectLevelAnchor);
+			//this.fillSelectionMenu(zz, selectLevelAnchor);
 		}
 
 		this.selectBarAnchor.content = this.zoomAnchors;
 
+
+
 		this.updateTimeSelectionBar();
+	}
+	addTransposeButtons(barIdx: number, barLeft: number, size: number, measureAnchor: TileAnchor, zz: number) {
+		if (globalCommandDispatcher.cfg().data.selectedPart.endMeasure == barIdx) {
+			if (zz < 6) {
+				//console.log('addTransposeButtons', globalCommandDispatcher.cfg().data.selectedPart);
+				let mark: TileRectangle = {
+					x: barLeft - size
+					, y: 0
+					, w: size
+					, h: size
+					, rx: size / 2, ry: size / 2
+					, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
+					, activation: (x, y) => {
+						//console.log('own');
+						globalCommandDispatcher.transposeSelection(-1);
+						globalCommandDispatcher.updatePlayerSchedule();
+						//globalCommandDispatcher.reStartPlayIfPlay();
+					}
+				};
+				measureAnchor.content.push(mark);
+
+				let mark2: TileRectangle = {
+					x: barLeft - size - size
+					, y: 0
+					, w: size
+					, h: size
+					, rx: size / 2, ry: size / 2
+					, css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix
+					, activation: (x, y) => {
+						globalCommandDispatcher.transposeSelection(1);
+						globalCommandDispatcher.updatePlayerSchedule();
+						//globalCommandDispatcher.reStartPlayIfPlay();
+					}
+				};
+				measureAnchor.content.push(mark2);
+
+
+				let nm: TileText = {
+					x: barLeft - 0.5 * size - size
+					, y: zoomPrefixLevelsCSS[zz].minZoom * 1
+					, text: icon_valigntop
+					, css: 'selectionTransposeLabel' + zoomPrefixLevelsCSS[zz].prefix
+				};
+				measureAnchor.content.push(nm);
+				let nm2: TileText = {
+					x: barLeft - 0.5 * size
+					, y: zoomPrefixLevelsCSS[zz].minZoom * 1
+					, text: icon_valignbottom
+					, css: 'selectionTransposeLabel' + zoomPrefixLevelsCSS[zz].prefix
+				};
+				measureAnchor.content.push(nm2);
+			}
+		}
 	}
 }
