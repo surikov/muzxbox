@@ -192,7 +192,7 @@ class RightMenuPanel {
 		};
 		this.bgLayer = { g: this.menuPanelBackground, anchors: [this.backgroundAnchor], mode: LevelModes.overlay };
 		this.contentLayer = { g: this.menuPanelContent, anchors: [this.contentAnchor], mode: LevelModes.overlay };
-		this.interLayer = { g: this.menuPanelInteraction, anchors: [this.focusTargetAnchor,this.interAnchor], mode: LevelModes.overlay };
+		this.interLayer = { g: this.menuPanelInteraction, anchors: [this.focusTargetAnchor, this.interAnchor], mode: LevelModes.overlay };
 		this.buttonsLayer = { g: this.menuPanelButtons, anchors: [this.buttonsAnchor], mode: LevelModes.overlay };
 
 		return [this.bgLayer
@@ -329,7 +329,7 @@ class RightMenuPanel {
 						if (it.onSubClick) {
 							it.onSubClick();
 						}
-					 }, (x: number, y: number) => {
+					}, (x: number, y: number) => {
 						if (it.onMenuItemDrag) {
 							it.onMenuItemDrag(x, y);
 						}
@@ -344,7 +344,7 @@ class RightMenuPanel {
 						if (it.onSubClick) {
 							it.onSubClick();
 						}
-					 }, (x: number, y: number) => {
+					}, (x: number, y: number) => {
 						if (it.onMenuItemDrag) {
 							it.onMenuItemDrag(x, y);
 						}
@@ -354,6 +354,55 @@ class RightMenuPanel {
 					it.menuTop = this.items.length - 1;
 					break;
 				}
+
+
+
+
+
+				case kindDraggableCircle2: {
+					this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x: number, y: number) => {
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
+						}
+						me.setFocus(it, infos);
+						me.resetAllAnchors();
+					}));
+					it.menuTop = this.items.length - 1;
+					break;
+				}
+				case kindDraggableSquare2: {
+					this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					}, (x: number, y: number) => {
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
+						}
+						me.setFocus(it, infos);
+						me.resetAllAnchors();
+					}));
+					it.menuTop = this.items.length - 1;
+					break;
+				}
+				case kindDraggableTriangle2: {
+					this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					}, (x: number, y: number) => {
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
+						}
+						me.setFocus(it, infos);
+						me.resetAllAnchors();
+					}));
+					it.menuTop = this.items.length - 1;
+					break;
+				}
+
+
+
 				case kindPreview: {
 					let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
 						if (it.onClick) {
@@ -526,10 +575,10 @@ class RightMenuPanel {
 		this.menuUpButton.resize(this.shiftX + this.itemsWidth - 1, 0, 1);
 		let msz = 1.75;
 		if (globalCommandDispatcher.cfg().data.list) {
-this.menuToggleButton.resize(this.shiftX - msz / 2,  msz, msz);
+			this.menuToggleButton.resize(this.shiftX - msz / 2, msz, msz);
 			//this.menuToggleButton.resize(this.shiftX - msz / 2, viewHeight - 2 * msz, msz);
 		} else {
-this.menuToggleButton.resize(this.shiftX - msz,  msz, msz);
+			this.menuToggleButton.resize(this.shiftX - msz, msz, msz);
 			//this.menuToggleButton.resize(this.shiftX - msz, viewHeight - 2 * msz, msz);
 		}
 		this.rerenderMenuContent(null);

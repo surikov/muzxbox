@@ -471,6 +471,9 @@ declare const kindClosedFolder: 6;
 declare const kindOpenedFolder: 7;
 declare const kindAction2: 8;
 declare const kindActionDisabled: 9;
+declare const kindDraggableCircle2: 10;
+declare const kindDraggableSquare2: 11;
+declare const kindDraggableTriangle2: 12;
 declare class RightMenuItem {
     action?: {
         (): void;
@@ -504,7 +507,7 @@ type MenuInfo = {
     highlight?: string;
     menuTop?: number;
     url?: string;
-    itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+    itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 };
 declare let menuItemsData: MenuInfo[] | null;
 declare let menuPointActions: MenuInfo;
@@ -515,6 +518,7 @@ declare let menuPointAddPlugin: MenuInfo;
 declare let menuPointSettings: MenuInfo;
 declare function findNearestFilterByKind(idx: number, kind: string): Zvoog_FilterTarget;
 declare function fillClipboardList(): void;
+declare function setProjectPositionFanArea(): void;
 declare function fillPluginsLists(): void;
 declare function findPerformerIdxByXYcurZ(dx: number, dy: number): number;
 declare function findSamplerIdxByXYcurZ(dx: number, dy: number): number;

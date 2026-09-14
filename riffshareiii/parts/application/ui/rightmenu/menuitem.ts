@@ -8,6 +8,9 @@ const kindClosedFolder: 6 = 6;
 const kindOpenedFolder: 7 = 7;
 const kindAction2: 8 = 8;
 const kindActionDisabled: 9 = 9;
+const kindDraggableCircle2: 10 = 10;
+const kindDraggableSquare2: 11 = 11;
+const kindDraggableTriangle2: 12 = 12;
 class RightMenuItem {
 	/*
 		kindAction: 1 = 1;
@@ -143,8 +146,8 @@ class RightMenuItem {
 			//spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
 		}
 		if (this.info.itemKind == kindAction2
-			|| this.info.itemKind == kindDraggableSquare
-			|| this.info.itemKind == kindDraggableTriangle
+			|| this.info.itemKind == kindDraggableSquare2
+			|| this.info.itemKind == kindDraggableTriangle2
 		) {
 			let stateIicon = '?';
 			let sel = this.info.selectedState ? this.info.selectedState : 0;
@@ -157,19 +160,19 @@ class RightMenuItem {
 			anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
 			spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
 		}
-		if (this.info.itemKind == kindDraggableCircle) {
+		if (this.info.itemKind == kindDraggableCircle || this.info.itemKind == kindDraggableCircle2) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.info.itemKind == kindDraggableSquare) {
+		if (this.info.itemKind == kindDraggableSquare || this.info.itemKind == kindDraggableSquare2) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
-		if (this.info.itemKind == kindDraggableTriangle) {
+		if (this.info.itemKind == kindDraggableTriangle || this.info.itemKind == kindDraggableTriangle2) {
 			spot.draggable = true;
 			spot.activation = this.drag;
 			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });

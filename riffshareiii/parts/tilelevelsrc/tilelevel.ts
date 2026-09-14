@@ -103,11 +103,12 @@ class TileLevelRealTime implements TileLevelBase {
 		};
 	}
 	setCurrentPointPosition(position: TileZoom): void {
-		//console.log('setCurrentPointPosition',position);
+		//console.log('setCurrentPointPosition from',position);
 		this._translateX = position.x;
 		this._translateY = position.y;
 		this._translateZ = position.z;
 		this.applyZoomPosition();
+		//console.log('now',this.getCurrentPointPosition());
 	}
 	getCurrentPointPosition(): TileZoom {
 		return {
@@ -298,6 +299,7 @@ class TileLevelRealTime implements TileLevelBase {
 	}
 	slideToContentPosition() {
 		let a = this.calculateValidContentPosition();
+		//console.log('slideToContentPosition',a,this.translateX,this.translateY,this.translateZ);
 		if (a.x != this.translateX || a.y != this.translateY || a.z != this.translateZ) {
 			this.startSlideTo(a.x, a.y, a.z, null);
 		}

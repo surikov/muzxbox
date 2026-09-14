@@ -3382,6 +3382,47 @@ class RightMenuPanel {
                     it.menuTop = this.items.length - 1;
                     break;
                 }
+                case kindDraggableCircle2: {
+                    this.items.push(new RightMenuItem(kindDraggableCircle, it, pad, () => { }, () => { }, (x, y) => {
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.menuTop = this.items.length - 1;
+                    break;
+                }
+                case kindDraggableSquare2: {
+                    this.items.push(new RightMenuItem(kindDraggableSquare, it, pad, () => { }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                    }, (x, y) => {
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.menuTop = this.items.length - 1;
+                    break;
+                }
+                case kindDraggableTriangle2: {
+                    this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => {
+                        if (it.onSubClick) {
+                            it.onSubClick();
+                        }
+                    }, (x, y) => {
+                        if (it.onMenuItemDrag) {
+                            it.onMenuItemDrag(x, y);
+                        }
+                        me.setFocus(it, infos);
+                        me.resetAllAnchors();
+                    }));
+                    it.menuTop = this.items.length - 1;
+                    break;
+                }
                 case kindPreview: {
                     let rightMenuItem = new RightMenuItem(kindPreview, it, pad, () => {
                         if (it.onClick) {
@@ -3548,6 +3589,9 @@ const kindClosedFolder = 6;
 const kindOpenedFolder = 7;
 const kindAction2 = 8;
 const kindActionDisabled = 9;
+const kindDraggableCircle2 = 10;
+const kindDraggableSquare2 = 11;
+const kindDraggableTriangle2 = 12;
 class RightMenuItem {
     constructor(newkind, info, pad, tap, tap2, drag) {
         this.pad = 0;
@@ -3613,8 +3657,8 @@ class RightMenuItem {
             }
         }
         if (this.info.itemKind == kindAction2
-            || this.info.itemKind == kindDraggableSquare
-            || this.info.itemKind == kindDraggableTriangle) {
+            || this.info.itemKind == kindDraggableSquare2
+            || this.info.itemKind == kindDraggableTriangle2) {
             let stateIicon = '?';
             let sel = this.info.selectedState ? this.info.selectedState : 0;
             if (this.info.itemStates) {
@@ -3626,19 +3670,19 @@ class RightMenuItem {
             anchor.content.push({ x: itemWidth - 1.1 + 0.4, y: itemTop + 0.7, text: stateIicon, css: 'rightMenuIconLabel' });
             spot2 = { x: itemWidth - 1.2, y: itemTop, w: 1, h: 1, activation: this.action2, css: 'transparentSpot' };
         }
-        if (this.info.itemKind == kindDraggableCircle) {
+        if (this.info.itemKind == kindDraggableCircle || this.info.itemKind == kindDraggableCircle2) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.info.itemKind == kindDraggableSquare) {
+        if (this.info.itemKind == kindDraggableSquare || this.info.itemKind == kindDraggableSquare2) {
             spot.draggable = true;
             spot.activation = this.drag;
             anchor.content.push({ x: 0.15 + this.pad, y: itemTop + 0.15, w: 0.7, h: 0.7, rx: 0.05, ry: 0.05, css: 'rightMenuItemDragBG' });
             anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
         }
-        if (this.info.itemKind == kindDraggableTriangle) {
+        if (this.info.itemKind == kindDraggableTriangle || this.info.itemKind == kindDraggableTriangle2) {
             spot.draggable = true;
             spot.activation = this.drag;
             let sz = 0.45;
@@ -3875,7 +3919,7 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    let info = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare };
+                    let info = { text: track.title, noLocalization: true, itemKind: kindDraggableSquare2 };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
                     let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
                         let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
@@ -3897,12 +3941,14 @@ function fillClipboardList() {
                             if (globalCommandDispatcher.clipboardData) {
                                 console.log(track.measures);
                                 for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-                                    let from = track.measures[pp];
-                                    for (let tt = 0; tt < from.chords.length; tt++) {
-                                        if (barIdx + pp < to.length) {
-                                            if (from.chords[tt]) {
-                                                let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
-                                                to[barIdx + pp].chords.push(fromChord);
+                                    if (barIdx + pp < to.length) {
+                                        let from = track.measures[pp];
+                                        for (let tt = 0; tt < from.chords.length; tt++) {
+                                            if (barIdx + pp < to.length) {
+                                                if (from.chords[tt]) {
+                                                    let fromChord = JSON.parse(JSON.stringify(from.chords[tt]));
+                                                    to[barIdx + pp].chords.push(fromChord);
+                                                }
                                             }
                                         }
                                     }
@@ -3945,7 +3991,7 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    let info = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle };
+                    let info = { text: percussion.title, noLocalization: true, itemKind: kindDraggableTriangle2 };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
                     let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
                         let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
@@ -3972,11 +4018,13 @@ function fillClipboardList() {
                             globalCommandDispatcher.exe.commitProjectChanges(['percussions', startY], () => {
                                 if (globalCommandDispatcher.clipboardData) {
                                     for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-                                        let from = percussion.measures[pp];
-                                        for (let tt = 0; tt < from.skips.length; tt++) {
-                                            if (from.skips[tt]) {
-                                                let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
-                                                to[barIdx + pp].skips.push(fromIt);
+                                        if (barIdx + pp < to.length) {
+                                            let from = percussion.measures[pp];
+                                            for (let tt = 0; tt < from.skips.length; tt++) {
+                                                if (from.skips[tt]) {
+                                                    let fromIt = JSON.parse(JSON.stringify(from.skips[tt]));
+                                                    to[barIdx + pp].skips.push(fromIt);
+                                                }
                                             }
                                         }
                                     }
@@ -4019,7 +4067,7 @@ function fillClipboardList() {
                     }
                 }
                 if (!empty) {
-                    let info = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle };
+                    let info = { text: filter.title, noLocalization: true, itemKind: kindDraggableCircle2 };
                     let tri = { x: 0, y: 0, w: 11, h: 1, css: 'pasteDragItem' };
                     let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
                         let startX = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
@@ -4051,11 +4099,13 @@ function fillClipboardList() {
                             globalCommandDispatcher.exe.commitProjectChanges(['filters', startY], () => {
                                 if (globalCommandDispatcher.clipboardData) {
                                     for (let pp = 0; pp < globalCommandDispatcher.clipboardData.timeline.length; pp++) {
-                                        let from = filter.automation[pp];
-                                        for (let tt = 0; tt < from.changes.length; tt++) {
-                                            if (from.changes[tt]) {
-                                                let fromIt = JSON.parse(JSON.stringify(from.changes[tt]));
-                                                to[barIdx + pp].changes.push(fromIt);
+                                        if (barIdx + pp < to.length) {
+                                            let from = filter.automation[pp];
+                                            for (let tt = 0; tt < from.changes.length; tt++) {
+                                                if (from.changes[tt]) {
+                                                    let fromIt = JSON.parse(JSON.stringify(from.changes[tt]));
+                                                    to[barIdx + pp].changes.push(fromIt);
+                                                }
                                             }
                                         }
                                     }
@@ -4073,6 +4123,17 @@ function fillClipboardList() {
             }
         }
     }
+}
+function setProjectPositionFanArea() {
+    let position = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+    if (position.x > -globalCommandDispatcher.cfg().timelineWidth() * globalCommandDispatcher.renderer.tiler.tapPxSize()) {
+        position = {
+            x: -globalCommandDispatcher.cfg().timelineWidth() * globalCommandDispatcher.renderer.tiler.tapPxSize(),
+            y: position.y,
+            z: position.z
+        };
+    }
+    globalCommandDispatcher.cfg().data.position = position;
 }
 function fillPluginsLists() {
     menuPointAddPlugin.children = [];
@@ -4093,9 +4154,13 @@ function fillPluginsLists() {
                 let info = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
                 let tri = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
                 let fotri = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
-                let dragger = new DragMenuItemUtil(tri, info, (xx, yy) => {
+                let dragger = new DragMenuItemUtil(tri, info, (dx, yy) => {
                     globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-                        let samplerNo = findSamplerIdxByXYcurZ(xx, yy);
+                        let samplerNo = findSamplerIdxByXYcurZ(dx, yy);
+                        let xx = dx;
+                        if (xx < globalCommandDispatcher.cfg().padGridFan) {
+                            xx = globalCommandDispatcher.cfg().padGridFan;
+                        }
                         if (samplerNo > -1) {
                             let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
                             toSamplerTrack.sampler.kind = MZXBX_currentPlugins()[ii].kind;
@@ -4120,6 +4185,7 @@ function fillPluginsLists() {
                                 measures: [],
                                 title: MZXBX_currentPlugins()[ii].label
                             });
+                            setProjectPositionFanArea();
                             globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                         }
                         refreshMixerItemFocus.currentID = -1;
@@ -4193,7 +4259,6 @@ function fillPluginsLists() {
                             }
                             let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
                             globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
-                            console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
                             globalCommandDispatcher.player.clearPluginsCache();
                             globalCommandDispatcher.reStartPlayIfPlay();
                         }
@@ -4216,6 +4281,7 @@ function fillPluginsLists() {
                                     measures: [],
                                     title: MZXBX_currentPlugins()[ii].label
                                 });
+                                setProjectPositionFanArea();
                                 globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }
@@ -4262,7 +4328,11 @@ function fillPluginsLists() {
                     if (purpose == 'Filter') {
                         let info = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
                         let circle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
-                        let dragger = new DragMenuItemUtil(circle, info, (xx, yy) => {
+                        let dragger = new DragMenuItemUtil(circle, info, (dx, yy) => {
+                            let xx = dx;
+                            if (xx < globalCommandDispatcher.cfg().padGridFan) {
+                                xx = globalCommandDispatcher.cfg().padGridFan;
+                            }
                             globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
                                 globalCommandDispatcher.cfg().data.filters.push({
                                     id: '' + Math.random(),
@@ -4274,6 +4344,7 @@ function fillPluginsLists() {
                                     state: 0,
                                     title: MZXBX_currentPlugins()[ii].label
                                 });
+                                setProjectPositionFanArea();
                                 globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
                             });
                         }, null, (zz) => { });
