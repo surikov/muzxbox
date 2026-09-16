@@ -15,56 +15,10 @@
 }:root {
     --tapSize: 1cm;
 }
-/* cyrillic 
-@font-face {
-    font-family: 'Poiret One';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url(poiretone/poiretonecyrillic.woff2) format('woff2');
-    unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-*/
-/* latin-ext 
-@font-face {
-    font-family: 'Poiret One';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url(poiretone/poiretonelatinext.woff2) format('woff2');
-    unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-*/
-/* latin 
-@font-face {
-    font-family: 'Poiret One';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url(poiretone/poiretonelatin.woff2) format('woff2');
-    unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-*/
-/*
-@font-face {
-    font-family: 'Roboto';
-    src: url(roboto/Roboto-Regular.ttf);
-}
-*/
 
-/*
-@font-face {
-	font-family: 'MontserratAlternates-Regular';
-	src: url(MontserratAlternates/MontserratAlternates-Regular.ttf);
-}*/
-/*
-@font-face {
-	font-family: 'Brahms';
-	src: url('ofont.ru_Brahms Gotisch.ttf');
-}*/
 @font-face {
 	font-family: 'MontserratAlternates';
-	src: url('MontserratAlternates/MontserratAlternates-Regular.ttf');
+	src: url('theme/MontserratAlternates/MontserratAlternates-Regular.ttf');
 }
 
 
@@ -105,16 +59,6 @@
 
 
 	--color-debug: #c00;
-	/*
-	--color-shadow: #00000066;
-	--color-background: #000000ff;
-	--color-panel: #114466ff;
-	--color-focus: #009933ff;
-	--color-interactive: #cc6633ff;
-	--color-panel: #44ccffff;
-	--color-subtext: #99ccccff;
-	(((--main-color))): #ddeeffff;
-*/
 	--background-color: #030900;
 	--main-color: #fff;
 	--drag-color: #066;
@@ -131,6 +75,7 @@
 	--line-color6: color-mix(in lab, transparent 6%, var(--line-color));
 
 	--background-color10: color-mix(in lab, transparent 10%, var(--background-color));
+--drag-color50: color-mix(in lab, transparent 50%, var(--drag-color));
 
 	--selectedtime-color22: color-mix(in lab, transparent 85%, var(--line-color));
 	--selectedtime-color: color-mix(in lab, transparent 66%, var(--drag-color));
@@ -139,6 +84,8 @@
 
 	--disable-drag-color: color-mix(in lab, transparent 75%, var(--drag-color));
 	--disable-click-color: color-mix(in lab, transparent 75%, var(--click-color));
+	
+	--black-key-color: color-mix(in lab, transparent 50%, var(--click-color));
 
 }
 
@@ -146,7 +93,7 @@
 	--fog-color: color-mix(in lab, transparent 10%, var(--background-color));
 	--back-color: color-mix(in lab, transparent 3%, var(--background-color));
 	--shadow-color: color-mix(in lab, transparent 75%, var(--main-color));
-	--plugintitle-color: var(--drag-color);
+	--plugintitle-color: color-mix(in lab, var(--background-color) 90%, var(--line-color) 10%);
 }
 
 #file_midi_input {
@@ -321,7 +268,8 @@ body {
 }
 .gridRollTracks {
 	fill: #ffffff01
-}.samplerRowBorder{
+}
+.samplerRowBorder{
 	fill: var(--line-color);
 	fill-opacity:25%;
     stroke: none;
@@ -350,7 +298,7 @@ body {
 }
 .samplerDrumDotLine{
 	fill: var(--main-color);
-	fill-opacity33:95%;
+	fill-opacity:75%;
     stroke: none;
 	pointer-events: none;
 }
@@ -390,13 +338,28 @@ body {
 	stroke: none;
 	pointer-events: none;
 }.rightMenuPanel {
-    fill: var(--background-color);
+    fill2: var(--background-color);
+	fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
 }
 
 .rectangleDragItem {
     fill: var(--drag-color);
 	stroke: var(--main-color);
     stroke-width: 0.01cm;
+}
+.rectangleDragFocus {
+    fill: none;
+	stroke: var(--line-color30);
+    stroke-width: 0.05cm;
+}
+
+.pasteDragItem {
+    fill: var(--drag-color50);
+
+}
+.pasteDragFocus {
+    fill: var(--main-color50);
+
 }
 
 .dragDropMixerItem {
@@ -476,10 +439,19 @@ body {
     pointer-events: none;
     font-family: "Material-Design-Iconic-Font";
 }
+.menuTogglerLine {
+    fill: var(--click-color);
+    stroke:0;
 
+}
 
 .menuButtonCircle {
     fill: var(--click-color);
+    stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.menuTogglerFill {
+    fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
     stroke: var(--main-color);
     stroke-width: 0.015cm;
 }
@@ -499,7 +471,8 @@ body {
     opacity: 50%;
     transform: rotate(90deg);
     transform-origin: 0cm 0cm;
-}.leftBlackKey {
+}
+.leftBlackKey {
 	fill: var(--drag-color);
 }
 
@@ -510,62 +483,62 @@ body {
 
 .octaveLabel025 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*0.25*var(--tapSize));
 
 }
 
 .octaveLabel05 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*0.5*var(--tapSize));
 }
 
 .octaveLabel1 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*var(--tapSize));
 }
 
 .octaveLabel2 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*2*var(--tapSize));
 }
 
 .octaveLabel4 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*4*var(--tapSize));
 }
 
 .octaveLabel8 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*8*var(--tapSize));
 }
 
 .octaveLabel16 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*16*var(--tapSize));
 }
 
 .octaveLabel32 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*32*var(--tapSize));
 }
 
 .octaveLabel64 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*64*var(--tapSize));
 }
 
 .octaveLabel128 {
 	fill: var(--line-color);
-	fill-opacity: 50%;
+	fill-opacity: 25%;
 	font-size: calc(1*128*var(--tapSize));
 }
 
@@ -1311,7 +1284,11 @@ cursor:col-resize;
     stroke: none;
     pointer-events: none;
 }
-
+.interActiveGridWhiteKey{
+	fill: var(--black-key-color);
+    stroke: none;
+    pointer-events: none;
+}
 
 .commentLineText025 {
     fill: var(--main-color);
@@ -1390,10 +1367,18 @@ cursor:col-resize;
     font-size: calc(4*var(--tapSize));
 	pointer-events: none;
 }
-
+.xAutoStart {
+    stop-color: var(--main-color);
+    stop-opacity: 100%;
+  }
+  .xAutoEnd {
+    stop-color: var(--main-color);
+    stop-opacity: 0%;
+  }
 .automationBgDot{
-	fill: var(--main-color);
-	fill-opacity:95%;
+	fill999: var(--main-color);
+	fill-opacity9999:95%;
+	fill: url(#autoDotGradient);
     stroke: none;
 	pointer-events: none;
 }
@@ -1408,6 +1393,8 @@ cursor:col-resize;
 	fill-opacity:90%;
     stroke: none;
 }
+
+
 .timeMeasureMark22222 {
 	fill: var(--line-color);
 	fill-opacity: 25%;
@@ -1520,6 +1507,51 @@ cursor:col-resize;
 	fill: var(--main-color);
 
 }
+
+
+.selectionTransposeLabel025 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.2*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel05 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.4*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel1 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(0.8*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel2 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(1.6*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel4 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(3.2*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+.selectionTransposeLabel8 {
+    fill: var(--line-color);
+    text-anchor: middle;
+    font-size: calc(6.4*var(--tapSize));
+    pointer-events: none;
+    font-family: 'Material-Design-Iconic-Font';
+}
+
 
 .timeBarNum025 {
 	fill: var(--line-color);
@@ -1962,7 +1994,7 @@ cursor:col-resize;
 #pluginPointHeader {
 	width: 100%;
 	height: 1.0cm;
-	background-color: var(--background-color);
+	background-color: var(--plugintitle-color);
 	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
 	flex-shrink: 0;
@@ -1975,7 +2007,7 @@ cursor:col-resize;
 .pluginOtherHeader {
 	width: 100%;
 	height: 1.0cm;
-	background-color: var(--background-color);
+	background-color: var(--plugintitle-color);
 	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
 	flex-shrink: 0;
@@ -1984,27 +2016,10 @@ cursor:col-resize;
 	flex-direction: row;
 	justify-content: space-between;
 	padding-top: 0.1cm;
+	
+	
 }
-/*
-#pluginEditTitleButton {
-	border-radius: 0.4cm;
-	background-color: var(--click-color);
-	color: var(--main-color);
-	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
-	font-size: var(--label-05cm);
-	width: 0.8cm;
-	height: 0.8cm;
-	text-align: center;
-	font-family: "Material-Design-Iconic-Font";
-	cursor: pointer;
-	margin-left: 0.2cm;
-	margin-right: 0.2cm;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 0.8cm;
-}
-*/
+
 #pluginActionTitle {
 	color: var(--line-color);
 	font-size: var(--label-04cm);
@@ -2077,34 +2092,12 @@ cursor:col-resize;
 	justify-content: center;
 	min-width: 0.8cm;
 }
-/*
-#pluginRefresh {
-	border-radius2: 0.4cm;
-	background-color: var(--click-color);
-	color: var(--main-color);
-	text-shadow2: 0.25px 0px var(--main-color), -0.25px 0px var(--main-color), 0px 0.25px var(--main-color), 0px -0.25px var(--main-color);
-	font-size: var(--label-05cm);
-	width: 0.8cm;
-	height: 0.8cm;
-	text-align: center;
-	margin-to2p: 0.1cm;
-	font-family: "Material-Design-Iconic-Font";
-	background-color2: brown;
-	cursor: pointer;
-	box-shadow: inset 0px 0px 0px 0.5px var(--main-color);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	min-width: 0.8cm;
-
-}
-*/
 
 
 .pluginBottom {
 	width: 100%;
 	height: 1.0cm;
-	background-color: var(--background-color10);
+	background-color: var(--plugintitle-color);
 	border-radius2: 0.125cm 0.125cm 0.0cm 0.0cm;
 	flex-basis: auto;
 	flex-shrink: 0;
@@ -2113,20 +2106,10 @@ cursor:col-resize;
 	flex-direction: row;
 	justify-content: center;
 	padding-top: 0.1cm;
+	
+	
 }
-/*
-#pluginDeleteLabel {
-	color: var(--main-color);
-	font-size: var(--label-04cm);
-	padding-left: 0.5cm;
-	padding-top: 0.15cm;
-	flex-grow: 1;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	text-align: right;
-}
-*/
+
 .pluginDoButton {
 	border-radius: 0.4cm;
 	background-color: var(--click-color);
@@ -2227,18 +2210,9 @@ cursor:col-resize;
 .fanSamplerMoveIcon7 {stroke-width: calc(2.56*var(--tapSize));}
 .fanSamplerMoveIcon8 {stroke-width: calc(5.12*var(--tapSize));}
 .fanSamplerMoveIcon9 {stroke-width: calc(10.24*var(--tapSize));}
-/*
-.fanSamplerUpIcon0 {stroke-width: calc(0.08*var(--tapSize));}
-.fanSamplerUpIcon1 {stroke-width: calc(0.16*var(--tapSize));}
-.fanSamplerUpIcon2 {stroke-width: calc(0.32*var(--tapSize));}
-.fanSamplerUpIcon3 {stroke-width: calc(0.64*var(--tapSize));}
-.fanSamplerUpIcon4 {stroke-width: calc(1.28*var(--tapSize));}
-.fanSamplerUpIcon5 {stroke-width: calc(2.56*var(--tapSize));}
-.fanSamplerUpIcon6 {stroke-width: calc(5.12*var(--tapSize));}
-.fanSamplerUpIcon7 {stroke-width: calc(7.68*var(--tapSize));}
-.fanSamplerUpIcon8 {stroke-width: calc(10.24*var(--tapSize));}
-.fanSamplerUpIcon9 {stroke-width: calc(20.48*var(--tapSize));}
-*/
+.fanSamplerMoveIcon10 {stroke-width: calc(10.24*var(--tapSize));}
+
+
 .fanSamplerInteractionIcon {
 	fill: var(--click-color);
 	font-size: calc(0.25*var(--tapSize));
@@ -2257,11 +2231,21 @@ cursor:col-resize;
 	stroke-linejoin: round;
 	paint-order: stroke fill;
 }
+.fanEmptySymbol {
+	fill: #00000000;
+	pointer-events: none;
+	stroke: var(--line-color75);
+}
+
 .fanButton0 {stroke-width: calc(0.02*var(--tapSize));}
 .fanButton1 {stroke-width: calc(0.04*var(--tapSize));}
 .fanButton2 {stroke-width: calc(0.08*var(--tapSize));}
 .fanButton3 {stroke-width: calc(0.16*var(--tapSize));}
 .fanButton4 {stroke-width: calc(0.32*var(--tapSize));}
+.fanButton5 {stroke-width: calc(0.64*var(--tapSize));}
+.fanButton6 {stroke-width: calc(1.28*var(--tapSize));}
+.fanButton7 {stroke-width: calc(2.56*var(--tapSize));}
+.fanButton8 {stroke-width: calc(5.12*var(--tapSize));}
 
 .fanSamplerActionIconLabel {
 	fill: var(--main-color);
@@ -2340,6 +2324,8 @@ cursor:col-resize;
 .fanConnection6 {stroke-width: 0.75cm;}
 .fanConnection7 {stroke-width: 1cm;}
 .fanConnection8 {stroke-width: 2cm;}
+.fanConnection9 {stroke-width: 2cm;}
+.fanConnection10 {stroke-width: 2cm;}
 
 .fanStream {
 	pointer-events: none;
@@ -2420,6 +2406,7 @@ cursor:col-resize;
 	--drag-color: #c30;
 	--line-color: #fff;
 	--click-color: #264;
+	--black-key-color: color-mix(in lab, transparent 70%, var(--click-color));
 }
 
 #tileLevelSVG {
@@ -2434,22 +2421,22 @@ cursor:col-resize;
 :root {
     --font-ratio: 0.85;
 }
-/* latin-ext */
+
 @font-face {
 	font-family: 'Bruno Ace';
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
-	src: url(BrunoAce/WwkcxPa2E06x4trkOj_UOaANaNM.woff2) format('woff2');
+	src: url(theme/BrunoAce/WwkcxPa2E06x4trkOj_UOaANaNM.woff2) format('woff2');
 	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
   }
-  /* latin */
+
   @font-face {
 	font-family: 'Bruno Ace';
 	font-style: normal;
 	font-weight: 400;
 	font-display: swap;
-	src: url(BrunoAce/WwkcxPa2E06x4trkOj_UN6AN.woff2) format('woff2');
+	src: url(theme/BrunoAce/WwkcxPa2E06x4trkOj_UN6AN.woff2) format('woff2');
 	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
   }
 html {

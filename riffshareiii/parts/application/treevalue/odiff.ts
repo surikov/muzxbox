@@ -31,6 +31,11 @@ class StateDiff {
 	}
 	addDiff(nodePath: (string | number)[], commands: Zvoog_Action[], old: any, changed: any): void {
 		if (Array.isArray(old)) {
+			if(changed){
+
+			}else{
+				changed=[];
+			}
 			this.calculateArray(nodePath, commands, old, changed);
 		} else {
 			this.calculateNonArray(nodePath, commands, old, changed);
@@ -62,7 +67,7 @@ class StateDiff {
 		}
 	}
 	calculateArray(nodePath: (string | number)[], commands: Zvoog_Action[], old: any[], changed: any[]): void {
-		//console.log('calculateArray', nodePath, old, changed);
+		//console.log('calculateArray', nodePath, 'old',old, 'changed',changed);
 		for (let idx = 0; idx < old.length && idx < changed.length; idx++) {
 			let currentPath: (string | number)[] = nodePath.slice(0);
 			currentPath.push(idx);
