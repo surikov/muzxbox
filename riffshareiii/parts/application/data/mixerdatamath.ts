@@ -227,7 +227,10 @@ class MixerDataMathUtility {
 		for (let ii = 0; ii < this.data.timeline.length; ii++) {
 			let timebar = this.data.timeline[ii];
 			if (!(timebar)) {
-				timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
+				timebar = {
+					tempo: 120, metre: { count: 4, part: 4 }
+					//, modality: { step: { step: 0, shift: 0 }, mode: { tonic: 0, second: 0, third: 0, sixth: 0, seventh: 0 }, hint: '' }
+				}
 			}
 			ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
 			//ww = ww + mm.set(this.data.timeline[ii].metre).duration(this.data.timeline[ii].tempo) * this.widthDurationRatio;

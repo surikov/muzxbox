@@ -314,7 +314,10 @@ function fillClipboardList() {
 		for (let ii = 0; ii < globalCommandDispatcher.clipboardData.timeline.length; ii++) {
 			let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
 			if (!(timebar)) {
-				timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
+				timebar = {
+					tempo: 120, metre: { count: 4, part: 4 }
+					//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+				}
 			}
 			pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 		}

@@ -1062,19 +1062,9 @@ type Zvoog_TrackMeasure = {
 type Zvoog_PercussionMeasure = {
     skips: Zvoog_Metre[];
 };
-type Zvoog_ChordStep = {
-    step: number;
-    shift: number;
-};
-type Zvoog_ChordMode = {
-    mode: number[];
-    chord: Zvoog_ChordStep[];
-    tonic: Zvoog_ChordStep;
-};
 type Zvoog_SongMeasure = {
     tempo: number;
     metre: Zvoog_Metre;
-    modality: Zvoog_ChordMode;
 };
 type Zvoog_FilterMeasure = {
     changes: Zvoog_FilterStateChange[];

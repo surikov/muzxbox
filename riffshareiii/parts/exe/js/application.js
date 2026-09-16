@@ -234,7 +234,7 @@ class StateDiff {
     }
 }
 let goHomeBackURL = '';
-let applicationVersion = '1.8.3';
+let applicationVersion = '1.8.31';
 function startApplication() {
     console.log('startApplication v', applicationVersion);
     document.title = 'Minium Studio ' + applicationVersion;
@@ -1668,7 +1668,6 @@ class CommandDispatcher {
                             it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
                         }
                         if (it.pitches.length < 1) {
-                            console.log('empty', it);
                         }
                     }
                 }
@@ -2254,7 +2253,6 @@ class CommandDispatcher {
     adjustAppendBar(project) {
         project.timeline.push({
             tempo: project.timeline[project.timeline.length - 1].tempo,
-            modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] },
             metre: {
                 count: project.timeline[project.timeline.length - 1].metre.count,
                 part: project.timeline[project.timeline.length - 1].metre.part
@@ -3904,7 +3902,9 @@ function fillClipboardList() {
         for (let ii = 0; ii < globalCommandDispatcher.clipboardData.timeline.length; ii++) {
             let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
+                timebar = {
+                    tempo: 120, metre: { count: 4, part: 4 }
+                };
             }
             pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
         }
@@ -5640,7 +5640,8 @@ class MixerUI {
             let css = 'mixFiller' + filIdx;
             let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
+                timebar = { tempo: 120, metre: { count: 4, part: 4 }
+                };
             }
             let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barLeft = barX;
@@ -5718,7 +5719,9 @@ class MixerZoomLevel {
         for (let ii = 0; ii < globalCommandDispatcher.cfg().data.timeline.length; ii++) {
             let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
+                timebar = {
+                    tempo: 120, metre: { count: 4, part: 4 }
+                };
             }
             width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             let barGridAnchor = {
@@ -7200,10 +7203,18 @@ function createNewEmptyProjectData() {
         selectedPart: { startMeasure: -1, endMeasure: -1 },
         position: { x: 0, y: -0, z: 33 },
         timeline: [
-            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-            { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
+            {
+                tempo: 120, metre: { count: 4, part: 4 }
+            },
+            {
+                tempo: 120, metre: { count: 4, part: 4 }
+            },
+            {
+                tempo: 120, metre: { count: 4, part: 4 }
+            },
+            {
+                tempo: 120, metre: { count: 4, part: 4 }
+            }
         ],
         tracks: [
             {
@@ -7227,16 +7238,36 @@ let _______mzxbxProjectForTesting2 = {
     selectedPart: { startMeasure: 1, endMeasure: 1 },
     position: { x: -13037.9, y: -1317.9, z: 4.7 },
     timeline: [
-        { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 200, metre: { count: 3, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } },
-        { tempo: 180, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } }
+        {
+            tempo: 120, metre: { count: 4, part: 4 }
+        },
+        {
+            tempo: 120, metre: { count: 4, part: 4 }
+        },
+        {
+            tempo: 200, metre: { count: 3, part: 4 }
+        },
+        {
+            tempo: 180, metre: { count: 4, part: 4 }
+        },
+        {
+            tempo: 200, metre: { count: 3, part: 4 }
+        },
+        {
+            tempo: 180, metre: { count: 4, part: 4 }
+        },
+        {
+            tempo: 200, metre: { count: 3, part: 4 }
+        },
+        {
+            tempo: 180, metre: { count: 4, part: 4 }
+        },
+        {
+            tempo: 200, metre: { count: 3, part: 4 }
+        },
+        {
+            tempo: 180, metre: { count: 4, part: 4 }
+        }
     ],
     tracks: [
         {
@@ -7520,7 +7551,9 @@ class MixerDataMathUtility {
         for (let ii = 0; ii < this.data.timeline.length; ii++) {
             let timebar = this.data.timeline[ii];
             if (!(timebar)) {
-                timebar = { tempo: 120, metre: { count: 4, part: 4 }, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
+                timebar = {
+                    tempo: 120, metre: { count: 4, part: 4 }
+                };
             }
             ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;
         }

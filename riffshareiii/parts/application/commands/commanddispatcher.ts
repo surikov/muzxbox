@@ -424,7 +424,7 @@ class CommandDispatcher {
 							it.slides.push({ duration: MMUtil().set(one.duration).duration(measure.tempo), delta: one.delta });
 						}
 						if (it.pitches.length < 1) {
-							console.log('empty', it);
+							//console.log('empty', it);
 						}
 					}
 				}
@@ -1273,7 +1273,7 @@ class CommandDispatcher {
 	adjustAppendBar(project: Zvoog_Project) {
 		project.timeline.push({
 			tempo: project.timeline[project.timeline.length - 1].tempo
-			, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+			//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			, metre: {
 				count: project.timeline[project.timeline.length - 1].metre.count
 				, part: project.timeline[project.timeline.length - 1].metre.part

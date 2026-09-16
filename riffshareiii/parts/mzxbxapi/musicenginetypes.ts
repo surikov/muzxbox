@@ -85,19 +85,27 @@ type Zvoog_TrackMeasure = {
 type Zvoog_PercussionMeasure = {
 	skips: Zvoog_Metre[];
 };
+/*
 type Zvoog_ChordStep = {
 	step: number;
 	shift: number;
 };
-type Zvoog_ChordMode = {
-	mode: number[];
-	chord: Zvoog_ChordStep[];
-	tonic: Zvoog_ChordStep;
+type Zvoog_ModeIntervals = {
+	second: number;
+	third: number;
+	sixth: number;
+	seventh: number;
 };
+type Zvoog_ChordMode = {
+	mode: Zvoog_ModeIntervals;
+	shifts: number[];
+	chord: Zvoog_ChordStep;
+	tonic: number;
+};*/
 type Zvoog_SongMeasure = {
 	tempo: number;
 	metre: Zvoog_Metre;
-	modality: Zvoog_ChordMode;
+	//modality: Zvoog_ChordMode;
 };
 /*
 type Zvoog_AutomationTrack = {
