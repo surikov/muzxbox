@@ -126,7 +126,7 @@ class FileLoaderAlpha {
 			}
 			let measure: Zvoog_SongMeasure = {
 				tempo: tempo
-				, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 				, metre: {
 					count: maBar.timeSignatureNumerator
 					, part: maBar.timeSignatureDenominator
@@ -196,7 +196,7 @@ class FileLoaderAlpha {
 
 	}
 	dumpProjectInfo(project: Zvoog_Project | null) {
-		console.log('dumpProjectInfo', project);
+		console.log('dumpProjectInfo--------------------------------------', project);
 		if (project) {
 			console.log(//'tracks', project.tracks.length, 
 				'bars', project.timeline.length);
@@ -223,12 +223,43 @@ class FileLoaderAlpha {
 					let dnu = msr.skips.length > 0 ? 1 : 0;
 					return ss + dnu;
 				}, 0);
-				console.log(drm, '/', usdr, '=',Math.round( drm / usdr), track.title);
+				console.log(drm, '/', usdr, '=', Math.round(drm / usdr), track.title);
 				return sum + drm;
 			}, 0);
 
 			console.log('all drums', allDrumCount);
+
+			let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				let pitches: { pitch: number, count: number }[] = [];
+				for (let tt = 0; tt < project.tracks.length; tt++) {
+					let trackMeasure = project.tracks[tt].measures[ii];
+					for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+						let trackMeasureChord = trackMeasure.chords[cc];
+						for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+							let pitch = trackMeasureChord.pitches[pp] % 12;
+							//pitches[pitch] = pitches[pitch] ? pitches[pitch] : 0;
+							//pitches[pitch]++;
+							let it = pitches.find((value) => value.pitch == pitch);
+							if (!(it)) {
+								it = { pitch: pitch, count: 0 };
+								pitches.push(it);
+							}
+							it.count++;
+						}
+					}
+				}
+				pitches.sort((aa, bb) => bb.count - aa.count);
+				let pitchesLine = '';
+				for (let pp = 0; pp < pitches.length; pp++) {
+					pitchesLine = pitchesLine + '  ' + noteNames[pitches[pp].pitch] + ':' + pitches[pp].count;
+				}
+				console.log(ii, pitchesLine);
+			}
+
 		}
+
+		console.log('-------------------');
 	}
 
 

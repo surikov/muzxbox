@@ -15856,7 +15856,9 @@ class EventsConverter {
                 meter.part = 4;
             }
             let barDurationMs = meter.duration(tempo) * 1000;
-            let nextBar = { tempo: tempo, metre: meter.metre(), modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } };
+            let nextBar = {
+                tempo: tempo, metre: meter.metre()
+            };
             project.timeline.push(nextBar);
             if (barDurationMs < 100)
                 barDurationMs = 100;
@@ -15956,7 +15958,6 @@ class EventsConverter {
                     hint35_81: 0
                 }
             };
-            console.log(pp.title, ':', pp.sampler.data, insOut, allPercussions[ii].midiPitch);
             for (let mm = 0; mm < project.timeline.length; mm++) {
                 pp.measures.push({ skips: [] });
             }
@@ -16513,7 +16514,6 @@ class FileLoaderAlpha {
             }
             let measure = {
                 tempo: tempo,
-                modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] },
                 metre: {
                     count: maBar.timeSignatureNumerator,
                     part: maBar.timeSignatureDenominator
@@ -16575,7 +16575,7 @@ class FileLoaderAlpha {
         parsedProject = project;
     }
     dumpProjectInfo(project) {
-        console.log('dumpProjectInfo', project);
+        console.log('dumpProjectInfo--------------------------------------', project);
         if (project) {
             console.log('bars', project.timeline.length);
             let allChordCount = project.tracks.reduce((sum, track, currentIndex, arr) => {
@@ -16602,7 +16602,33 @@ class FileLoaderAlpha {
                 return sum + drm;
             }, 0);
             console.log('all drums', allDrumCount);
+            let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+            for (let ii = 0; ii < project.timeline.length; ii++) {
+                let pitches = [];
+                for (let tt = 0; tt < project.tracks.length; tt++) {
+                    let trackMeasure = project.tracks[tt].measures[ii];
+                    for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                        let trackMeasureChord = trackMeasure.chords[cc];
+                        for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+                            let pitch = trackMeasureChord.pitches[pp] % 12;
+                            let it = pitches.find((value) => value.pitch == pitch);
+                            if (!(it)) {
+                                it = { pitch: pitch, count: 0 };
+                                pitches.push(it);
+                            }
+                            it.count++;
+                        }
+                    }
+                }
+                pitches.sort((aa, bb) => bb.count - aa.count);
+                let pitchesLine = '';
+                for (let pp = 0; pp < pitches.length; pp++) {
+                    pitchesLine = pitchesLine + '  ' + noteNames[pitches[pp].pitch] + ':' + pitches[pp].count;
+                }
+                console.log(ii, pitchesLine);
+            }
         }
+        console.log('-------------------');
     }
     addRepeats(project, score) {
         let startLoop = -1;
