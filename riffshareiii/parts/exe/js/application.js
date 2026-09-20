@@ -239,7 +239,7 @@ class StateDiff {
     }
 }
 let goHomeBackURL = '';
-let applicationVersion = '1.8.31';
+let applicationVersion = '1.8.32';
 function startApplication() {
     console.log('startApplication v', applicationVersion);
     document.title = 'Minium Studio ' + applicationVersion;
