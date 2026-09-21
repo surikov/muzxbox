@@ -1,10 +1,10 @@
 :root {
-	--background-color: #411;
-	--main-color: #ff9;
-	--drag-color: #c30;
-	--line-color: #fff;
-	--click-color: #264;
-	--black-key-color: color-mix(in lab, transparent 70%, var(--click-color));
+	--background-color: #32383d;
+	--main-color: #fff;
+	--drag-color: #4dcc72;
+	--line-color: #aa4e4e;
+	--click-color: #4bb8f5;
+	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color));
 }
 
 #tileLevelSVG {

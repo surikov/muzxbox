@@ -1,6 +1,6 @@
 .rightMenuPanel {
     fill2: var(--background-color);
-	fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
+	fill: color-mix(in lab, var(--background-color) 90%, var(--drag-color) 10%);;
 }
 
 .rectangleDragItem {
@@ -112,7 +112,7 @@
     stroke-width: 0.015cm;
 }
 .menuTogglerFill {
-    fill: color-mix(in lab, var(--background-color) 70%, var(--drag-color) 30%);;
+    fill: color-mix(in lab, var(--background-color) 90%, var(--drag-color) 10%);;
     stroke: var(--main-color);
     stroke-width: 0.015cm;
 }
