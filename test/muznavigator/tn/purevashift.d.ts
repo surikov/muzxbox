@@ -2287,8 +2287,13 @@ declare class PitchShift2 extends FeedbackEffect2 {
     setupPitch(interval: number): void;
     dispose(): this;
 }
+declare class Synth2 {
+    output: GainNode;
+    constructor(ac: AudioContext);
+    start(when: number): void;
+}
 declare function createShift2(ac: AudioContext): PitchShift2;
 declare function createShift(): PitchShift;
 declare let cuCo: AudioContext | null;
-declare let o1: Oscillator2 | null;
+declare let synth: Synth2 | null;
 declare function doTest2(): void;

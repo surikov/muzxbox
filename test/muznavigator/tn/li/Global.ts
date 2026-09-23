@@ -47,7 +47,7 @@ function setContext(
 	context: BaseContext | AnyAudioContext,
 	disposeOld = false
 ): void {
-	console.log('setContext',context,disposeOld);
+	//console.log('setContext',context,disposeOld);
 	if (disposeOld) {
 		globalContext.dispose();
 	}

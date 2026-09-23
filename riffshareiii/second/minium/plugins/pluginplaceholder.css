@@ -1,0 +1,16 @@
+body {
+	font-family: "Poiret One", sans-serif;
+	font-weight: 600;
+	font-style: normal;
+	/* background-color: #eef; */
+	background-color: var(--background-color);
+	color: var(--line-color);
+	/* background: #2A7B9B; */
+	/* background: radial-gradient(circle, rgba(255, 255, 255, 1) 0%, rgba(190, 210, 255, 1) 100%); */
+	/*background: radial-gradient(circle, var(--line-color) 0%, var(--background-color) 100%);*/
+}
+
+h1 {
+	text-align: center;
+}
+

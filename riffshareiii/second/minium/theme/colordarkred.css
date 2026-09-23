@@ -1,0 +1,20 @@
+:root {
+	--background-color: #32383d;
+	--main-color: #fff;
+	--drag-color: #459;
+	--drag-color11: #363;
+	--line-color: #4dcc72;
+	--line-color11: #ccc;
+	--click-color: #aa4e4e;
+	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color));
+}
+
+#tileLevelSVG {
+	background-image: url("bg/logo.png");
+	background-size2: cover;
+	background-position-x: left;
+	background-position-y: bottom;
+	background-repeat: no-repeat;
+	background-size: auto 100%;
+}
+

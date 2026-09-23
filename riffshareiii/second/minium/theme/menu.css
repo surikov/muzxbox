@@ -1,0 +1,135 @@
+.rightMenuPanel {
+    fill2: var(--background-color);
+	fill: color-mix(in lab, var(--background-color) 90%, var(--drag-color) 10%);;
+}
+
+.rectangleDragItem {
+    fill: var(--drag-color);
+	stroke: var(--main-color);
+    stroke-width: 0.01cm;
+}
+.rectangleDragFocus {
+    fill: none;
+	stroke: var(--line-color30);
+    stroke-width: 0.05cm;
+}
+
+.pasteDragItem {
+    fill: var(--drag-color50);
+
+}
+.pasteDragFocus {
+    fill: var(--main-color50);
+
+}
+
+.dragDropMixerItem {
+    visibility: visible;
+}
+.noDragDropMixerItem {
+    visibility: hidden;
+}
+
+.rightMenuDelimiterLine {
+    fill: var(--shadow-color);
+    pointer-events: none;
+}
+
+.rightMenuFocusedDelimiter {
+    fill: var(--main-color);
+    pointer-events: none;
+    animation: focusFlashFill 4s linear infinite;
+}
+
+.rightMenuLabel {
+    fill: var(--main-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+.rightMenuLightLabel {
+    fill: var(--shadow-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+
+.rightMenuSubLabel {
+    fill: var(--drag-color);
+    font-size: var(--label-04cm);
+    pointer-events: none;
+}
+
+.rightMenuItemDragBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: var(--drag-color);
+    cursor: move;
+}
+
+.rightMenuItemActionBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: var(--click-color);
+}
+
+.rightMenuItemDisabledBG {
+    stroke: var(--main-color);
+    stroke-width: 0.01cm;
+    fill: none;
+}
+
+.rightMenuItemSubActionBG {
+    fill: none;
+    stroke: var(--click-color);
+    stroke-width: 0.05cm;
+}
+
+.rightMenuButtonLabel {
+    fill: var(--click-color);
+    text-anchor: middle;
+
+    font-size: var(--label-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+
+.rightMenuIconLabel {
+    fill: var(--main-color);
+    text-anchor: middle;
+
+    font-size: var(--icon-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+.menuTogglerLine {
+    fill: var(--click-color);
+    stroke:0;
+
+}
+
+.menuButtonCircle {
+    fill: var(--click-color);
+    stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.menuTogglerFill {
+    fill: color-mix(in lab, var(--background-color) 90%, var(--drag-color) 10%);;
+    stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+
+.menuButtonLabel {
+    fill: var(--main-color);
+    text-anchor: middle;
+    font-size: var(--icon-05cm);
+    pointer-events: none;
+    font-family: "Material-Design-Iconic-Font";
+}
+
+.currentTitleLabel {
+    fill: var(--line-color);
+    font-size: var(--label-05cm);
+    pointer-events: none;
+    opacity: 50%;
+    transform: rotate(90deg);
+    transform-origin: 0cm 0cm;
+}

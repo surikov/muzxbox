@@ -134,7 +134,7 @@ class DestinationInstance extends ToneAudioNode<DestinationOptions> {
 //-------------------------------------
 //console.log('destinatinon 1');
 onContextInit((context) => {
-	console.log('destinatinon',context);
+	//console.log('destinatinon',context);
 	context.destination = new DestinationInstance({ context });
 });
 //console.log('destinatinon 2');

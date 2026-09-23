@@ -90,28 +90,34 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 	constructor(pitch?: Interval);
 	constructor(options?: Partial<PitchShiftOptions>);
 	constructor() {
+		
 		const options = optionsFromArguments(
 			PitchShift.getDefaults(),
 			arguments,
 			["pitch"]
 		);
 		super(options);
-
+console.log('PitchShift options',options);
+console.log('__frequency');
 		this.__frequency = new Signal({ context: this.context });
+		console.log('_delayA');
 		this._delayA = new Delay({
 			maxDelay: 1,
 			context: this.context,
 		});
+		console.log('_lfoA');
 		this._lfoA = new LFO({
 			context: this.context,
 			min: 0,
 			max: 0.1,
 			type: "sawtooth",
 		}).connect(this._delayA.delayTime);
+		console.log('_delayB');
 		this._delayB = new Delay({
 			maxDelay: 1,
 			context: this.context,
 		});
+		console.log('_lfoB');
 		this._lfoB = new LFO({
 			context: this.context,
 			min: 0,
@@ -119,7 +125,9 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 			type: "sawtooth",
 			phase: 180,
 		}).connect(this._delayB.delayTime);
+		console.log('_crossFade');
 		this._crossFade = new CrossFade({ context: this.context });
+		console.log('_crossFadeLFO');
 		this._crossFadeLFO = new LFO({
 			context: this.context,
 			min: 0,
@@ -127,10 +135,12 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 			type: "triangle",
 			phase: 90,
 		}).connect(this._crossFade.fade);
+		console.log('_feedbackDelay');
 		this._feedbackDelay = new Delay({
 			delayTime: options.delayTime,
 			context: this.context,
 		});
+		
 		this.delayTime = this._feedbackDelay.delayTime;
 		readOnly(this, "delayTime");
 		this._pitch = options.pitch;
@@ -158,6 +168,7 @@ class PitchShift extends FeedbackEffect<PitchShiftOptions> {
 		this.windowSize = this._windowSize;
 		console.log('PitchShift output', this.baseOutputNode);
 		console.log('PitchShift input', this.input);
+		//console.log('PitchShift', this);
 	}
 
 	static getDefaults(): PitchShiftOptions {

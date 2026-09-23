@@ -1,0 +1,53 @@
+<html>
+
+<head>
+	<title>Pitch UI</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link rel="stylesheet" href="../../../subwindow.css">
+</head>
+
+<body>
+	<h1 id='title'>Chord/Pitch</h1>
+	<p class="cntrblk" id='tileval'>Snare 1 / 887_sdgfbsdbgfsgbsgbsdgbsgf</p>
+	<div class="cntrblk">
+		<div class="form_radio_group">
+			<div class="form_radio_group-item">
+				<input id="radio0" type="radio" name="radio" value="1" checked>
+				<label for="radio0">Flat</label>
+			</div>
+			<div class="form_radio_group-item">
+				<input id="radio1" type="radio" name="radio" value="2">
+				<label for="radio1">Down</label>
+			</div>
+			<div class="form_radio_group-item">
+				<input id="radio2" type="radio" name="radio" value="3">
+				<label for="radio2">Up</label>
+			</div>
+			<div class="form_radio_group-item">
+				<input id="radio3" type="radio" name="radio" value="4">
+				<label for="radio3">Snap</label>
+			</div>
+			<div class="form_radio_group-item">
+				<input id="radio4" type="radio" name="radio" value="5">
+				<label for="radio4">Pong</label>
+			</div>
+		</div>
+	</div>
+	<p>Volume <span id='numval'>77</span>%<br />
+		<input type="range" id="level" min="0" max="100" value="33" />
+	</p>
+	<div class="cntrblk">
+		<ul id='inslist'>
+			
+		</ul>
+	</div>
+	<p style="visibility: hidden;">▢</p>
+	<script src="chordpitch_gui.js"></script>
+	<script>
+		initCHPUI();
+	</script>
+</body>
+
+</html>

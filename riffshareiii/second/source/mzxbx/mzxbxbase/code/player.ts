@@ -1,0 +1,698 @@
+function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player {
+	return new SchedulePlayer(callback);
+}
+class SchedulePlayer implements MZXBX_Player {
+	position: number = 0;
+	audioContext: AudioContext;
+	schedule: MZXBX_Schedule | null = null;
+	performerDrumHolders: MZXBX_PerformerSamplerHolder[] = [];
+	filterHolders: MZXBX_FilterHolder[] = [];
+	//pluginsList: MZXBX_PerformerSamplerHolder[] = [];
+	nextAudioContextStart: number = 0;
+	tickDuration = 0.25;
+	//playState: 'waiting' | 'starting' | 'playing' | 'stopping' = 'waiting';
+	isPlayLoop: boolean = false;
+	isConnected: boolean = false;
+	isLoadingPlugins: boolean = false;
+
+	playCallback: (start: number, position: number, end: number) => void = (start: number, position: number, end: number) => { };
+	waitForID: number = -1;
+	constructor(callback: (start: number, position: number, end: number) => void) {
+		this.playCallback = callback;
+	}
+	replaceCurrentSchedule(schedule: MZXBX_Schedule) {
+		this.schedule = schedule;
+	}
+	clearPluginsCache() {
+		console.log('clearPluginsCache');
+		this.performerDrumHolders.length = 0;
+		this.filterHolders.length = 0;
+	}
+	startSetupPlugins(context: AudioContext, schedule: MZXBX_Schedule): null | string {
+		//console.log('startSetupPlugins', this.isPlayLoop, this.isLoadingPlugins);
+		//if (!(this.isPlayLoop || this.isLoadingPlugins)) {
+		if (this.isPlayLoop) {
+			//console.log('startSetupPlugins Already playing');
+			return 'Already playing';
+
+		} else {
+			this.isLoadingPlugins = true;
+			this.audioContext = context;
+			this.schedule = schedule;
+			if (this.schedule) {
+				//console.log('load plugins for', this.schedule);
+				let pluginLoader: PluginLoader = new PluginLoader();
+				let waitload = pluginLoader.collectLoadPlugins(this.schedule, this.filterHolders, this.performerDrumHolders);
+				if (waitload) {
+					return waitload;
+				} else {
+					this.isLoadingPlugins = false;
+					return null;
+				}
+
+			} else {
+				return 'Empty schedule';
+			}
+		}
+	}
+	allFilters(): MZXBX_FilterHolder[] {
+		return this.filterHolders;
+	}
+	allPerformersSamplers(): MZXBX_PerformerSamplerHolder[] {
+		return this.performerDrumHolders;
+	}
+
+	launchCollectedPlugins(): null | string {
+		//console.log('launchCollectedPlugins filters',this.filterHolders,'drums/tones',this.performerDrumHolders);
+		let trackName: string = '?';
+		try {
+			//
+			for (let ff = 0; ff < this.filterHolders.length; ff++) {
+				//console.log('launch filter',ff,this.filters[ff]);
+				let plugin: MZXBX_AudioFilterPlugin | null = this.filterHolders[ff].pluginAudioFilter;
+
+				if (plugin) {
+					plugin.launch(this.audioContext, this.filterHolders[ff].properties);
+				}
+			}
+			for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+				//
+				trackName = this.performerDrumHolders[pp].description;
+				let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].pluginPerformerSampler;
+				if (plugin) {
+					this.performerDrumHolders[pp].channel.hint = plugin.launch(this.audioContext, this.performerDrumHolders[pp].properties);
+					//console.log('launch performer/drum', pp, this.performerDrumHolders[pp]);
+				}
+			}
+			return null;
+		} catch (xx) {
+			let ermsg = 'Can not launch [' + trackName + '] due';
+			console.log(ermsg, xx);
+			return ermsg + ' ' + xx;
+		}
+	}
+	checkCollectedPlugins(): null | string {
+		for (let ff = 0; ff < this.filterHolders.length; ff++) {
+			//console.log(ff, this.filters[ff]);
+			let plugin: MZXBX_AudioFilterPlugin | null = this.filterHolders[ff].pluginAudioFilter;
+			if (plugin) {
+				let busyState = plugin.busy()
+				if (busyState) {
+					return busyState + ' [' + this.filterHolders[ff].filterId + ']';
+				}
+			} else {
+				console.log('no plugin for filter', this.filterHolders[ff]);
+				return 'plugin not found [' + this.filterHolders[ff].description + ']';
+			}
+		}
+		for (let pp = 0; pp < this.performerDrumHolders.length; pp++) {
+			let plugin: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null = this.performerDrumHolders[pp].pluginPerformerSampler;
+			if (plugin) {
+				let busyState = plugin.busy()
+				if (busyState) {
+					return busyState + ' [' + this.performerDrumHolders[pp].description + ' ]';
+				}
+			} else {
+				console.log('no plugin for performer/sampler', this.performerDrumHolders[pp]);
+				return 'plugin not found [' + this.performerDrumHolders[pp].description + ']';
+			}
+		}
+		return null;
+	}
+	/*reconnectAllPlugins(schedule: MZXBX_Schedule): void {
+		this.disconnectAllPlugins();
+		this.schedule = schedule;
+		let msg = this.connectAllPlugins();
+		console.log('reconnectAllPlugins', msg);
+	}*/
+	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void {
+		//console.log('startLoopTicks start');
+		this.connectAllPlugins((msg: string | null) => {
+			//console.log('startLoopTicks connected');
+			if (msg) {
+				onDone(msg);
+			} else {
+				if (this.audioContext) {
+					//console.log('startLoopTicks ready');
+					this.isConnected = true;
+					this.position = currentPosition;
+					this.isPlayLoop = true;
+					this.waitForID = Math.random();
+					setTimeout(() => {
+						this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+						this.doTick(loopStart, loopEnd, this.waitForID);
+						//console.log('started doTick');
+					}, 100);
+					//console.log('startLoopTicks done');
+					onDone(null);
+				} else {
+					this.cancel();
+					onDone('Empty audio context');
+				}
+			}
+		});
+	}
+	/*
+	startLoopTicks222(loopStart: number, currentPosition: number, loopEnd: number): string {
+		//console.log('startLoopTicks', loopStart, currentPosition, loopEnd,this.schedule);
+		let msg: string | null = this.connectAllPlugins();
+		if (msg) {
+			//console.log('Can\'t start loop:', msg);
+			return msg;
+		} else {
+			if (this.audioContext) {
+
+				this.position = currentPosition;
+				this.isPlayLoop = true;
+				//this.onAir = true;
+				this.waitForID = Math.random();
+				//this.doTick(loopStart, loopEnd, this.waitForID);
+				//let me=this;
+				//console.log('prepare doTick');
+				setTimeout(() => {
+					this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+					//console.log('start doTick', this.nextAudioContextStart, this.audioContext.currentTime, this.tickDuration);
+					this.doTick(loopStart, loopEnd, this.waitForID);
+					console.log('started doTick');
+				}, 100);
+				//console.log('wait doTick');
+				return '';
+			} else {
+				this.cancel();
+				return 'Empty audio context';
+			}
+		}
+	}*/
+	playState(): { connected: boolean, play: boolean, loading: boolean } {
+		return {
+			connected: this.isConnected
+			, play: this.isPlayLoop
+			, loading: this.isLoadingPlugins
+		};
+	}
+	connectNextCollectedPerformer(nn: number, connectResult: (message: string | null) => void) {
+		if (this.schedule) {
+			if (nn < this.schedule.channels.length) {
+				let channel = this.schedule.channels[nn];
+				let performer = this.findPerformerSamplerPlugin(channel);
+				if (performer) {
+					let output = performer.output();
+					if (output) {
+						//console.log(nn, 'start connect channel', this.audioContext.currentTime);
+						let chcnt = channel.outputs.length;
+						for (let oo = 0; oo < chcnt; oo++) {
+							//console.log('channel', oo, chcnt);
+							let outId = channel.outputs[oo];
+							let targetNode: AudioNode | null = this.audioContext.destination;
+							if (outId) {
+								let target = this.findFilterPlugin(outId);
+								if (target) {
+									targetNode = target.input();
+								}
+							}
+							if (targetNode) {
+								//console.log(nn, 'connect channel', oo, channel.performer.kind, this.audioContext.currentTime);
+								output.connect(targetNode);
+								//console.log('connected');
+							}
+							//console.log('done channel', oo);
+						}
+						//console.log(nn, 'next channel', this.audioContext.currentTime);
+						this.delayedStart(() => {
+							//console.log( (nn+1),'check channel', this.audioContext.currentTime);
+							this.connectNextCollectedPerformer(nn + 1, connectResult);
+						});
+					} else {
+						connectResult('No output for performer ' + nn + ' for ' + channel.performer.description);
+					}
+				} else {
+					connectResult('Not found performer ' + nn + ' for ' + channel.performer.description);
+				}
+			} else {
+				connectResult(null);
+			}
+		} else {
+			connectResult('empty schedule');
+		}
+	}
+	connectNextCollectedFilter(nn: number, connectResult: (message: string | null) => void) {
+		if (nn < 0) {
+			connectResult(null);
+		} else {
+			if (this.schedule) {
+				let filter = this.schedule.filters[nn];
+				//console.log(ff, 'connect filter', filter.kind);
+				let plugin = this.findFilterPlugin(filter.id);
+				if (plugin) {
+					let pluginOutput = plugin.output();
+					if (pluginOutput) {
+						for (let oo = 0; oo < filter.outputs.length; oo++) {
+							let outId = filter.outputs[oo];
+							let targetNode: AudioNode | null = this.audioContext.destination;;
+							if (outId) {
+								let target = this.findFilterPlugin(outId);
+								if (target) {
+									targetNode = target.input();
+								}
+							}
+							if (targetNode) {
+								//console.log(nn, 'connect filter', filter.kind, this.audioContext.currentTime);
+								pluginOutput.connect(targetNode);
+								//console.log('connected');
+							}
+						}
+						this.delayedStart(() => {
+							this.connectNextCollectedFilter(nn - 1, connectResult);
+						});
+					} else {
+						connectResult('no filter output ' + nn);
+					}
+				} else {
+					connectResult('no filter ' + nn);
+				}
+			} else {
+				connectResult('empty schedule');
+			}
+		}
+	}
+	launchNextCollectedFilter(nn: number, launchResult: (message: string | null) => void) {
+		if (nn < this.filterHolders.length) {
+			let holder = this.filterHolders[nn];
+			if (holder.pluginAudioFilter) {
+				holder.pluginAudioFilter.launch(this.audioContext, holder.properties);
+				let busyState = holder.pluginAudioFilter.busy();
+				if (busyState) {
+					launchResult('Filter ' + nn + ' for ' + holder.description + ': ' + busyState);
+				} else {
+					this.delayedStart(() => {
+						this.launchNextCollectedFilter(nn + 1, launchResult);
+					});
+				}
+			} else {
+				launchResult('Not found filter ' + nn + ' for ' + holder.description);
+			}
+		} else {
+			launchResult(null);
+		}
+	}
+	launchNextCollectedPerformer(nn: number, launchResult: (message: string | null) => void) {
+		if (nn < this.performerDrumHolders.length) {
+			let holder = this.performerDrumHolders[nn];
+			if (holder.pluginPerformerSampler) {
+				holder.channel.hint = holder.pluginPerformerSampler.launch(this.audioContext, holder.properties);
+				let busyState = holder.pluginPerformerSampler.busy();
+				if (busyState) {
+					launchResult('Performer/sampler ' + nn + ' for ' + holder.description + ': ' + busyState);
+				} else {
+					this.delayedStart(() => {
+						this.launchNextCollectedPerformer(nn + 1, launchResult);
+					});
+				}
+			} else {
+				launchResult('Not found performer/sampler ' + nn + ' for ' + holder.description);
+			}
+		} else {
+			launchResult(null);
+		}
+	}
+	delayedStart(doTask: () => void) {
+		window.requestAnimationFrame(function (time) {
+			doTask();
+		});
+		/*setTimeout(() => {
+			doTask();
+		},1500);*/
+	}
+	connectLaunchCollectedPlugins(onDone: (message: string | null) => void) {
+		if (this.schedule) {
+			let msg: string | null = this.launchCollectedPlugins();
+			if (msg) {
+				onDone(msg);
+			} else {
+				msg = this.checkCollectedPlugins();
+				if (msg) {
+					onDone(msg);
+				} else {
+					//console.log('connect plugins start');
+					let cuschedule: MZXBX_Schedule = this.schedule;
+					this.delayedStart(() => {
+						this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message: string | null) => {
+							if (message) {
+								onDone(message);
+							} else {
+								this.delayedStart(() => {
+									this.connectNextCollectedPerformer(0, (message: string | null) => {
+										if (message) {
+											onDone(message);
+										} else {
+											onDone(message);
+										}
+									});
+								});
+							}
+						});
+					});
+				}
+			}
+			/*let cuschedule: MZXBX_Schedule = this.schedule;
+			this.delayedStart(() => {
+				this.launchNextCollectedFilter(0, (message: string | null) => {
+					if (message) {
+						onDone(message);
+					} else {
+						this.delayedStart(() => {
+							this.launchNextCollectedPerformer(0, (message: string | null) => {
+								if (message) {
+									onDone(message);
+								} else {
+									this.delayedStart(() => {
+										this.connectNextCollectedFilter(cuschedule.filters.length - 1, (message: string | null) => {
+											if (message) {
+												onDone(message);
+											} else {
+												this.delayedStart(() => {
+													this.connectNextCollectedPerformer(0, (message: string | null) => {
+														if (message) {
+															onDone(message);
+														} else {
+															onDone(message);
+														}
+													});
+												});
+											}
+										});
+									});
+								}
+							});
+						});
+					}
+				});
+			});*/
+		} else {
+			onDone('no schedule');
+		}
+	}
+	/*connectAllPlufffgins(): string | null {
+		this.connectLaunchCollectedPlugins((message: string | null) => {
+			console.log('connectAllPlugins', message);
+		});
+		return 'test';
+	}*/
+	connectAllPlugins(onDone: (message: string | null) => void): void {
+		this.connectLaunchCollectedPlugins(onDone);
+	}
+	connectAllPlugin222s(): string | null {
+		console.log('connectAllPlugins');
+		if (!this.isConnected) {
+			let msg: string | null = this.launchCollectedPlugins();
+			//console.log('launchCollectedPlugins', msg);
+			if (msg) {
+				return msg;
+			} else {
+				msg = this.checkCollectedPlugins();
+				//console.log('checkCollectedPlugins', msg);
+				if (msg) {
+					return msg;
+				} else {
+					if (this.schedule) {
+						let master: AudioNode = this.audioContext.destination;
+						for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+
+							let filter = this.schedule.filters[ff];
+							//console.log(ff, 'connect filter', filter.kind);
+							let plugin = this.findFilterPlugin(filter.id);
+							if (plugin) {
+								let pluginOutput = plugin.output();
+								if (pluginOutput) {
+									for (let oo = 0; oo < filter.outputs.length; oo++) {
+										let outId = filter.outputs[oo];
+										let targetNode: AudioNode | null = master;
+										if (outId) {
+											let target = this.findFilterPlugin(outId);
+											if (target) {
+												targetNode = target.input();
+											}
+										}
+										if (targetNode) {
+											//console.log(ff, 'connect filter', filter.kind);
+											pluginOutput.connect(targetNode);
+										}
+									}
+								}
+							}
+						}
+						for (let cc = 0; cc < this.schedule.channels.length; cc++) {
+							let channel = this.schedule.channels[cc];
+							//console.log(cc, 'connect channel', channel.performer.kind);
+							let performer = this.findPerformerSamplerPlugin(channel);
+							if (performer) {
+								let output = performer.output();
+								if (output) {
+									for (let oo = 0; oo < channel.outputs.length; oo++) {
+										let outId = channel.outputs[oo];
+										let targetNode: AudioNode | null = master;
+										if (outId) {
+											let target = this.findFilterPlugin(outId);
+											if (target) {
+												targetNode = target.input();
+											}
+										}
+										if (targetNode) {
+											//console.log(cc, 'connect channel', channel.performer.kind);
+											output.connect(targetNode);
+										}
+									}
+								}
+							}
+						}
+					}
+					this.isConnected = true;
+					return null;
+				}
+			}
+		} else {
+			console.log('Connected aready');
+			return null;
+		}
+	}
+	disconnectAllPlugins() {
+		//console.log('disconnectAllPlugins');
+		if (this.isConnected) {
+			if (this.schedule) {
+				let master: AudioNode = this.audioContext.destination;
+				for (let ff = this.schedule.filters.length - 1; ff >= 0; ff--) {
+					let filter = this.schedule.filters[ff];
+					//console.log('disconnect', ff, filter);
+					let plugin = this.findFilterPlugin(filter.id);
+					if (plugin) {
+						let output = plugin.output();
+						if (output) {
+							try {
+								for (let oo = 0; oo < filter.outputs.length; oo++) {
+									//console.log(oo, 'disconnect filter', filter.kind);
+									let outId = filter.outputs[oo];
+									let targetNode: AudioNode | null = master;
+									if (outId) {
+										let target = this.findFilterPlugin(outId);
+										if (target) {
+											targetNode = target.input();
+
+										}
+									}
+									if (targetNode) {
+										//console.log(oo, 'disconnect filter', filter.kind);
+										output.disconnect(targetNode);
+									}
+								}
+							} catch (ex) {
+								console.log(ex);
+							}
+						}
+					}
+				}
+				for (let cc = 0; cc < this.schedule.channels.length; cc++) {
+					let channel = this.schedule.channels[cc];
+					//console.log('disconnect', cc, channel);
+					let plugin = this.findPerformerSamplerPlugin(channel);
+					if (plugin) {
+						let output = plugin.output();
+						if (output) {
+							try {
+								plugin.cancel();
+								for (let oo = 0; oo < channel.outputs.length; oo++) {
+									//console.log(oo, 'disconnect channel', channel.performer.kind);
+									let outId = channel.outputs[oo];
+									let targetNode: AudioNode | null = master;
+									if (outId) {
+										let target = this.findFilterPlugin(outId);
+										if (target) {
+											targetNode = target.input();
+
+										}
+									}
+									if (targetNode) {
+										//console.log(oo, 'disconnect channel', channel.performer.kind);
+										output.disconnect(targetNode);
+									}
+								}
+							} catch (ex) {
+								console.log(ex);
+							}
+						}
+					}
+				}
+				this.isConnected = false;
+			} else {
+				console.log('empty schedule');
+			}
+
+		} else {
+			console.log('not connected');
+		}
+	}
+	doTick(loopStart: number, loopEnd: number, waitId: number) {
+		if (this.audioContext) {
+			if (waitId == this.waitForID) {
+				let sendFrom = this.position;
+				let sendTo = this.position + this.tickDuration;
+				if (this.audioContext.currentTime > this.nextAudioContextStart - 1.5 * this.tickDuration) {
+					let atTime = this.nextAudioContextStart;
+					if (sendTo > loopEnd) {
+						this.sendPiece(sendFrom, loopEnd, atTime);
+						atTime = atTime + (loopEnd - sendFrom);
+						sendFrom = loopStart;
+						sendTo = loopStart + (sendTo - loopEnd);
+					}
+					this.sendPiece(sendFrom, sendTo, atTime);
+					this.position = sendTo;
+					this.nextAudioContextStart = this.nextAudioContextStart + this.tickDuration;
+					if (this.nextAudioContextStart < this.audioContext.currentTime) {
+						this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
+					}
+					this.playCallback(loopStart, this.position, loopEnd);
+				}
+				let me = this;
+				if (this.isPlayLoop) {
+					if (this.waitForID == waitId) {
+						this.waitForID = Math.random();
+						let id = this.waitForID;
+						window.requestAnimationFrame(function (time) {
+							me.doTick(loopStart, loopEnd, id);
+						});
+						this.waitForID = id;
+					} else {
+						console.log('cancel ticks due different id');
+					}
+					//} else {
+					//this.disconnectAllPlugins();
+				} else {
+					console.log('cancel ticks due stop');
+				}
+			}
+		}
+	}
+	findPerformerSamplerPlugin(//channelId: string
+		channel: MZXBX_Channel
+	): MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin | null {
+		if (this.schedule) {
+			for (let ii = 0; ii < this.schedule.channels.length; ii++) {
+				if (this.schedule.channels[ii].id == channel.id) {
+					for (let nn = 0; nn < this.performerDrumHolders.length; nn++) {
+						let performer = this.performerDrumHolders[nn];
+						if (channel.id == performer.channel.id) {
+							if (performer.pluginPerformerSampler) {
+								let pluginPerformerSampler: MZXBX_AudioPerformerPlugin | MZXBX_AudioSamplerPlugin = performer.pluginPerformerSampler;
+								return pluginPerformerSampler;
+							} else {
+								console.log('Empty performer plugin for', channel.id);
+							}
+						}
+					}
+					console.log('not found cache', channel.id);
+				}
+			}
+			console.log('not found channel', channel.id);
+		} else {
+			console.log('Empty schedule');
+		}
+		console.log('No performer for', channel.id);
+		return null;
+	}
+	sendPerformerItem(it: MZXBX_PlayItem, whenAudio: number, tempo: number) {
+		let pp = this.findPerformerSamplerPlugin(it.channel) as any;
+		//console.log('sendPerformerItem',whenAudio,it);
+		if (pp) {
+			if (pp.start) {
+				let sampler: MZXBX_AudioSamplerPlugin = pp;
+				sampler.start(whenAudio, tempo);
+			} else {
+				let performer: MZXBX_AudioPerformerPlugin = pp;
+				performer.strum(whenAudio, it.pitches, tempo, it.slides);
+			}
+		}
+	}
+	findFilterPlugin(filterId: string): MZXBX_AudioFilterPlugin | null {
+		if (this.schedule) {
+			for (let nn = 0; nn < this.filterHolders.length; nn++) {
+				let filter = this.filterHolders[nn];
+				if (filter.filterId == filterId) {
+					if (filter.pluginAudioFilter) {
+						let plugin: MZXBX_AudioFilterPlugin = filter.pluginAudioFilter;
+						if (plugin) {
+							return plugin;
+						}
+					}
+				}
+			}
+		}
+		console.log('not found filter', filterId);
+		return null;
+	}
+	sendFilterItem(state: MZXBX_FilterState, whenAudio: number, tempo: number) {
+		let plugin: MZXBX_AudioFilterPlugin | null = this.findFilterPlugin(state.filterId);
+		if (plugin) {
+			plugin.schedule(whenAudio, tempo, state.data);
+		}
+	}
+	ms(nn: number): number {
+		return Math.round(nn * 1000);
+	}
+	sendPiece(fromPosition: number, toPosition: number, whenAudio: number) {
+
+		if (this.schedule) {
+			let serieStart = 0;
+			for (let ii = 0; ii < this.schedule.series.length; ii++) {
+				let cuSerie: MZXBX_Set = this.schedule.series[ii];
+				if (this.ms(serieStart) < this.ms(toPosition)
+					&& this.ms(serieStart + cuSerie.duration) >= this.ms(fromPosition)) {
+					for (let nn = 0; nn < cuSerie.items.length; nn++) {
+						let it: MZXBX_PlayItem = cuSerie.items[nn];
+						if (this.ms(serieStart + it.skip) >= this.ms(fromPosition)
+							&& this.ms(serieStart + it.skip) < this.ms(toPosition)) {//}, it.channelId) {
+							this.sendPerformerItem(it, whenAudio + serieStart + it.skip - fromPosition, cuSerie.tempo);
+						}
+					}
+					for (let nn = 0; nn < cuSerie.states.length; nn++) {
+						let state: MZXBX_FilterState = cuSerie.states[nn];
+						if (this.ms(serieStart + state.skip) >= this.ms(fromPosition)
+							&& this.ms(serieStart + state.skip) < this.ms(toPosition)) {
+							this.sendFilterItem(state, whenAudio + serieStart + state.skip - fromPosition, cuSerie.tempo);
+						}
+					}
+				}
+				serieStart = serieStart + cuSerie.duration;
+			}
+		}
+		//console.log('sendPiece');
+	}
+	cancel(): void {
+		if (this.isPlayLoop) {
+			this.waitForID = -1;
+			this.isPlayLoop = false;
+			this.disconnectAllPlugins();
+		} else {
+			//console.log('No loop to cancel');
+		}
+	}
+
+}

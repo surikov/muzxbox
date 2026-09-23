@@ -1,0 +1,22 @@
+:root {
+	--background-color: #eef6ff;
+	--main-color: #606;
+	--drag-color: #fcf;
+	--line-color: #339;
+	--click-color: #6cf;
+	
+	--black-key-color: color-mix(in lab, transparent 85%, var(--click-color));
+}
+
+#tileLevelSVG {
+
+	background-image: url("bg/gjel.png");
+	background-repeat: repeat-x;
+	background-size2: cover;
+	background-position: bottom;
+	background-position-x2: center;
+	background-position-y2: bottom;
+	background-color2: red;
+	background-size: 25% auto;
+}
+

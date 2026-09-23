@@ -1,0 +1,355 @@
+
+
+.projectTitle222222 {
+    fill: var(--drag-color);
+	font-size: var(--label-4cm);
+}
+.trackTitle {
+    fill: var(--drag-color);
+	font-size: var(--label-1cm);
+}
+.mixNoteLine{
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 90%;
+    pointer-events: none;
+}
+.mixMuteLine{
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 8%;
+    pointer-events: none;
+}
+.mixDropClick{
+    fill: red;/* var(--click-color); */
+	fill-opacity: 0.001%;
+cursor:col-resize;
+}
+.mixDropNote{
+    fill: var(--click-color);
+	fill-opacity: 90%;
+    pointer-events: none;
+}
+.mixNoteSub{
+    stroke: var(--line-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 33%;
+    pointer-events: none;
+}
+.mixMuteSub{
+    stroke: var(--line-color);
+    stroke-linejoin: round;
+    stroke-width: calc(0.95*var(--tapSize));
+	stroke-opacity: 8%;
+    pointer-events: none;
+}
+
+.mixTimeMeasureMark{
+    fill: var(--line-color);
+	fill-opacity: 25%;
+}
+
+.interactiveTimeMeasureMark{
+    fill: var(--click-color);
+	fill-opacity: 95%;
+    pointer-events: none;
+}
+
+.mixFiller1{
+    fill: var(--line-color);
+	fill-opacity: 5%;
+}
+.mixFiller2{
+    fill: var(--line-color);
+	fill-opacity: 10%;
+}
+.mixFiller3{
+    fill: var(--line-color);
+	fill-opacity: 15%;
+}
+.mixFiller4{
+    fill: var(--line-color);
+	fill-opacity: 20%;
+}
+.mixFiller5{
+    fill: var(--line-color);
+	fill-opacity: 25%;
+}
+.mixFiller6{
+    fill: var(--line-color);
+	fill-opacity: 30%;
+}
+.mixFiller7{
+    fill: var(--line-color);
+	fill-opacity: 35%;
+}
+.mixFiller8{
+    fill: var(--line-color);
+	fill-opacity: 40%;
+}
+
+
+.titleLabel025 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(0.25*var(--tapSize));
+    text-anchor22: start;
+	pointer-events: none;
+}
+.titleLabel05 {
+	fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel1 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel2 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel4 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel8 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(8*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel16 {
+	fill: var(--line-color);
+	fill-opacity:50%;
+    font-size: calc(16*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel32 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(32*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel64 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(64*var(--tapSize));
+	pointer-events: none;
+}
+.titleLabel128 {
+    fill: var(--line-color);
+	fill-opacity: 50%;
+    font-size: calc(128*var(--tapSize));
+	pointer-events: none;
+}
+
+
+.markPointFill22222 {
+    fill: var(--drag-color);
+	fill-opacity: 90%;
+    stroke-dasharray: 5px;
+    stroke: var(--main-color);
+    stroke-linejoin: round;
+    stroke-linecap: butt;
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 90%;
+	pointer-events: none;
+}
+.slidePointFill {
+    fill: none;
+    stroke-dasharray2: 5px;
+    stroke: var(--drag-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
+	pointer-events: none;
+}
+.markPointFill {
+    fill: none;
+    stroke-dasharray2: 5px;
+    stroke: var(--main-color);
+    stroke-width: calc(0.25*var(--tapSize));
+	stroke-opacity: 60%;
+	pointer-events: none;
+}
+.markPointNone {
+    fill: none;
+    stroke: none;
+	pointer-events: none;
+}
+
+.octaveBottomBorder{
+	fill: var(--line-color);
+	fill-opacity:75%;
+    stroke: none;
+	pointer-events: none;
+}
+.octaveBottomBorder123{
+	fill: url(#horizontalBorderLine);;
+    stroke: none;
+	pointer-events: none;
+}
+
+.stepPartDelimiter{
+	fill2: var(--line-color);
+
+	fill-opacity:9%;
+    stroke2: none;
+
+	fill22: url(#verticalBorderLine);;
+	fill: var(--line-color);
+    stroke: none;
+	pointer-events: none;
+}
+.verLineFrom {
+    stop-color: var(--line-color);
+    stop-opacity: 50%;
+  }
+  .verLineMiddle{
+    stop-color: var(--line-color);
+    stop-opacity: 20%;
+  }
+  .verLineTo {
+    stop-color: var(--line-color);
+    stop-opacity: 0;
+  }
+.barRightBorder{
+	fill: url(#verticalBorderLine);
+    stroke: none;
+	pointer-events: none;
+}
+
+
+.barRightBorder2{
+	fill: var(--line-color);
+	fill-opacity:50%;
+    stroke: none;
+	pointer-events: none;
+}
+.interActiveGridLine{
+	fill: var(--click-color);
+	fill-opacity:95%;
+    stroke: none;
+    pointer-events: none;
+}
+.interActiveGridWhiteKey{
+	fill: var(--black-key-color);
+    stroke: none;
+    pointer-events: none;
+}
+
+.commentLineText025 {
+    fill: var(--main-color);
+    font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText05 {
+    fill: var(--main-color);
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText1 {
+    fill: var(--main-color);
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText2 {
+    fill: var(--main-color);
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText4 {
+    fill: var(--main-color);
+    font-size: calc(3*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText8 {
+    fill: var(--main-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.commentLineText16 {
+    fill: var(--main-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+
+
+.commentPaneForClick {
+    fill: #00000000;
+	cursor: pointer;
+}
+
+.commentReadText025 {
+    fill: var(--line-color);
+    font-size: calc(0.25*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText05 {
+    fill: var(--line-color);
+    font-size: calc(0.5*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText1 {
+    fill: var(--line-color);
+    font-size: calc(1*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText2 {
+    fill: var(--line-color);
+    font-size: calc(2*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText4 {
+    fill: var(--line-color);
+    font-size: calc(3*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText8 {
+    fill: var(--line-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.commentReadText16 {
+    fill: var(--line-color);
+    font-size: calc(4*var(--tapSize));
+	pointer-events: none;
+}
+.xAutoStart {
+    stop-color: var(--main-color);
+    stop-opacity: 100%;
+  }
+  .xAutoEnd {
+    stop-color: var(--main-color);
+    stop-opacity: 0%;
+  }
+.automationBgDot{
+	fill999: var(--main-color);
+	fill-opacity9999:95%;
+	fill: url(#autoDotGradient);
+    stroke: none;
+	pointer-events: none;
+}
+.automationMuteDot{
+	fill: var(--main-color);
+	fill-opacity:8%;
+    stroke: none;
+	pointer-events: none;
+}
+.automationFocusedDot{
+	fill: var(--click-color);
+	fill-opacity:90%;
+    stroke: none;
+}
+
+

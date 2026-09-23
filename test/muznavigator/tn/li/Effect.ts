@@ -56,7 +56,7 @@ abstract class Effect<Options extends EffectOptions,> extends ToneAudioNode<Opti
 
 	constructor(options: EffectOptions) {
 		super(options);
-
+console.log('Effect options',options);
 		// connections
 		this.input.fan(this._dryWet.a, this.effectSend);
 		this.effectReturn.connect(this._dryWet.b);

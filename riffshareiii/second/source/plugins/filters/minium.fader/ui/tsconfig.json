@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "outFile": "../../../../../minium/plugins/filters/minium.fader/ui/faderui.js",
+        "strictNullChecks": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "noResolve": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "experimentalDecorators": true,
+        "isolatedModules": false,
+        "module": "AMD",
+        "lib": [
+            "dom",
+            "es2015",
+            "es5"
+        ],
+        "declaration": true,
+        "types": []
+    },
+    "files": [
+        "../../../../mzxbx/mzxbxapi/musicenginetypes.ts",
+       // "../../../../mzxbx/mzxbxapi/musicenginedeclarations.ts",
+        "faderbridge.ts",
+        "faderui.ts"
+    ]
+}

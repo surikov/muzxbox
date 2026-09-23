@@ -1,0 +1,30 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        ,"outFile": "../../../../../minium/plugins/performers/miniumpitchchord1/audio/strum_plugin.js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": true
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": true
+		,"types": [ ]
+	}
+	,"files": [
+        "../../../../mzxbx/mzxbxapi/musicenginetypes.ts"
+		,"../list/names.ts"
+        ,"waflib.ts"
+        ,"main.ts"
+	]
+}

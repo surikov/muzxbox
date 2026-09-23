@@ -1,0 +1,29 @@
+<html>
+
+<head>
+	<title>Minium MIDI export</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+	<link rel="stylesheet" href="../../subwindow.css">
+	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+</head>
+
+<body>
+	<h1 id="plugintitle">Minium MIDI Export</h1>
+	<p class="cntrblk">
+		<canvas  id="prvw" width=500 height=500 onclick="plugin.exportImage();"/>
+	</p>
+	<div class='centercolumn'>
+		<p class="cntrlrow"><button id='btnsendmidi' onclick="plugin.startExportMIDI();">btnsend</button></p>
+	</div>
+	<div class='centercolumn'>
+		<p class="cntrlrow"><button id='btnsendjson' onclick="plugin.startExportJSON();">btnsend2</button></p>
+	</div>
+</body>
+<script type='text/javascript' src='mx.js'></script>
+<script>
+	let plugin = new MiniumMIDIx();
+</script>
+
+</html>

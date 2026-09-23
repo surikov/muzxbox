@@ -61,7 +61,7 @@ class Delay extends ToneAudioNode<DelayOptions2> {
 			"maxDelay",
 		]);
 		super(options);
-
+console.log('Delay options',options);
 		const maxDelayInSeconds = this.toSeconds(options.maxDelay);
 		this._maxDelay = Math.max(
 			maxDelayInSeconds,

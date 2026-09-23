@@ -357,12 +357,12 @@ function connect(
 
 	// make the connection
 	if (isAudioParam(dstNode)) {
-		console.log('connect node to param');
+		//console.log('connect node to param');
 		//console.log(srcNode);
 		//console.log(dstNode);
 		srcNode.connect(dstNode as AudioParam, outputNumber);
 	} else {
-		console.log('connect node to node');
+		//console.log('connect node to node');
 		//console.log(srcNode);
 		//console.log(dstNode);
 		srcNode.connect(dstNode, outputNumber, inputNumber);

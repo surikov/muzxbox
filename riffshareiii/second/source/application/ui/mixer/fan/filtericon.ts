@@ -1,0 +1,396 @@
+class FilterIcon {
+	filterId: string;
+	constructor(filterId: string) {
+		this.filterId = filterId;
+	}
+	buildAutoSpot(order: number, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+		for (let ii = 0; ii < globalCommandDispatcher.cfg().data.filters.length; ii++) {
+			if (globalCommandDispatcher.cfg().data.filters[ii].id == this.filterId) {
+				let filterTarget: Zvoog_FilterTarget = globalCommandDispatcher.cfg().data.filters[ii];
+				this.addFilterSpot(order, filterTarget, fanLevelAnchor, spearsAnchor, zidx);
+				break;
+			}
+		}
+	}
+
+	addFilterSpot(order: number, filterTarget: Zvoog_FilterTarget, fanLevelAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+		let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+		let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+		let top = globalCommandDispatcher.cfg().gridTop();
+		let xx = left;
+		let yy = top;
+		if (filterTarget.iconPosition) {
+			xx = left + filterTarget.iconPosition.x;
+			yy = top + filterTarget.iconPosition.y;
+		}
+		let dragAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
+			//,id:'drag'+Math.random()
+		};
+		fanLevelAnchor.content.push(dragAnchor);
+		let dropAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
+		};
+		fanLevelAnchor.content.push(dropAnchor);
+		let rec: TileRectangle = {
+			x: xx - sz / 2, y: yy - sz / 2, w: sz
+			, rx: sz / 2, ry: sz / 2
+			, h: sz
+		};
+		if (zidx < 7) {
+			rec.draggable = true;
+			let toFilter: Zvoog_FilterTarget | null = null;
+			let toSpeaker: boolean = false;
+			let needReset = false;
+			rec.activation = (x: number, y: number) => {
+				if (!dragAnchor.translation) {
+					dragAnchor.translation = { x: 0, y: 0 };
+				}
+				dropAnchor.content = [];
+				if (x == 0 && y == 0) {
+					if (!filterTarget.iconPosition) {
+						filterTarget.iconPosition = { x: 0, y: 0 };
+					}
+					if (toSpeaker) {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							filterTarget.outputs.push('');
+						});
+					} else {
+						if (toFilter) {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+								if (toFilter) filterTarget.outputs.push(toFilter.id);
+							});
+						} else {
+							globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+								if (dragAnchor.translation) {
+									filterTarget.iconPosition.x = filterTarget.iconPosition.x + dragAnchor.translation.x;
+									filterTarget.iconPosition.y = filterTarget.iconPosition.y + dragAnchor.translation.y;
+								}
+							});
+						}
+					}
+					dragAnchor.translation = { x: 0, y: 0 };
+					globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+				} else {
+					toSpeaker = false;
+					toFilter = null;
+					dragAnchor.translation.x = dragAnchor.translation.x + x;
+					dragAnchor.translation.y = dragAnchor.translation.y + y;
+					if (filterTarget.iconPosition) {
+						let xx = filterTarget.iconPosition.x + dragAnchor.translation.x;
+						let yy = filterTarget.iconPosition.y + dragAnchor.translation.y;
+						toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, filterTarget.id, filterTarget.outputs);
+						if (toFilter) {
+							needReset = true;
+							let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+							let top = globalCommandDispatcher.cfg().gridTop();
+							let fx = left;
+							let fy = top;
+							if (toFilter.iconPosition) {
+								fx = left + toFilter.iconPosition.x;
+								fy = top + toFilter.iconPosition.y;
+							}
+							dropAnchor.content.push({
+								x: fx - sz * 0.75, y: fy - sz * 0.75
+								, w: sz * 1.5, h: sz * 1.5
+								, rx: sz * 0.75, ry: sz * 0.75
+								, css: 'fanConnectionBase  fanConnection' + zidx
+							});
+							globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+						} else {
+							if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, filterTarget.outputs)) {
+								toSpeaker = true;
+								needReset = true;
+								let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
+								let rec: TileRectangle = {
+									x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, w: globalCommandDispatcher.cfg().speakerIconSize * 1.1
+									, h: globalCommandDispatcher.cfg().speakerIconSize * 1.1
+									, rx: globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, ry: globalCommandDispatcher.cfg().speakerIconSize * 0.55
+									, css: 'fanConnectionBase  fanConnection' + zidx
+								};
+								dropAnchor.content = [rec];
+								globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+							} else {
+								//console.log('updateAnchorTranslation',dragAnchor);
+								//globalCommandDispatcher.renderer.tiler.updateAnchorTranslation(dragAnchor);
+								if (needReset) {
+									globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+									needReset = false;
+								} else {
+									globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
+								}
+							}
+						}
+					}
+				}
+			}
+			if (filterTarget.state == 1) {
+				rec.css = 'fanSamplerMoveIconDisabled fanSamplerMoveIcon' + zidx;
+			} else {
+				rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+			}
+
+		} else {
+			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		}
+		dragAnchor.content.push(rec);
+		spearsAnchor.content.push({
+			x: xx - sz / 2 * 0.9, y: yy - sz / 2 * 0.9
+			, w: sz * 0.9
+			, rx: sz / 2 * 0.9, ry: sz / 2 * 0.9
+			, h: sz * 0.9
+			, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
+		});
+		if (zidx < 5) {
+			let px: number = globalCommandDispatcher.renderer.tiler.tapPxSize();
+			//let url: string = MZXBX_currentPlugins()[order].ui;
+			let cssstring: string = 'fanSamplerInteractionIcon fanButton' + zidx;
+			if (filterTarget.state == 1) {
+				cssstring = 'fanSamplerInterDisabledIcon fanButton' + zidx;
+			}
+			let btn: TilePath = {
+				x: xx - sz / 2
+				, y: yy
+				, points: 'M 0 0 a 1 1 0 0 0 ' + (sz * px) + ' 0 Z'
+				//, css: 'fanSamplerInteractionIcon fanButton' + zidx
+				, css: cssstring
+				, activation: (x: number, y: number) => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
+					//console.log(filterTarget.kind,info);
+					//if (info) {
+					globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
+					//}
+				}
+			};
+			dragAnchor.content.push(btn);
+		}
+		if (zidx <= 5) {// globalCommandDispatcher.cfg().zoomEditSLess) {
+			//let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
+			let txt: TileText = {
+				text: filterTarget.title //+ ': ' + track.volume + ': ' + track.performer.kind + ': ' + track.performer.id
+				, x: xx - sz * 0.4
+				, y: yy - sz * 0.1
+				//, css: 'fanIconLabel fanIconLabelSize' + zidx
+				, css: (filterTarget.state == 1 ? 'fanDisabledLabel' : 'fanIconLabel') + ' fanIconLabelSize' + zidx
+			};
+			dragAnchor.content.push(txt);
+		}
+		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
+		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let css = 'fanConnectionBase fanConnection' + zidx;
+		//if (order) {
+		//	css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+		//}
+		let hoLine: TileLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
+		spearsAnchor.content.push(hoLine);
+		new SpearConnection().addSpear(//order > 0
+			false
+			, zidx,
+			xx
+			, filterFromY
+			, sz
+			, xx
+			, yy
+			, spearsAnchor);
+		let fol = new FanOutputLine();
+		for (let oo = 0; oo < filterTarget.outputs.length; oo++) {
+			let outId = filterTarget.outputs[oo];
+			if (outId) {
+				fol.connectOutput(outId, filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
+					, (x: number, y: number) => {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							let nn = filterTarget.outputs.indexOf(outId);
+							if (nn > -1) {
+								filterTarget.outputs.splice(nn, 1);
+							}
+						});
+					});
+			} else {
+				fol.connectSpeaker(filterTarget.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, filterTarget.outputs
+					, (x: number, y: number) => {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters', order], () => {
+							let nn = filterTarget.outputs.indexOf('');
+							if (nn > -1) {
+								filterTarget.outputs.splice(nn, 1);
+							}
+						});
+					});
+			}
+		}
+		/*if (zidx < 5) {
+			let sbuttn: TileRectangle = {
+				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, y: filterFromY - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, w: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
+				, h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
+				, rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				, css: 'fanFilterDrragger'
+				, draggable: true
+			};
+			let btnAnchor: TileAnchor = {
+				xx: sbuttn.x
+				, yy: sbuttn.y
+				, ww: sbuttn.w
+				, hh: sbuttn.h
+				, minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [sbuttn], translation: { x: 0, y: 0 }
+			};
+			sbuttn.activation = (x: number, y: number) => {
+				if (!btnAnchor.translation) {
+					btnAnchor.translation = { x: 0, y: 0 };
+				}
+				if (x == 0 && y == 0) {
+					let dy = btnAnchor.translation.y;
+					btnAnchor.translation.y = 0;
+					let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().autoPointHeight);
+					if (newOrder < 0) newOrder = 0;
+					if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1) newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
+					if (order != newOrder) {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+							globalCommandDispatcher.cfg().data.filters.splice(order, 1);
+							globalCommandDispatcher.cfg().data.filters.splice(newOrder, 0, filterTarget);
+						});
+					}
+				} else {
+					btnAnchor.translation.y = btnAnchor.translation.y + y;
+				}
+				globalCommandDispatcher.renderer.tiler.resetAnchor(
+					globalCommandDispatcher.renderer.mixer.spearsSVGgroup
+					, spearsAnchor
+					, LevelModes.normal);
+			};
+			spearsAnchor.content.push(btnAnchor);
+		}*/
+		if (zidx < 4) {
+			this.addReorderFilterIcon(zidx, order, fanLevelAnchor);
+		} else {
+			if (order == 0) {
+				if (zidx < 7) {
+					this.addZoomReorderIcon(zidx, order, fanLevelAnchor);
+				}
+			}
+		}
+	}
+	addZoomReorderIcon(zidx: number, order: number, fanLevelAnchor: TileAnchor) {
+		let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+		if (zidx >= 3) {
+			ratio = ratio / 2;
+		}
+		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let top = globalCommandDispatcher.cfg().automationTop();
+		let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+		let zoomReorderAutoButton: TileRectangle = {
+			x: xx - 0.5 * sz
+			, y: yy - 0.5 * sz
+			, w: sz
+			, h: sz
+			, rx: 0.5 * sz
+			, ry: 0.5 * sz
+			, css: 'fanEmptySymbol fanButton' + zidx
+			//, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
+			, draggable: false
+
+		};
+		fanLevelAnchor.content.push(zoomReorderAutoButton);
+	}
+	addReorderFilterIcon(zidx: number, order: number, fanLevelAnchor: TileAnchor) {
+		//if (zidx < 4) {
+		let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+		if (zidx >= 3) {
+			ratio = ratio / 2;
+		}
+		let top = globalCommandDispatcher.cfg().automationTop();
+		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+		let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+		let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+		let dragOrderFilterAnchor: TileAnchor = {
+			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
+			, minZoom: fanLevelAnchor.minZoom
+			, beforeZoom: fanLevelAnchor.beforeZoom
+			, content: []
+			, translation: { x: 0, y: 0 }
+		};
+		let reorderAutoButton: TileRectangle = {
+			x: xx - 0.5 * sz
+			, y: yy - 0.5 * sz
+			, w: sz
+			, h: sz
+			, rx: 0.5 * sz
+			, ry: 0.5 * sz
+			, css: css
+			, draggable: true
+
+		};
+		let aim = order;
+		reorderAutoButton.activation = (xx, yy) => {
+			if (dragOrderFilterAnchor.translation) {
+				if (xx == 0 && yy == 0) {
+					dragOrderFilterAnchor.translation.x = 0;
+					dragOrderFilterAnchor.translation.y = 0;
+					if (aim < 0) {
+						aim = 0;
+					}
+					if (aim > globalCommandDispatcher.cfg().data.filters.length - 1) {
+						aim = globalCommandDispatcher.cfg().data.filters.length - 1;
+
+					}
+					if (aim == order) {
+						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
+					} else {
+						globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+							let autoTrack: Zvoog_FilterTarget
+								= globalCommandDispatcher.cfg().data.filters.splice(order, 1)[0];
+							globalCommandDispatcher.cfg().data.filters.splice(aim, 0, autoTrack);
+						});
+						globalCommandDispatcher.resetProject();
+					}
+				} else {
+					dragOrderFilterAnchor.translation.x = sz / 3;
+					aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
+						/ globalCommandDispatcher.cfg().autoPointHeight) + order;
+					//console.log(aim);
+					if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
+						dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
+					}
+					globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderFilterAnchor);
+				}
+				//console.log(xx, yy,dragOrderSampleAnchor.translation.x,dragOrderSampleAnchor.translation.y);
+
+			}
+		}
+		dragOrderFilterAnchor.content.push(reorderAutoButton);
+		fanLevelAnchor.content.push(dragOrderFilterAnchor);
+		/*} else {
+			if (zidx < 7) {
+				let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+				if (zidx >= 3) {
+					ratio = ratio / 2;
+				}
+				let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+				let top = globalCommandDispatcher.cfg().automationTop();
+				let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+				let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+				let zoomReorderAutoButton: TileRectangle = {
+					x: xx - 0.5 * sz
+					, y: yy - 0.5 * sz
+					, w: sz
+					, h: sz
+					, rx: 0.5 * sz
+					, ry: 0.5 * sz
+					, css: 'fanSamplerInteractionIcon fanButton' + zidx
+					, draggable: false
+
+				};
+				fanLevelAnchor.content.push(zoomReorderAutoButton);
+			}
+		}*/
+	}
+}

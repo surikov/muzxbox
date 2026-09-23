@@ -755,7 +755,6 @@ function getContext() {
     return globalContext;
 }
 function setContext(context, disposeOld = false) {
-    console.log('setContext', context, disposeOld);
     if (disposeOld) {
         globalContext.dispose();
     }
@@ -1665,11 +1664,9 @@ function connect(srcNode, dstNode, outputNumber = 0, inputNumber = 0) {
         }
     }
     if (isAudioParam(dstNode)) {
-        console.log('connect node to param');
         srcNode.connect(dstNode, outputNumber);
     }
     else {
-        console.log('connect node to node');
         srcNode.connect(dstNode, outputNumber, inputNumber);
     }
 }
@@ -2300,7 +2297,6 @@ class DestinationInstance extends ToneAudioNode {
     }
 }
 onContextInit((context) => {
-    console.log('destinatinon', context);
     context.destination = new DestinationInstance({ context });
 });
 onContextClose((context) => {
@@ -2316,6 +2312,7 @@ class Effect extends ToneAudioNode {
         this.effectReturn = new Gain({ context: this.context });
         this.input = new Gain({ context: this.context });
         this.baseOutputNode = this._dryWet;
+        console.log('Effect options', options);
         this.input.fan(this._dryWet.a, this.effectSend);
         this.effectReturn.connect(this._dryWet.b);
         this.wet.setValueAtTime(options.wet, 0);
@@ -5785,6 +5782,7 @@ class Delay extends ToneAudioNode {
         ]);
         super(options);
         this.name = "Delay";
+        console.log('Delay options', options);
         const maxDelayInSeconds = this.toSeconds(options.maxDelay);
         this._maxDelay = Math.max(maxDelayInSeconds, this.toSeconds(options.delayTime));
         this._delayNode =
@@ -5839,21 +5837,27 @@ class PitchShift extends FeedbackEffect {
         const options = optionsFromArguments(PitchShift.getDefaults(), arguments, ["pitch"]);
         super(options);
         this.name = "PitchShift";
+        console.log('PitchShift options', options);
+        console.log('__frequency');
         this.__frequency = new Signal({ context: this.context });
+        console.log('_delayA');
         this._delayA = new Delay({
             maxDelay: 1,
             context: this.context,
         });
+        console.log('_lfoA');
         this._lfoA = new LFO({
             context: this.context,
             min: 0,
             max: 0.1,
             type: "sawtooth",
         }).connect(this._delayA.delayTime);
+        console.log('_delayB');
         this._delayB = new Delay({
             maxDelay: 1,
             context: this.context,
         });
+        console.log('_lfoB');
         this._lfoB = new LFO({
             context: this.context,
             min: 0,
@@ -5861,7 +5865,9 @@ class PitchShift extends FeedbackEffect {
             type: "sawtooth",
             phase: 180,
         }).connect(this._delayB.delayTime);
+        console.log('_crossFade');
         this._crossFade = new CrossFade({ context: this.context });
+        console.log('_crossFadeLFO');
         this._crossFadeLFO = new LFO({
             context: this.context,
             min: 0,
@@ -5869,6 +5875,7 @@ class PitchShift extends FeedbackEffect {
             type: "triangle",
             phase: 90,
         }).connect(this._crossFade.fade);
+        console.log('_feedbackDelay');
         this._feedbackDelay = new Delay({
             delayTime: options.delayTime,
             context: this.context,
@@ -6214,6 +6221,13 @@ class PitchShift2 extends FeedbackEffect2 {
         return this;
     }
 }
+class Synth2 {
+    constructor(ac) {
+        this.output = ac.createGain();
+    }
+    start(when) {
+    }
+}
 function createShift2(ac) {
     let sh = new PitchShift2(ac);
     console.log('created2', sh);
@@ -6225,19 +6239,19 @@ function createShift() {
     return sh;
 }
 let cuCo = null;
-let o1 = null;
+let synth = null;
 function doTest2() {
     console.log('doTest2');
     if (cuCo) {
     }
     else {
         cuCo = new AudioContext();
-        o1 = new Oscillator2(cuCo);
-        o1.output.connect(cuCo.destination);
+        synth = new Synth2(cuCo);
+        synth.output.connect(cuCo.destination);
     }
     if (cuCo) {
-        if (o1) {
-            o1.start(cuCo.currentTime + 0.1);
+        if (synth) {
+            synth.start(cuCo.currentTime + 0.1);
         }
     }
 }

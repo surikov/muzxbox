@@ -4,6 +4,12 @@
 	--drag-color: #066;
 	--line-color: #cfe;
 	--click-color: #360;
+
+	--background-color: #012622;
+	--main-color: #F2FfF2;
+	--drag-color: #0c6;
+	--line-color: #A68D60;
+	--click-color: #027367;
 	
 	--black-key-color: color-mix(in lab, transparent 70%, var(--click-color));
 

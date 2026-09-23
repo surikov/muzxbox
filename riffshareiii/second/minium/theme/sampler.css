@@ -1,0 +1,69 @@
+.samplerRowBorder{
+	fill: var(--line-color);
+	fill-opacity:25%;
+    stroke: none;
+}
+.samplerDrumDotFocused{
+	fill: var(--main-color);
+	fill-opacity:99%;
+    stroke: none;
+}
+.samplerDrumDotBg{
+	fill: var(--main-color);
+	fill-opacity2:75%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumMuteBg{
+	fill: var(--main-color);
+	fill-opacity:10%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumDotActive23542354{
+	fill: var(--click-color);
+	fill-opacity2:75%;
+    stroke: none;
+}
+.samplerDrumDotLine{
+	fill: var(--main-color);
+	fill-opacity:75%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumMuteLine{
+	fill: var(--main-color);
+	fill-opacity:10%;
+    stroke: none;
+	pointer-events: none;
+}
+.samplerDrumDeleteIcon{
+	fill: var(--click-color);
+    stroke: none;
+	font-family: 'Material-Design-Iconic-Font';
+	pointer-events: none;
+	
+}
+.samplerDrumDeleteSize2{
+	font-size: var(--icon-075cm);
+}
+.samplerDrumDeleteSize1{
+	font-size: var(--icon-05cm);
+}
+.samplerDrumDeleteSize0{
+	font-size: var(--icon-033cm);
+}
+.samplerDrumDragSpot{
+	fill: var(--drag-color);
+    stroke: none;
+	cursor: ew-resize;
+	stroke: var(--main-color);
+    stroke-width: 0.015cm;
+}
+.samplerDrumDragIcon{
+	font-size: var(--icon-05cm);
+	font-family: 'Material-Design-Iconic-Font';
+	fill: var(--main-color);
+	stroke: none;
+	pointer-events: none;
+}

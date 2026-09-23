@@ -1,0 +1,11 @@
+:root {
+    --font-ratio: 1.5;
+}
+
+@font-face {
+    font-family: 'Fontquan-XinYiJiXiangSong';
+    src: url(Fontquan-XinYiJiXiangSong-Regular/Fontquan-XinYiJiXiangSong-Regular.ttf);
+}
+html {
+    font-family: 'Fontquan-XinYiJiXiangSong';
+}
