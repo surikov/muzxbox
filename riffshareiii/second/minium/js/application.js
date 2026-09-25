@@ -309,7 +309,7 @@ function startApplication() {
     globalCommandDispatcher.resetProject();
 }
 function setupHomeBackURL() {
-    let mzxbox = 'https://mzxbox.ru/';
+    let mzxbox = 'https://daw1024.com/';
     let urlParams = new URLSearchParams(window.location.search);
     let home = urlParams.get('home');
     if (home) {

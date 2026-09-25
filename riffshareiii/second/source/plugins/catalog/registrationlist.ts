@@ -72,12 +72,6 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "evaluate": ""
 		, "script": ""
 	}
-	/*
-	,
-	, 
-	, 
-	,
-	,
 	, {
 		"label": "Yamaha DX7"
 		, "purpose": "Performer"
@@ -86,6 +80,22 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "evaluate": "newDX7FMSynth1"
 		, "script": _t_plugin_root_folder + "performers/dx7fmsynth1/synth/dx7minium.js"
 	}
+	,
+	{
+		"label": "Roland TR-808"
+		, "purpose": "Sampler"
+		, "kind": "tr808drums"
+		, "ui": _t_plugin_root_folder + "samplers/tr808drums/ui/tr808ui.html"
+		, "evaluate": "createNewTR808synth"
+		, "script": _t_plugin_root_folder + "samplers/tr808drums/audio/tr808drumsBase.js"
+	}
+	/*
+	,
+	, 
+	, 
+	,
+	,
+	,
 	, 
 	, {
 		"label": "MIDI.RU Archive"
@@ -116,14 +126,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	,
 	
 	,
-	{
-		"label": "Roland TR-808"
-		, "purpose": "Sampler"
-		, "kind": "tr808drums"
-		, "ui": _t_plugin_root_folder + "samplers/tr808drums/ui/tr808ui.html"
-		, "evaluate": "createNewTR808synth"
-		, "script": _t_plugin_root_folder + "samplers/tr808drums/audio/tr808drumsBase.js"
-	}*/
+	*/
 ];
 function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[] {
 	return _t_all_registerd_plugins_list;

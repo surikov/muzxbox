@@ -22,4 +22,10 @@ echo alphaTabImport
 call tsc -p ./actions/alphaTabImport
 echo minium.writer
 call tsc -p ./actions/minium.writer
+echo dx7
+call tsc -p ./performers/dx7minium/synth
+call tsc -p ./performers/dx7minium/ui
+echo tr808
+call tsc -p ./samplers/tr808/plugin
+call tsc -p ./samplers/tr808/ui
 pause

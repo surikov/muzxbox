@@ -1,0 +1,34 @@
+{
+	"compilerOptions": {
+		"target": "es2019",
+		"outFile": "../../../../../minium/plugins/performers/dx7fmsynth1/ui/dx7selector.js"
+		//,"outDir":"../js"
+		,
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2019",
+			"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+		"../../../../mzxbx/mzxbxapi/musicenginetypes.ts",
+		"../dx7types.ts",
+		
+		"loadersys.ts",
+		"lib.ts",
+		"dx7ui.ts"	
+	]
+}

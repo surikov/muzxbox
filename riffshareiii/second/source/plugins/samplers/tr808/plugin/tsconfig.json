@@ -1,0 +1,37 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"outFile": "../../../../../minium/plugins/samplers/tr808drums/audio/tr808drumsBase.js",
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": true,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2015",
+			"es5"
+		],
+		"declaration": true,
+		"types": []
+	},
+	"files": [
+		"../../../../mzxbx/mzxbxapi/musicenginetypes.ts",
+		"tr808list.ts",
+		"tr808synth.ts",
+		"voiceType.ts",
+		"voices/voiceKick.ts",
+		"voices/voiceSnare.ts",
+		"voices/voiceTom.ts",
+		"voices/voiceHat.ts",
+		"voices/voiceBell.ts",
+		"voices/voiceClap.ts",
+		"tr808plugin.ts"
+	]
+}
