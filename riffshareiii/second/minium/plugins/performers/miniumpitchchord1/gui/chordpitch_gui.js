@@ -518,4 +518,3 @@ class ChordPitchPerformerUtil {
     }
     ;
 }
-//# sourceMappingURL=chordpitch_gui.js.map

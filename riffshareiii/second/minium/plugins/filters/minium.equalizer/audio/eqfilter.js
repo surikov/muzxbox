@@ -72,4 +72,3 @@ class EqualizerImplementation {
 function new10bEqualizer() {
     return new EqualizerImplementation();
 }
-//# sourceMappingURL=eqfilter.js.map

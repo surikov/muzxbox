@@ -160,4 +160,3 @@ function resetSpotClass(nn) {
     spot.classList.add(cssSpotClassName(nn));
 }
 let ui808 = new UI808(false);
-//# sourceMappingURL=tr808ui.js.map

@@ -11,7 +11,7 @@
         ,"noImplicitAny": false
         ,"removeComments": true
         ,"preserveConstEnums": true
-        ,"sourceMap": true
+        ,"sourceMap": false
         ,"experimentalDecorators": true
         ,"isolatedModules": false
 		,"module": "AMD"
@@ -20,7 +20,7 @@
             ,"es2015"
             ,"es5"
         ]
-        ,"declaration": true
+        ,"declaration": false
 		,"types": [ ]
 	}
 	,"files": [

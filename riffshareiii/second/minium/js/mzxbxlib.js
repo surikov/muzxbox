@@ -107,6 +107,7 @@ function MZXBX_appendScriptURL(url) {
             }
         }
     }
+    console.log('MZXBX_appendScriptURL', url);
     var scriptElement = document.createElement('script');
     scriptElement.setAttribute("type", "text/javascript");
     scriptElement.setAttribute("src", url);
@@ -200,4 +201,3 @@ function MZXBX_waitForCondition(sleepMs, isDone, onFinish) {
         }, sleepMs);
     }
 }
-//# sourceMappingURL=mzxbxlib.js.map

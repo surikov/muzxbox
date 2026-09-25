@@ -67,4 +67,3 @@ class EchoImplementation {
 function newBaseEchoV1() {
     return new EchoImplementation();
 }
-//# sourceMappingURL=plugin.js.map

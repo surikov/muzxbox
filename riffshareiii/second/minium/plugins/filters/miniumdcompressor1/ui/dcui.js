@@ -56,4 +56,3 @@ function initCompressorUI() {
         bridge.sendMessageToHost(level.value);
     });
 }
-//# sourceMappingURL=dcui.js.map

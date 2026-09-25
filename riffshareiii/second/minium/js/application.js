@@ -388,6 +388,7 @@ function saveProjectState() {
     }
 }
 function startLoadCSSfile(cssurl) {
+    console.log('startLoadCSSfile', cssurl);
     var head = document.getElementsByTagName('head')[0];
     var link = document.createElement('link');
     link.rel = 'stylesheet';
@@ -8132,4 +8133,3 @@ function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
 }
-//# sourceMappingURL=application.js.map

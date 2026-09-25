@@ -1,0 +1,43 @@
+{
+	"compilerOptions": {
+		"target": "es2015",
+		"outFile": "../../midi.ru/js/midiru.js"
+		//,"outDir":"../js"
+		,
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": false,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2015",
+			"es5"
+		],
+		"declaration": false,
+		"types": []
+	},
+	"files": [
+		"../mzxbx/mzxbxapi/musicenginetypes.ts",
+
+		//"../../extensions/minium.percussion/list/names.ts",
+		//"../../extensions/minium.pitch/list/names.ts",
+		"../plugins/actions/alphaTabImport/alphatab/AlphaTabError.ts",
+		"../plugins/actions/alphaTabImport/midiimport/MIDIEvent.ts",
+		"../plugins/actions/alphaTabImport/midiimport/MIDIParser.ts",
+		"../plugins/actions/alphaTabImport/midiimport/MIDIFileTrack.ts",
+		"../plugins/actions/alphaTabImport/midiimport/MIDIFileHeader.ts",
+		"../plugins/actions/alphaTabImport/midiimport/DataViewStream.ts",
+		"../plugins/actions/alphaTabImport/midiimport/midiimport.ts",
+		"../plugins/actions/alphaTabImport/midiimport/eventsconvert.ts",
+		"../plugins/actions/alphaTabImport/midiimport/typesmidi.ts",
+		//"testminium.ts",
+		"midiruarchive.ts"
+	]
+}

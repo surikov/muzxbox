@@ -61,4 +61,3 @@ class CompressorImplementation {
 function newBaseCompressor() {
     return new CompressorImplementation();
 }
-//# sourceMappingURL=compress.js.map

@@ -1834,4 +1834,3 @@ class DX7UI {
         window.parent.postMessage(message, '*');
     }
 }
-//# sourceMappingURL=dx7selector.js.map

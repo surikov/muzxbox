@@ -57,4 +57,3 @@ function initFaderUI() {
         bridge.sendMessageToHost('' + volume.value);
     });
 }
-//# sourceMappingURL=faderui.js.map

@@ -33,4 +33,3 @@ class FaderImplementation {
 function newBaseFader() {
     return new FaderImplementation();
 }
-//# sourceMappingURL=faderaudio.js.map

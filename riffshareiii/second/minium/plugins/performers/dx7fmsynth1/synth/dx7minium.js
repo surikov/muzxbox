@@ -244,4 +244,3 @@ function newDX7FMSynth1() {
     }
     return new MiniumPluginDX7Bridge();
 }
-//# sourceMappingURL=dx7minium.js.map

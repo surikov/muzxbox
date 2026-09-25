@@ -860,4 +860,3 @@ class StrumPerformerImplementation {
 function newStrumPerformerImplementation() {
     return new StrumPerformerImplementation();
 }
-//# sourceMappingURL=strum_plugin.js.map

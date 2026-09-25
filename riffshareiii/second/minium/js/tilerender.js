@@ -1250,4 +1250,3 @@ function TAnchor(xx, yy, ww, hh, showZoom, hideZoom, id, translation) {
 function TText(x, y, css, text) {
     return { x: x, y: y, text: text, css: css, };
 }
-//# sourceMappingURL=tilerender.js.map

@@ -613,4 +613,3 @@ class PercussionDrumKitImplementation {
 function newBasePercussionPlugin() {
     return new PercussionDrumKitImplementation();
 }
-//# sourceMappingURL=drmsplgn.js.map

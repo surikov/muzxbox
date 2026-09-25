@@ -2,10 +2,10 @@
 declare function createSchedulePlayer(callback: (start: number, position: number, end: number) => void): MZXBX_Player;
 declare function createTileLevel(): TileLevelBase;
 let goHomeBackURL: string = '';
-let applicationVersion='1.8.32';
+let applicationVersion = '1.8.32';
 function startApplication() {
-	console.log('startApplication v',applicationVersion);
-	document.title = 'Minium Studio '+applicationVersion;
+	console.log('startApplication v', applicationVersion);
+	document.title = 'Minium Studio ' + applicationVersion;
 	//let commands = new CommandDispatcher();
 	setupHomeBackURL();
 
@@ -94,7 +94,7 @@ function startApplication() {
 
 }
 function setupHomeBackURL() {
-	let mzxbox='https://daw1024.com/';
+	let mzxbox = 'https://daw1024.com/';
 	let urlParams = new URLSearchParams(window.location.search);
 	let home = urlParams.get('home');
 	if (home) {
@@ -106,7 +106,7 @@ function setupHomeBackURL() {
 			goHomeBackURL = saved;
 			console.log('goHomeBackURL cache', goHomeBackURL);
 		}*/
-		goHomeBackURL=mzxbox;
+		goHomeBackURL = mzxbox;
 	}
 	if (goHomeBackURL) {
 		saveRawText2localStorage('goHomeBackURL', goHomeBackURL);
@@ -187,6 +187,7 @@ function initWebAudioFromUI() {
 	globalCommandDispatcher.initAudioFromUI();
 }*/
 function startLoadCSSfile(cssurl: string) {
+	console.log('startLoadCSSfile', cssurl);
 	var head = document.getElementsByTagName('head')[0];
 	var link = document.createElement('link');
 	link.rel = 'stylesheet';

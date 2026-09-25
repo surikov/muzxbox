@@ -11,7 +11,7 @@
 		,"noImplicitAny": false
 		,"removeComments": true
 		,"preserveConstEnums": true
-		,"sourceMap": true
+		,"sourceMap": false
 		,"experimentalDecorators": true
 		,"isolatedModules": false
 		//,"moduleResolution":"nodenext" 
@@ -22,7 +22,7 @@
 			,"es2018"
 			,"es5"
 		]
-		,"declaration": true
+		,"declaration": false
 		//,"typeRoots": [ "./node_types" ]
 		//,"types": ["node"]
 		//,"types": []

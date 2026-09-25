@@ -1,17 +1,18 @@
 function MZXBX_appendScriptURL(url: string): boolean {
-	//console.log('MZXBX_appendScriptURL', url);
+	
 	let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
-	//console.log('MZXBX_appendScriptURL',url,'scripts',scripts);
+	
 	for (let ii = 0; ii < scripts.length; ii++) {
 		let script: HTMLScriptElement | null = scripts.item(ii);
-		//console.log('check',script);
+	
 		if (script) {
 			if (url == (script as any).lockedLoaderURL) {
-				//console.log('skip',url);
+				
 				return false;
 			}
 		}
 	}
+	console.log('MZXBX_appendScriptURL', url);
 	var scriptElement: HTMLScriptElement = document.createElement('script');
 	scriptElement.setAttribute("type", "text/javascript");
 	scriptElement.setAttribute("src", url);

@@ -677,4 +677,3 @@ class VoiceClap {
 function createNewTR808synth() {
     return new TR808Synth();
 }
-//# sourceMappingURL=tr808drumsBase.js.map

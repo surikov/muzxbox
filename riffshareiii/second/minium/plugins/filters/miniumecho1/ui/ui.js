@@ -56,4 +56,3 @@ function initEchoUI() {
         bridge.sendMessageToHost(volume.value);
     });
 }
-//# sourceMappingURL=ui.js.map

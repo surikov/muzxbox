@@ -1004,4 +1004,3 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
         }
     }
 }
-//# sourceMappingURL=mx.js.map

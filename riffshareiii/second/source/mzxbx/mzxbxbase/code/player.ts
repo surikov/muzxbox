@@ -119,21 +119,16 @@ class SchedulePlayer implements MZXBX_Player {
 		}
 		return null;
 	}
-	/*reconnectAllPlugins(schedule: MZXBX_Schedule): void {
-		this.disconnectAllPlugins();
-		this.schedule = schedule;
-		let msg = this.connectAllPlugins();
-		console.log('reconnectAllPlugins', msg);
-	}*/
+	
 	startLoopTicks(loopStart: number, currentPosition: number, loopEnd: number, onDone: (message: string | null) => void): void {
-		//console.log('startLoopTicks start');
+		
 		this.connectAllPlugins((msg: string | null) => {
-			//console.log('startLoopTicks connected');
+			
 			if (msg) {
 				onDone(msg);
 			} else {
 				if (this.audioContext) {
-					//console.log('startLoopTicks ready');
+					
 					this.isConnected = true;
 					this.position = currentPosition;
 					this.isPlayLoop = true;
@@ -141,9 +136,9 @@ class SchedulePlayer implements MZXBX_Player {
 					setTimeout(() => {
 						this.nextAudioContextStart = this.audioContext.currentTime + this.tickDuration;
 						this.doTick(loopStart, loopEnd, this.waitForID);
-						//console.log('started doTick');
+						
 					}, 100);
-					//console.log('startLoopTicks done');
+					
 					onDone(null);
 				} else {
 					this.cancel();

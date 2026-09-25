@@ -1,5 +1,6 @@
 "use strict";
 let _t_plugin_root_folder = './plugins/';
+_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list = [
     {
         label: "Minium 10-band Equalizer",
@@ -80,9 +81,16 @@ let _t_all_registerd_plugins_list = [
         "ui": _t_plugin_root_folder + "samplers/tr808drums/ui/tr808ui.html",
         "evaluate": "createNewTR808synth",
         "script": _t_plugin_root_folder + "samplers/tr808drums/audio/tr808drumsBase.js"
+    },
+    {
+        "label": "MIDI.RU Archive",
+        "purpose": "Action",
+        "kind": "midiarchive1",
+        "ui": "https://daw1024.com/midi.ru/libstart.html",
+        "evaluate": "",
+        "script": ""
     }
 ];
 function MZXBX_currentPlugins() {
     return _t_all_registerd_plugins_list;
 }
-//# sourceMappingURL=catalog.js.map

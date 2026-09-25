@@ -1,4 +1,5 @@
 let _t_plugin_root_folder = './plugins/';
+_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	
 	{
@@ -89,6 +90,15 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "evaluate": "createNewTR808synth"
 		, "script": _t_plugin_root_folder + "samplers/tr808drums/audio/tr808drumsBase.js"
 	}
+	,
+	{
+		"label": "MIDI.RU Archive"
+		, "purpose": "Action"
+		, "kind": "midiarchive1"
+		, "ui": "https://daw1024.com/midi.ru/libstart.html"
+		, "evaluate": ""
+		, "script": ""
+	}
 	/*
 	,
 	, 
@@ -97,14 +107,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 	,
 	,
 	, 
-	, {
-		"label": "MIDI.RU Archive"
-		, "purpose": "Action"
-		, "kind": "midiarchive1"
-		, "ui": "https://mzxbox.ru/midiruplugin/libstart.html"
-		, "evaluate": ""
-		, "script": ""
-	}
+	, 
 	,
 	{
 		"label": "Publish & Share"

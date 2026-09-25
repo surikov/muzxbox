@@ -81,10 +81,7 @@ class PluginLoader {
 		return null;
 	}
 
-	startLoadPluginStarter(kind: string
-		//holder: MZXBX_FilterHolder | MZXBX_PerformerSamplerHolder
-		//, filters: MZXBX_FilterHolder[], performers: MZXBX_PerformerSamplerHolder[]
-		, onDone: (exeName: string) => void
+	startLoadPluginStarter(kind: string, onDone: (exeName: string) => void
 	): null | string {
 
 		let tt: MZXBX_PluginRegistrationInformation | null = this.findPluginInfo(kind);
