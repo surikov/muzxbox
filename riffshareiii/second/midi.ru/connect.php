@@ -32,17 +32,22 @@ function getIntOrNegative($name)
 register_shutdown_function('shutDownFunction');
 $limit = 15;
 $steps = 100;
-$author=getIntOrNegative('author');
-$tempo=getIntOrNegative('tempo');
-$duration=getIntOrNegative('duration');
-$bass=getIntOrNegative('bass');
-$chords=getIntOrNegative('chords');
-$drums=getIntOrNegative('drums');
-$artist=getIntOrNegative('artist');
+$author = getIntOrNegative('author');
+$tempo = getIntOrNegative('tempo');
+$duration = getIntOrNegative('duration');
+$bass = getIntOrNegative('bass');
+$chords = getIntOrNegative('chords');
+$drums = getIntOrNegative('drums');
+$artist = getIntOrNegative('artist');
 $offset = intval(getVarOrSpace("page"));
 $file = intval(getVarOrSpace("file"));
 $find = getVarOrSpace("find");
-$find = trim(str_replace(array("'","\r","\n","\\", "\"", "%", "&", "<", ">"), "", $find));
+$find = trim(str_replace(array("'", "\r", "\n", "\\", "\"", "%", "&", "<", ">"), "", $find));
+
+
+
+
+
 $dbconnection = new mysqli($servername, $username, $password, $db);
 if ($dbconnection->connect_errno) {
 	echo "<p>Failed to connect to MySQL: " . $mysqli->connect_error . '</p>';

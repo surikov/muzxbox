@@ -11,9 +11,48 @@
 	<title>MIDI.ru Archive</title>
 </head>
 
-<body>
-	<h1 class='startlink'><a href='midiru.php'>MIDI.RU</a></h1>
+<body onclick='goPreURL();'>
+	<h1 class='startlink'><a onclick='goPreURL();'>MIDI.RU</a></h1>
 </body>
+<script>
+	function getCookie(name) {
+		let cookies = document.cookie.split('; ');
+		for (let cookie of cookies) {
+			let [cookieName, cookieValue] = cookie.split('=');
+			if (cookieName === name) {
+				return decodeURIComponent(cookieValue);
+			}
+		}
+		return null;
+	}
 
+	function goPreURL() {
+		let url = 'midiru.php?a=1';
+		try {
+
+			let txt = getCookie('page');
+			if (txt) url = url + '&page=' + txt;
+			txt = getCookie('author');
+			if (txt) url = url + '&author=' + txt;
+			txt = getCookie('tempo');
+			if (txt) url = url + '&tempo=' + txt;
+			txt = getCookie('duration');
+			if (txt) url = url + '&duration=' + txt;
+			txt = getCookie('bass');
+			if (txt) url = url + '&bass=' + txt;
+			txt = getCookie('chords');
+			if (txt) url = url + '&chords=' + txt;
+			txt = getCookie('drums');
+			if (txt) url = url + '&drums=' + txt;
+			txt = getCookie('find');
+			if (txt) url = url + '&find=' + txt;
+
+		} catch (xx) {
+			console.log(xx);
+		}
+		console.log('goPreURL', url);
+		window.location.href = url;
+	}
+</script>
 
 </html>

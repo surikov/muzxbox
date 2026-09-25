@@ -1,37 +1,31 @@
 {
-    "compilerOptions": {
-        "target": "es2015",
-        "outFile": "../../../minium/js/mzxbx.js",
-        "strictNullChecks": true,
-        "alwaysStrict": true,
-        "esModuleInterop": true,
-        "noResolve": false,
-        "noImplicitAny": false,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "sourceMap": false,
-        "experimentalDecorators": true,
-        "isolatedModules": false,
-        "module": "AMD",
-        "lib": [
-            "dom",
-            "es2015",
-            "es5"
-        ],
-        "declaration": false,
-        "types": []
-    },
-    "files": [
-        
-
-        "../mzxbxapi/musicenginetypes.ts",
+	"compilerOptions": {
+		"target": "es2015",
+		"outFile": "../../../minium/js/mzxbx.js",
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": false,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD",
+		"lib": [
+			"dom",
+			"es2015",
+			"es5"
+		],
+		"declaration": false,
+		"types": []
+	},
+	"files": [
+		"../mzxbxapi/musicenginetypes.ts",
 		"../mzxbxapi/musicenginedeclarations.ts",
-		
-        "./code/main.ts"
-		,"./code/player.ts"
-
-        ,"./code/loader.ts"
-        
-
-    ]
+		"./code/main.ts",
+		"./code/player.ts",
+		"./code/loader.ts"
+	]
 }
