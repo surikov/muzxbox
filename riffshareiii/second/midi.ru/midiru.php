@@ -23,6 +23,7 @@
 		setcookie('drums', $drums, $expiry_time, "/");
 		setcookie('page', $offset, $expiry_time, "/");
 		setcookie('find', $find, $expiry_time, "/");
+		setcookie('artist', $artist, $expiry_time, "/");
 
 	} catch (Exception $e) {
 		echo '<p>Caught exception: ',  $e, '</p>';

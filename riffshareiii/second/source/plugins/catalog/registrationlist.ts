@@ -1,7 +1,7 @@
 let _t_plugin_root_folder = './plugins/';
-_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
+//_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
-	
+
 	{
 		label: "Minium 10-band Equalizer"
 		, purpose: "Filter"
@@ -38,7 +38,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, script: _t_plugin_root_folder + "filters/minium.fader/audio/faderaudio.js"
 	}
 	,
-	 {
+	{
 		"label": "Minium Chords GM"
 		, "purpose": "Performer"
 		, "kind": "miniumpitchchord1"
@@ -47,7 +47,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "script": _t_plugin_root_folder + "performers/miniumpitchchord1/audio/strum_plugin.js"
 	}
 	,
-	 {
+	{
 		label: "Minium Percussion GM"
 		, purpose: "Sampler"
 		, kind: "miniumdrums1"
@@ -99,6 +99,23 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "evaluate": ""
 		, "script": ""
 	}
+	, {
+		"label": "Timeline editor"
+		, "purpose": "Action"
+		, "kind": "baredit1"
+		, "ui": _t_plugin_root_folder + "actions/baredit1/mied.html"
+		, "evaluate": ""
+		, "script": ""
+	}
+	,
+	{
+		"label": "Publish & Share"
+		, "purpose": "Action"
+		, "kind": "sharemzxbox1"
+		, "ui": _t_plugin_root_folder + "actions/miniumshare/shareui.html"
+		, "evaluate": ""
+		, "script": ""
+	}
 	/*
 	,
 	, 
@@ -118,14 +135,7 @@ let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 		, "script": ""
 	}
 	,
-	{
-		"label": "Timeline editor"
-		, "purpose": "Action"
-		, "kind": "baredit1"
-		, "ui": _t_plugin_root_folder + "actions/baredit1/mied.html"
-		, "evaluate": ""
-		, "script": ""
-	}
+	
 	,
 	
 	,

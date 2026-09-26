@@ -1,0 +1,32 @@
+{
+	"compilerOptions": {
+		"target": "es2015"
+        ,"outFile": "../../../../minium/plugins/actions/miniumshare/miniumshare1.js"
+        //,"outDir":"../js"
+		,"strictNullChecks": true
+		,"alwaysStrict": true
+		,"esModuleInterop": true
+		,"noResolve": false
+        ,"noImplicitAny": false
+        ,"removeComments": true
+        ,"preserveConstEnums": true
+        ,"sourceMap": false
+        ,"experimentalDecorators": true
+        ,"isolatedModules": false
+		,"module": "AMD"
+        ,"lib": [
+            "dom"
+            ,"es2015"
+            ,"es5"
+        ]
+        ,"declaration": false
+		,"types": [ ]
+	}
+	,"files": [
+		
+		
+		
+        "../../../mzxbx/mzxbxapi/musicenginetypes.ts"
+        ,"exportshare.ts"
+	]
+}

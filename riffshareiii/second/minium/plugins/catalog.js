@@ -1,6 +1,5 @@
 "use strict";
 let _t_plugin_root_folder = './plugins/';
-_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list = [
     {
         label: "Minium 10-band Equalizer",
@@ -87,6 +86,22 @@ let _t_all_registerd_plugins_list = [
         "purpose": "Action",
         "kind": "midiarchive1",
         "ui": "https://daw1024.com/midi.ru/libstart.html",
+        "evaluate": "",
+        "script": ""
+    },
+    {
+        "label": "Timeline editor",
+        "purpose": "Action",
+        "kind": "baredit1",
+        "ui": _t_plugin_root_folder + "actions/baredit1/mied.html",
+        "evaluate": "",
+        "script": ""
+    },
+    {
+        "label": "Publish & Share",
+        "purpose": "Action",
+        "kind": "sharemzxbox1",
+        "ui": _t_plugin_root_folder + "actions/miniumshare/shareui.html",
         "evaluate": "",
         "script": ""
     }

@@ -47,6 +47,8 @@
 			if (txt) url = url + '&drums=' + txt;
 			txt = getCookie('find');
 			if (txt) url = url + '&find=' + txt;
+			txt = getCookie('artist');
+			if (txt) url = url + '&artist=' + txt;
 
 		} catch (xx) {
 			console.log(xx);

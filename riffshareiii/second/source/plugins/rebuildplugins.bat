@@ -28,4 +28,8 @@ call tsc -p ./performers/dx7minium/ui
 echo tr808
 call tsc -p ./samplers/tr808/plugin
 call tsc -p ./samplers/tr808/ui
+echo minium.baredit
+call tsc -p ./actions/minium.baredit
+echo miniumshare
+call tsc -p ./actions/miniumshare
 pause

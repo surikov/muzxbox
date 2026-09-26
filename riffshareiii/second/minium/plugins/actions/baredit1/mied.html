@@ -1,0 +1,37 @@
+<html>
+
+<head>
+	<title>Timeline edit</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=WDXL+Lubrifont+SC&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../../subwindow.css">
+	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+</head>
+
+<body>
+	<h1 id="plugintitle">Minium edit selection</h1>
+	<div class='centercolumn'>
+		<p class="cntrlrow"><span id='sellabel'>Selection</span>:&nbsp;<input id="selfrom" type="number" value='34' />&nbsp;-&nbsp;<input id="selto" type="number" value='35' /></p>
+		
+		<p class="cntrlrow"><span id='splitlabel'>splt</span>:&nbsp;<input id="splitinput" class='shorttextinput' type="text" value='1/4' /> <button onclick="plugin.split();">✓</button></p>
+		<p class="cntrlrow"><span id='tempolabel'>tmp</span>:&nbsp;<input id='bpm' type="number" value='128' /> <button onclick="plugin.setTempo();">✓</button></p>
+		<p class="cntrlrow"><span id='metrelabel'>mtr</span>:&nbsp;<input id="metreinput" class='shorttextinput' type="text" value='12/8' /> <button onclick="plugin.metre();">✓</button></p>
+		<p class="cntrlrow"><span id='refitlabel'>rft</span>:&nbsp;<input id="refitinput" class='shorttextinput' type="text" value='4/4' /> <button onclick="plugin.refit();">✓</button></p>
+
+		<p class="cntrlrow"><button id='btndel' onclick="plugin.deleteBars();">Delete bars</button></p>
+		<p class="cntrlrow"><button id='btnclear' onclick="plugin.clear();">clear</button></p>
+		<p class="cntrlrow"><button id='btnadd' onclick="plugin.addBars();">Add bars</button></p>
+		<p class="cntrlrow"><button id='btnpushaside' onclick="plugin.shiftContent();">Push content aside</button></p>
+		<p class="cntrlrow"><button id='btnmerge' onclick="plugin.mergeBars();">merge</button></p>
+
+	</div>
+</body>
+<script type='text/javascript' src='miedit.js'></script>
+<script>
+	let plugin = new BarTimeEdit();
+</script>
+
+</html>
