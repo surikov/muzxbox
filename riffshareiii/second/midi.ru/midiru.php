@@ -13,6 +13,17 @@
 	<?php
 	try {
 		include('connect.php');
+
+		$expiry_time = time() + (60 * 60 * 24 * 30);
+		if (!empty($author)) setcookie('author', empty($author) ? '' : $author, $expiry_time, "/");
+		setcookie('tempo', $tempo, $expiry_time, "/");
+		setcookie('duration', $duration, $expiry_time, "/");
+		setcookie('bass', $bass, $expiry_time, "/");
+		setcookie('chords', $chords, $expiry_time, "/");
+		setcookie('drums', $drums, $expiry_time, "/");
+		setcookie('page', $offset, $expiry_time, "/");
+		setcookie('find', $find, $expiry_time, "/");
+
 	} catch (Exception $e) {
 		echo '<p>Caught exception: ',  $e, '</p>';
 	}
@@ -232,16 +243,6 @@
 						$result->close();
 					}
 					$dbconnection->close();
-
-					$expiry_time = time() + (60 * 60 * 24 * 30);
-					if (!empty($author)) setcookie('author', empty($author) ? '' : $author, $expiry_time, "/");
-					setcookie('tempo', $tempo, $expiry_time, "/");
-					setcookie('duration', $duration, $expiry_time, "/");
-					setcookie('bass', $bass, $expiry_time, "/");
-					setcookie('chords', $chords, $expiry_time, "/");
-					setcookie('drums', $drums, $expiry_time, "/");
-					setcookie('page', $offset, $expiry_time, "/");
-					setcookie('find', $find, $expiry_time, "/");
 				} catch (Exception $e) {
 					echo '<p>Caught exception: ',  $e, '</p>';
 				}
