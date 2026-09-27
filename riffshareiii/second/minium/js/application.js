@@ -239,7 +239,7 @@ class StateDiff {
     }
 }
 let goHomeBackURL = '';
-let applicationVersion = '1.8.32';
+let applicationVersion = '1.8.33';
 function startApplication() {
     console.log('startApplication v', applicationVersion);
     document.title = 'Minium Studio ' + applicationVersion;
@@ -8113,7 +8113,7 @@ let styleText = '#topbox { width:100%; height2:1cm; background-color: #330099; f
 let colorbirch = ':root { 	--background-color: #ccc; 	--main-color: #030; 	--drag-color: #dd6; 	--line-color: #003; 	--click-color: #090; 	 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); }';
 let colordarkblue = ':root { 	--background-color: #001; 	--main-color: #eef; 	--drag-color: #399; 	--line-color: #9cf; 	--click-color: #069; 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); }';
 let colordarkgreen = ':root { 	--background-color: #030900; 	--main-color: #dff; 	--drag-color: #066; 	--line-color: #cfe; 	--click-color: #360;  	--background-color: #012622; 	--main-color: #F2FfF2; 	--drag-color: #663; 	--line-color: #cfe; 	--click-color: #027367; 	 	--black-key-color: color-mix(in lab, transparent 70%, var(--click-color));  }';
-let colordarkred = ':root { 	--background-color: #32383d; 	--main-color: #fff; 	--drag-color: #459; 	--drag-color11: #363; 	--line-color: #4dcc72; 	--line-color11: #ccc; 	--click-color: #aa4e4e; 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
+let colordarkred = ':root { 	--background-color: #32383d; 	--main-color: #fff; 	--drag-color: #459; 	--drag-color11: #363; 	--line-color: #fed; 	--line-color11: #ccc; 	--click-color: #aa4e4e; 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
 let colorlight = ':root { 	--background-color: #eef6ff; 	--main-color: #606; 	--drag-color: #fcf; 	--line-color: #339; 	--click-color: #6cf; 	 	--black-key-color: color-mix(in lab, transparent 85%, var(--click-color)); }  ';
 let colorneon = ':root { 	--background-color: #101; 	--main-color: #9cf; 	--drag-color: #03f; 	--line-color: #ffc; 	--click-color: #c39;  	--background-color: #2B0D40; 	--main-color: #F2EA79; 	--drag-color: #3E22F2; 	--line-color: #dff; 	--click-color: #BC17BF; 	 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
 let colorwhite = ':root { 	--background-color: #fff9f6; 	--main-color: #900; 	--drag-color: #9cf; 	--line-color: #433; 	--click-color: #fc0; 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); } ';

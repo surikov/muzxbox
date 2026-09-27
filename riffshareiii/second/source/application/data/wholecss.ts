@@ -7,7 +7,7 @@ let colordarkblue = ':root { 	--background-color: #001; 	--main-color: #eef; 	--
 
 let colordarkgreen = ':root { 	--background-color: #030900; 	--main-color: #dff; 	--drag-color: #066; 	--line-color: #cfe; 	--click-color: #360;  	--background-color: #012622; 	--main-color: #F2FfF2; 	--drag-color: #663; 	--line-color: #cfe; 	--click-color: #027367; 	 	--black-key-color: color-mix(in lab, transparent 70%, var(--click-color));  }';
 
-let colordarkred = ':root { 	--background-color: #32383d; 	--main-color: #fff; 	--drag-color: #459; 	--drag-color11: #363; 	--line-color: #4dcc72; 	--line-color11: #ccc; 	--click-color: #aa4e4e; 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
+let colordarkred = ':root { 	--background-color: #32383d; 	--main-color: #fff; 	--drag-color: #459; 	--drag-color11: #363; 	--line-color: #fed; 	--line-color11: #ccc; 	--click-color: #aa4e4e; 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
 
 let colorlight = ':root { 	--background-color: #eef6ff; 	--main-color: #606; 	--drag-color: #fcf; 	--line-color: #339; 	--click-color: #6cf; 	 	--black-key-color: color-mix(in lab, transparent 85%, var(--click-color)); }  ';
 

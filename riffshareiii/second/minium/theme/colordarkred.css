@@ -3,7 +3,8 @@
 	--main-color: #fff;
 	--drag-color: #459;
 	--drag-color11: #363;
-	--line-color: #4dcc72;
+	--line-color22: #4dcc72;
+	--line-color: #fed;
 	--line-color11: #ccc;
 	--click-color: #aa4e4e;
 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color));
