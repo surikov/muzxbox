@@ -242,7 +242,7 @@ let goHomeBackURL = '';
 let applicationVersion = '1.8.33';
 function startApplication() {
     console.log('startApplication v', applicationVersion);
-    document.title = 'Minium Studio ' + applicationVersion;
+    document.title = 'v' + applicationVersion + ' DAW1024';
     setupHomeBackURL();
     globalCommandDispatcher.registerWorkProject(createNewEmptyProjectData());
     let ui = new UIRenderer();
@@ -1964,21 +1964,23 @@ class CommandDispatcher {
             globalCommandDispatcher.downloadBlob(blobresult, fileName);
         });
     }
-    hideMenuByStyle() {
+    hideMenuToolbarByStyle() {
         this.renderer.menu.menuPanelBackground.style.visibility = 'hidden';
         this.renderer.menu.menuPanelContent.style.visibility = 'hidden';
         this.renderer.menu.menuPanelInteraction.style.visibility = 'hidden';
         this.renderer.menu.menuPanelButtons.style.visibility = 'hidden';
+        this.renderer.toolbar.toolBarGroup.style.visibility = 'hidden';
     }
-    showMenuByStyle() {
+    showMenuToolbarByStyle() {
         this.renderer.menu.menuPanelBackground.style.visibility = 'visible';
         this.renderer.menu.menuPanelContent.style.visibility = 'visible';
         this.renderer.menu.menuPanelInteraction.style.visibility = 'visible';
         this.renderer.menu.menuPanelButtons.style.visibility = 'visible';
+        this.renderer.toolbar.toolBarGroup.style.visibility = 'visible';
     }
     makeTileSVGsquareCanvas(canvasSize, onDoneCanvas) {
         console.log('makeTileSVGsquareCanvas', canvasSize);
-        this.hideMenuByStyle();
+        this.hideMenuToolbarByStyle();
         let tileLevelSVG = document.getElementById('tileLevelSVG');
         let xml = encodeURIComponent(tileLevelSVG.outerHTML);
         let replaceText = '%3C!--%20css%20--%3E';
@@ -2027,7 +2029,7 @@ class CommandDispatcher {
             var imageData = context.getImageData(0, 0, canvasSize, canvasSize);
             var buffer = imageData.data.buffer;
             onDoneCanvas(canvas, buffer);
-            this.showMenuByStyle();
+            this.showMenuToolbarByStyle();
         };
         svgImg.src = url;
     }

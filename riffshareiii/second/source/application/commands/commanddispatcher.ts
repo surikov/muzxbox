@@ -925,21 +925,23 @@ class CommandDispatcher {
 			globalCommandDispatcher.downloadBlob(blobresult, fileName);
 		});
 	}
-	hideMenuByStyle() {
+	hideMenuToolbarByStyle() {
 		this.renderer.menu.menuPanelBackground.style.visibility = 'hidden';
 		this.renderer.menu.menuPanelContent.style.visibility = 'hidden';
 		this.renderer.menu.menuPanelInteraction.style.visibility = 'hidden';
 		this.renderer.menu.menuPanelButtons.style.visibility = 'hidden';
+		this.renderer.toolbar.toolBarGroup.style.visibility = 'hidden';
 	}
-	showMenuByStyle() {
+	showMenuToolbarByStyle() {
 		this.renderer.menu.menuPanelBackground.style.visibility = 'visible';
 		this.renderer.menu.menuPanelContent.style.visibility = 'visible';
 		this.renderer.menu.menuPanelInteraction.style.visibility = 'visible';
 		this.renderer.menu.menuPanelButtons.style.visibility = 'visible';
+		this.renderer.toolbar.toolBarGroup.style.visibility = 'visible';
 	}
 	makeTileSVGsquareCanvas(canvasSize: number, onDoneCanvas: (canvas: HTMLCanvasElement, buffer: ArrayBuffer) => void): void {
 		console.log('makeTileSVGsquareCanvas', canvasSize);
-		this.hideMenuByStyle();
+		this.hideMenuToolbarByStyle();
 		let tileLevelSVG: HTMLElement = document.getElementById('tileLevelSVG') as HTMLElement;
 		let xml: string = encodeURIComponent(tileLevelSVG.outerHTML);
 		let replaceText = '%3C!--%20css%20--%3E';//<!-- css -->;
@@ -993,7 +995,7 @@ class CommandDispatcher {
 			var imageData: ImageData = context.getImageData(0, 0, canvasSize, canvasSize);
 			var buffer: ArrayBuffer = imageData.data.buffer;
 			onDoneCanvas(canvas, buffer);
-			this.showMenuByStyle();
+			this.showMenuToolbarByStyle();
 		};
 		svgImg.src = url;
 		//this.showMenuByStyle();

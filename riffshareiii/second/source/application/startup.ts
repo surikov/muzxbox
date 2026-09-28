@@ -5,7 +5,7 @@ let goHomeBackURL: string = '';
 let applicationVersion = '1.8.33';
 function startApplication() {
 	console.log('startApplication v', applicationVersion);
-	document.title = 'Minium Studio ' + applicationVersion;
+	document.title = 'v' + applicationVersion+' DAW1024';
 	//let commands = new CommandDispatcher();
 	setupHomeBackURL();
 
