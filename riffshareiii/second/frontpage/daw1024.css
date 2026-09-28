@@ -6,9 +6,11 @@ html {
 	background-position: center;
 	background-size: cover;
 	font-family2: 'LCDFont', 'Courier New', Courier, monospace;
-	font-size: 1cm;
+	font-family: Courier, monospace;
+	font-size: 0.75cm;
 	color: white;
-	background-color: #32383d;
+	background-color2: #32383d;
+	background-color: black;
 	height: 100%;
 	margin: 0;
 }
@@ -36,7 +38,7 @@ p {
 }
 
 .bg {
-	background-color: #32383d;
+	background-color: black;
 
 }
 
