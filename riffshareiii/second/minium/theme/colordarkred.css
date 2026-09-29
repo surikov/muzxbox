@@ -12,6 +12,7 @@
 
 #tileLevelSVG {
 	background-image3: url("bg/logo.png");
+	background-image: none;
 	background-size2: cover;
 	background-position-x: left;
 	background-position-y: bottom;

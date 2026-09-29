@@ -1,6 +1,6 @@
 body,
 html {
-	background-image: url(bgpage.png);
+	background-image: url(phonebg.jpg);
 	background-attachment: fixed;
 	background-repeat: no-repeat;
 	background-position: center;
@@ -41,7 +41,9 @@ p {
 	background-color: black;
 
 }
-
+sup{
+	font-size: 0.25cm;
+}
 a:link,
 a:visited {
 	color: white;
