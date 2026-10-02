@@ -87,6 +87,8 @@ let copyToClipboard: MenuInfo = {
 			setTimeout(() => {
 				if (globalCommandDispatcher.clipboardData) {
 					globalCommandDispatcher.lockPlayCallback = true;
+					globalCommandDispatcher.clipboardData.selectedPart = { startMeasure: -1, endMeasure: -1 };
+					globalCommandDispatcher.playPosition = 0;
 					globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.clipboardData);
 				}
 			}, 123);

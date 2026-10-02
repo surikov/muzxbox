@@ -1701,14 +1701,14 @@ class CommandDispatcher {
         this.lastUsedSchedule = this.renderZvoogProjectForOutput(prj);
         let from = 0;
         let to = 0;
-        if (globalCommandDispatcher.cfg().data.selectedPart.startMeasure > -1) {
-            let endbar = globalCommandDispatcher.cfg().data.selectedPart.endMeasure;
+        if (prj.selectedPart.startMeasure > -1) {
+            let endbar = prj.selectedPart.endMeasure;
             if (endbar > this.lastUsedSchedule.series.length - 1) {
                 endbar = this.lastUsedSchedule.series.length - 1;
             }
             for (let nn = 0; nn <= endbar; nn++) {
                 to = to + this.lastUsedSchedule.series[nn].duration;
-                if (nn < globalCommandDispatcher.cfg().data.selectedPart.startMeasure) {
+                if (nn < prj.selectedPart.startMeasure) {
                     from = to;
                 }
             }
@@ -3755,6 +3755,8 @@ let copyToClipboard = {
             setTimeout(() => {
                 if (globalCommandDispatcher.clipboardData) {
                     globalCommandDispatcher.lockPlayCallback = true;
+                    globalCommandDispatcher.clipboardData.selectedPart = { startMeasure: -1, endMeasure: -1 };
+                    globalCommandDispatcher.playPosition = 0;
                     globalCommandDispatcher.setupAndStartPlay(globalCommandDispatcher.clipboardData);
                 }
             }, 123);
