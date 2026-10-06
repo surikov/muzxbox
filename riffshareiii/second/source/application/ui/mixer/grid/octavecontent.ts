@@ -43,11 +43,14 @@ class OctaveContent {
 			let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
 			let track = globalCommandDispatcher.cfg().data.tracks[farorder[0]];
 
-			let css = 'mixNoteLine';
+			//let css = 'mixNoteLine';
+			let css = globalCommandDispatcher.calculateCSSforMixNoteLine();
 			//css = 'mixMuteLine';
 			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
-				css = 'mixMuteLine';
+				//css = 'mixMuteLine';
+				css = globalCommandDispatcher.calculateCSSforMutedNote();
 			}
+			//css=css+' fillHalfStep04';
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
 		}
 	}
@@ -77,15 +80,28 @@ class OctaveContent {
 		let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
 		//for (let ii = 1; ii < globalCommandDispatcher.cfg().data.tracks.length; ii++) {
 		//console.log(farorder);
-		for (let kk = 1; kk<farorder.length; kk++) {
+		for (let kk = 1; kk < farorder.length; kk++) {
 			let ii = farorder[kk];
 			//console.log(kk, ii);
 			let track = globalCommandDispatcher.cfg().data.tracks[ii];
-			let css = 'mixNoteSub';
 
+
+
+
+			/*let css = 'mixNoteSub';
 			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
 				css = 'mixMuteSub';
+			}*/
+			let css = globalCommandDispatcher.calculateCSSforSubLine();
+			if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
+				css = globalCommandDispatcher.calculateCSSforMutedSub();
 			}
+
+
+
+
+
+
 			this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, false, zoomLevel);
 		}
 	}
@@ -93,7 +109,7 @@ class OctaveContent {
 		, left: number, top: number, width: number, height: number
 		, barOctaveAnchor: TileAnchor
 		, transpose: number
-		, css: string
+		, trackCSS: string
 		, interact: boolean, zoomLevel: number
 	) {
 		if (!track.measures[barIdx]) {
@@ -103,7 +119,7 @@ class OctaveContent {
 		}
 		let measure: Zvoog_TrackMeasure = track.measures[barIdx];
 		if (measure) {
-
+			//console.log(track);
 			for (let cc = 0; cc < measure.chords.length; cc++) {
 				let chord: Zvoog_Chord = measure.chords[cc];
 				for (let nn = 0; nn < chord.pitches.length; nn++) {
@@ -136,7 +152,7 @@ class OctaveContent {
 								, y1: y1 - globalCommandDispatcher.cfg().notePathHeight / 2
 								, x2: r_x2
 								, y2: y2 - globalCommandDispatcher.cfg().notePathHeight / 2
-								, css: css
+								, css: trackCSS + globalCommandDispatcher.calculatePitchColorCSS(chord.pitches[nn])
 							};
 							barOctaveAnchor.content.push(line);
 							x1 = x2;

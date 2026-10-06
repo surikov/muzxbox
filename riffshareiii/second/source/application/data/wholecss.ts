@@ -14,6 +14,7 @@ let colorlight = ':root { 	--background-color: #eef6ff; 	--main-color: #606; 	--
 let colorneon = ':root { 	--background-color: #101; 	--main-color: #9cf; 	--drag-color: #03f; 	--line-color: #ffc; 	--click-color: #c39;  	--background-color: #2B0D40; 	--main-color: #F2EA79; 	--drag-color: #3E22F2; 	--line-color: #dff; 	--click-color: #BC17BF; 	 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
 
 let colorwhite = ':root { 	--background-color: #fff9f6; 	--main-color: #900; 	--drag-color: #9cf; 	--line-color: #433; 	--click-color: #fc0; 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); } ';
+let colorcolor = ':root { 	--background-color: #fff9f6; 	--main-color: #900; 	--drag-color: #9cf; 	--line-color: #433; 	--click-color: #fc0; 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); } ';
 
 /*
 let wholeCSSstring

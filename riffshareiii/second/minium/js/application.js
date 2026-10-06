@@ -1331,6 +1331,8 @@ class CommandDispatcher {
         this.tapSizeRatio = 1;
         this.clipboardData = null;
         this.lastUsedSchedule = null;
+        this.colorizedNoteLines = true;
+        this.colorizedToneBase0_11 = 10;
         this.playPosition = 0;
         this.restartOnInitError = false;
         this.lockPlayCallback = false;
@@ -1349,6 +1351,96 @@ class CommandDispatcher {
         this.samplerPluginDialog = new SamplerPluginDialog();
         this.actionPluginDialog = new ActionPluginDialog();
         this.sequencerPluginDialog = new SequencerPluginDialog();
+    }
+    calculatePitchColorCSS(pitch) {
+        if (this.colorizedNoteLines) {
+            let halfToneStep = 1 + pitch % 12;
+            halfToneStep = halfToneStep - this.colorizedToneBase0_11;
+            if (halfToneStep < 1) {
+                halfToneStep = halfToneStep + 12;
+            }
+            let cssName = '';
+            if (halfToneStep < 10) {
+                cssName = ' fillHalfStep0' + halfToneStep;
+            }
+            else {
+                cssName = ' fillHalfStep' + halfToneStep;
+            }
+            return cssName;
+        }
+        else {
+            return '';
+        }
+    }
+    calculateCSSforMixNoteLine() {
+        if (this.colorizedNoteLines) {
+            return 'coloredMixNoteLine';
+        }
+        else {
+            return 'mixNoteLine';
+        }
+    }
+    calculateCSSforMutedNote() {
+        if (this.colorizedNoteLines) {
+            return 'coloredMixMuteLine';
+        }
+        else {
+            return 'mixMuteLine';
+        }
+    }
+    calculateCSSforSubLine() {
+        if (this.colorizedNoteLines) {
+            return 'coloredMixNoteSub';
+        }
+        else {
+            return 'mixNoteSub';
+        }
+    }
+    calculateCSSforMutedSub() {
+        if (this.colorizedNoteLines) {
+            return 'coloredMixMuteSub';
+        }
+        else {
+            return 'mixMuteSub';
+        }
+    }
+    setupColorizedMode() {
+        let idx = readRawTextFromlocalStorage('uicolortheme');
+        if (idx == 'color') {
+            this.colorizedNoteLines = true;
+            let durations = [];
+            let project = this.cfg().data;
+            for (let ii = 0; ii < project.timeline.length; ii++) {
+                for (let tt = 0; tt < project.tracks.length; tt++) {
+                    let trackMeasure = project.tracks[tt].measures[ii];
+                    for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                        let trackMeasureChord = trackMeasure.chords[cc];
+                        for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+                            let halftone = trackMeasureChord.pitches[pp] % 12;
+                            if (!(durations[halftone])) {
+                                durations[halftone] = { count: 0, part: 1 };
+                            }
+                            durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
+                        }
+                    }
+                }
+            }
+            durations = durations.map(value => MMUtil().set(value).strip(1));
+            this.colorizedToneBase0_11 = 0;
+            let last = 0;
+            for (let ii = 0; ii < durations.length; ii++) {
+                if (durations[ii]) {
+                    if (durations[ii].count > last) {
+                        last = durations[ii].count;
+                        this.colorizedToneBase0_11 = ii;
+                    }
+                }
+            }
+            console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBase0_11, durations);
+        }
+        else {
+            this.colorizedNoteLines = false;
+        }
     }
     cfg() {
         return this._mixerDataMathUtility;
@@ -1831,9 +1923,13 @@ class CommandDispatcher {
         if (idx == 'light3') {
             cssPath = 'theme/colorbirch.css';
         }
+        if (idx == 'color') {
+            cssPath = 'theme/colorcolor.css';
+        }
         startLoadCSSfile(cssPath);
         this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
         saveRawText2localStorage('uicolortheme', idx);
+        this.resetProject();
     }
     resetAnchor(parentSVGGroup, anchor, layerMode) {
         this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -1863,6 +1959,7 @@ class CommandDispatcher {
     }
     resetProject() {
         try {
+            this.setupColorizedMode();
             this.setPlayPositionFromSelectedPart();
             this.renderer.fillWholeUI();
         }
@@ -2006,6 +2103,9 @@ class CommandDispatcher {
         }
         if (idx == 'light3') {
             csscolors = colorbirch;
+        }
+        if (idx == 'color') {
+            csscolors = colorcolor;
         }
         let wholeCSSstring = encodeURIComponent('<style>')
             + encodeURIComponent(styleText)
@@ -3857,6 +3957,10 @@ let menuPointSettings = {
                     text: 'Bereza', noLocalization: true, onClick: () => {
                         globalCommandDispatcher.setThemeColor('light3');
                     }, itemKind: kindAction
+                }, {
+                    text: 'Colorizer', noLocalization: true, onClick: () => {
+                        globalCommandDispatcher.setThemeColor('color');
+                    }, itemKind: kindAction
                 }
             ], itemKind: kindClosedFolder
         },
@@ -4783,9 +4887,9 @@ class OctaveContent {
             }
             let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
             let track = globalCommandDispatcher.cfg().data.tracks[farorder[0]];
-            let css = 'mixNoteLine';
+            let css = globalCommandDispatcher.calculateCSSforMixNoteLine();
             if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
-                css = 'mixMuteLine';
+                css = globalCommandDispatcher.calculateCSSforMutedNote();
             }
             this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, true, zoomLevel);
         }
@@ -4807,14 +4911,14 @@ class OctaveContent {
         for (let kk = 1; kk < farorder.length; kk++) {
             let ii = farorder[kk];
             let track = globalCommandDispatcher.cfg().data.tracks[ii];
-            let css = 'mixNoteSub';
+            let css = globalCommandDispatcher.calculateCSSforSubLine();
             if ((soloOnly && track.performer.state != 2) || ((!soloOnly) && track.performer.state == 1)) {
-                css = 'mixMuteSub';
+                css = globalCommandDispatcher.calculateCSSforMutedSub();
             }
             this.addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, false, zoomLevel);
         }
     }
-    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, css, interact, zoomLevel) {
+    addTrackNotes(track, barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, trackCSS, interact, zoomLevel) {
         if (!track.measures[barIdx]) {
             return;
         }
@@ -4852,7 +4956,7 @@ class OctaveContent {
                                 y1: y1 - globalCommandDispatcher.cfg().notePathHeight / 2,
                                 x2: r_x2,
                                 y2: y2 - globalCommandDispatcher.cfg().notePathHeight / 2,
-                                css: css
+                                css: trackCSS + globalCommandDispatcher.calculatePitchColorCSS(chord.pitches[nn])
                             };
                             barOctaveAnchor.content.push(line);
                             x1 = x2;
@@ -8121,6 +8225,7 @@ let colordarkred = ':root { 	--background-color: #32383d; 	--main-color: #fff; 	
 let colorlight = ':root { 	--background-color: #eef6ff; 	--main-color: #606; 	--drag-color: #fcf; 	--line-color: #339; 	--click-color: #6cf; 	 	--black-key-color: color-mix(in lab, transparent 85%, var(--click-color)); }  ';
 let colorneon = ':root { 	--background-color: #101; 	--main-color: #9cf; 	--drag-color: #03f; 	--line-color: #ffc; 	--click-color: #c39;  	--background-color: #2B0D40; 	--main-color: #F2EA79; 	--drag-color: #3E22F2; 	--line-color: #dff; 	--click-color: #BC17BF; 	 	--black-key-color: color-mix(in lab, transparent 75%, var(--click-color)); } ';
 let colorwhite = ':root { 	--background-color: #fff9f6; 	--main-color: #900; 	--drag-color: #9cf; 	--line-color: #433; 	--click-color: #fc0; 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); } ';
+let colorcolor = ':root { 	--background-color: #fff9f6; 	--main-color: #900; 	--drag-color: #9cf; 	--line-color: #433; 	--click-color: #fc0; 	--black-key-color: color-mix(in lab, transparent 95%, var(--click-color)); } ';
 var LevelModes;
 (function (LevelModes) {
     LevelModes[LevelModes["normal"] = 0] = "normal";

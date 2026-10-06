@@ -309,16 +309,25 @@ body {
 	fill: #ffffff01
 }
 
-.fillHalfStep01 { fill: #1a1a1aff;}
-.fillHalfStep02 { fill: #c87137ff;}
-.fillHalfStep03 { fill: #ff9955ff;}
-.fillHalfStep04 { fill: #0000ffff;}
-.fillHalfStep05 { fill: #ff0099ff;}
-.fillHalfStep06 { fill: #808080ff;}
-.fillHalfStep07 { fill: #ff0000ff;}
-.fillHalfStep08 { fill: #ffffffff;}
-.fillHalfStep09 { fill: #aad400ff;}
-.fillHalfStep10 { fill: #c8ab37ff;}
-.fillHalfStep11 { fill: #00ffffff;}
-.fillHalfStep12 { fill: #00ffccff;}
+.fillHalfStepBg { stroke: #a9afcc;}
+
+.fillHalfStep01 { stroke: #000;}
+
+.fillHalfStep02 { stroke: #cfc;}
+.fillHalfStep03 { stroke: #ccf;}
+
+.fillHalfStep04 { stroke: #00f;}
+.fillHalfStep05 { stroke: #f60;}
+
+.fillHalfStep06 { stroke: #030;}
+.fillHalfStep07 { stroke: #900;}
+.fillHalfStep08 { stroke: #003;}
+
+.fillHalfStep09 { stroke: #cff;}
+.fillHalfStep10 { stroke: #ffc;}
+
+.fillHalfStep11 { stroke: #0ff;}
+.fillHalfStep12 { stroke: #ff0;}
+
+
 

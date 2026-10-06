@@ -1,5 +1,5 @@
 let _t_plugin_root_folder = './plugins/';
-_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
+//_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list: MZXBX_PluginRegistrationInformation[] = [
 
 	{

@@ -191,6 +191,10 @@ let menuPointSettings: MenuInfo = {
 					text: 'Bereza', noLocalization: true, onClick: () => {
 						globalCommandDispatcher.setThemeColor('light3');
 					}, itemKind: kindAction
+				}, {
+					text: 'Colorizer', noLocalization: true, onClick: () => {
+						globalCommandDispatcher.setThemeColor('color');
+					}, itemKind: kindAction
 				}
 			], itemKind: kindClosedFolder
 		}/*, {

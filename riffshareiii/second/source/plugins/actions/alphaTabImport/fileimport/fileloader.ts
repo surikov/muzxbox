@@ -1,3 +1,4 @@
+//console.log('alphatabimport1');
 class FileLoaderAlpha {
 	inames: ChordPitchPerformerUtilMIDI = new ChordPitchPerformerUtilMIDI();
 
@@ -230,6 +231,7 @@ class FileLoaderAlpha {
 			console.log('all drums', allDrumCount);
 
 			let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+			/*
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				let pitches: { pitch: number, count: number }[] = [];
 				for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -256,7 +258,32 @@ class FileLoaderAlpha {
 				}
 				console.log(ii, pitchesLine);
 			}
-
+*/
+			let durations: Zvoog_Metre[] = [];
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				//let pitches: { pitch: number, count: number }[] = [];
+				for (let tt = 0; tt < project.tracks.length; tt++) {
+					let trackMeasure = project.tracks[tt].measures[ii];
+					for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+						let trackMeasureChord = trackMeasure.chords[cc];
+						for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+							let halftone = trackMeasureChord.pitches[pp] % 12;
+							if (!(durations[halftone])) {
+								durations[halftone] = { count: 0, part: 1 };
+							}
+							durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
+						}
+					}
+				}
+			}
+			durations = durations.map(value => MMUtil().set(value).strip(1));
+			for (let ii = 0; ii < durations.length; ii++) {
+				if (durations[ii]) {
+					console.log(noteNames[ii], durations[ii].count);
+				} else {
+					console.log(noteNames[ii]);
+				}
+			}
 		}
 
 		console.log('-------------------');

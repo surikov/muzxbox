@@ -7,6 +7,10 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	clipboardData: Zvoog_Project | null = null;
 	lastUsedSchedule: MZXBX_Schedule | null = null;
+
+	colorizedNoteLines: boolean = true;
+	colorizedToneBase0_11: number = 10;
+
 	//onAir = false;
 	//neeToStart = false;
 	playPosition = 0;
@@ -20,6 +24,95 @@ class CommandDispatcher {
 			this.reDrawPlayPosition();
 		}
 	};
+	calculatePitchColorCSS(pitch: number): string {
+		if (this.colorizedNoteLines) {
+			let halfToneStep = 1 + pitch % 12;
+			halfToneStep = halfToneStep - this.colorizedToneBase0_11;
+			if (halfToneStep < 1) {
+				halfToneStep = halfToneStep + 12;
+			}
+
+			let cssName = '';
+			if (halfToneStep < 10) {
+				cssName = ' fillHalfStep0' + halfToneStep;
+			} else {
+				cssName = ' fillHalfStep' + halfToneStep;
+			}
+			//console.log(halfToneStep, (pitch % 12), pitch, cssName);
+			return cssName;
+		} else {
+			return '';
+		}
+	}
+	calculateCSSforMixNoteLine(): string {
+		if (this.colorizedNoteLines) {
+			return 'coloredMixNoteLine';
+		} else {
+			return 'mixNoteLine';
+		}
+	}
+	calculateCSSforMutedNote(): string {
+		if (this.colorizedNoteLines) {
+			return 'coloredMixMuteLine';
+		} else {
+			return 'mixMuteLine';
+		}
+	}
+
+	calculateCSSforSubLine(): string {
+		if (this.colorizedNoteLines) {
+			return 'coloredMixNoteSub';
+		} else {
+			return 'mixNoteSub';
+		}
+	}
+	calculateCSSforMutedSub(): string {
+		if (this.colorizedNoteLines) {
+			return 'coloredMixMuteSub';
+		} else {
+			return 'mixMuteSub';
+		}
+	}
+	setupColorizedMode() {
+		let idx = readRawTextFromlocalStorage('uicolortheme');
+		if (idx == 'color') {
+			this.colorizedNoteLines = true;
+			let durations: Zvoog_Metre[] = [];
+			let project = this.cfg().data;
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				//let pitches: { pitch: number, count: number }[] = [];
+				for (let tt = 0; tt < project.tracks.length; tt++) {
+					let trackMeasure = project.tracks[tt].measures[ii];
+					for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+						let trackMeasureChord = trackMeasure.chords[cc];
+						for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+							let halftone = trackMeasureChord.pitches[pp] % 12;
+							if (!(durations[halftone])) {
+								durations[halftone] = { count: 0, part: 1 };
+							}
+							durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
+						}
+					}
+				}
+			}
+			durations = durations.map(value => MMUtil().set(value).strip(1));
+			this.colorizedToneBase0_11 = 0;
+			let last = 0;
+			for (let ii = 0; ii < durations.length; ii++) {
+				if (durations[ii]) {
+					if (durations[ii].count > last) {
+						last = durations[ii].count;
+						this.colorizedToneBase0_11 = ii;
+					}
+				}
+			}
+console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBase0_11,durations);
+
+		} else {
+			this.colorizedNoteLines = false;
+		}
+		
+	}
 
 	_mixerDataMathUtility: MixerDataMathUtility;
 	listener: null | ((this: HTMLElement, event: HTMLElementEventMap['change']) => any) = null;
@@ -665,11 +758,16 @@ class CommandDispatcher {
 		if (idx == 'light3') {
 			cssPath = 'theme/colorbirch.css';
 		}
+		if (idx == 'color') {
+			cssPath = 'theme/colorcolor.css';
+		}
 
 		//console.log("cssPath " + cssPath);
 		startLoadCSSfile(cssPath);
 		this.renderer.menu.resizeMenu(this.renderer.menu.lastWidth, this.renderer.menu.lastHeight);
 		saveRawText2localStorage('uicolortheme', idx);
+		//this.setupColorizedMode();
+		this.resetProject();
 	}
 	resetAnchor(parentSVGGroup: SVGElement, anchor: TileAnchor, layerMode: LevelModes) {
 		this.renderer.tiler.resetAnchor(parentSVGGroup, anchor, layerMode);
@@ -714,6 +812,7 @@ class CommandDispatcher {
 
 	resetProject() {
 		try {
+			this.setupColorizedMode();
 			/*
 						if (this.cfg().data.tracks)
 							if (this.cfg().data.tracks[0])
@@ -972,6 +1071,9 @@ class CommandDispatcher {
 		}
 		if (idx == 'light3') {
 			csscolors = colorbirch;
+		}
+		if (idx == 'color') {
+			csscolors = colorcolor;
 		}
 
 		let wholeCSSstring = encodeURIComponent('<style>')

@@ -16342,7 +16342,7 @@ class EventsConverter {
         return allPercussions.length - 1;
     }
 }
-console.log('Alpha Tab Import *.mid v1.0.2');
+console.log('Alpha Tab Import *.mid v1.0.21');
 let parsedProject = null;
 class AlphaTabImportMusicPlugin {
     constructor() {
@@ -16603,29 +16603,30 @@ class FileLoaderAlpha {
             }, 0);
             console.log('all drums', allDrumCount);
             let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+            let durations = [];
             for (let ii = 0; ii < project.timeline.length; ii++) {
-                let pitches = [];
                 for (let tt = 0; tt < project.tracks.length; tt++) {
                     let trackMeasure = project.tracks[tt].measures[ii];
                     for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
                         let trackMeasureChord = trackMeasure.chords[cc];
                         for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-                            let pitch = trackMeasureChord.pitches[pp] % 12;
-                            let it = pitches.find((value) => value.pitch == pitch);
-                            if (!(it)) {
-                                it = { pitch: pitch, count: 0 };
-                                pitches.push(it);
+                            let halftone = trackMeasureChord.pitches[pp] % 12;
+                            if (!(durations[halftone])) {
+                                durations[halftone] = { count: 0, part: 1 };
                             }
-                            it.count++;
+                            durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
                         }
                     }
                 }
-                pitches.sort((aa, bb) => bb.count - aa.count);
-                let pitchesLine = '';
-                for (let pp = 0; pp < pitches.length; pp++) {
-                    pitchesLine = pitchesLine + '  ' + noteNames[pitches[pp].pitch] + ':' + pitches[pp].count;
+            }
+            durations = durations.map(value => MMUtil().set(value).strip(1));
+            for (let ii = 0; ii < durations.length; ii++) {
+                if (durations[ii]) {
+                    console.log(noteNames[ii], durations[ii].count);
                 }
-                console.log(ii, pitchesLine);
+                else {
+                    console.log(noteNames[ii]);
+                }
             }
         }
         console.log('-------------------');
