@@ -1236,6 +1236,7 @@ console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBas
 	setPlayPositionFromSelectedPart() {
 		//console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
+			if (this.cfg().data.selectedPart.startMeasure <this.cfg().data.timeline.length) {
 			this.playPosition = 0;
 			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
 				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
@@ -1243,6 +1244,7 @@ console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBas
 				this.playPosition = this.playPosition + cuDuration;
 			}
 			//console.log('playPosition', this.playPosition);
+		}
 		}
 	}
 	rollTracksClick(left: number, top: number) {

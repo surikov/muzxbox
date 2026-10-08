@@ -59,6 +59,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 			this.setText('metrelabel', '音乐节拍');
 			this.setText('btndel', '删除');
 			this.setText('btnclear', '清除');
+			this.setText('btntrim', '隔断');
 			this.setText('btnadd', '添加');
 			this.setText('btnpushaside', '推开');
 			this.setText('btnmerge', '合并');
@@ -72,6 +73,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 				this.setText('metrelabel', 'Метр');
 				this.setText('btndel', 'Удалить');
 				this.setText('btnclear', 'Очистить');
+				this.setText('btntrim', 'Обрезать');
 				this.setText('refitlabel', 'Пересчитать');
 				this.setText('btnadd', 'Добавить');
 				this.setText('btnpushaside', 'Отодвинуть');
@@ -83,7 +85,8 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 				this.setText('tempolabel', 'Tempo');
 				this.setText('metrelabel', 'Metre');
 				this.setText('btndel', 'Delete');
-				this.setText('btnclear', 'Clrear');
+				this.setText('btnclear', 'Clear');
+				this.setText('btntrim', 'Trim');
 				this.setText('btnadd', 'Add to end');
 				this.setText('btnpushaside', 'Push aside');
 				this.setText('btnmerge', 'Merge');
@@ -139,6 +142,38 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 			}
 			this.closeDialog(this.currentProject);
 		}
+	}
+	trim() {
+		let selfrom = document.getElementById('selfrom');
+		let selto = document.getElementById('selto');
+		let from: number = parseInt((selfrom as any).value) - 1;
+		let to: number = parseInt((selto as any).value);
+		console.log('trim', from, to);
+
+		this.currentProject.timeline.splice(to);
+		this.currentProject.timeline.splice(0, from);
+
+		for (let ii = 0; ii < this.currentProject.tracks.length; ii++) {
+			this.currentProject.tracks[ii].measures.splice(to);
+			this.currentProject.tracks[ii].measures.splice(0, from);
+
+		}
+		for (let ii = 0; ii < this.currentProject.filters.length; ii++) {
+			this.currentProject.filters[ii].automation.splice(to);
+			this.currentProject.filters[ii].automation.splice(0, from);
+
+		}
+		for (let ii = 0; ii < this.currentProject.percussions.length; ii++) {
+			this.currentProject.percussions[ii].measures.splice(to);
+			this.currentProject.percussions[ii].measures.splice(0, from);
+
+		}
+		this.currentProject.comments.splice(to);
+		this.currentProject.comments.splice(0, from);
+
+		this.currentProject.selectedPart = { startMeasure: 0, endMeasure: this.currentProject.tracks.length - 1 };
+
+		this.closeDialog(this.currentProject);
 	}
 	deleteBars() {
 		let selfrom = document.getElementById('selfrom');

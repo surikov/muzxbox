@@ -2223,11 +2223,13 @@ class CommandDispatcher {
     }
     setPlayPositionFromSelectedPart() {
         if (this.cfg().data.selectedPart.startMeasure >= 0) {
-            this.playPosition = 0;
-            for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
-                let measure = this.cfg().data.timeline[mm];
-                let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-                this.playPosition = this.playPosition + cuDuration;
+            if (this.cfg().data.selectedPart.startMeasure < this.cfg().data.timeline.length) {
+                this.playPosition = 0;
+                for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+                    let measure = this.cfg().data.timeline[mm];
+                    let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+                    this.playPosition = this.playPosition + cuDuration;
+                }
             }
         }
     }
