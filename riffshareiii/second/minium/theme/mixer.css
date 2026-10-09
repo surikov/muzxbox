@@ -14,6 +14,9 @@
 	stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 90%;
 	pointer-events: none;
+
+  filter66: drop-shadow( 0.1cm 0.9cm 0.75cm var(--click-color)); 
+
 }
 .coloredMixNoteLine {
 	stroke11111: var(--main-color);
@@ -21,6 +24,8 @@
 	stroke-width: calc(0.95*var(--tapSize));
 	stroke-opacity: 90%;
 	pointer-events: none;
+
+	filter7777: drop-shadow( 0.1cm 0.9cm 0.75cm var(--click-color)); 
 }
 
 .mixMuteLine {

@@ -311,23 +311,23 @@ body {
 
 .fillHalfStepBg { stroke: #a9afcc;}
 
-.fillHalfStep01 { stroke: #000;}
+.fillHalfStep01 { stroke: #000;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #000); }
 
-.fillHalfStep02 { stroke: #eff;}
-.fillHalfStep03 { stroke: #def;}
+.fillHalfStep02 { stroke: #eff;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #eff);}
+.fillHalfStep03 { stroke: #def;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #def);}
 
-.fillHalfStep04 { stroke: #00f;}
-.fillHalfStep05 { stroke: #f90;}
+.fillHalfStep04 { stroke: #00f;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #00f);}
+.fillHalfStep05 { stroke: #f90;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #f90);}
 
-.fillHalfStep06 { stroke: #303;}
-.fillHalfStep07 { stroke: #c00;}
-.fillHalfStep08 { stroke: #033;}
+.fillHalfStep06 { stroke: #303;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #303);}
+.fillHalfStep07 { stroke: #c00;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #c00);}
+.fillHalfStep08 { stroke: #033;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #033);}
 
-.fillHalfStep09 { stroke: #dfc;}
-.fillHalfStep10 { stroke: #efd;}
+.fillHalfStep09 { stroke: #dfc;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #dfc);}
+.fillHalfStep10 { stroke: #efd;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #efd);}
 
-.fillHalfStep11 { stroke: #9ff;}
-.fillHalfStep12 { stroke: #ff9;}
+.fillHalfStep11 { stroke: #9ff;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #9ff);}
+.fillHalfStep12 { stroke: #ff9;filter1: drop-shadow( 0.1cm 0.9cm 0.5cm #ff9);}
 
 
 

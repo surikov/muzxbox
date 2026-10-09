@@ -171,7 +171,9 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 		this.currentProject.comments.splice(to);
 		this.currentProject.comments.splice(0, from);
 
-		this.currentProject.selectedPart = { startMeasure: 0, endMeasure: this.currentProject.tracks.length - 1 };
+		//this.currentProject.selectedPart = { startMeasure: 0, endMeasure: this.currentProject.tracks.length - 1 };
+		this.currentProject.selectedPart = { startMeasure: -1, endMeasure: - 1 };
+
 
 		this.closeDialog(this.currentProject);
 	}
@@ -191,6 +193,7 @@ class BarTimeEdit extends MZXBX_Plugin_UI {
 			this.currentProject.percussions[ii].measures.splice(startMeasure, 1 + endMeasure - startMeasure);
 		}
 		this.currentProject.comments.splice(startMeasure, 1 + endMeasure - startMeasure);
+		this.currentProject.selectedPart = { startMeasure: -1, endMeasure: - 1 };
 		this.closeDialog(this.currentProject);
 	}
 	shiftContent() {
