@@ -6,9 +6,9 @@ const ReaperAutomationTrack = require('./reaper-automation-track')
 const path = require('path')
 const { VstB64 } = require('./vst-utils')
 const { base64StringByteLength } = require('./base64')
-
-const emptys = fs.readFileSync(path.join(__dirname, '../data/empty.RPP'), 'utf8')
 */
+const emptys = fs.readFileSync(path.join(__dirname, '../data/empty.RPP'), 'utf8')
+
 /**
  * @typedef {import('./reaper-base.js').ReaData} ReaData
  */
@@ -20,7 +20,8 @@ class ReaperProject extends ReaperBase {
   constructor (obj) {
     if (obj) super(obj)
     else {
-      const empty = parser.parse(emptys)
+      //const empty = parser.parse(emptys)
+	  const empty = peg_parse(emptys);
       super(empty)
     }
   }

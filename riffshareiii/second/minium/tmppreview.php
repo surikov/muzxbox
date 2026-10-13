@@ -30,10 +30,6 @@ function limitcheck()
 		return filemtime('./tmp/'.$a) - filemtime('./tmp/'.$b);
 	});
 	
-	//foreach ($files as $value) {
-	//	error_log($value);
-	//}
-
 	$cnt=count($files);
 	error_log($cnt);
 	$lmt=3210;
@@ -64,7 +60,6 @@ $gdimage = null;
 $imgPlay = null;
 limitcheck();
 
-//file_put_contents($file, $postdata);
 echo $key;
 
 error_log('done------------------------------------');

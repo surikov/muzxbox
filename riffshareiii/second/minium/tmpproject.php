@@ -341,8 +341,8 @@ $html = <<<HTMLPREVIEW
 	<h1 id="labeltxt">$title</h1>
 	<p id="picDiv">
 		<img id='picImg' src="https://daw1024.com/minium/tmp/$key.png" 
-		width=500px 
-		height=500px 
+		width2=500px 
+		height2=500px 
 		onclick="starttmpload($key);" />
 	</p>
 	<div id="sharingbuttonsio">
