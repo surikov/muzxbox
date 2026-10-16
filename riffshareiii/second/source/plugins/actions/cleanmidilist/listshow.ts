@@ -15,6 +15,7 @@ class UIShowLib {
 		this.currentPage = this.currentPage ? this.currentPage : 0;
 		this.setupSlider();
 		this.refilllist(this.currentPage);
+		
 	}
 	init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
@@ -66,6 +67,7 @@ class UIShowLib {
 		}
 	}
 	startLoad(idx: number) {
+		this.showFog();
 		let urlstring = 'https://daw1024.com/clean_midi/' + listcleanmidifiles[idx].replace('\\', '/') + '.mid';
 		//alert('' + idx + ': ' + urlstring);
 		//console.log(urlstring);
@@ -95,6 +97,12 @@ class UIShowLib {
 		//this.parsedProject = mireader.project;
 		//console.log('loadFromArray', this.parsedProject);
 		this.sendImportedMusicData( mireader.project);
+	}
+	showFog(){
+		let pagefog = document.getElementById('pagefog') as any;
+		if (pagefog) {
+			pagefog.style.display = 'block';
+		}
 	}
 	setupSlider() {
 		let position = document.getElementById('position') as any;

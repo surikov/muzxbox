@@ -228,7 +228,7 @@ button {
 
 .smallbutton {
 	height: 1cm;
-	
+
 	width: 1cm;
 	font-family2: sans-serif;
 	font-weight44: 400;
@@ -241,7 +241,7 @@ button {
 	padding-left: 0.2cm;
 	padding-right: 0.2cm;
 	color: var(--main-color);
-	
+
 }
 
 
@@ -294,4 +294,16 @@ a:active {
 	border-width: 1px;
 	border-color: var(--line-color80);
 	;
+}
+
+#pagefog {
+	background-color: #999999dd;
+	width: 120%;
+	height: 120%;
+	position: absolute;
+	z-index: 123;
+	top: -10%;
+	left: -10%;
+	text-align: center;
+	display: none;
 }

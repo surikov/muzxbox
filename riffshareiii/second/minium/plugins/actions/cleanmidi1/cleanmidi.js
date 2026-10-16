@@ -2309,6 +2309,7 @@ class UIShowLib {
         }
     }
     startLoad(idx) {
+        this.showFog();
         let urlstring = 'https://daw1024.com/clean_midi/' + listcleanmidifiles[idx].replace('\\', '/') + '.mid';
         this.loadFromFileURL(urlstring, listcleanmidifiles[idx].replace('\\', ' - '));
     }
@@ -2333,6 +2334,12 @@ class UIShowLib {
         let title = filetitle ? filetitle : '?';
         let mireader = new MIDIReader(title, 123, arrayBuffer);
         this.sendImportedMusicData(mireader.project);
+    }
+    showFog() {
+        let pagefog = document.getElementById('pagefog');
+        if (pagefog) {
+            pagefog.style.display = 'block';
+        }
     }
     setupSlider() {
         let position = document.getElementById('position');
