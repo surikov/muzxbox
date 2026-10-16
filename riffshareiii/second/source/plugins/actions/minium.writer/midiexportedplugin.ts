@@ -4,13 +4,30 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 	constructor() {
 		super(true);
 	}
+	startExportReaperRPP() {
+		if (this.currentProject) {
+			let writer = new RPPWriter();
+			let txt = writer.composeReaperProject(this.currentProject);
+			this.download(txt, this.safeProjectName() + '.rpp', 'text/plain');
+		}
+	}
 	startExportJSON() {
 		this.exportLocalfile();
 	}
 	exportLocalfile() {
 		//console.log('exportLocalfile', th);
 		if (this.currentProject) {
-			this.download(JSON.stringify(this.currentProject), 'minium', 'application/json');
+
+			this.download(JSON.stringify(this.currentProject), this.safeProjectName(), 'application/json');
+		}
+	}
+	safeProjectName() {
+		if (this.currentProject) {
+			let text = this.currentProject.title;
+			let cleanText: string = text.replace(/[^a-zA-Z0-9]/g, "");
+			return '' + cleanText + '_DAW1024';
+		} else {
+			return 'DAW1024export';
 		}
 	}
 	download(data: string, filename: string, type: string) {
@@ -44,7 +61,7 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 
 			let a: HTMLAnchorElement = document.createElement("a");
 			a.href = dataURl;
-			a.download = "minium";
+			a.download = this.safeProjectName();
 			document.body.appendChild(a);
 			a.click();
 		}
@@ -159,13 +176,13 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 		//let url = URL.createObjectURL(file);
 		//a.href = url;
 		a.href = write.dataUri();
-		a.download = "export.mid";
+		a.download = this.safeProjectName();
 		document.body.appendChild(a);
 		a.click();
 	}
 	onMessageFromHost(message: MZXBX_MessageToPlugin): void {
 		this.currentProject = message.hostData;
-		console.log('onMessageFromHost',message);
+		console.log('onMessageFromHost', message);
 		if (message.screenData) {
 			let sz = 500;
 			let canvas = document.getElementById("prvw") as HTMLCanvasElement;
@@ -183,20 +200,29 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 			oo.innerHTML = txt;
 		}
 	}
+
 	onLanguaga(enruzhId: string): void {
+		let exportName = '';
+		if (this.currentProject) {
+			let text = this.currentProject.title;
+			exportName = text.replace(/[^a-zA-Z0-9]/g, "");
+		}
 		if (enruzhId == 'zh') {
-			this.setText('plugintitle', 'Export');
-			this.setText('btnsendmidi', 'MIDI');
-			this.setText('btnsendjson', 'JSON');
+			this.setText('plugintitle', 'Exp ' + exportName);
+			this.setText('btnsendmidi', '*.mid MIDI');
+			this.setText('btnsendjson', '*.json DAW1024');
+			this.setText('btnsendrpp', '*.rpp Reaper');
 		} else {
 			if (enruzhId == 'ru') {
-				this.setText('plugintitle', 'Экспорт');
-				this.setText('btnsendmidi', 'MIDI');
-				this.setText('btnsendjson', 'JSON');
+				this.setText('plugintitle', 'Экспорт ' + exportName);
+				this.setText('btnsendmidi', '*.mid MIDI');
+				this.setText('btnsendjson', '*.json DAW1024');
+				this.setText('btnsendrpp', '*.rpp Reaper');
 			} else {
-				this.setText('plugintitle', 'Export');
-				this.setText('btnsendmidi', 'MIDI');
-				this.setText('btnsendjson', 'JSON');
+				this.setText('plugintitle', 'Export ' + exportName);
+				this.setText('btnsendmidi', '*.mid MIDI');
+				this.setText('btnsendjson', '*.json DAW1024');
+				this.setText('btnsendrpp', '*.rpp Reaper');
 			}
 		}
 

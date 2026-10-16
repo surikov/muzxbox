@@ -1,0 +1,55 @@
+{
+	"compilerOptions": {
+		"target": "es2020"
+		//"target": "es2015"
+		,
+		"outFile": "../../../../minium/plugins/actions/cleanmidi1/cleanmidi.js"
+		//,"outDir":"../js"
+		,
+		"strictNullChecks": true,
+		"alwaysStrict": true,
+		"esModuleInterop": true,
+		"noResolve": false,
+		"noImplicitAny": false,
+		"removeComments": true,
+		"preserveConstEnums": true,
+		"sourceMap": false,
+		"experimentalDecorators": true,
+		"isolatedModules": false,
+		"module": "AMD"
+		//,"module": "es2020"
+		,
+		"lib": [
+			"ES2015",
+			"ES2016",
+			"ES2017",
+			"ES2021",
+			//"es2022.regexp",
+			//"es2022.error",
+			//"ES2024.Promise",
+			"DOM",
+			"DOM.Iterable",
+			//"ES2017.ArrayBuffer",
+			//"ES2024.ArrayBuffer"
+			//"dom"
+			//,"es2015"
+			//,"es5"
+		],
+		"declaration": false,
+		"types": []
+	},
+	"files": [
+		"../../../mzxbx/mzxbxapi/musicenginetypes.ts",
+		"../alphaTabImport/alphatab/AlphaTabError.ts",
+		"../alphaTabImport/midiimport/MIDIEvent.ts",
+		"../alphaTabImport/midiimport/MIDIParser.ts",
+		"../alphaTabImport/midiimport/MIDIFileTrack.ts",
+		"../alphaTabImport/midiimport/MIDIFileHeader.ts",
+		"../alphaTabImport/midiimport/DataViewStream.ts",
+		"../alphaTabImport/midiimport/midiimport.ts",
+		"../alphaTabImport/midiimport/eventsconvert.ts",
+		"../alphaTabImport/midiimport/typesmidi.ts",
+		"cleanlist.ts"
+		,"listshow.ts"
+	]
+}

@@ -13,14 +13,16 @@
 	--bgfill: var(--background-color);
 	--bgfill3: color-mix(in lab, transparent 15%, var(--background-color));
 }
+
 @font-face {
-  font-family: 'WDXL Lubrifont SC';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(../theme/wdxllubrifont/WDXLLubrifontSC-Regular.ttf) format('truetype');
-  unicode-range2: U+1f68c, U+1f692-1f693, U+1f695, U+1f697-1f69b, U+1f6a2, U+1f6a8-1f6a9, U+1f6ab-1f6ac, U+1f6b2, U+1f6b4, U+1f6b6, U+1f6bd, U+1f6bf-1f6c1, U+1f6cd, U+1f6cf, U+1f6d2, U+1f6eb, U+1f847, U+1f910-1f914, U+1f916-1f919, U+1f91d-1f924, U+1f926-1f92b, U+1f92d, U+1f92f-1f930, U+1f933, U+1f937, U+1f940-1f943, U+1f947, U+1f94a, U+1f951, U+1f953-1f955, U+1f957-1f958, U+1f95a-1f95b, U+1f95d-1f95e, U+1f962-1f965, U+1f969-1f96a, U+1f980-1f981, U+1f984-1f986, U+1f98a-1f98c, U+1f990-1f991, U+1f995, U+1f9c0, U+1f9d0, U+1f9da, U+1f9dc, U+1f9e1, U+20024, U+210c1, U+22c51, U+282e2, U+f0001-f0005, U+f0012-f0013, U+f0019, U+f0023, U+f0025, U+f0063, U+f00b8, U+f00cb, U+f00cd, U+f00d6, U+f00e1, U+f0101-f0104, U+f012c-f012d, U+f012f, U+f0138, U+f013c, U+f0143, U+f0148, U+f0159, U+f0163, U+f016d, U+f0174, U+f0198, U+f01ba, U+f01c7, U+f01d6, U+f01ef, U+f0208-f0209, U+f0223-f0224, U+f027e, U+f0292;
+	font-family: 'WDXL Lubrifont SC';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url(../theme/wdxllubrifont/WDXLLubrifontSC-Regular.ttf) format('truetype');
+	unicode-range2: U+1f68c, U+1f692-1f693, U+1f695, U+1f697-1f69b, U+1f6a2, U+1f6a8-1f6a9, U+1f6ab-1f6ac, U+1f6b2, U+1f6b4, U+1f6b6, U+1f6bd, U+1f6bf-1f6c1, U+1f6cd, U+1f6cf, U+1f6d2, U+1f6eb, U+1f847, U+1f910-1f914, U+1f916-1f919, U+1f91d-1f924, U+1f926-1f92b, U+1f92d, U+1f92f-1f930, U+1f933, U+1f937, U+1f940-1f943, U+1f947, U+1f94a, U+1f951, U+1f953-1f955, U+1f957-1f958, U+1f95a-1f95b, U+1f95d-1f95e, U+1f962-1f965, U+1f969-1f96a, U+1f980-1f981, U+1f984-1f986, U+1f98a-1f98c, U+1f990-1f991, U+1f995, U+1f9c0, U+1f9d0, U+1f9da, U+1f9dc, U+1f9e1, U+20024, U+210c1, U+22c51, U+282e2, U+f0001-f0005, U+f0012-f0013, U+f0019, U+f0023, U+f0025, U+f0063, U+f00b8, U+f00cb, U+f00cd, U+f00d6, U+f00e1, U+f0101-f0104, U+f012c-f012d, U+f012f, U+f0138, U+f013c, U+f0143, U+f0148, U+f0159, U+f0163, U+f016d, U+f0174, U+f0198, U+f01ba, U+f01c7, U+f01d6, U+f01ef, U+f0208-f0209, U+f0223-f0224, U+f027e, U+f0292;
 }
+
 html {
 	scrollbar-color: var(--drag-color) var(--background-color);
 }
@@ -29,8 +31,10 @@ body {
 	font-family: "WDXL Lubrifont SC", sans-serif;
 	font-weight44: 400;
 	background-color: var(--bgfill3);
-	backdrop-filter: blur(2px);               /* Instant background blur */
-    -webkit-backdrop-filter: blur(2px);       /* Safari support */
+	backdrop-filter: blur(2px);
+	/* Instant background blur */
+	-webkit-backdrop-filter: blur(2px);
+	/* Safari support */
 	color: var(--main-color);
 }
 
@@ -73,6 +77,14 @@ input[type="range"]::-webkit-slider-thumb {
 	border-radius: 0.5cm;
 }
 
+.distributewidth {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+	align-items: center;
+}
+
 .cntrblk {
 	text-align: center;
 }
@@ -80,15 +92,15 @@ input[type="range"]::-webkit-slider-thumb {
 .centercolumn {
 	display: flex;
 	flex-direction: column;
-	
+
 }
 
 .cntrlrow {
-align-items: center;
+	align-items: center;
 	display: flex;
 	justify-content: center;
-	margin-top:0.1cm;
-	margin-bottom:0.2cm;
+	margin-top: 0.1cm;
+	margin-bottom: 0.2cm;
 }
 
 
@@ -179,7 +191,7 @@ input[type=text]:focus {
 
 .shorttextinput {
 	width: 2cm;
-text-align:center;
+	text-align: center;
 }
 
 input[type=number] {
@@ -192,7 +204,7 @@ input[type=number] {
 	font-weight44: 400;
 	color: var(--main-color);
 	width: 2cm;
-	text-align:center;
+	text-align: center;
 }
 
 input[type=number]:focus {
@@ -213,6 +225,25 @@ button {
 	padding-right: 0.5cm;
 	color: var(--main-color);
 }
+
+.smallbutton {
+	height: 1cm;
+	
+	width: 1cm;
+	font-family2: sans-serif;
+	font-weight44: 400;
+	font-size2: 1;
+	background: var(--click-color);
+	border-style: solid;
+	border-width: 1px;
+	border-color: var(--line-color);
+	border-radius: 0.5cm;
+	padding-left: 0.2cm;
+	padding-right: 0.2cm;
+	color: var(--main-color);
+	
+}
+
 
 input[type=file] {
 	height: 1cm;

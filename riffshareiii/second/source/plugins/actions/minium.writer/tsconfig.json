@@ -19,7 +19,7 @@
 		//,"module": "nodenext"
 		,"lib": [
 			"dom"
-			,"es2018"
+			,"es2019"
 			,"es5"
 		]
 		,"declaration": false
@@ -31,6 +31,7 @@
 	,"files": [
 		"../../../mzxbx/mzxbxapi/musicenginetypes.ts"
 		,"../../../pluginAPI/MZXBX_Plugin_UI.ts"
+		,"../../../application/treevalue/treevalue.ts"
 		//,"ethereumjs-tx-1.3.3.js"
 		//,"midiwriter.ts"
 		//,"MidiWriterJS-master/build/index.browser.js"
@@ -67,6 +68,8 @@
 		,"midiwriterjs/main.ts"
 		,"midiwriterjs/utils.ts"
 		,"midiwriterjs/writer.ts"
+
+		,"reaper/rppwriter.ts"
 
 		,"midiexportedplugin.ts"
 	]

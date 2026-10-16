@@ -2,6 +2,14 @@
 let _t_plugin_root_folder = './plugins/';
 let _t_all_registerd_plugins_list = [
     {
+        "label": "Examples",
+        "purpose": "Action",
+        "kind": "cleanmidi1",
+        "ui": _t_plugin_root_folder + "actions/cleanmidi1/cleanmidi.html",
+        "evaluate": "",
+        "script": ""
+    },
+    {
         label: "Minium 10-band Equalizer",
         purpose: "Filter",
         kind: "minium10band_equalizer1",

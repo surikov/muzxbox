@@ -31,14 +31,15 @@ abstract class MZXBX_Plugin_UI {
 				this.onMessageFromHost(message);
 			} else {
 				this.dialogId = message.hostData;
-				this.onLanguaga(message.langID);
-				if (message.colors) {
-					document.documentElement.style.setProperty('--background-color', message.colors.background);
-					document.documentElement.style.setProperty('--main-color', message.colors.main);
-					document.documentElement.style.setProperty('--drag-color', message.colors.drag);
-					document.documentElement.style.setProperty('--line-color', message.colors.line);
-					document.documentElement.style.setProperty('--click-color', message.colors.click);
-				}
+
+			}
+			this.onLanguaga(message.langID);
+			if (message.colors) {
+				document.documentElement.style.setProperty('--background-color', message.colors.background);
+				document.documentElement.style.setProperty('--main-color', message.colors.main);
+				document.documentElement.style.setProperty('--drag-color', message.colors.drag);
+				document.documentElement.style.setProperty('--line-color', message.colors.line);
+				document.documentElement.style.setProperty('--click-color', message.colors.click);
 			}
 		}
 	}
