@@ -2,7 +2,10 @@ class UIShowLib {
 	pageSize = 25;
 	currentPage = 0;
 	storeName = 'curpagelist1';
+	filterName = 'curfilter1';
 	callbackID = '';
+	filteredlistcleanmidifiles: string[];
+	prefilter = '';
 	constructor() {
 		console.log('UIShowLib 1');
 		this.init();
@@ -12,10 +15,17 @@ class UIShowLib {
 		} catch (xx) {
 			console.log(xx);
 		}
+		let ff = localStorage.getItem(this.filterName);
+		this.prefilter = ff ? ff : '';
+		let filterval = document.getElementById('filterval') as any;
+		if (filterval) {
+			filterval.value = this.prefilter;
+		}
 		this.currentPage = this.currentPage ? this.currentPage : 0;
+		this.filterData();
 		this.setupSlider();
-		this.refilllist(this.currentPage);
-		
+		this.refilllist();
+
 	}
 	init() {
 		window.addEventListener('message', this.receiveHostMessage.bind(this), false);
@@ -68,10 +78,10 @@ class UIShowLib {
 	}
 	startLoad(idx: number) {
 		this.showFog();
-		let urlstring = 'https://daw1024.com/clean_midi/' + listcleanmidifiles[idx].replace('\\', '/') + '.mid';
+		let urlstring = 'https://daw1024.com/clean_midi/' + this.filteredlistcleanmidifiles[idx].replace('\\', '/') + '.mid';
 		//alert('' + idx + ': ' + urlstring);
 		//console.log(urlstring);
-		this.loadFromFileURL(urlstring,listcleanmidifiles[idx].replace('\\', ' - '));
+		this.loadFromFileURL(urlstring, this.filteredlistcleanmidifiles[idx].replace('\\', ' - '));
 	}
 	loadFromFileURL(fileurl: string, filetitle: string) {
 
@@ -96,12 +106,33 @@ class UIShowLib {
 		let mireader: MIDIReader = new MIDIReader(title, 123, arrayBuffer);
 		//this.parsedProject = mireader.project;
 		//console.log('loadFromArray', this.parsedProject);
-		this.sendImportedMusicData( mireader.project);
+		this.sendImportedMusicData(mireader.project);
 	}
-	showFog(){
+	showFog() {
 		let pagefog = document.getElementById('pagefog') as any;
 		if (pagefog) {
 			pagefog.style.display = 'block';
+		}
+	}
+	filterData() {
+		let filter = '';
+		let filterval = document.getElementById('filterval') as any;
+		if (filterval) {
+			filter = filterval.value.toLowerCase().trim();
+		}
+		if (filter) {
+			this.filteredlistcleanmidifiles = unfilteredlistcleanmidifiles.filter(value => value.toLowerCase().indexOf(filter) > -1);
+		} else {
+			this.filteredlistcleanmidifiles = unfilteredlistcleanmidifiles;
+		}
+		this.prefilter = filter;
+		localStorage.setItem(this.filterName, '' + this.prefilter);
+
+		let position = document.getElementById('position') as any;
+		if (position) {
+			position.value = this.currentPage;
+			position.min = 0;
+			position.max = Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize);
 		}
 	}
 	setupSlider() {
@@ -109,15 +140,16 @@ class UIShowLib {
 		if (position) {
 			position.value = 2;
 			position.min = 0;
-			position.max = Math.floor(listcleanmidifiles.length / this.pageSize);
+			position.max = Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize);
 
 			position.addEventListener('change', (event) => {
 				let num = parseInt(position.value);
 				//console.log(num,position.value,position);
 				this.currentPage = num;
-				this.refilllist(this.currentPage);
+				this.refilllist();
 			});
 		}
+		
 	}
 
 	moveLeft() {
@@ -126,37 +158,41 @@ class UIShowLib {
 		} else {
 			this.currentPage = 0;
 		}
-		this.refilllist(this.currentPage);
+		this.refilllist();
 	}
 	moveRight() {
-		if (this.currentPage < Math.floor(listcleanmidifiles.length / this.pageSize)) {
+		if (this.currentPage < Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize)) {
 			this.currentPage++;
 		} else {
-			this.currentPage = Math.floor(listcleanmidifiles.length / this.pageSize);
+			this.currentPage = Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize);
 		}
-		this.refilllist(this.currentPage);
+		this.refilllist();
 	}
-	refilllist(pagenum: number) {
+	refilllist() {
 		this.clearlist();
-		for (let ii = pagenum * this.pageSize; ii < pagenum * this.pageSize + this.pageSize; ii++) {
+		this.filterData();
+		if (this.currentPage * this.pageSize > this.filteredlistcleanmidifiles.length) {
+			this.currentPage = Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize);
+		}
+		for (let ii = this.currentPage * this.pageSize; ii < this.currentPage * this.pageSize + this.pageSize; ii++) {
 			this.addListItem(ii);
 		}
 		let numval = document.getElementById('numval');
 		if (numval) {
 			//console.log(pagenum,numval);
-			let nn = pagenum + 1.0;
-			numval.innerHTML = '' + nn + '/' + (1 + Math.floor(listcleanmidifiles.length / this.pageSize));
+			let nn = this.currentPage + 1.0;
+			numval.innerHTML = '' + nn + '/' + (1 + Math.floor(this.filteredlistcleanmidifiles.length / this.pageSize));
 		}
 		let position = document.getElementById('position') as any;
 		if (position) {
-			if (position.value != pagenum) {
-				position.value = pagenum;
+			if (position.value != this.currentPage) {
+				position.value = this.currentPage;
 			}
 		}
-		localStorage.setItem(this.storeName, '' + pagenum);
+		localStorage.setItem(this.storeName, '' + this.currentPage);
 	}
 	addListItem(idx: number) {
-		if (listcleanmidifiles[idx]) {
+		if (this.filteredlistcleanmidifiles[idx]) {
 			let listitems = document.getElementById('listitems');
 			if (listitems) {
 				/*const aa = document.createElement("a");
@@ -167,7 +203,7 @@ class UIShowLib {
 				listitems.appendChild(li);
 				*/
 				let li = document.createElement("li");
-				li.innerText = listcleanmidifiles[idx].replace('\\', ' - ');
+				li.innerText = this.filteredlistcleanmidifiles[idx].replace('\\', ' - ');
 				li.onclick = () => {
 					this.startLoad(idx);
 				};
