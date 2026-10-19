@@ -7,15 +7,24 @@
 
 	<link rel="stylesheet" href="../../subwindow.css">
 	<script type='text/javascript' src='../../../js/mzxbxlib.js'></script>
+	<style>
+		#prvw {
+			width: 3cm;
+			height: 3cm;
+		}
+	</style>
 </head>
 
 <body>
 	<h1 id="plugintitle">Minium MIDI Export</h1>
 	<p class="cntrblk">
-		<canvas  id="prvw" width=500 height=500 onclick="plugin.exportImage();"/>
+		<canvas id="prvw" width="500px" height="500px"/>
 	</p>
 	<div class='centercolumn'>
-		<p class="cntrlrow"><button id='btnsendmidi' onclick="plugin.startExportMIDI();">btnsend</button></p>
+		<p class="cntrlrow"><button id='btnsendimage' onclick="plugin.exportImage();">btnsend0</button></p>
+	</div>
+	<div class='centercolumn'>
+		<p class="cntrlrow"><button id='btnsendmidi' onclick="plugin.startExportMIDI();">btnsend1</button></p>
 	</div>
 	<div class='centercolumn'>
 		<p class="cntrlrow"><button id='btnsendjson' onclick="plugin.startExportJSON();">btnsend2</button></p>

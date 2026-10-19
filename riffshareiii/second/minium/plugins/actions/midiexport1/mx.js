@@ -1198,10 +1198,11 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
             exportName = text.replace(/[^a-zA-Z0-9]/g, "");
         }
         if (enruzhId == 'zh') {
-            this.setText('plugintitle', 'Exp ' + exportName);
+            this.setText('plugintitle', '导出 ' + exportName);
             this.setText('btnsendmidi', '*.mid MIDI');
             this.setText('btnsendjson', '*.json DAW1024');
             this.setText('btnsendrpp', '*.rpp Reaper');
+            this.setText('btnsendimage', '*.png image');
         }
         else {
             if (enruzhId == 'ru') {
@@ -1209,12 +1210,14 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
                 this.setText('btnsendmidi', '*.mid MIDI');
                 this.setText('btnsendjson', '*.json DAW1024');
                 this.setText('btnsendrpp', '*.rpp Reaper');
+                this.setText('btnsendimage', '*.png image');
             }
             else {
                 this.setText('plugintitle', 'Export ' + exportName);
                 this.setText('btnsendmidi', '*.mid MIDI');
                 this.setText('btnsendjson', '*.json DAW1024');
                 this.setText('btnsendrpp', '*.rpp Reaper');
+                this.setText('btnsendimage', '*.png image');
             }
         }
     }

@@ -29,12 +29,9 @@ html {
 
 body {
 	font-family: "WDXL Lubrifont SC", sans-serif;
-	font-weight44: 400;
 	background-color: var(--bgfill3);
-	backdrop-filter: blur(2px);
-	/* Instant background blur */
-	-webkit-backdrop-filter: blur(2px);
-	/* Safari support */
+	backdrop-filter1: blur(2px);
+	-webkit-backdrop-filter1: blur(2px);
 	color: var(--main-color);
 }
 
@@ -155,24 +152,20 @@ ul li::marker {
 	border-right: 1px solid var(--line-color);
 }
 
-/* Checked */
+
 .form_radio_group input[type=radio]:checked+label {
 	background: var(--background-color);
 
 	color: var(--main-color);
 }
 
-/* Hover */
+
 .form_radio_group label:hover {
 	color: var(--main-color);
 	background: var(--background-color);
 }
 
-/* Disabled */
-/*.form_radio_group input[type=radio]:disabled+label {
-	background: #efefef;
-	color: #666;
-}*/
+
 
 input[type=text] {
 	background: var(--background-color);
@@ -298,12 +291,25 @@ a:active {
 
 #pagefog {
 	background-color: #999999dd;
-	width: 120%;
-	height: 120%;
+	width: 1200%;
+	height: 1200%;
 	position: absolute;
 	z-index: 123;
 	top: -10%;
 	left: -10%;
 	text-align: center;
 	display: none;
+}
+
+.overbottombar {
+	background-color2: #99999922;
+	background-color: color-mix(in lab, transparent 95%, var(--line-color));
+	padding-left: 1%;
+	padding-right: 1%;
+	z-index: 2222;
+	position: fixed;
+	bottom: 0px;
+	left: 0;
+	width: 98%;
+	pointer-events2: none;
 }
