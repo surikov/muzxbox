@@ -21,9 +21,9 @@ class ShareExportPlugin {
     }
     fogClick() {
         console.log('start publish');
-        let url = 'https://daw1024.com/minium/';
+        let url = 'https://daw1024.com/';
         if (this.hostProject) {
-            this.sendRequest('', url + 'tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
+            this.sendRequest('', url + 'minium/tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
                 + '&txt=' + encodeURIComponent(this.txtPar)
                 + '&title=' + this.hostProject.title
                 .replace("\"", " ")
@@ -45,14 +45,22 @@ class ShareExportPlugin {
                 if (xmlHttpRequest.status == 200) {
                     let key = xmlHttpRequest.responseText;
                     if (this.previewArrayBuffer) {
-                        this.sendRequest('', url + 'tmppreview.php?key=' + key, 'POST', this.previewArrayBuffer, (info) => {
+                        this.sendRequest('', url + 'minium/tmppreview.php?key=' + key, 'POST', this.previewArrayBuffer, (info) => {
                             console.log('error', info);
                         }, (xmlHttpRequest, vProgressEven) => {
                             console.log('request', xmlHttpRequest);
                             if (xmlHttpRequest.status == 200) {
-                                let link = url + 'tmp/' + key + '.html';
-                                console.log();
-                                window.open(link);
+                                let link = url + 'share/' + key + '.html';
+                                console.log(link);
+                                let sharedata = { url: link };
+                                navigator
+                                    .share(sharedata)
+                                    .then((value) => {
+                                    console.log('shared', value, link);
+                                })
+                                    .catch((reason) => {
+                                    console.log('failed', reason, link);
+                                });
                             }
                         });
                     }

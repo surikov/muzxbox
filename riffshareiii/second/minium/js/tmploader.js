@@ -1,1 +1,471 @@
-'use strict';const a0_0x2a2f8e=a0_0x3f08;(function(_0x5f268f,_0x505b31){const _0x914512=a0_0x3f08,_0x4030cf=_0x5f268f();while(!![]){try{const _0x3aa7e0=parseInt(_0x914512(0x1b7))/0x1+-parseInt(_0x914512(0x1b5))/0x2*(parseInt(_0x914512(0x1c1))/0x3)+parseInt(_0x914512(0x1ce))/0x4*(parseInt(_0x914512(0x1c7))/0x5)+-parseInt(_0x914512(0x1c4))/0x6+-parseInt(_0x914512(0x1db))/0x7*(-parseInt(_0x914512(0x1e2))/0x8)+-parseInt(_0x914512(0x1b8))/0x9*(parseInt(_0x914512(0x1d6))/0xa)+parseInt(_0x914512(0x1d8))/0xb;if(_0x3aa7e0===_0x505b31)break;else _0x4030cf['push'](_0x4030cf['shift']());}catch(_0x343a69){_0x4030cf['push'](_0x4030cf['shift']());}}}(a0_0x5674,0x5196a));class LZUtil{constructor(){const _0x5a07dc=a0_0x3f08;this[_0x5a07dc(0x1ba)]=_0x5a07dc(0x1e6),this[_0x5a07dc(0x1dd)]=_0x5a07dc(0x1cb),this[_0x5a07dc(0x1cf)]={};}[a0_0x2a2f8e(0x1e3)](_0xe45e24,_0x56cba1){const _0x4d7f64=a0_0x2a2f8e;if(!this[_0x4d7f64(0x1cf)][_0xe45e24]){this[_0x4d7f64(0x1cf)][_0xe45e24]={};for(let _0xc2182a=0x0;_0xc2182a<_0xe45e24['length'];_0xc2182a++){this[_0x4d7f64(0x1cf)][_0xe45e24][_0xe45e24[_0x4d7f64(0x1d3)](_0xc2182a)]=_0xc2182a;}}return this[_0x4d7f64(0x1cf)][_0xe45e24][_0x56cba1];}['_compress'](_0x436f1e,_0x3f2b71,_0x14007b){const _0x116436=a0_0x2a2f8e;if(_0x436f1e==null)return'';let _0x42026d;const _0x2dc57f={},_0x28ec1d={};let _0x249ccf='',_0x237f0b='',_0x23dbf2='',_0x3421c3=0x2,_0x486883=0x3,_0x51f712=0x2;const _0x557e22=[];let _0x287a42=0x0,_0x35b0c6=0x0;for(let _0xb2d5f8=0x0;_0xb2d5f8<_0x436f1e[_0x116436(0x1d5)];_0xb2d5f8+=0x1){_0x249ccf=_0x436f1e[_0x116436(0x1d3)](_0xb2d5f8);!Object[_0x116436(0x1c9)]['hasOwnProperty']['call'](_0x2dc57f,_0x249ccf)&&(_0x2dc57f[_0x249ccf]=_0x486883++,_0x28ec1d[_0x249ccf]=!![]);_0x237f0b=_0x23dbf2+_0x249ccf;if(Object['prototype'][_0x116436(0x1e1)]['call'](_0x2dc57f,_0x237f0b))_0x23dbf2=_0x237f0b;else{if(Object['prototype'][_0x116436(0x1e1)][_0x116436(0x1b9)](_0x28ec1d,_0x23dbf2)){if(_0x23dbf2[_0x116436(0x1be)](0x0)<0x100){for(let _0x10f2e4=0x0;_0x10f2e4<_0x51f712;_0x10f2e4++){_0x287a42=_0x287a42<<0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22['push'](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++;}_0x42026d=_0x23dbf2[_0x116436(0x1be)](0x0);for(let _0x119bbe=0x0;_0x119bbe<0x8;_0x119bbe++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22['push'](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}else{_0x42026d=0x1;for(let _0x91c39c=0x0;_0x91c39c<_0x51f712;_0x91c39c++){_0x287a42=_0x287a42<<0x1|_0x42026d,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=0x0;}_0x42026d=_0x23dbf2[_0x116436(0x1be)](0x0);for(let _0x1aa9b4=0x0;_0x1aa9b4<0x10;_0x1aa9b4++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}_0x3421c3--,_0x3421c3==0x0&&(_0x3421c3=Math['pow'](0x2,_0x51f712),_0x51f712++),delete _0x28ec1d[_0x23dbf2];}else{_0x42026d=_0x2dc57f[_0x23dbf2];for(let _0x5a2546=0x0;_0x5a2546<_0x51f712;_0x5a2546++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22['push'](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}_0x3421c3--,_0x3421c3==0x0&&(_0x3421c3=Math[_0x116436(0x1c5)](0x2,_0x51f712),_0x51f712++),_0x2dc57f[_0x237f0b]=_0x486883++,_0x23dbf2=String(_0x249ccf);}}if(_0x23dbf2!==''){if(Object[_0x116436(0x1c9)][_0x116436(0x1e1)][_0x116436(0x1b9)](_0x28ec1d,_0x23dbf2)){if(_0x23dbf2['charCodeAt'](0x0)<0x100){for(let _0x59e137=0x0;_0x59e137<_0x51f712;_0x59e137++){_0x287a42=_0x287a42<<0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++;}_0x42026d=_0x23dbf2['charCodeAt'](0x0);for(let _0x568bf0=0x0;_0x568bf0<0x8;_0x568bf0++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22['push'](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}else{_0x42026d=0x1;for(let _0x8f98bb=0x0;_0x8f98bb<_0x51f712;_0x8f98bb++){_0x287a42=_0x287a42<<0x1|_0x42026d,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=0x0;}_0x42026d=_0x23dbf2[_0x116436(0x1be)](0x0);for(let _0x18747f=0x0;_0x18747f<0x10;_0x18747f++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}_0x3421c3--,_0x3421c3==0x0&&(_0x3421c3=Math[_0x116436(0x1c5)](0x2,_0x51f712),_0x51f712++),delete _0x28ec1d[_0x23dbf2];}else{_0x42026d=_0x2dc57f[_0x23dbf2];for(let _0xa25706=0x0;_0xa25706<_0x51f712;_0xa25706++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}}_0x3421c3--,_0x3421c3==0x0&&(_0x3421c3=Math[_0x116436(0x1c5)](0x2,_0x51f712),_0x51f712++);}_0x42026d=0x2;for(let _0x5cc802=0x0;_0x5cc802<_0x51f712;_0x5cc802++){_0x287a42=_0x287a42<<0x1|_0x42026d&0x1,_0x35b0c6==_0x3f2b71-0x1?(_0x35b0c6=0x0,_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x287a42=0x0):_0x35b0c6++,_0x42026d=_0x42026d>>0x1;}let _0x3aa486=!![];do{_0x287a42=_0x287a42<<0x1;if(_0x35b0c6==_0x3f2b71-0x1)_0x557e22[_0x116436(0x1c8)](_0x14007b(_0x287a42)),_0x3aa486=![];else _0x35b0c6++;}while(_0x3aa486);return _0x557e22[_0x116436(0x1d7)]('');}['_decompress'](_0x170db5,_0x57d987,_0x24c86f){const _0x3346bb=a0_0x2a2f8e,_0x3b55ad=[],_0x2451ca=[],_0x1cf985={'val':_0x24c86f(0x0),'position':_0x57d987,'index':0x1};let _0x2c1f36=0x4,_0x1ae359=0x4,_0xeec32c=0x3,_0x56ffa4='',_0x12f3fa,_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,0x2),_0x391018=0x1;for(let _0x128139=0x0;_0x128139<0x3;_0x128139+=0x1){_0x3b55ad[_0x128139]=String(_0x128139);}while(_0x391018!=_0xd17ab0){const _0x1c22e7=_0x1cf985[_0x3346bb(0x1bb)]&_0x1cf985[_0x3346bb(0x1e4)];_0x1cf985[_0x3346bb(0x1e4)]>>=0x1,_0x1cf985[_0x3346bb(0x1e4)]==0x0&&(_0x1cf985['position']=_0x57d987,_0x1cf985[_0x3346bb(0x1bb)]=_0x24c86f(_0x1cf985[_0x3346bb(0x1c0)]++)),_0x5bd754|=(_0x1c22e7>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}switch(_0x5bd754){case 0x0:_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,0x8),_0x391018=0x1;while(_0x391018!=_0xd17ab0){const _0x32c56c=_0x1cf985[_0x3346bb(0x1bb)]&_0x1cf985['position'];_0x1cf985[_0x3346bb(0x1e4)]>>=0x1,_0x1cf985[_0x3346bb(0x1e4)]==0x0&&(_0x1cf985[_0x3346bb(0x1e4)]=_0x57d987,_0x1cf985[_0x3346bb(0x1bb)]=_0x24c86f(_0x1cf985['index']++)),_0x5bd754|=(_0x32c56c>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}_0x12f3fa=String[_0x3346bb(0x1cd)](_0x5bd754);break;case 0x1:_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,0x10),_0x391018=0x1;while(_0x391018!=_0xd17ab0){const _0x1f771d=_0x1cf985[_0x3346bb(0x1bb)]&_0x1cf985[_0x3346bb(0x1e4)];_0x1cf985[_0x3346bb(0x1e4)]>>=0x1,_0x1cf985[_0x3346bb(0x1e4)]==0x0&&(_0x1cf985[_0x3346bb(0x1e4)]=_0x57d987,_0x1cf985[_0x3346bb(0x1bb)]=_0x24c86f(_0x1cf985['index']++)),_0x5bd754|=(_0x1f771d>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}_0x12f3fa=String[_0x3346bb(0x1cd)](_0x5bd754);break;case 0x2:return'';}if(_0x12f3fa===undefined)throw new Error('No\x20character\x20found');_0x3b55ad[0x3]=String(_0x12f3fa);let _0x3eef88=String(_0x12f3fa);_0x2451ca[_0x3346bb(0x1c8)](String(_0x12f3fa));const _0x18b7b1=!![];while(_0x18b7b1){if(_0x1cf985[_0x3346bb(0x1c0)]>_0x170db5)return'';_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,_0xeec32c),_0x391018=0x1;while(_0x391018!=_0xd17ab0){const _0x145be6=_0x1cf985[_0x3346bb(0x1bb)]&_0x1cf985['position'];_0x1cf985['position']>>=0x1,_0x1cf985[_0x3346bb(0x1e4)]==0x0&&(_0x1cf985[_0x3346bb(0x1e4)]=_0x57d987,_0x1cf985['val']=_0x24c86f(_0x1cf985[_0x3346bb(0x1c0)]++)),_0x5bd754|=(_0x145be6>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}switch(_0x12f3fa=_0x5bd754){case 0x0:_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,0x8),_0x391018=0x1;while(_0x391018!=_0xd17ab0){const _0x191c91=_0x1cf985[_0x3346bb(0x1bb)]&_0x1cf985['position'];_0x1cf985[_0x3346bb(0x1e4)]>>=0x1,_0x1cf985['position']==0x0&&(_0x1cf985[_0x3346bb(0x1e4)]=_0x57d987,_0x1cf985['val']=_0x24c86f(_0x1cf985[_0x3346bb(0x1c0)]++)),_0x5bd754|=(_0x191c91>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}_0x3b55ad[_0x1ae359++]=String['fromCharCode'](_0x5bd754),_0x12f3fa=_0x1ae359-0x1,_0x2c1f36--;break;case 0x1:_0x5bd754=0x0,_0xd17ab0=Math[_0x3346bb(0x1c5)](0x2,0x10),_0x391018=0x1;while(_0x391018!=_0xd17ab0){const _0x28a5f2=_0x1cf985['val']&_0x1cf985['position'];_0x1cf985[_0x3346bb(0x1e4)]>>=0x1,_0x1cf985[_0x3346bb(0x1e4)]==0x0&&(_0x1cf985[_0x3346bb(0x1e4)]=_0x57d987,_0x1cf985[_0x3346bb(0x1bb)]=_0x24c86f(_0x1cf985[_0x3346bb(0x1c0)]++)),_0x5bd754|=(_0x28a5f2>0x0?0x1:0x0)*_0x391018,_0x391018<<=0x1;}_0x3b55ad[_0x1ae359++]=String[_0x3346bb(0x1cd)](_0x5bd754),_0x12f3fa=_0x1ae359-0x1,_0x2c1f36--;break;case 0x2:return _0x2451ca['join']('');}_0x2c1f36==0x0&&(_0x2c1f36=Math[_0x3346bb(0x1c5)](0x2,_0xeec32c),_0xeec32c++);if(_0x3b55ad[_0x12f3fa])_0x56ffa4=String(_0x3b55ad[_0x12f3fa]);else{if(_0x12f3fa===_0x1ae359)_0x56ffa4=_0x3eef88+_0x3eef88[_0x3346bb(0x1d3)](0x0);else return null;}_0x2451ca['push'](_0x56ffa4),_0x3b55ad[_0x1ae359++]=_0x3eef88+_0x56ffa4[_0x3346bb(0x1d3)](0x0),_0x2c1f36--,_0x3eef88=_0x56ffa4,_0x2c1f36==0x0&&(_0x2c1f36=Math['pow'](0x2,_0xeec32c),_0xeec32c++);}}[a0_0x2a2f8e(0x1bc)](_0xcbec65){const _0x56b674=a0_0x2a2f8e;return _0xcbec65?this['_compress'](_0xcbec65,0xf,_0x3eedd8=>String[_0x56b674(0x1cd)](_0x3eedd8+0x20))+'\x20':'';}['decompressFromUTF16'](_0x4d2113){const _0x7c3d7e=a0_0x2a2f8e;if(_0x4d2113)return this[_0x7c3d7e(0x1d9)](_0x4d2113[_0x7c3d7e(0x1d5)],0x4000,_0x44f192=>_0x4d2113[_0x7c3d7e(0x1be)](_0x44f192)-0x20);else return null;}}console[a0_0x2a2f8e(0x1bd)](a0_0x2a2f8e(0x1c6));function a0_0x3f08(_0x3d6fae,_0x322eaa){_0x3d6fae=_0x3d6fae-0x1b5;const _0x567404=a0_0x5674();let _0x3f0886=_0x567404[_0x3d6fae];return _0x3f0886;}function starttmpload(_0x4312d2){const _0x1fb544=a0_0x2a2f8e;let _0x140b19=_0x1fb544(0x1de)+_0x4312d2+_0x1fb544(0x1c3);console['log'](_0x1fb544(0x1b6),_0x140b19);let _0x5bf5b2=new XMLHttpRequest();_0x5bf5b2[_0x1fb544(0x1ca)](_0x1fb544(0x1d4),_0x140b19),_0x5bf5b2[_0x1fb544(0x1df)]=_0xfb09af=>{const _0x45630f=_0x1fb544;let _0x4cb71c=JSON['parse'](_0x5bf5b2[_0x45630f(0x1da)]);saveProject(_0x4cb71c),goedit();},_0x5bf5b2[_0x1fb544(0x1d1)](null);}function saveProject(_0xcd63c1){const _0x2f04e8=a0_0x2a2f8e;console[_0x2f04e8(0x1bd)](_0x2f04e8(0x1d2),_0xcd63c1);let _0x4ca5d4=readLzObjectFromlocalStorage(_0x2f04e8(0x1d0));console[_0x2f04e8(0x1bd)](_0x2f04e8(0x1d0),_0x4ca5d4);let _0x1a04ec=JSON[_0x2f04e8(0x1dc)](_0xcd63c1);saveLzText2localStorage(_0x2f04e8(0x1d0),_0x1a04ec),saveRawText2localStorage(_0x2f04e8(0x1e0),JSON['stringify']([])),saveRawText2localStorage('redocommands',JSON[_0x2f04e8(0x1dc)]([]));}function readLzObjectFromlocalStorage(_0x2859da){const _0x39e7d4=a0_0x2a2f8e;try{let _0x444c17=localStorage[_0x39e7d4(0x1e5)](_0x2859da),_0x17ec93=new LZUtil(),_0x33c47e=_0x17ec93[_0x39e7d4(0x1cc)](_0x444c17);if(_0x33c47e){let _0x3f04b8=JSON[_0x39e7d4(0x1c2)](_0x33c47e);return _0x3f04b8;}else return null;}catch(_0x5498c9){console[_0x39e7d4(0x1bd)](_0x5498c9);}return null;}function saveLzText2localStorage(_0x3091dc,_0x22abf6){const _0x3be9d6=a0_0x2a2f8e;let _0x1b1ccf=new LZUtil(),_0x2a98eb=_0x1b1ccf[_0x3be9d6(0x1bc)](_0x22abf6);localStorage['setItem'](_0x3091dc,_0x2a98eb);}function a0_0x5674(){const _0x3b0b9a=['1414660YFomZG','join','887425NdLChW','_decompress','responseText','73857THKNsq','stringify','keyStrUriSafe','https://daw1024.com/minium/tmp/','onload','undocommands','hasOwnProperty','104ZJozAm','getBaseValue','position','getItem','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=','6734iUMPor','startload','425858TjXfJJ','9OkIzaN','call','keyStrBase64','val','compressToUTF16','log','charCodeAt','_self','index','249ztpLcX','parse','.json','1476966bltHYF','pow','tmploader','85BcJcKg','push','prototype','open','ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$','decompressFromUTF16','fromCharCode','84136tZnHTC','baseReverseDic','lastprojectdata','send','parsedProject','charAt','GET','length'];a0_0x5674=function(){return _0x3b0b9a;};return a0_0x5674();}function saveRawText2localStorage(_0x4171cb,_0x35cda3){localStorage['setItem'](_0x4171cb,_0x35cda3);}function goedit(){const _0x2d6ec0=a0_0x2a2f8e;window[_0x2d6ec0(0x1ca)]('../minium.studio.html',_0x2d6ec0(0x1bf));}
+"use strict";
+class LZUtil {
+    constructor() {
+        this.keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        this.keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+        this.baseReverseDic = {};
+    }
+    getBaseValue(alphabet, character) {
+        if (!this.baseReverseDic[alphabet]) {
+            this.baseReverseDic[alphabet] = {};
+            for (let i = 0; i < alphabet.length; i++) {
+                this.baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+            }
+        }
+        return this.baseReverseDic[alphabet][character];
+    }
+    _compress(uncompressed, bitsPerChar, getCharFromInt) {
+        if (uncompressed == null) {
+            return "";
+        }
+        let value;
+        const context_dictionary = {};
+        const context_dictionaryToCreate = {};
+        let context_c = "";
+        let context_wc = "";
+        let context_w = "";
+        let context_enlargeIn = 2;
+        let context_dictSize = 3;
+        let context_numBits = 2;
+        const context_data = [];
+        let context_data_val = 0;
+        let context_data_position = 0;
+        for (let ii = 0; ii < uncompressed.length; ii += 1) {
+            context_c = uncompressed.charAt(ii);
+            if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+                context_dictionary[context_c] = context_dictSize++;
+                context_dictionaryToCreate[context_c] = true;
+            }
+            context_wc = context_w + context_c;
+            if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+                context_w = context_wc;
+            }
+            else {
+                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                    if (context_w.charCodeAt(0) < 256) {
+                        for (let i = 0; i < context_numBits; i++) {
+                            context_data_val = context_data_val << 1;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (let i = 0; i < 8; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    else {
+                        value = 1;
+                        for (let i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | value;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = 0;
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (let i = 0; i < 16; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            }
+                            else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    delete context_dictionaryToCreate[context_w];
+                }
+                else {
+                    value = context_dictionary[context_w];
+                    for (let i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+                context_dictionary[context_wc] = context_dictSize++;
+                context_w = String(context_c);
+            }
+        }
+        if (context_w !== "") {
+            if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                if (context_w.charCodeAt(0) < 256) {
+                    for (let i = 0; i < context_numBits; i++) {
+                        context_data_val = context_data_val << 1;
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                    }
+                    value = context_w.charCodeAt(0);
+                    for (let i = 0; i < 8; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                else {
+                    value = 1;
+                    for (let i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | value;
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = 0;
+                    }
+                    value = context_w.charCodeAt(0);
+                    for (let i = 0; i < 16; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        }
+                        else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+                delete context_dictionaryToCreate[context_w];
+            }
+            else {
+                value = context_dictionary[context_w];
+                for (let i = 0; i < context_numBits; i++) {
+                    context_data_val = (context_data_val << 1) | (value & 1);
+                    if (context_data_position == bitsPerChar - 1) {
+                        context_data_position = 0;
+                        context_data.push(getCharFromInt(context_data_val));
+                        context_data_val = 0;
+                    }
+                    else {
+                        context_data_position++;
+                    }
+                    value = value >> 1;
+                }
+            }
+            context_enlargeIn--;
+            if (context_enlargeIn == 0) {
+                context_enlargeIn = Math.pow(2, context_numBits);
+                context_numBits++;
+            }
+        }
+        value = 2;
+        for (let i = 0; i < context_numBits; i++) {
+            context_data_val = (context_data_val << 1) | (value & 1);
+            if (context_data_position == bitsPerChar - 1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+            }
+            else {
+                context_data_position++;
+            }
+            value = value >> 1;
+        }
+        let loop = true;
+        do {
+            context_data_val = context_data_val << 1;
+            if (context_data_position == bitsPerChar - 1) {
+                context_data.push(getCharFromInt(context_data_val));
+                loop = false;
+            }
+            else
+                context_data_position++;
+        } while (loop);
+        return context_data.join("");
+    }
+    _decompress(length, resetValue, getNextValue) {
+        const dictionary = [];
+        const result = [];
+        const data = {
+            val: getNextValue(0),
+            position: resetValue,
+            index: 1,
+        };
+        let enlargeIn = 4;
+        let dictSize = 4;
+        let numBits = 3;
+        let entry = "";
+        let c;
+        let bits = 0;
+        let maxpower = Math.pow(2, 2);
+        let power = 1;
+        for (let i = 0; i < 3; i += 1) {
+            dictionary[i] = String(i);
+        }
+        while (power != maxpower) {
+            const resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+                data.position = resetValue;
+                data.val = getNextValue(data.index++);
+            }
+            bits |= (resb > 0 ? 1 : 0) * power;
+            power <<= 1;
+        }
+        switch (bits) {
+            case 0:
+                bits = 0;
+                maxpower = Math.pow(2, 8);
+                power = 1;
+                while (power != maxpower) {
+                    const resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                c = String.fromCharCode(bits);
+                break;
+            case 1:
+                bits = 0;
+                maxpower = Math.pow(2, 16);
+                power = 1;
+                while (power != maxpower) {
+                    const resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                c = String.fromCharCode(bits);
+                break;
+            case 2:
+                return "";
+        }
+        if (c === undefined) {
+            throw new Error("No character found");
+        }
+        dictionary[3] = String(c);
+        let w = String(c);
+        result.push(String(c));
+        const forever = true;
+        while (forever) {
+            if (data.index > length) {
+                return "";
+            }
+            bits = 0;
+            maxpower = Math.pow(2, numBits);
+            power = 1;
+            while (power != maxpower) {
+                const resb = data.val & data.position;
+                data.position >>= 1;
+                if (data.position == 0) {
+                    data.position = resetValue;
+                    data.val = getNextValue(data.index++);
+                }
+                bits |= (resb > 0 ? 1 : 0) * power;
+                power <<= 1;
+            }
+            switch ((c = bits)) {
+                case 0:
+                    bits = 0;
+                    maxpower = Math.pow(2, 8);
+                    power = 1;
+                    while (power != maxpower) {
+                        const resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    dictionary[dictSize++] = String.fromCharCode(bits);
+                    c = dictSize - 1;
+                    enlargeIn--;
+                    break;
+                case 1:
+                    bits = 0;
+                    maxpower = Math.pow(2, 16);
+                    power = 1;
+                    while (power != maxpower) {
+                        const resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    dictionary[dictSize++] = String.fromCharCode(bits);
+                    c = dictSize - 1;
+                    enlargeIn--;
+                    break;
+                case 2:
+                    return result.join("");
+            }
+            if (enlargeIn == 0) {
+                enlargeIn = Math.pow(2, numBits);
+                numBits++;
+            }
+            if (dictionary[c]) {
+                entry = String(dictionary[c]);
+            }
+            else {
+                if (c === dictSize) {
+                    entry = w + w.charAt(0);
+                }
+                else {
+                    return null;
+                }
+            }
+            result.push(entry);
+            dictionary[dictSize++] = w + entry.charAt(0);
+            enlargeIn--;
+            w = entry;
+            if (enlargeIn == 0) {
+                enlargeIn = Math.pow(2, numBits);
+                numBits++;
+            }
+        }
+    }
+    compressToUTF16(input) {
+        if (input) {
+            return this._compress(input, 15, (a) => String.fromCharCode(a + 32)) + " ";
+        }
+        else {
+            return '';
+        }
+    }
+    decompressFromUTF16(compressed) {
+        if (compressed) {
+            return this._decompress(compressed.length, 16384, (index) => compressed.charCodeAt(index) - 32);
+        }
+        else
+            return null;
+    }
+}
+console.log('tmploader');
+function starttmpload(keypar) {
+    let fileurl = 'https://daw1024.com/share/' + keypar + '.json';
+    console.log('startload', fileurl);
+    let xmlHttpRequest = new XMLHttpRequest();
+    xmlHttpRequest.open("GET", fileurl);
+    xmlHttpRequest.onload = (event) => {
+        let json = JSON.parse(xmlHttpRequest.responseText);
+        saveProject(json);
+        goedit();
+    };
+    xmlHttpRequest.send(null);
+}
+function starttmpshare(keypar) {
+    let link = 'https://daw1024.com/share/' + keypar + '.html';
+    let sharedata = { url: link };
+    navigator
+        .share(sharedata)
+        .then((value) => {
+        console.log('shared', value, link);
+    })
+        .catch((reason) => {
+        console.log('failed', reason, link);
+    });
+}
+function saveProject(parsedProject) {
+    console.log('parsedProject', parsedProject);
+    let lastprojectdata = readLzObjectFromlocalStorage('lastprojectdata');
+    console.log('lastprojectdata', lastprojectdata);
+    let txtdata = JSON.stringify(parsedProject);
+    saveLzText2localStorage('lastprojectdata', txtdata);
+    saveRawText2localStorage('undocommands', JSON.stringify([]));
+    saveRawText2localStorage('redocommands', JSON.stringify([]));
+}
+function readLzObjectFromlocalStorage(name) {
+    try {
+        let cmpr = localStorage.getItem(name);
+        let lzu = new LZUtil();
+        let txt = lzu.decompressFromUTF16(cmpr);
+        if (txt) {
+            let o = JSON.parse(txt);
+            return o;
+        }
+        else {
+            return null;
+        }
+    }
+    catch (ex) {
+        console.log(ex);
+    }
+    return null;
+}
+function saveLzText2localStorage(name, text) {
+    let lzu = new LZUtil();
+    let cmpr = lzu.compressToUTF16(text);
+    localStorage.setItem(name, cmpr);
+}
+function saveRawText2localStorage(name, text) {
+    localStorage.setItem(name, text);
+}
+function goedit() {
+    window.open('../minium/minium.studio.html', "_self");
+}

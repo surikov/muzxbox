@@ -5,18 +5,30 @@
 //let fileurl = 'https://daw1024.com/minium/tmp/' + keypar + '.json';
 console.log('tmploader');
 function starttmpload(keypar) {
-	let fileurl = 'https://daw1024.com/minium/tmp/' + keypar + '.json';
+	let fileurl = 'https://daw1024.com/share/' + keypar + '.json';
 	console.log('startload', fileurl);
 	//if (fileurl) {
-		let xmlHttpRequest = new XMLHttpRequest();
-		xmlHttpRequest.open("GET", fileurl);
-		xmlHttpRequest.onload = (event) => {
-			let json:Zvoog_Project=JSON.parse(xmlHttpRequest.responseText) as Zvoog_Project;
-			saveProject(json);
-			goedit();
-		};
-		xmlHttpRequest.send(null);
+	let xmlHttpRequest = new XMLHttpRequest();
+	xmlHttpRequest.open("GET", fileurl);
+	xmlHttpRequest.onload = (event) => {
+		let json: Zvoog_Project = JSON.parse(xmlHttpRequest.responseText) as Zvoog_Project;
+		saveProject(json);
+		goedit();
+	};
+	xmlHttpRequest.send(null);
 	//}
+}
+function starttmpshare(keypar) {
+	let link = 'https://daw1024.com/share/' + keypar + '.html';
+	let sharedata: ShareData = { url: link };
+	navigator
+		.share(sharedata)
+		.then((value) => {
+			console.log('shared', value, link);
+		})
+		.catch((reason) => {
+			console.log('failed', reason, link);
+		});
 }
 function saveProject(parsedProject: Zvoog_Project) {
 	console.log('parsedProject', parsedProject);
@@ -53,5 +65,5 @@ function saveRawText2localStorage(name: string, text: string) {
 	localStorage.setItem(name, text);
 }
 function goedit() {
-	window.open('../minium.studio.html', "_self");
+	window.open('../minium/minium.studio.html', "_self");
 }

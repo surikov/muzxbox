@@ -24,9 +24,10 @@ class ShareExportPlugin {
 		console.log('start publish');
 		//let url = 'http://127.0.0.1:8080/';
 		//let url = 'https://mzxbox.ru/minium/';
-		let url = 'https://daw1024.com/minium/';
+		//let url = 'https://daw1024.com/minium/';
+		let url = 'https://daw1024.com/';
 		if (this.hostProject) {
-			this.sendRequest('', url + 'tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
+			this.sendRequest('', url + 'minium/tmpproject.php?bg=' + encodeURIComponent(this.bgPar)
 				+ '&txt=' + encodeURIComponent(this.txtPar)
 				+ '&title=' + this.hostProject.title
 					.replace("\"", " ")
@@ -51,16 +52,26 @@ class ShareExportPlugin {
 					if (xmlHttpRequest.status == 200) {
 						let key = xmlHttpRequest.responseText;
 						if (this.previewArrayBuffer) {
-							this.sendRequest('', url + 'tmppreview.php?key=' + key, 'POST', this.previewArrayBuffer
+							this.sendRequest('', url + 'minium/tmppreview.php?key=' + key, 'POST', this.previewArrayBuffer
 								, (info: string) => {
 									console.log('error', info);
 								}
 								, (xmlHttpRequest: XMLHttpRequest, vProgressEven: ProgressEvent) => {
 									console.log('request', xmlHttpRequest);
 									if (xmlHttpRequest.status == 200) {
-										let link = url + 'tmp/' + key + '.html';
-										console.log();
-										window.open(link);
+										let link = url + 'share/' + key + '.html';
+										console.log(link);
+										
+										let sharedata: ShareData = { url: link };
+										navigator
+											.share(sharedata)
+											.then((value) => {
+												console.log('shared', value, link);
+											})
+											.catch((reason) => {
+												console.log('failed', reason, link);
+											});
+										//window.open(link);
 									}
 								});
 						}

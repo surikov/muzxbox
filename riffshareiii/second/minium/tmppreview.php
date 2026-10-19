@@ -19,15 +19,15 @@ function imagecopymerge_alpha(
 }
 function dropfile($name){
 	error_log($name);
-	if (is_file('./tmp/'.$name)) {
-		unlink('./tmp/'.$name);
+	if (is_file('../share/'.$name)) {
+		unlink('../share/'.$name);
 	}
 }
 function limitcheck()
 {
-	$files = scandir('./tmp/');
+	$files = scandir('../share/');
 	usort($files, function($a, $b) {
-		return filemtime('./tmp/'.$a) - filemtime('./tmp/'.$b);
+		return filemtime('../share/'.$a) - filemtime('../share/'.$b);
 	});
 	
 	$cnt=count($files);
@@ -39,7 +39,7 @@ function limitcheck()
 }
 $key = $_GET["key"];
 $postdata = file_get_contents("php://input");
-$file = './tmp/' . $key . '.png';
+$file = '../share/' . $key . '.png';
 
 ob_end_clean();
 $gdimage = imagecreatefromstring($postdata);
