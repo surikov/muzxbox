@@ -1,0 +1,12 @@
+"use strict";
+const Constants = {
+    VERSION: '3.1.1',
+    HEADER_CHUNK_TYPE: [0x4d, 0x54, 0x68, 0x64],
+    HEADER_CHUNK_LENGTH: [0x00, 0x00, 0x00, 0x06],
+    HEADER_CHUNK_FORMAT0: [0x00, 0x00],
+    HEADER_CHUNK_FORMAT1: [0x00, 0x01],
+    HEADER_CHUNK_DIVISION: [0x00, 0x80],
+    TRACK_CHUNK_TYPE: [0x4d, 0x54, 0x72, 0x6b],
+    META_EVENT_ID: 0xFF,
+    META_SMTPE_OFFSET: 0x54
+};

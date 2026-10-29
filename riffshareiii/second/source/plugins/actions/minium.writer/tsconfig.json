@@ -2,9 +2,7 @@
 	"compilerOptions": {
 		"target": "es2018"
 		,"outFile": "../../../../minium/plugins/actions/midiexport1/mx.js"
-		//,"outFile": "mx.js"
-		//,"outDir":"../js"
-		,		"strictNullChecks": true
+		,"strictNullChecks": true
 		,"alwaysStrict": true
 		,"esModuleInterop": true
 		,"noResolve": false
@@ -14,20 +12,15 @@
 		,"sourceMap": false
 		,"experimentalDecorators": true
 		,"isolatedModules": false
-		//,"moduleResolution":"nodenext" 
 		,"module": "AMD"
-		//,"module": "nodenext"
 		,"lib": [
 			"dom"
 			,"es2019"
 			,"es5"
 		]
 		,"declaration": false
-		//,"typeRoots": [ "./node_types" ]
-		//,"types": ["node"]
-		//,"types": []
-		//,"allowJs":true
 	}
+	
 	,"files": [
 		"../../../mzxbx/mzxbxapi/musicenginetypes.ts"
 		,"../../../pluginAPI/MZXBX_Plugin_UI.ts"

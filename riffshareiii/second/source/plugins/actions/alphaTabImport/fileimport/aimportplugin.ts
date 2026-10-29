@@ -38,6 +38,7 @@ class AlphaTabImportMusicPlugin {
 		} else {
 			this.callbackID = message.hostData;
 			this.setupColors(message.colors);
+			this.onLanguaga(message.langID);
 		}
 	}
 	setupColors(colors: {
@@ -53,6 +54,19 @@ class AlphaTabImportMusicPlugin {
 		document.documentElement.style.setProperty('--drag-color', colors.drag);
 		document.documentElement.style.setProperty('--line-color', colors.line);
 		document.documentElement.style.setProperty('--click-color', colors.click);
+	}
+
+	onLanguaga(enruzhId: string): void {
+		if (enruzhId == 'zh') {
+			//
+		} else {
+			if (enruzhId == 'ru') {
+				//
+			} else {
+				//
+			}
+		}
+
 	}
 
 	loadMusicfile(inputFile) {
