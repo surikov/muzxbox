@@ -1,62 +1,6 @@
 class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20Definitions
   crlf = '\r\n';
-  /*
-  composeReaperProject222(zvoogProject: Zvoog_Project): string {
-    let unixTimestamp = Math.floor(new Date().getTime() / 1000);
-    let rpp = new TreeValue('REAPER_PROJECT', '', []).advance('_', ['0.1', '"7.46/linux-x86_64"', '' + unixTimestamp]);
-    rpp.first('_SAMPLERATE').advance('_', ['48000', '0', '0']);
-    rpp.first('_TIMEMODE').advance('_', ['0', '5', '0', '30', '0', '-1', '0', '0']);
-    rpp.first('_MASTERMUTESOLO').advance('_', ['0']);
-    rpp.first('_MASTERTRACKVIEW').advance('_', ['0', '0.5', '0.5', '0.5', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '1']);
-    rpp.first('_MASTER_VOLUME').advance('_', ['1', '0', '-1', '-1', '1']);
 
-
-
-
-
-    rpp.first('_RIPPLE').advance('_', ['0']);
-    rpp.first('_GROUPOVERRIDE').advance('_', ['0', '0', '0']);
-    rpp.first('RECORD_CFG');
-    rpp.first('METRONOME').advance('_', ['6', '2']);
-    rpp.first('METRONOME').first('_VOL').advance('_', ['0.25', '0.125']);
-    rpp.first('METRONOME').first('_FREQ').advance('_', ['800', '1600', '1']);
-    rpp.first('METRONOME').first('_BEATLEN').advance('_', ['4']);
-    rpp.first('METRONOME').first('_SAMPLES').advance('_', ['""', '""']);
-    rpp.first('METRONOME').first('_PATTERN').advance('_', ['2863311530', '2863311529']);
-    return this.rpp2text('', rpp);
-  }
-  rpp2text(pad: string, tree: TreeValue): string {
-    let crlf = '\r\n';
-    let rpptxt = '';
-
-    let rline = pad + '<' + tree.name;
-    for (let ii = 0; ii < tree.content.length; ii++) {
-      if (tree.content[ii].name == '_') {
-        rline = rline + ' ' + tree.content[ii].value;
-      }
-    }
-    rpptxt = rpptxt + rline;
-    for (let kk = 0; kk < tree.content.length; kk++) {
-      let subtree = tree.content[kk];
-      if (subtree.name == '_') {
-        //
-      } else {
-        if (subtree.name.startsWith('_')) {
-          let subline = pad + '  ' + subtree.name.substring(1);
-          for (let nn = 0; nn < subtree.content.length; nn++) {
-            if (subtree.content[nn].name == '_') {
-              subline = subline + ' ' + subtree.content[nn].value;
-            }
-          }
-          rpptxt = rpptxt + crlf + subline;
-        } else {
-          rpptxt = rpptxt + crlf + this.rpp2text(pad + '  ', subtree);
-        }
-      }
-    }
-    rpptxt = rpptxt + crlf + pad + '>';
-    return rpptxt;
-  }*/
   composeReaperProject(zvoogProject: Zvoog_Project): string {
     let body = '';
 
@@ -154,16 +98,9 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
     LANEHEIGHT 0 0
     ARM 0
     DEFSHAPE 0 -1 -1
-  >
-  <TEMPOENVEX
-    EGUID {845912B6-402A-2FA6-975F-2A7D1BC3460B}
-    ACT 0 -1
-    VIS 1 0 1
-    LANEHEIGHT 0 0
-    ARM 0
-    DEFSHAPE 1 -1 -1
-  >
-  RULERHEIGHT 86 86
+  >`;
+    body = body + this.crlf + this.createTimeline(zvoogProject);
+    body = body + this.crlf + `  RULERHEIGHT 86 86
   RULERLANE 1 4 "" 0 -1 0
   RULERLANE 2 8 "" 0 -1 0
   <PROJBAY
@@ -313,6 +250,26 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
     body = body + this.crlf + '>';
     return body;
   }
+  createTimeline(zvoogProject: Zvoog_Project): string {
+    let timeData = `  <TEMPOENVEX
+    EGUID {` + crypto.randomUUID() + `}
+    ACT 0 -1
+    VIS 1 0 1
+    LANEHEIGHT 0 0
+    ARM 0
+    DEFSHAPE 1 -1 -1`;
+    let start = 0;
+    for (let ii = 0; ii < zvoogProject.timeline.length; ii++) {
+      let bar = zvoogProject.timeline[ii];
+      let txtTempo = bar.tempo.toFixed(10);
+      let txtStart = start.toFixed(12);
+      timeData = timeData + this.crlf + '    PT ' + txtStart + ' ' + txtTempo + ' 1'
+      let sDuration = MMUtil().set(bar.metre).duration(bar.tempo);
+      start = start + sDuration;
+    }
+    timeData = timeData + this.crlf + '  >'
+    return timeData;
+  }
   createCommentTrack(projectTitle: string): string {
     let commentTrackGuid = crypto.randomUUID();
     let commentBody = `  <TRACK {` + commentTrackGuid + `}
@@ -362,8 +319,117 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
   >`;
     return commentBody;
   }
+  /*
+        E 0 90 26 60
+        E 360 90 25 60
+        E 360 80 26 00
+        E 240 90 24 60
+        E 240 80 25 00
+        E 0 80 24 00
+        E 240 90 24 60
+        E 240 80 24 00
+        E 240 90 24 60
+        E 240 80 24 00
+        E 240 90 24 60
+        E 240 80 24 00
+        E 240 90 24 60
+  */
+  createMIDIevent(pitch35_81: number, ticksFromPrevious: number, kindByte: string, volumeByte: string): string {
+    let data: string = this.crlf + '        E';
+    let pitchByte = '' + pitch35_81.toString(16);
+    data = data + ' ' + ticksFromPrevious + ' ' + kindByte + ' ' + pitchByte + ' ' + volumeByte
+    return data;
+  }
+  createDrumMeasures(project: Zvoog_Project): string {
+    let duration = MMUtil();
+    let longS = 0;
+    let drums: { start: Zvoog_Metre, drumNum: number }[] = [];
+    for (let ii = 0; ii < project.timeline.length; ii++) {
+      let bar = project.timeline[ii];
 
+      for (let tt = 0; tt < project.percussions.length; tt++) {
+        let drumTrack = project.percussions[tt];
+        let num = 0;
+        num = drumTrack.sampler.hint35_81;
+        let drumSkips = drumTrack.measures[ii].skips;
+        for (let dd = 0; dd < drumSkips.length; dd++) {
+          let skip = drumSkips[dd];
+          drums.push({ start: duration.plus(skip).metre(), drumNum: num });
+        }
+      }
+
+
+      longS = longS + MMUtil().set(bar.metre).duration(bar.tempo);
+      duration = duration.plus(bar.metre);
+    }
+     drums.sort((a, b) => {
+      return MMUtil().set(a.start).duration(100) - MMUtil().set(b.start).duration(100);
+    });
+   // console.log(drums);
+
+    let drumItem = this.crlf + '';
+    drumItem = drumItem + `    <ITEM
+      POSITION 0.0
+      SNAPOFFS 0
+      LENGTH `+ longS.toFixed(10) + `
+      LOOP 1
+      ALLTAKES 0
+      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
+      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
+      MUTE 0 0
+      SEL 0
+      IGUID {`+ crypto.randomUUID() + `}
+      IID 4
+      NAME Percissuin
+      VOLPAN 1 0 1 -1
+      SOFFS 0 0
+      PLAYRATE 1 1 0 -1 0 0.0025
+      CHANMODE 0
+      GUID {`+ crypto.randomUUID() + `}
+      <SOURCE MIDI
+        HASDATA 1 960 QN
+        CCINTERP 32
+        POOLEDEVTS {`+ crypto.randomUUID() + `}`;
+    drumItem = drumItem + this.createMIDIevent(35, 0, '90', '7f');
+    drumItem = drumItem + this.createMIDIevent(35, 480, '80', '0');
+    drumItem = drumItem + this.createMIDIevent(35, 0, '90', '7f');
+    drumItem = drumItem + this.createMIDIevent(35, 480, '80', '0');
+    drumItem = drumItem + this.createMIDIevent(38, 0, '90', '7f');
+    drumItem = drumItem + this.createMIDIevent(38, 960, '80', '0');
+
+
+    let current = MMUtil();
+    for (let mm = 0; mm < drums.length; mm++) {
+      let singleDrum = drums[mm];
+      let delta = MMUtil().set(singleDrum.start).minus(current).metre();
+      let midiSkip = Math.round(240 * (delta.count / delta.part) / (1 / 16));//1/16=240
+      //console.log(singleDrum.drumNum, midiSkip, delta, singleDrum.start);
+      let drumHex = singleDrum.drumNum.toString(16);
+      drumItem = drumItem + this.crlf + '        e ' + midiSkip + ' 80 ' + drumHex + ' 0';
+      drumItem = drumItem + this.crlf + '        e ' + midiSkip + ' 90 ' + drumHex + ' 7f';
+      current.set(singleDrum.start);
+    }
+
+
+    //drumItem = drumItem + this.crlf + `        E 500 b0 7b 00`;
+
+    drumItem = drumItem + this.crlf + `        CCINTERP 32
+        CHASE_CC_TAKEOFFS 1
+        GUID {`+ crypto.randomUUID() + `}
+        IGNTEMPO 0 120 4 4
+        SRCCOLOR 3
+        EVTFILTER 0 -1 -1 -1 -1 0 1 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
+        VELLANE -1 100 0 0 1
+        CFGEDITVIEW 0 0.188451 61 12 0 0 0 0 0 0.5
+        KEYSNAP 0
+        TRACKSEL -252
+        CFGEDIT 1 1 0 1 0 8 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
+      >
+    >`;
+    return drumItem;
+  }
   createDrumTrack(project: Zvoog_Project) {
+
     let drumTrackGuid = crypto.randomUUID();
     let drumBody = `  <TRACK {` + drumTrackGuid + `}
     NAME Drums
@@ -404,124 +470,16 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
       FLOATPOS 0 0 0 0
       FXID {`+ crypto.randomUUID() + `}
       WAK 0 0
-    >
-    <ITEM
-      POSITION 0
-      SNAPOFFS 0
-      LENGTH 2
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
-      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {`+ crypto.randomUUID() + `}
-      IID 4
-      NAME 02-rumstest-MIDI
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {`+ crypto.randomUUID() + `}
-      <SOURCE MIDI
-        HASDATA 1 960 QN
-        CCINTERP 32
-        POOLEDEVTS {`+ crypto.randomUUID() + `}
-        e 120 90 26 60
-        E 240 90 19 60
-        e 480 80 26 00
-        E 0 90 33 60
-        E 0 90 1e 60
-        E 240 90 2e 60
-        E 120 80 19 00
-        E 240 80 33 00
-        E 0 80 2e 00
-        E 120 80 1e 00
-        E 240 90 1e 60
-        E 240 80 1e 00
-        E 240 90 23 60
-        E 240 80 23 00
-        E 0 90 2f 60
-        E 240 80 2f 00
-        E 360 90 3e 60
-        E 240 80 3e 00
-        E 0 90 1d 60
-        E 0 90 2d 60
-        E 360 80 1d 00
-        E 0 80 2d 00
-        E 120 b0 7b 00
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {`+ crypto.randomUUID() + `}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 3
-        EVTFILTER 0 -1 -1 -1 -1 0 1 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
-        VELLANE -1 100 0 0 1
-        CFGEDITVIEW 0 0.188451 61 12 0 0 0 0 0 0.5
-        KEYSNAP 0
-        TRACKSEL -252
-        CFGEDIT 1 1 0 1 0 0 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
-      >
-    >
-    <ITEM
-      POSITION 2
-      SNAPOFFS 0
-      LENGTH 6
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
-      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {`+ crypto.randomUUID() + `}
-      IID 2
-      NAME 02-rumstest-MIDI
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {`+ crypto.randomUUID() + `}
-      <SOURCE MIDI
-        HASDATA 1 960 QN
-        CCINTERP 32
-        POOLEDEVTS {`+ crypto.randomUUID() + `}
-        E 0 90 1a 60
-        E 120 90 1d 60
-        E 120 80 1d 00
-        E 120 90 23 60
-        E 120 90 1d 60
-        E 120 80 1a 00
-        E 0 80 1d 00
-        E 0 90 21 60
-        E 120 80 21 00
-        E 240 80 23 00
-        E 360 90 35 60
-        E 120 90 18 60
-        E 120 80 18 00
-        E 120 80 35 00
-        E 360 90 39 60
-        E 120 80 39 00
-        e 0 90 40 60
-        E 120 90 28 60
-        E 120 80 28 00
-        E 240 90 32 60
-        E 120 80 32 00
-        e 840 80 40 00
-        E 240 b0 7b 00
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {`+ crypto.randomUUID() + `}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 1
-        EVTFILTER 0 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
-        VELLANE -1 100 0 0 1
-        CFGEDITVIEW 0 0.188451 61 12 0 0 0 0 0 0.5
-        KEYSNAP 0
-        TRACKSEL 0
-        CFGEDIT 1 1 0 1 0 0 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
-      >
-    >
-  >`;
+    >`;
+    /*
+        drumBody = drumBody + this.createDrumMeasure('a', 0, 1);
+        drumBody = drumBody + this.createDrumMeasure('b', 1, 1.5);
+        drumBody = drumBody + this.createDrumMeasure('c', 2.5, 1.256);
+        drumBody = drumBody + this.createDrumMeasure('d', 3.756, 4);
+        */
+    drumBody = drumBody + this.createDrumMeasures(project);
+
+    drumBody = drumBody + this.crlf + `  >`;
 
 
 

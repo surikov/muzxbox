@@ -23,6 +23,7 @@
 	
 	,"files": [
 		"../../../mzxbx/mzxbxapi/musicenginetypes.ts"
+		//,"../../../mzxbx/mzxbxlib/metre.ts"
 		,"../../../pluginAPI/MZXBX_Plugin_UI.ts"
 		,"../../../application/treevalue/treevalue.ts"
 		//,"ethereumjs-tx-1.3.3.js"
