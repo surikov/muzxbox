@@ -953,6 +953,250 @@ class Writer {
         return process.stdout.write(Buffer.from(this.buildFile()));
     }
 }
+function createDrumMeasures(writer, project) {
+    let duration = MMUtil();
+    let longS = 0;
+    let drums = [];
+    for (let ii = 0; ii < project.timeline.length; ii++) {
+        let bar = project.timeline[ii];
+        for (let tt = 0; tt < project.percussions.length; tt++) {
+            let drumTrack = project.percussions[tt];
+            let num = 0;
+            num = drumTrack.sampler.hint35_81;
+            let drumSkips = drumTrack.measures[ii].skips;
+            for (let dd = 0; dd < drumSkips.length; dd++) {
+                let skip = drumSkips[dd];
+                drums.push({ start: duration.plus(skip).metre(), drumNum: num });
+            }
+        }
+        longS = longS + MMUtil().set(bar.metre).duration(bar.tempo);
+        duration = duration.plus(bar.metre);
+    }
+    drums.sort((a, b) => {
+        return MMUtil().set(a.start).duration(100) - MMUtil().set(b.start).duration(100);
+    });
+    let drumItem = writer.crlf + '';
+    drumItem = drumItem + `    <ITEM
+      POSITION 0.0
+      SNAPOFFS 0
+      LENGTH ` + longS.toFixed(10) + `
+      LOOP 1
+      ALLTAKES 0
+      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
+      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
+      MUTE 0 0
+      SEL 0
+      IGUID {` + crypto.randomUUID() + `}
+      IID 4
+      NAME Drums
+      VOLPAN 1 0 1 -1
+      SOFFS 0 0
+      PLAYRATE 1 1 0 -1 0 0.0025
+      CHANMODE 0
+      GUID {` + crypto.randomUUID() + `}
+      <SOURCE MIDI
+        HASDATA 1 960 QN
+        CCINTERP 32
+        POOLEDEVTS {` + crypto.randomUUID() + `}`;
+    let current = MMUtil();
+    for (let mm = 0; mm < drums.length; mm++) {
+        let singleDrum = drums[mm];
+        let delta = MMUtil().set(singleDrum.start).minus(current).metre();
+        let midiSkip = Math.round(120 * (delta.count / delta.part) / (1 / 16));
+        let drumHex = singleDrum.drumNum.toString(16);
+        drumItem = drumItem + writer.crlf + '        e ' + midiSkip + ' 80 ' + drumHex + ' 0';
+        drumItem = drumItem + writer.crlf + '        e ' + midiSkip + ' 90 ' + drumHex + ' 7f';
+        current.set(singleDrum.start);
+    }
+    let wholeDuration = project.timeline.reduce((accumulator, current) => accumulator.plus(current.metre), MMUtil());
+    let remains = wholeDuration.minus(current);
+    let ticks = Math.round(240 * (remains.count / remains.part) / (1 / 16));
+    ticks = ticks > 0 ? ticks : 0;
+    drumItem = drumItem + writer.crlf + `        E ` + ticks + ` b0 7b 00`;
+    drumItem = drumItem + writer.crlf + `        CCINTERP 32
+        CHASE_CC_TAKEOFFS 1
+        GUID {` + crypto.randomUUID() + `}
+        IGNTEMPO 0 120 4 4
+        SRCCOLOR 3
+        EVTFILTER 0 -1 -1 -1 -1 0 1 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
+        VELLANE -1 100 0 0 1
+        CFGEDITVIEW 0 0.188451 61 12 0 0 0 0 0 0.5
+        KEYSNAP 0
+        TRACKSEL -252
+        CFGEDIT 1 1 0 1 0 8 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
+      >
+    >`;
+    return drumItem;
+}
+function createDrumTrack(writer, project) {
+    let drumTrackGuid = crypto.randomUUID();
+    let drumBody = `  <TRACK {` + drumTrackGuid + `}
+    NAME Drums
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    PANLAWFLAGS 3
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    SHOWINMIX 1 0.6667 0.5 1 0.5 0 0 0 0
+    FIXEDLANES 9 0 0 0 0
+    LANEREC -1 -1 -1 0
+    SEL 0
+    REC 0 0 1 0 0 0 0 0
+    VU 64
+    TRACKHEIGHT 0 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NCHAN 2
+    FX 1
+    TRACKID {` + drumTrackGuid + `}
+    PERF 0
+    MIDIOUT -1 -1
+    MAINSEND 1 0
+    <FXCHAIN
+      WNDRECT 243 219 1227 753
+      SHOW 0
+      LASTSEL 0
+      DOCKED 0
+      BYPASS 0 0 0
+      <JS chmaha-inst/MajorGeneralMIDI.jsfx ""
+        128 1 2 3 4 5 6 7 8 128 10 11 12 13 14 15 440 5 0 2 84.5 0 1 30 39 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 64 64 64 64 "" 64 64 64 64 64 64 64 64 64 64 64 64 64
+      >
+      MULTIFXLINK 0
+      FLOATPOS 0 0 0 0
+      FXID {` + crypto.randomUUID() + `}
+      WAK 0 0
+    >`;
+    drumBody = drumBody + createDrumMeasures(writer, project);
+    drumBody = drumBody + writer.crlf + `  >`;
+    return drumBody;
+}
+function createTrackMeasures(writer, trackNo, project) {
+    let trackGUID = crypto.randomUUID();
+    let track = project.tracks[trackNo];
+    let midiProg = track.performer.hint1_128 - 1;
+    let duration = MMUtil();
+    let longS = 0;
+    let evnts = [];
+    for (let ii = 0; ii < project.timeline.length; ii++) {
+        let bar = project.timeline[ii];
+        let trackChords = track.measures[ii].chords;
+        for (let dd = 0; dd < trackChords.length; dd++) {
+            let singleChord = trackChords[dd];
+            let chordDuration = singleChord.slides.reduce((accumulator, current) => accumulator.plus(current.duration), MMUtil());
+            for (let ss = 0; ss < singleChord.pitches.length; ss++) {
+                let singlePitch = singleChord.pitches[ss];
+                evnts.push({ start: duration.plus(singleChord.skip).metre(), pitch: singlePitch, startStopSLide: 1 });
+                evnts.push({ start: duration.plus(MMUtil().set(singleChord.skip).plus(chordDuration)).metre(), pitch: singlePitch, startStopSLide: 2 });
+            }
+        }
+        longS = longS + MMUtil().set(bar.metre).duration(bar.tempo);
+        duration = duration.plus(bar.metre);
+    }
+    evnts.sort((a, b) => {
+        let aa = MMUtil().set(a.start).duration(100) * 1000 + 1;
+        let bb = MMUtil().set(b.start).duration(100) * 1000;
+        return aa - bb;
+    });
+    let trackData = `  <TRACK {` + trackGUID + `}
+    NAME ` + writer.safeLabel(project.tracks[trackNo].title) + `
+    PEAKCOL 16576
+    BEAT -1
+    AUTOMODE 0
+    PANLAWFLAGS 3
+    VOLPAN 1 0 -1 -1 1
+    MUTESOLO 0 0 0
+    IPHASE 0
+    PLAYOFFS 0 1
+    ISBUS 0 0
+    BUSCOMP 0 0 0 0 0
+    SHOWINMIX 1 0.6667 0.5 1 0.5 0 0 0 0
+    FIXEDLANES 9 0 0 0 0
+    LANEREC -1 -1 -1 0
+    SEL 0
+    REC 0 0 1 0 0 0 0 0
+    VU 64
+    TRACKHEIGHT 0 0 0 0 0 0 0
+    INQ 0 0 0 0.5 100 0 0 100
+    NCHAN 2
+    FX 1
+    TRACKID {` + trackGUID + `}
+    PERF 0
+    MIDIOUT -1 -1
+    MAINSEND 1 0
+    <FXCHAIN
+      WNDRECT 212 99 1227 753
+      SHOW 0
+      LASTSEL 0
+      DOCKED 0
+      BYPASS 0 0 0
+      <JS chmaha-inst/MajorGeneralMIDI.jsfx ""
+        ` + midiProg + ` 1 2 3 4 5 6 7 8 128 10 11 12 13 19 15 440 5 0 2 84.5 0 1 30 39 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 64 64 64 64 "" 64 64 64 64 64 64 64 64 64 64 64 64 64
+      >
+      MULTIFXLINK 0
+      FLOATPOS 0 0 0 0
+      FXID {` + trackGUID + `}
+      WAK 0 0
+    >
+    <ITEM
+      POSITION 0.0
+      SNAPOFFS 0
+      LENGTH ` + longS.toFixed(10) + `
+      LOOP 1
+      ALLTAKES 0
+      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
+      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
+      MUTE 0 0
+      SEL 0
+      IGUID {` + crypto.randomUUID() + `}
+      IID 3
+      NAME ` + writer.safeLabel(project.tracks[trackNo].title) + `
+      VOLPAN 1 0 1 -1
+      SOFFS 0.000 0.000
+      PLAYRATE 1 1 0 -1 0 0.0025
+      CHANMODE 0
+      GUID {` + crypto.randomUUID() + `}
+      <SOURCE MIDI
+        HASDATA 1 960 QN
+        CCINTERP 32
+        POOLEDEVTS {` + crypto.randomUUID() + `}`;
+    let current = MMUtil();
+    for (let ee = 0; ee < evnts.length; ee++) {
+        let singlEv = evnts[ee];
+        let delta = MMUtil().set(singlEv.start).minus(current).metre();
+        let midiSkip = Math.round(240 * (delta.count / delta.part) / (1 / 16));
+        let hex = singlEv.pitch.toString(16);
+        if (singlEv.startStopSLide == 1) {
+            trackData = trackData + writer.crlf + '        e ' + midiSkip + ' 90 ' + hex + ' 7f';
+        }
+        else {
+            trackData = trackData + writer.crlf + '        e ' + midiSkip + ' 80 ' + hex + ' 0';
+        }
+        current.set(singlEv.start);
+    }
+    let wholeDuration = project.timeline.reduce((accumulator, current) => accumulator.plus(current.metre), MMUtil());
+    let remains = wholeDuration.minus(current);
+    let ticks = Math.round(240 * (remains.count / remains.part) / (1 / 16));
+    ticks = ticks > 0 ? ticks : 0;
+    trackData = trackData + writer.crlf + `        CCINTERP 32
+        CHASE_CC_TAKEOFFS 1
+        GUID {` + crypto.randomUUID() + `}
+        IGNTEMPO 0 120 4 4
+        SRCCOLOR 2
+        EVTFILTER 0 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
+        VELLANE 128 100 0 0 1
+        CFGEDITVIEW -4786.468216 0.104879 45 12 0 0 0 0 0 0.5
+        KEYSNAP 0
+        TRACKSEL -252
+        CFGEDIT 1 1 0 1 0 0 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
+      >
+    >
+  >`;
+    return trackData;
+}
 class RPPWriter {
     constructor() {
         this.crlf = '\r\n';
@@ -1057,148 +1301,11 @@ class RPPWriter {
   RULERLANE 1 4 "" 0 -1 0
   RULERLANE 2 8 "" 0 -1 0
   <PROJBAY
-  >
-  <TRACK {E8FAFD0F-FFE1-DB44-5CAE-8AC7DAC5992D}
-    NAME testinsrtrynebt
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    PANLAWFLAGS 3
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 0 0 0 0
-    FIXEDLANES 9 0 0 0 0
-    LANEREC -1 -1 -1 0
-    SEL 0
-    REC 0 0 1 0 0 0 0 0
-    VU 64
-    TRACKHEIGHT 120 0 0 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {E8FAFD0F-FFE1-DB44-5CAE-8AC7DAC5992D}
-    PERF 0
-    MIDIOUT -1 -1
-    MAINSEND 1 0
-    <FXCHAIN
-      WNDRECT 212 99 1227 753
-      SHOW 0
-      LASTSEL 0
-      DOCKED 0
-      BYPASS 0 0 0
-      <JS chmaha-inst/MajorGeneralMIDI.jsfx ""
-        80 1 2 3 4 5 6 7 8 128 10 11 12 13 19 15 440 5 0 2 84.5 0 1 30 39 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 64 64 64 64 "" 64 64 64 64 64 64 64 64 64 64 64 64 64
-      >
-      MULTIFXLINK 0
-      FLOATPOS 0 0 0 0
-      FXID {9215941B-69D3-42ED-8EA6-002B8A507461}
-      WAK 0 0
-    >
-    <ITEM
-      POSITION 0
-      SNAPOFFS 0
-      LENGTH 4
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
-      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {1D84EA37-7518-49C9-12C5-FCB48F17FFDD}
-      IID 1
-      NAME 01-MIDI
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {4B3574FF-F14F-7D38-9484-F3538F84A12F}
-      <SOURCE MIDI
-        HASDATA 1 960 QN
-        CCINTERP 32
-        POOLEDEVTS {B198B953-C8B9-A3B1-4128-393FEC14D712}
-        e 0 90 40 60
-        E 360 e0 2e 42
-        E 120 e0 22 4a
-        E 120 e0 15 52
-        E 120 e0 08 5a
-        E 120 e0 6f 69
-        E 120 e0 6f 69
-        E 120 e0 18 70
-        E 120 e0 77 74
-        E 120 e0 55 79
-        E 0 90 3d 60
-        E 120 e0 6a 7c
-        E 120 e0 7f 7f
-        E 600 90 38 60
-        E 120 80 3d 00
-        e 720 80 40 00
-        E 600 80 38 00
-        E 240 b0 7b 00
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {4B571F06-0FF5-2A92-BB3E-AF2988C94DB3}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 0
-        EVTFILTER 0 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
-        VELLANE 128 100 0 0 1
-        CFGEDITVIEW -373.342898 0.104879 45 12 0 0 0 0 0 0.5
-        KEYSNAP 0
-        TRACKSEL -252
-        CFGEDIT 1 1 0 1 0 0 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
-      >
-    >
-    <ITEM
-      POSITION 4
-      SNAPOFFS 0
-      LENGTH 4
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
-      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {EB47B7BC-A3F6-445E-B038-385E5434900B}
-      IID 3
-      NAME 01-testinsrtrynebt-MIDI
-      VOLPAN 1 0 1 -1
-      SOFFS 1.5 3
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {612E7EE9-93E3-4CEE-BC61-EF72030B71FB}
-      <SOURCE MIDI
-        HASDATA 1 960 QN
-        CCINTERP 32
-        POOLEDEVTS {99E7E6FA-6F38-4BCB-8B01-BB522E5D5177}
-        E 600 90 36 60
-        E 240 90 51 60
-        E 0 90 48 60
-        E 480 80 36 00
-        E 120 80 48 00
-        e 1200 90 42 60
-        e 240 80 42 00
-        E 720 90 4b 60
-        E 240 80 51 00
-        E 0 80 4b 00
-        E 0 b0 7b 00
-        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {B0ECF4E2-C222-4A65-BFBC-91A9FC2DFE5D}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 2
-        EVTFILTER 0 -1 -1 -1 -1 0 0 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
-        VELLANE 128 100 0 0 1
-        CFGEDITVIEW -4786.468216 0.104879 45 12 0 0 0 0 0 0.5
-        KEYSNAP 0
-        TRACKSEL -252
-        CFGEDIT 1 1 0 1 0 0 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
-      >
-    >
   >`;
-        body = body + this.crlf + this.createDrumTrack(zvoogProject);
+        for (let rr = 0; rr < zvoogProject.tracks.length; rr++) {
+            body = body + this.crlf + createTrackMeasures(this, rr, zvoogProject);
+        }
+        body = body + this.crlf + createDrumTrack(this, zvoogProject);
         body = body + this.crlf + this.createCommentTrack(zvoogProject.title);
         body = body + this.crlf + '>';
         return body;
@@ -1272,133 +1379,8 @@ class RPPWriter {
   >`;
         return commentBody;
     }
-    createMIDIevent(pitch35_81, ticksFromPrevious, kindByte, volumeByte) {
-        let data = this.crlf + '        E';
-        let pitchByte = '' + pitch35_81.toString(16);
-        data = data + ' ' + ticksFromPrevious + ' ' + kindByte + ' ' + pitchByte + ' ' + volumeByte;
-        return data;
-    }
-    createDrumMeasures(project) {
-        let duration = MMUtil();
-        let longS = 0;
-        let drums = [];
-        for (let ii = 0; ii < project.timeline.length; ii++) {
-            let bar = project.timeline[ii];
-            for (let tt = 0; tt < project.percussions.length; tt++) {
-                let drumTrack = project.percussions[tt];
-                let num = 0;
-                num = drumTrack.sampler.hint35_81;
-                let drumSkips = drumTrack.measures[ii].skips;
-                for (let dd = 0; dd < drumSkips.length; dd++) {
-                    let skip = drumSkips[dd];
-                    drums.push({ start: duration.plus(skip).metre(), drumNum: num });
-                }
-            }
-            longS = longS + MMUtil().set(bar.metre).duration(bar.tempo);
-            duration = duration.plus(bar.metre);
-        }
-        drums.sort((a, b) => {
-            return MMUtil().set(a.start).duration(100) - MMUtil().set(b.start).duration(100);
-        });
-        let drumItem = this.crlf + '';
-        drumItem = drumItem + `    <ITEM
-      POSITION 0.0
-      SNAPOFFS 0
-      LENGTH ` + longS.toFixed(10) + `
-      LOOP 1
-      ALLTAKES 0
-      FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
-      FADEOUT 1 0 0 1 0 0 0 1 0 0 1 0 0
-      MUTE 0 0
-      SEL 0
-      IGUID {` + crypto.randomUUID() + `}
-      IID 4
-      NAME Percissuin
-      VOLPAN 1 0 1 -1
-      SOFFS 0 0
-      PLAYRATE 1 1 0 -1 0 0.0025
-      CHANMODE 0
-      GUID {` + crypto.randomUUID() + `}
-      <SOURCE MIDI
-        HASDATA 1 960 QN
-        CCINTERP 32
-        POOLEDEVTS {` + crypto.randomUUID() + `}`;
-        drumItem = drumItem + this.createMIDIevent(35, 0, '90', '7f');
-        drumItem = drumItem + this.createMIDIevent(35, 480, '80', '0');
-        drumItem = drumItem + this.createMIDIevent(35, 0, '90', '7f');
-        drumItem = drumItem + this.createMIDIevent(35, 480, '80', '0');
-        drumItem = drumItem + this.createMIDIevent(38, 0, '90', '7f');
-        drumItem = drumItem + this.createMIDIevent(38, 960, '80', '0');
-        let current = MMUtil();
-        for (let mm = 0; mm < drums.length; mm++) {
-            let singleDrum = drums[mm];
-            let delta = MMUtil().set(singleDrum.start).minus(current).metre();
-            let midiSkip = Math.round(240 * (delta.count / delta.part) / (1 / 16));
-            let drumHex = singleDrum.drumNum.toString(16);
-            drumItem = drumItem + this.crlf + '        e ' + midiSkip + ' 80 ' + drumHex + ' 0';
-            drumItem = drumItem + this.crlf + '        e ' + midiSkip + ' 90 ' + drumHex + ' 7f';
-            current.set(singleDrum.start);
-        }
-        drumItem = drumItem + this.crlf + `        CCINTERP 32
-        CHASE_CC_TAKEOFFS 1
-        GUID {` + crypto.randomUUID() + `}
-        IGNTEMPO 0 120 4 4
-        SRCCOLOR 3
-        EVTFILTER 0 -1 -1 -1 -1 0 1 0 0 -1 -1 -1 -1 0 -1 0 -1 -1
-        VELLANE -1 100 0 0 1
-        CFGEDITVIEW 0 0.188451 61 12 0 0 0 0 0 0.5
-        KEYSNAP 0
-        TRACKSEL -252
-        CFGEDIT 1 1 0 1 0 8 1 1 1 1 1 0.125 260 79 1503 964 0 0 0 0 0 0 0 0 0 0.5 0 0 1 64
-      >
-    >`;
-        return drumItem;
-    }
-    createDrumTrack(project) {
-        let drumTrackGuid = crypto.randomUUID();
-        let drumBody = `  <TRACK {` + drumTrackGuid + `}
-    NAME Drums
-    PEAKCOL 16576
-    BEAT -1
-    AUTOMODE 0
-    PANLAWFLAGS 3
-    VOLPAN 1 0 -1 -1 1
-    MUTESOLO 0 0 0
-    IPHASE 0
-    PLAYOFFS 0 1
-    ISBUS 0 0
-    BUSCOMP 0 0 0 0 0
-    SHOWINMIX 1 0.6667 0.5 1 0.5 0 0 0 0
-    FIXEDLANES 9 0 0 0 0
-    LANEREC -1 -1 -1 0
-    SEL 0
-    REC 0 0 1 0 0 0 0 0
-    VU 64
-    TRACKHEIGHT 0 0 0 0 0 0 0
-    INQ 0 0 0 0.5 100 0 0 100
-    NCHAN 2
-    FX 1
-    TRACKID {` + drumTrackGuid + `}
-    PERF 0
-    MIDIOUT -1 -1
-    MAINSEND 1 0
-    <FXCHAIN
-      WNDRECT 243 219 1227 753
-      SHOW 0
-      LASTSEL 0
-      DOCKED 0
-      BYPASS 0 0 0
-      <JS chmaha-inst/MajorGeneralMIDI.jsfx ""
-        128 1 2 3 4 5 6 7 8 128 10 11 12 13 14 15 440 5 0 2 84.5 0 1 30 39 100 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 100 64 64 64 64 "" 64 64 64 64 64 64 64 64 64 64 64 64 64
-      >
-      MULTIFXLINK 0
-      FLOATPOS 0 0 0 0
-      FXID {` + crypto.randomUUID() + `}
-      WAK 0 0
-    >`;
-        drumBody = drumBody + this.createDrumMeasures(project);
-        drumBody = drumBody + this.crlf + `  >`;
-        return drumBody;
+    safeLabel(txt) {
+        return txt.replace(/[^A-Za-z0-9]/g, "_");
     }
 }
 console.log('newMIDIx v1.0.1');

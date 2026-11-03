@@ -63,6 +63,8 @@
 		,"midiwriterjs/utils.ts"
 		,"midiwriterjs/writer.ts"
 
+		,"reaper/rppdrums.ts"
+		,"reaper/rpptrack.ts"
 		,"reaper/rppwriter.ts"
 
 		,"midiexportedplugin.ts"
