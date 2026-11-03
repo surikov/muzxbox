@@ -27,7 +27,7 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
   VIDEO_CONFIG 0 0 65792
   PANMODE 3
   PANLAWFLAGS 3
-  CURSOR 8.5
+  CURSOR 0.0
   ZOOM 100 0 0
   VZOOMEX 6 0
   USE_REC_CFG 0

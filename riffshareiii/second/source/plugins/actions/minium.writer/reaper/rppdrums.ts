@@ -77,6 +77,7 @@ drumItem = drumItem + this.createMIDIevent(38, 960, '80', '0');
     ticks = ticks > 0 ? ticks : 0;
     drumItem = drumItem + writer.crlf + `        E ` + ticks + ` b0 7b 00`;
     //console.log('wholeDuration', wholeDuration, remains);
+    //console.log('drums', wholeDuration, remains,ticks);
     drumItem = drumItem + writer.crlf + `        CCINTERP 32
         CHASE_CC_TAKEOFFS 1
         GUID {`+ crypto.randomUUID() + `}

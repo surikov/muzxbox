@@ -20,6 +20,13 @@ function createTrackMeasures(writer: RPPWriter, trackNo: number, project: Zvoog_
             for (let ss = 0; ss < singleChord.pitches.length; ss++) {
                 let singlePitch = singleChord.pitches[ss];
                 evnts.push({ start: duration.plus(singleChord.skip).metre(), pitch: singlePitch, startStopSLide: 1 });
+                if (singleChord.slides.length > 1 || (singleChord.slides[0].delta)) {
+                    let slidePoint = MMUtil().set(duration).plus(singleChord.skip);
+                    for (let ss = 0; ss < singleChord.slides.length; ss++) {
+                        slidePoint = slidePoint.plus(singleChord.slides[ss].duration);
+                        evnts.push({ start: slidePoint.metre(), pitch: singleChord.slides[ss].delta, startStopSLide: 3 });
+                    }
+                }
                 evnts.push({ start: duration.plus(MMUtil().set(singleChord.skip).plus(chordDuration)).metre(), pitch: singlePitch, startStopSLide: 2 });
             }
             //evnts.push({ start: duration.plus(skip).metre(), drumNum: num });
@@ -29,11 +36,19 @@ function createTrackMeasures(writer: RPPWriter, trackNo: number, project: Zvoog_
         duration = duration.plus(bar.metre);
     }
     evnts.sort((a, b) => {
-        let aa = MMUtil().set(a.start).duration(100) * 1000 + 1;
-        let bb = MMUtil().set(b.start).duration(100) * 1000;
+        let aa = Math.round(MMUtil().set(a.start).duration(100) * 1000);
+        let bb = Math.round(MMUtil().set(b.start).duration(100) * 1000);
+
+        if (a.startStopSLide == 1) aa = aa + 10;
+        if (a.startStopSLide == 2) aa = aa + 1;
+        if (a.startStopSLide == 3) aa = aa + 0;
+
+        if (b.startStopSLide == 1) bb = bb + 10;
+        if (b.startStopSLide == 2) bb = bb + 1;
+        if (b.startStopSLide == 3) bb = bb + 0;
         return aa - bb;
     });
-    //console.log(this.safeLabel(project.tracks[trackNo].title),evnts);
+    console.log(writer.safeLabel(project.tracks[trackNo].title), evnts);
 
     let trackData = `  <TRACK {` + trackGUID + `}
     NAME `+ writer.safeLabel(project.tracks[trackNo].title) + `
@@ -112,7 +127,13 @@ function createTrackMeasures(writer: RPPWriter, trackNo: number, project: Zvoog_
         if (singlEv.startStopSLide == 1) {
             trackData = trackData + writer.crlf + '        e ' + midiSkip + ' 90 ' + hex + ' 7f';
         } else {
-            trackData = trackData + writer.crlf + '        e ' + midiSkip + ' 80 ' + hex + ' 0';
+            if (singlEv.startStopSLide == 2) {
+                trackData = trackData + writer.crlf + '        e ' + midiSkip + ' 80 ' + hex + ' 0';
+            } else {
+                let sghift = Math.round(0x40-singlEv.pitch * 3).toString(16);
+                trackData = trackData + writer.crlf + '        e ' + midiSkip + ' e0 0 ' + sghift ;
+                trackData = trackData + writer.crlf + '        ENV 1 0 0';
+            }
         }
         current.set(singlEv.start);
     }
@@ -132,8 +153,8 @@ function createTrackMeasures(writer: RPPWriter, trackNo: number, project: Zvoog_
     let remains = wholeDuration.minus(current);
     let ticks = Math.round(240 * (remains.count / remains.part) / (1 / 16));
     ticks = ticks > 0 ? ticks : 0;
-    // trackData = trackData + this.crlf + `        E ` + ticks + ` b0 7b 00`;
-    //console.log(this.safeLabel(project.tracks[trackNo].title));
+    trackData = trackData + writer.crlf + `        E ` + ticks + ` b0 7b 00`;
+    //console.log(writer.safeLabel(project.tracks[trackNo].title), wholeDuration, remains,ticks);
     //console.log('wholeDuration', wholeDuration, remains);
 
     trackData = trackData + writer.crlf + `        CCINTERP 32
