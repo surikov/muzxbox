@@ -106,10 +106,10 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
   <PROJBAY
   >`;
     for (let rr = 0; rr < zvoogProject.tracks.length; rr++) {
-      body = body + this.crlf + createTrackMeasures(this,rr, zvoogProject);
+      body = body + this.crlf + createTrackMeasures(this, rr, zvoogProject);
     }
-    body = body + this.crlf + createDrumTrack(this,zvoogProject);
-    body = body + this.crlf + this.createCommentTrack(zvoogProject.title);
+    body = body + this.crlf + createDrumTrack(this, zvoogProject);
+    body = body + this.crlf + this.createCommentTrack(zvoogProject);
     body = body + this.crlf + '>';
     return body;
   }
@@ -133,8 +133,12 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
     timeData = timeData + this.crlf + '  >'
     return timeData;
   }
-  createCommentTrack(projectTitle: string): string {
+  createCommentTrack(project: Zvoog_Project): string {
     let commentTrackGuid = crypto.randomUUID();
+    let longS = project.timeline.reduce(
+      (accumulator, current) =>
+        accumulator = accumulator + MMUtil()
+          .set(current.metre).duration(current.tempo), 0);
     let commentBody = `  <TRACK {` + commentTrackGuid + `}
     NAME DAW1024
     PEAKCOL 16576
@@ -163,7 +167,7 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
     <ITEM
       POSITION 0
       SNAPOFFS 0
-      LENGTH 8
+      LENGTH `+ longS.toFixed(10) + `
       LOOP 1
       ALLTAKES 0
       FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
@@ -174,7 +178,7 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
       IID 6
       <NOTES`;
     commentBody = commentBody + this.crlf + '        |https://daw1024.com';
-    commentBody = commentBody + this.crlf + '        |' + projectTitle.replace('\n', ' ').replace('\r', ' ').replace('\'', ' ').replace('"', ' ').replace('\t', ' ');
+    commentBody = commentBody + this.crlf + '        |' + project.title.replace('\n', ' ').replace('\r', ' ').replace('\'', ' ').replace('"', ' ').replace('\t', ' ');
     commentBody = commentBody + this.crlf + `      >
       IMGRESOURCEFLAGS 8
       NOTESWND 0 43 499 440
@@ -206,6 +210,6 @@ class RPPWriter {//https://github.com/ReaTeam/Doc/blob/master/State%20Chunk%20De
   safeLabel(txt: string): string {
     return txt.replace(/[^A-Za-z0-9]/g, "_");
   }
-  
-  
+
+
 }

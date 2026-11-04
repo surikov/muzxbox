@@ -211,20 +211,20 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
 			this.setText('plugintitle', '导出 ' + exportName);
 			this.setText('btnsendmidi', '*.mid MIDI');
 			this.setText('btnsendjson', '*.json DAW1024');
-			this.setText('btnsendrpp', '*.rpp Reaper');
+			this.setText('btnsendrpp', '*.rpp Reaper v7.83');
 			this.setText('btnsendimage', '*.png image');
 		} else {
 			if (enruzhId == 'ru') {
 				this.setText('plugintitle', 'Экспорт ' + exportName);
 				this.setText('btnsendmidi', '*.mid MIDI');
 				this.setText('btnsendjson', '*.json DAW1024');
-				this.setText('btnsendrpp', '*.rpp Reaper');
+				this.setText('btnsendrpp', '*.rpp Reaper v7.83');
 				this.setText('btnsendimage', '*.png image');
 			} else {
 				this.setText('plugintitle', 'Export ' + exportName);
 				this.setText('btnsendmidi', '*.mid MIDI');
 				this.setText('btnsendjson', '*.json DAW1024');
-				this.setText('btnsendrpp', '*.rpp Reaper');
+				this.setText('btnsendrpp', '*.rpp Reaper v7.83');
 				this.setText('btnsendimage', '*.png image');
 			}
 		}

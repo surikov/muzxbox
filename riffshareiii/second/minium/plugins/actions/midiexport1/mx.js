@@ -1094,7 +1094,6 @@ function createTrackMeasures(writer, trackNo, project) {
                     let slidePoint = MMUtil().set(duration).plus(singleChord.skip);
                     for (let ss = 0; ss < singleChord.slides.length; ss++) {
                         slidePoint = slidePoint.plus(singleChord.slides[ss].duration);
-                        evnts.push({ start: slidePoint.metre(), pitch: singleChord.slides[ss].delta, startStopSLide: 3 });
                     }
                 }
                 evnts.push({ start: duration.plus(MMUtil().set(singleChord.skip).plus(chordDuration)).metre(), pitch: singlePitch, startStopSLide: 2 });
@@ -1334,7 +1333,7 @@ class RPPWriter {
             body = body + this.crlf + createTrackMeasures(this, rr, zvoogProject);
         }
         body = body + this.crlf + createDrumTrack(this, zvoogProject);
-        body = body + this.crlf + this.createCommentTrack(zvoogProject.title);
+        body = body + this.crlf + this.createCommentTrack(zvoogProject);
         body = body + this.crlf + '>';
         return body;
     }
@@ -1358,8 +1357,10 @@ class RPPWriter {
         timeData = timeData + this.crlf + '  >';
         return timeData;
     }
-    createCommentTrack(projectTitle) {
+    createCommentTrack(project) {
         let commentTrackGuid = crypto.randomUUID();
+        let longS = project.timeline.reduce((accumulator, current) => accumulator = accumulator + MMUtil()
+            .set(current.metre).duration(current.tempo), 0);
         let commentBody = `  <TRACK {` + commentTrackGuid + `}
     NAME DAW1024
     PEAKCOL 16576
@@ -1388,7 +1389,7 @@ class RPPWriter {
     <ITEM
       POSITION 0
       SNAPOFFS 0
-      LENGTH 8
+      LENGTH ` + longS.toFixed(10) + `
       LOOP 1
       ALLTAKES 0
       FADEIN 1 0 0 1 0 0 0 1 0 0 1 0 0
@@ -1399,7 +1400,7 @@ class RPPWriter {
       IID 6
       <NOTES`;
         commentBody = commentBody + this.crlf + '        |https://daw1024.com';
-        commentBody = commentBody + this.crlf + '        |' + projectTitle.replace('\n', ' ').replace('\r', ' ').replace('\'', ' ').replace('"', ' ').replace('\t', ' ');
+        commentBody = commentBody + this.crlf + '        |' + project.title.replace('\n', ' ').replace('\r', ' ').replace('\'', ' ').replace('"', ' ').replace('\t', ' ');
         commentBody = commentBody + this.crlf + `      >
       IMGRESOURCEFLAGS 8
       NOTESWND 0 43 499 440
@@ -1612,7 +1613,7 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
             this.setText('plugintitle', '导出 ' + exportName);
             this.setText('btnsendmidi', '*.mid MIDI');
             this.setText('btnsendjson', '*.json DAW1024');
-            this.setText('btnsendrpp', '*.rpp Reaper');
+            this.setText('btnsendrpp', '*.rpp Reaper v7.83');
             this.setText('btnsendimage', '*.png image');
         }
         else {
@@ -1620,14 +1621,14 @@ class MiniumMIDIx extends MZXBX_Plugin_UI {
                 this.setText('plugintitle', 'Экспорт ' + exportName);
                 this.setText('btnsendmidi', '*.mid MIDI');
                 this.setText('btnsendjson', '*.json DAW1024');
-                this.setText('btnsendrpp', '*.rpp Reaper');
+                this.setText('btnsendrpp', '*.rpp Reaper v7.83');
                 this.setText('btnsendimage', '*.png image');
             }
             else {
                 this.setText('plugintitle', 'Export ' + exportName);
                 this.setText('btnsendmidi', '*.mid MIDI');
                 this.setText('btnsendjson', '*.json DAW1024');
-                this.setText('btnsendrpp', '*.rpp Reaper');
+                this.setText('btnsendrpp', '*.rpp Reaper v7.83');
                 this.setText('btnsendimage', '*.png image');
             }
         }

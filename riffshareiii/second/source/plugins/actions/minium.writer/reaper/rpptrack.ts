@@ -24,7 +24,7 @@ function createTrackMeasures(writer: RPPWriter, trackNo: number, project: Zvoog_
                     let slidePoint = MMUtil().set(duration).plus(singleChord.skip);
                     for (let ss = 0; ss < singleChord.slides.length; ss++) {
                         slidePoint = slidePoint.plus(singleChord.slides[ss].duration);
-                        evnts.push({ start: slidePoint.metre(), pitch: singleChord.slides[ss].delta, startStopSLide: 3 });
+                        //evnts.push({ start: slidePoint.metre(), pitch: singleChord.slides[ss].delta, startStopSLide: 3 });
                     }
                 }
                 evnts.push({ start: duration.plus(MMUtil().set(singleChord.skip).plus(chordDuration)).metre(), pitch: singlePitch, startStopSLide: 2 });
