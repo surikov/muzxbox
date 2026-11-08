@@ -57,11 +57,12 @@ class ShareExportPlugin {
 									console.log('error', info);
 								}
 								, (xmlHttpRequest: XMLHttpRequest, vProgressEven: ProgressEvent) => {
-									console.log('request', xmlHttpRequest);
+									console.log('request', xmlHttpRequest, vProgressEven);
 									if (xmlHttpRequest.status == 200) {
 										let link = url + 'share/' + key + '.html';
 										console.log(link);
-										
+										this.navigatorTryShare(link);
+										/*
 										let sharedata: ShareData = { url: link };
 										navigator
 											.share(sharedata)
@@ -71,6 +72,7 @@ class ShareExportPlugin {
 											.catch((reason) => {
 												console.log('failed', reason, link);
 											});
+											*/
 										//window.open(link);
 									}
 								});
@@ -78,6 +80,34 @@ class ShareExportPlugin {
 					}
 				});
 		}
+	}
+
+	navigatorTryShare(link: string) {
+		let sharedata: ShareData = { url: link };
+		try {
+			navigator
+				.share(sharedata)
+				.then((value) => {
+					console.log('shared', value, link);
+				})
+				.catch((reason) => {
+					console.log('failed', reason, link);
+				});
+		} catch (xxx) {
+			console.log('navigatorTryShare', xxx);
+		}
+		let sharedurltxt = document.getElementById("sharedurltxt");
+		(sharedurltxt as any).innerHTML = link;
+		this.copyToClipboard(link);
+	}
+	copyToClipboard(text: string) {
+		navigator.clipboard.writeText(text)
+			.then(() => {
+				console.log('copyToClipboard', text);
+			})
+			.catch(err => {
+				console.error('copyToClipboard', text, err);
+			});
 	}
 	sendRequest(token: string, url: string, method: string, jsonOrArrayBuffer: string | ArrayBuffer
 		, onError: (info: string) => void

@@ -48,25 +48,45 @@ class ShareExportPlugin {
                         this.sendRequest('', url + 'minium/tmppreview.php?key=' + key, 'POST', this.previewArrayBuffer, (info) => {
                             console.log('error', info);
                         }, (xmlHttpRequest, vProgressEven) => {
-                            console.log('request', xmlHttpRequest);
+                            console.log('request', xmlHttpRequest, vProgressEven);
                             if (xmlHttpRequest.status == 200) {
                                 let link = url + 'share/' + key + '.html';
                                 console.log(link);
-                                let sharedata = { url: link };
-                                navigator
-                                    .share(sharedata)
-                                    .then((value) => {
-                                    console.log('shared', value, link);
-                                })
-                                    .catch((reason) => {
-                                    console.log('failed', reason, link);
-                                });
+                                this.navigatorTryShare(link);
                             }
                         });
                     }
                 }
             });
         }
+    }
+    navigatorTryShare(link) {
+        let sharedata = { url: link };
+        try {
+            navigator
+                .share(sharedata)
+                .then((value) => {
+                console.log('shared', value, link);
+            })
+                .catch((reason) => {
+                console.log('failed', reason, link);
+            });
+        }
+        catch (xxx) {
+            console.log('navigatorTryShare', xxx);
+        }
+        let sharedurltxt = document.getElementById("sharedurltxt");
+        sharedurltxt.innerHTML = link;
+        this.copyToClipboard(link);
+    }
+    copyToClipboard(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+            console.log('copyToClipboard', text);
+        })
+            .catch(err => {
+            console.error('copyToClipboard', text, err);
+        });
     }
     sendRequest(token, url, method, jsonOrArrayBuffer, onError, onDone) {
         console.log('sendRequest', url, jsonOrArrayBuffer);
