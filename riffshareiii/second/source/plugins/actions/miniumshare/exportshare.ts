@@ -97,7 +97,8 @@ class ShareExportPlugin {
 			console.log('navigatorTryShare', xxx);
 		}
 		let sharedurltxt = document.getElementById("sharedurltxt");
-		(sharedurltxt as any).innerHTML = link;
+		(sharedurltxt as any).textContent = link;
+		(sharedurltxt as any).href = link;
 		this.copyToClipboard(link);
 	}
 	copyToClipboard(text: string) {

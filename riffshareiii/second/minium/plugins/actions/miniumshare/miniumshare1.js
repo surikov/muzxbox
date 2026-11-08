@@ -77,6 +77,7 @@ class ShareExportPlugin {
         }
         let sharedurltxt = document.getElementById("sharedurltxt");
         sharedurltxt.innerHTML = link;
+        sharedurltxt.href = link;
         this.copyToClipboard(link);
     }
     copyToClipboard(text) {
