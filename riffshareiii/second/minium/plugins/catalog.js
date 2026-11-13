@@ -1,6 +1,5 @@
 "use strict";
 let _t_plugin_root_folder = './plugins/';
-_t_plugin_root_folder = 'https://daw1024.com/minium/plugins/';
 let _t_all_registerd_plugins_list = [
     {
         "label": "Examples",
@@ -113,6 +112,14 @@ let _t_all_registerd_plugins_list = [
         "ui": _t_plugin_root_folder + "actions/miniumshare/shareui.html",
         "evaluate": "",
         "script": ""
+    },
+    {
+        "label": "Minium Active Stem",
+        "purpose": "ActiveStem",
+        "kind": "miniumactivestem1",
+        "ui": _t_plugin_root_folder + "activestems/miniumactivestem/ui/ui.html",
+        "evaluate": "createMiniumActiveStem",
+        "script": _t_plugin_root_folder + "activestems/miniumactivestem/audio/prg.js"
     }
 ];
 function MZXBX_currentPlugins() {

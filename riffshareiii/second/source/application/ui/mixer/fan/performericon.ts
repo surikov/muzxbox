@@ -1,6 +1,6 @@
 class PerformerIcon {
 	performerId: string;
-	
+
 	constructor(performerId: string) {
 		this.performerId = performerId;
 
@@ -47,7 +47,7 @@ class PerformerIcon {
 			x: xx - sz / 2, y: yy - sz / 2
 			, w: sz, h: sz
 		};
-		
+
 		//console.log(this.performerFocusRetangle);
 		let showSoloOnly = false;
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
@@ -170,10 +170,19 @@ class PerformerIcon {
 			if (track.performer.state == 1) dragSamplerCss = 'fanSamplerMoveIconDisabled';
 			//rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
 			itemrec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
+			if (zidx < 4) {
+				let interSamplerCss = 'fanSamplerInteractionIcon';
+				itemrec.css = interSamplerCss + ' fanButton' + zidx;
+				itemrec.activation = (x: number, y: number) => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+					globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, track, info);
+				}
+				itemrec.draggable = false;
+			}
 		} else {
 			itemrec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
-		
+
 		dragAnchor.content.push(itemrec);
 		spearsAnchor.content.push({
 			x: xx - sz / 2 + sz * 0.05, y: yy - sz / 2 + sz * 0.05
@@ -182,26 +191,26 @@ class PerformerIcon {
 		});
 
 
-
-		if (zidx < 5) {
-			let interSamplerCss = 'fanSamplerInteractionIcon';
-			if (track.performer.state == 0 && showSoloOnly) interSamplerCss = 'fanSamplerInterDisabledIcon';
-			if (track.performer.state == 1) interSamplerCss = 'fanSamplerInterDisabledIcon';
-			let btn: TileRectangle = {
-				x: xx - sz / 2
-				, y: yy
-				, w: sz
-				, h: sz / 2
-				//, css: 'fanSamplerInteractionIcon fanButton' + zidx
-				, css: interSamplerCss + ' fanButton' + zidx
-				, activation: (x: number, y: number) => {
-					//console.log('open',farNo, trackNo, track.title);
-					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
-					globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, track, info);
-				}
-			};
-			dragAnchor.content.push(btn);
-		}
+		/*
+				if (zidx < 5) {
+					let interSamplerCss = 'fanSamplerInteractionIcon';
+					if (track.performer.state == 0 && showSoloOnly) interSamplerCss = 'fanSamplerInterDisabledIcon';
+					if (track.performer.state == 1) interSamplerCss = 'fanSamplerInterDisabledIcon';
+					let btn: TileRectangle = {
+						x: xx - sz / 2
+						, y: yy
+						, w: sz
+						, h: sz / 2
+						//, css: 'fanSamplerInteractionIcon fanButton' + zidx
+						, css: interSamplerCss + ' fanButton' + zidx
+						, activation: (x: number, y: number) => {
+							//console.log('open',farNo, trackNo, track.title);
+							let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
+							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, track, info);
+						}
+					};
+					dragAnchor.content.push(btn);
+				}*/
 		if (zidx <= 5) {//} globalCommandDispatcher.cfg().zoomEditSLess) {
 			let labelSamplerCss = 'fanIconLabel';
 			if (track.performer.state == 0 && showSoloOnly) labelSamplerCss = 'fanDisabledLabel';
@@ -255,6 +264,6 @@ class PerformerIcon {
 			}
 		}
 	}
-	
+
 }
 

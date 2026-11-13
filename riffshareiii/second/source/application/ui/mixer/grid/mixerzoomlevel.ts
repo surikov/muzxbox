@@ -24,7 +24,7 @@ class MixerZoomLevel {
 			let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
 			if (!(timebar)) {
 				timebar = {
-					tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+					tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 				}
 			}
 			width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;

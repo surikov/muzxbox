@@ -228,7 +228,7 @@ class MixerDataMathUtility {
 			let timebar = this.data.timeline[ii];
 			if (!(timebar)) {
 				timebar = {
-					tempo: 120, metre: { count: 4, part: 4 }
+					tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
 					//, modality: { step: { step: 0, shift: 0 }, mode: { tonic: 0, second: 0, third: 0, sixth: 0, seventh: 0 }, hint: '' }
 				}
 			}

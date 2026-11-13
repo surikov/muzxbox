@@ -135,7 +135,15 @@ class FilterIcon {
 			} else {
 				rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
 			}
-
+			if (zidx < 4) {
+				let cssstring: string = 'fanSamplerInteractionIcon fanButton' + zidx;
+				rec.css = cssstring;
+				rec.draggable = false;
+				rec.activation = (x: number, y: number) => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(filterTarget.kind);
+					globalCommandDispatcher.filterPluginDialog.openFilterPluginDialogFrame(order, filterTarget, info);
+				}
+			}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -147,7 +155,7 @@ class FilterIcon {
 			, h: sz * 0.9
 			, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
 		});
-		if (zidx < 5) {
+		/*if (zidx < 5) {
 			let px: number = globalCommandDispatcher.renderer.tiler.tapPxSize();
 			//let url: string = MZXBX_currentPlugins()[order].ui;
 			let cssstring: string = 'fanSamplerInteractionIcon fanButton' + zidx;
@@ -169,7 +177,7 @@ class FilterIcon {
 				}
 			};
 			dragAnchor.content.push(btn);
-		}
+		}*/
 		if (zidx <= 5) {// globalCommandDispatcher.cfg().zoomEditSLess) {
 			//let txt: TileText = { text: filterTarget.kind + ':' + filterTarget.id, x: xx, y: yy, css: 'fanIconLabel' };
 			let txt: TileText = {

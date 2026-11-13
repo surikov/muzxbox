@@ -72,6 +72,13 @@ type Zvoog_AudioSampler = {
 	state: 0 | 1 | 2;//on|mute|solo
 	hint35_81: number;
 };
+type Zvoog_Arpeggiator = {
+	id: string;
+	data: string;
+	kind: string;
+	iconPosition: { x: number, y: number };
+	state: 0 | 1 | 2;//on|mute|solo
+};
 type Zvoog_Chord = {
 	skip: Zvoog_Metre;
 	//notes: Zvoog_Note[];
@@ -84,6 +91,13 @@ type Zvoog_TrackMeasure = {
 };
 type Zvoog_PercussionMeasure = {
 	skips: Zvoog_Metre[];
+};
+type Zvoog_PatternPoint = {
+	skip: Zvoog_Metre;
+	duration: Zvoog_Metre;
+};
+type Zvoog_PatternMeasure = {
+	points: Zvoog_PatternPoint[];
 };
 /*
 type Zvoog_ChordStep = {
@@ -106,6 +120,7 @@ type Zvoog_SongMeasure = {
 	tempo: number;
 	metre: Zvoog_Metre;
 	//modality: Zvoog_ChordMode;
+	chordNameHint: string;
 };
 /*
 type Zvoog_AutomationTrack = {
@@ -127,6 +142,11 @@ type Zvoog_PercussionTrack = {
 	measures: Zvoog_PercussionMeasure[];
 	sampler: Zvoog_AudioSampler;
 	//volume: number;
+};
+type Zvoog_PatternTrack = {
+	title: string;
+	measures: Zvoog_PatternMeasure[];
+	arpeggiator: Zvoog_Arpeggiator;
 };
 type Zvoog_MusicTrack = {
 	title: string;
@@ -186,9 +206,9 @@ type Zvoog_Action = DifferenceCreate | DifferenceRemove | DifferenceChange;
 
 type Zvoog_UICommand = {
 	position: {
-		x: number,
-		y: number,
-		z: number
+		x: number
+		, y: number
+		, z: number
 	};
 	actions: Zvoog_Action[];
 };
@@ -199,9 +219,11 @@ type Zvoog_Project = {
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
 	farorder: number[];
+	modeNameHint: '';
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
+	patterns: Zvoog_PatternTrack[];
 	selectedPart: Zvoog_Selection;
 	position: {
 		x: number;
@@ -311,6 +333,10 @@ type MZXBX_ChannelSampler = {
 	properties: string;
 };
 */
+type MZXBX_ActivePatternPlugin = {
+	launch: (parameters: string, base: Zvoog_Project) => Zvoog_Project;
+	busy: () => null | string;
+};
 type MZXBX_AudioSamplerPlugin = {
 	launch: (context: AudioContext, parameters: string) => number;
 	busy: () => null | string;
@@ -368,7 +394,7 @@ enum MZXBX_PluginPurpose {
 type MZXBX_PluginRegistrationInformation = {
 	label: string
 	, kind: string
-	, purpose: 'Action' | 'Filter' | 'Sampler' | 'Performer'
+	, purpose: 'Action' | 'Filter' | 'Sampler' | 'Performer' | 'ActiveStem'
 	, ui: string
 	, evaluate: string
 	, script: string
@@ -399,7 +425,7 @@ type MZXBX_MessageToHost = {
 };
 
 declare function MZXBX_waitForCondition(sleepMs: number, isDone: () => boolean, onFinish: () => void): void;
-declare function MZXBX_loadCachedBuffer(audioContext: AudioContext,path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
+declare function MZXBX_loadCachedBuffer(audioContext: AudioContext, path: string, onDone: (cachedWave: MZXBX_CachedWave) => void): void;
 declare function MZXBX_appendScriptURL(url: string): boolean;
 declare function MMUtil(): Zvoog_MetreMathType;
 declare function MZXBX_currentPlugins(): MZXBX_PluginRegistrationInformation[];

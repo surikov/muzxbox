@@ -23,7 +23,7 @@
 	},
 	"files": [
 		"../mzxbxapi/musicenginetypes.ts",
-		"../mzxbxapi/musicenginedeclarations.ts",
+		//"../mzxbxapi/musicenginedeclarations.ts",
 		"./code/main.ts",
 		"./code/player.ts",
 		"./code/loader.ts"

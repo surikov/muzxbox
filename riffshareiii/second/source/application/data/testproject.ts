@@ -5,20 +5,21 @@ function createNewEmptyProjectData(): Zvoog_Project {
 		, versionCode: '1'
 		, farorder: []
 		, list: false
+		, modeNameHint: ''
 		, selectedPart: { startMeasure: -1, endMeasure: -1 }
 		, position: { x: 0, y: -0, z: 33 }
 		, timeline: [
 			{
-				tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 
 		]
@@ -29,6 +30,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 				, performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0, hint1_128: 0 }
 			}
 		]
+		, patterns: []
 		, percussions: []
 		, comments: []
 		, filters: []
@@ -53,44 +55,45 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 	, versionCode: '1'
 	, list: false
 	, farorder: []
+	, modeNameHint: ''
 	, selectedPart: { startMeasure: 1, endMeasure: 1 }
 	//, undo: []
 	//, redo: []
 	, position: { x: -13037.9, y: -1317.9, z: 4.7 }
 	, timeline: [
 		{
-			tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+			tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
 		}
 		, {
-			tempo: 120, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
-		}
-
-		, {
-			tempo: 200, metre: { count: 3, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
-		}
-		, {
-			tempo: 180, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+			tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
 		}
 
 		, {
-			tempo: 200, metre: { count: 3, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+			tempo: 200, metre: { count: 3, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 		}
 		, {
-			tempo: 180, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
-		}
-
-		, {
-			tempo: 200, metre: { count: 3, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
-		}
-		, {
-			tempo: 180, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+			tempo: 180, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 		}
 
 		, {
-			tempo: 200, metre: { count: 3, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+			tempo: 200, metre: { count: 3, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
 		}
 		, {
-			tempo: 180, metre: { count: 4, part: 4 }//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+			tempo: 180, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+		}
+
+		, {
+			tempo: 200, metre: { count: 3, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+		}
+		, {
+			tempo: 180, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+		}
+
+		, {
+			tempo: 200, metre: { count: 3, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+		}
+		, {
+			tempo: 180, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 		}
 	]
 	, tracks: [
@@ -264,6 +267,7 @@ let _______mzxbxProjectForTesting2: Zvoog_Project = {
 		, { id: 'track2Volme', title: 'tg1', kind: 'zvolume1', data: '99', outputs: ['volumeSlide'], iconPosition: { x: 102, y: 64 }, automation: [], state: 0 }
 		, { id: 'track3Echo', title: 't1h', kind: 'zvecho1', data: '100', outputs: ['volumeSlide'], iconPosition: { x: 72, y: 30 }, automation: [], state: 0 }
 	]
+	, patterns: []
 	/*
 	, automations: [
 		{ output: 'masterVolme', title: 'test1122', measures: [{ changes: [] }, { changes: [] }, { changes: [{ skip: { count: 1, part: 16 }, stateBlob: 's1' }, { skip: { count: 2, part: 16 }, stateBlob: 's1' }, { skip: { count: 3, part: 16 }, stateBlob: 's1' }, { skip: { count: 4, part: 16 }, stateBlob: 's1' }, { skip: { count: 5, part: 16 }, stateBlob: 's1' }, { skip: { count: 6, part: 16 }, stateBlob: 's1' }, { skip: { count: 7, part: 16 }, stateBlob: 's1' }] }, { changes: [] }] }

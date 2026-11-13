@@ -154,7 +154,15 @@ class SamplerIcon {
 			}
 			//rec.css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
 			rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
-
+			if (zidx < 4) {
+				let interSamplerCss = 'fanSamplerInteractionIcon';
+				rec.css = interSamplerCss + ' fanButton' + zidx;
+				rec.activation = (x: number, y: number) => {
+					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
+					globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(percnum, samplerTrack, info);
+				}
+				rec.draggable = false;
+			}
 		} else {
 			rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
 		}
@@ -165,7 +173,7 @@ class SamplerIcon {
 			, dots: [0, 0, sz * 2 * 0.8 * 0.9, sz * 0.9, 0, sz * 2 * 0.9]
 			, css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
 		});
-		if (zidx < 5) {
+		/*if (zidx < 4) {
 			let interSamplerCss = 'fanSamplerInteractionIcon';
 			if (samplerTrack.sampler.state == 0 && showSoloOnly) interSamplerCss = 'fanSamplerInterDisabledIcon';
 			if (samplerTrack.sampler.state == 1) interSamplerCss = 'fanSamplerInterDisabledIcon';
@@ -184,7 +192,7 @@ class SamplerIcon {
 				}
 			};
 			dragAnchor.content.push(btn);
-		}
+		}*/
 
 		if (zidx <= 5) {//} globalCommandDispatcher.cfg().zoomEditSLess) {
 			let labelSamplerCss = 'fanIconLabel';

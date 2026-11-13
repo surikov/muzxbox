@@ -18,7 +18,7 @@ type MenuInfo = {
 	highlight?: string;
 	menuTop?: number;
 	url?: string;
-	itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
+	itemKind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14;
 };
 
 let menuItemsData: MenuInfo[] | null = null;
@@ -323,6 +323,7 @@ function fillClipboardList() {
 				timebar = {
 					tempo: 120, metre: { count: 4, part: 4 }
 					//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
+					, chordNameHint: ''
 				}
 			}
 			pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -601,6 +602,253 @@ function setProjectPositionFanArea() {
 	}
 	globalCommandDispatcher.cfg().data.position = position;
 }
+function addMenuItemAction(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
+	return {
+		text: reg.label, noLocalization: true, onClick: () => {
+			globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(reg);
+		}
+		, itemKind: kindAction
+	};
+}
+function addMenuItemSampler(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
+	let info: MenuInfo = { text: reg.label, noLocalization: true, itemKind: kindDraggableTriangle };
+	let tri: TilePolygon = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
+	let fotri: TilePolygon = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
+	let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (dx: number, yy: number) => {
+		globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+			let samplerNo = findSamplerIdxByXYcurZ(dx, yy);
+			let xx = dx;
+			if (xx < globalCommandDispatcher.cfg().padGridFan) {
+				xx = globalCommandDispatcher.cfg().padGridFan;
+			}
+			if (samplerNo > -1) {
+				let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+				toSamplerTrack.sampler.kind = reg.kind;
+				toSamplerTrack.sampler.data = '';
+				toSamplerTrack.sampler.id = '' + Math.random();
+				let info = globalCommandDispatcher.findPluginRegistrationByKind(toSamplerTrack.sampler.kind);
+				globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(samplerNo, toSamplerTrack, info);
+				globalCommandDispatcher.player.clearPluginsCache();
+				globalCommandDispatcher.reStartPlayIfPlay();//true);
+			} else {
+				globalCommandDispatcher.cfg().data.percussions.push({
+					sampler: {
+						id: '' + Math.random()
+						, kind: reg.kind
+						, data: ''
+						, outputs: ['']
+						, iconPosition: { x: xx, y: yy }
+						, state: 0
+						, hint35_81: 0
+					}
+					, measures: []
+					, title: reg.label
+				});
+				setProjectPositionFanArea();
+				globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+			}
+
+			refreshMixerItemFocus.currentID = -1;
+			globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+
+			globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+
+		});
+	}, (dx: number, dy: number, zz: number) => {
+		refreshMixerItemFocus.start(200, () => {
+			let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
+			if (samplerNo > -1) {
+				let toSamplerTrack: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+				let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+				let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+				let sz = globalCommandDispatcher.cfg().fanPluginIconSize
+					(zoomIndexFromZoom
+						(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+					/ xyz.z;
+				let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+				if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+					left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+				}
+				let top = globalCommandDispatcher.cfg().gridTop();
+				if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+					top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+				}
+				let fx = left + toSamplerTrack.sampler.iconPosition.x + xyz.x / tapPx;
+				let fy = top + toSamplerTrack.sampler.iconPosition.y + xyz.y / tapPx;
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [fotri];
+				fotri.x = fx / xyz.z - sz * 0.75;
+				fotri.y = fy / xyz.z - sz * 0.75;
+				fotri.dots = [0 * sz, -0.5 * sz, 2 * sz, 0.75 * sz, 0 * sz, 2 * sz];
+			} else {
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+			}
+
+
+			globalCommandDispatcher.renderer.tiler.resetAnchor(
+				globalCommandDispatcher.renderer.menu.menuPanelInteraction
+				, globalCommandDispatcher.renderer.menu.focusTargetAnchor
+				, LevelModes.overlay);
+
+		});
+	}, (zz: number) => { });
+	info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+	//menuPointChildren.push(info);
+	return info;
+}
+function addMenuItemPerformer(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
+	let info: MenuInfo = { text: reg.label, noLocalization: true, itemKind: kindDraggableSquare };
+	let square: TileRectangle = {
+		x: 0, y: 0
+		, w: 1, h: 1
+		, rx: 1 / 20, ry: 1 / 20
+		, css: 'rectangleDragItem'
+	};
+	let focusSquare: TileRectangle = {
+		x: 0, y: 0
+		, w: 2, h: 2
+		, rx: 1 / 20, ry: 1 / 20
+		, css: 'rectangleDragFocus'
+	};
+	let dragger: DragMenuItemUtil = new DragMenuItemUtil(square, info, (dx: number, dy: number) => {
+
+		let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+		if (trackNo > -1) {
+			let toPerformerTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
+			globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+				toPerformerTrack.performer.kind = reg.kind;
+				toPerformerTrack.performer.data = '';
+				toPerformerTrack.performer.id = '' + Math.random();
+			});
+			let farNo = 0;
+			let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
+			for (let ff = 0; ff < farorder.length; ff++) {
+				if (farorder[ff] == trackNo) {
+					farNo = ff;
+					break;
+				}
+			}
+			let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
+			globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
+
+			globalCommandDispatcher.player.clearPluginsCache();
+			globalCommandDispatcher.reStartPlayIfPlay();//true);
+		} else {
+
+			let xx = dx;
+
+			if (xx < globalCommandDispatcher.cfg().padGridFan) {
+				xx = globalCommandDispatcher.cfg().padGridFan;
+			}
+
+			globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
+				globalCommandDispatcher.cfg().data.tracks.push({
+					performer: {
+						id: '' + Math.random()
+						, kind: reg.kind
+						, data: ''
+						, outputs: ['']
+						, iconPosition: { x: xx, y: dy }
+						, state: 0
+						, hint1_128: 0
+					}
+					, measures: []
+					, title: reg.label
+				});
+
+				setProjectPositionFanArea();
+				globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+			});
+		}
+		refreshMixerItemFocus.currentID = -1;
+
+		globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+
+		globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+
+	}, (dx: number, dy: number, zz: number) => {
+		refreshMixerItemFocus.start(200, () => {
+			let trackNo = findPerformerIdxByXYcurZ(dx, dy);
+			if (trackNo > -1) {
+				let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
+				let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+
+
+				let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+
+				let sz = globalCommandDispatcher.cfg().fanPluginIconSize
+					(zoomIndexFromZoom
+						(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+					/ xyz.z;
+				let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+				if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+					left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+				}
+
+				let top = globalCommandDispatcher.cfg().gridTop();
+
+				if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+
+					top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+				}
+				let fx = left + toPerformerTrack.performer.iconPosition.x + xyz.x / tapPx;
+				let fy = top + toPerformerTrack.performer.iconPosition.y + xyz.y / tapPx;
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [focusSquare];
+				focusSquare.x = fx / xyz.z - sz * 0.75;
+				focusSquare.y = fy / xyz.z - sz * 0.75;
+				focusSquare.w = sz * 1.5;
+				focusSquare.h = sz * 1.5;
+				focusSquare.rx = sz * 1.5 / 20;
+				focusSquare.ry = sz * 1.5 / 20
+
+			} else {
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+			}
+
+			globalCommandDispatcher.renderer.tiler.resetAnchor(
+				globalCommandDispatcher.renderer.menu.menuPanelInteraction
+				, globalCommandDispatcher.renderer.menu.focusTargetAnchor
+				, LevelModes.overlay);
+		});
+
+	}, (zz: number) => { });
+	info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+	//menuPointAddPlugin.children.push(info);
+	return info;
+}
+function addMenuItemFilter(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
+	let info: MenuInfo = { text: reg.label, noLocalization: true, itemKind: kindDraggableCircle };
+	let circle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
+
+	let dragger: DragMenuItemUtil = new DragMenuItemUtil(circle, info, (dx: number, yy: number) => {
+
+		let xx = dx;
+		if (xx < globalCommandDispatcher.cfg().padGridFan) {
+			xx = globalCommandDispatcher.cfg().padGridFan;
+		}
+		globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+			globalCommandDispatcher.cfg().data.filters.push({
+				id: '' + Math.random()
+				, kind: reg.kind
+				, data: ''
+				, outputs: ['']
+				, automation: []
+				, iconPosition: { x: xx, y: yy }
+				, state: 0
+				, title: reg.label
+			});
+			setProjectPositionFanArea();
+			globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+		});
+	}, null, (zz: number) => { });
+	info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+	//menuPointAddPlugin.children.push(info);
+	return info;
+}
+function addMenuItemStem(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
+	let info: MenuInfo = { text: reg.label, noLocalization: true, itemKind: kindDraggableDiamond };
+
+	return info;
+}
 function fillPluginsLists() {
 	menuPointAddPlugin.children = [];
 	menuPointActions.children = [];
@@ -609,101 +857,104 @@ function fillPluginsLists() {
 		let purpose: string = MZXBX_currentPlugins()[ii].purpose;
 		//console.log(ii,purpose,label);
 		if (purpose == 'Action') {
-			menuPointActions.children.push({
+			menuPointActions.children.push(addMenuItemAction(MZXBX_currentPlugins()[ii]));
+			/*menuPointActions.children.push({
 				text: label, noLocalization: true, onClick: () => {
 					globalCommandDispatcher.actionPluginDialog.openActionPluginDialogFrame(MZXBX_currentPlugins()[ii]);
 				}
 				, itemKind: kindAction
-			});
+			});*/
 		} else {
 			if (purpose == 'Sampler') {
-				let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
-				let tri: TilePolygon = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
-				let fotri: TilePolygon = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
-				let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (dx: number, yy: number) => {
-					globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-						let samplerNo = findSamplerIdxByXYcurZ(dx, yy);
-						let xx = dx;
-						if (xx < globalCommandDispatcher.cfg().padGridFan) {
-							xx = globalCommandDispatcher.cfg().padGridFan;
-						}
-						if (samplerNo > -1) {
-							let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
-							toSamplerTrack.sampler.kind = MZXBX_currentPlugins()[ii].kind;
-							toSamplerTrack.sampler.data = '';
-							toSamplerTrack.sampler.id = '' + Math.random();
-							let info = globalCommandDispatcher.findPluginRegistrationByKind(toSamplerTrack.sampler.kind);
-							globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(samplerNo, toSamplerTrack, info);
-							//farNo, trackNo, toPerformerTrack, info);
-							//console.log('replace sampler track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
-							globalCommandDispatcher.player.clearPluginsCache();
-							globalCommandDispatcher.reStartPlayIfPlay();//true);
-						} else {
-							globalCommandDispatcher.cfg().data.percussions.push({
-								sampler: {
-									id: '' + Math.random()
-									, kind: MZXBX_currentPlugins()[ii].kind
-									, data: ''
-									, outputs: ['']
-									, iconPosition: { x: xx, y: yy }
-									, state: 0
-									, hint35_81: 0
-								}
-								, measures: []
-								, title: MZXBX_currentPlugins()[ii].label
-							});
-							setProjectPositionFanArea();
-							globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
-						}
-
-						refreshMixerItemFocus.currentID = -1;
-						globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
-						//square.css = 'rectangleDragItem';
-						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
-
-					});
-				}, (dx: number, dy: number, zz: number) => {
-					refreshMixerItemFocus.start(200, () => {
-						let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
-						if (samplerNo > -1) {
-							let toSamplerTrack: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
-							let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
-							let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
-							let sz = globalCommandDispatcher.cfg().fanPluginIconSize
-								(zoomIndexFromZoom
-									(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
-								/ xyz.z;
-							let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
-							if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
-								left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
-							}
-							let top = globalCommandDispatcher.cfg().gridTop();
-							if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
-								top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
-							}
-							let fx = left + toSamplerTrack.sampler.iconPosition.x + xyz.x / tapPx;
-							let fy = top + toSamplerTrack.sampler.iconPosition.y + xyz.y / tapPx;
-							globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [fotri];
-							fotri.x = fx / xyz.z - sz * 0.75;
-							fotri.y = fy / xyz.z - sz * 0.75;
-							fotri.dots = [0 * sz, -0.5 * sz, 2 * sz, 0.75 * sz, 0 * sz, 2 * sz];
-						} else {
-							globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
-						}
-
-
-						globalCommandDispatcher.renderer.tiler.resetAnchor(
-							globalCommandDispatcher.renderer.menu.menuPanelInteraction
-							, globalCommandDispatcher.renderer.menu.focusTargetAnchor
-							, LevelModes.overlay);
-
-					});
-				}, (zz: number) => { });
-				info.onMenuItemDrag = dragger.doDrag.bind(dragger);
-				menuPointAddPlugin.children.push(info);
+				menuPointAddPlugin.children.push(addMenuItemSampler(MZXBX_currentPlugins()[ii]));
+				/*
+								let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableTriangle };
+								let tri: TilePolygon = { x: 0, y: 0, dots: [0, 0, 2 * 0.8 * 0.9, 0.9, 0, 2 * 0.9], css: 'rectangleDragItem' };
+								let fotri: TilePolygon = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
+								let dragger: DragMenuItemUtil = new DragMenuItemUtil(tri, info, (dx: number, yy: number) => {
+									globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+										let samplerNo = findSamplerIdxByXYcurZ(dx, yy);
+										let xx = dx;
+										if (xx < globalCommandDispatcher.cfg().padGridFan) {
+											xx = globalCommandDispatcher.cfg().padGridFan;
+										}
+										if (samplerNo > -1) {
+											let toSamplerTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+											toSamplerTrack.sampler.kind = MZXBX_currentPlugins()[ii].kind;
+											toSamplerTrack.sampler.data = '';
+											toSamplerTrack.sampler.id = '' + Math.random();
+											let info = globalCommandDispatcher.findPluginRegistrationByKind(toSamplerTrack.sampler.kind);
+											globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(samplerNo, toSamplerTrack, info);
+											globalCommandDispatcher.player.clearPluginsCache();
+											globalCommandDispatcher.reStartPlayIfPlay();//true);
+										} else {
+											globalCommandDispatcher.cfg().data.percussions.push({
+												sampler: {
+													id: '' + Math.random()
+													, kind: MZXBX_currentPlugins()[ii].kind
+													, data: ''
+													, outputs: ['']
+													, iconPosition: { x: xx, y: yy }
+													, state: 0
+													, hint35_81: 0
+												}
+												, measures: []
+												, title: MZXBX_currentPlugins()[ii].label
+											});
+											setProjectPositionFanArea();
+											globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+										}
+				
+										refreshMixerItemFocus.currentID = -1;
+										globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+				
+										globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+				
+									});
+								}, (dx: number, dy: number, zz: number) => {
+									refreshMixerItemFocus.start(200, () => {
+										let samplerNo = findSamplerIdxByXYcurZ(dx, dy);
+										if (samplerNo > -1) {
+											let toSamplerTrack: Zvoog_PercussionTrack = globalCommandDispatcher.cfg().data.percussions[samplerNo];
+											let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+											let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+											let sz = globalCommandDispatcher.cfg().fanPluginIconSize
+												(zoomIndexFromZoom
+													(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+												/ xyz.z;
+											let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+											if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+												left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+											}
+											let top = globalCommandDispatcher.cfg().gridTop();
+											if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+												top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+											}
+											let fx = left + toSamplerTrack.sampler.iconPosition.x + xyz.x / tapPx;
+											let fy = top + toSamplerTrack.sampler.iconPosition.y + xyz.y / tapPx;
+											globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [fotri];
+											fotri.x = fx / xyz.z - sz * 0.75;
+											fotri.y = fy / xyz.z - sz * 0.75;
+											fotri.dots = [0 * sz, -0.5 * sz, 2 * sz, 0.75 * sz, 0 * sz, 2 * sz];
+										} else {
+											globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+										}
+				
+				
+										globalCommandDispatcher.renderer.tiler.resetAnchor(
+											globalCommandDispatcher.renderer.menu.menuPanelInteraction
+											, globalCommandDispatcher.renderer.menu.focusTargetAnchor
+											, LevelModes.overlay);
+				
+									});
+								}, (zz: number) => { });
+								info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+								menuPointAddPlugin.children.push(info);
+								*/
 			} else {
 				if (purpose == 'Performer') {
-
+					menuPointAddPlugin.children.push(addMenuItemPerformer(MZXBX_currentPlugins()[ii]));
+					/*
 					let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableSquare };
 					let square: TileRectangle = {
 						x: 0, y: 0
@@ -737,22 +988,16 @@ function fillPluginsLists() {
 							}
 							let info = globalCommandDispatcher.findPluginRegistrationByKind(toPerformerTrack.performer.kind);
 							globalCommandDispatcher.sequencerPluginDialog.openSequencerPluginDialogFrame(farNo, trackNo, toPerformerTrack, info);
-							//console.log('replace performer track', toPerformerTrack.performer.iconPosition.x, toPerformerTrack.performer.iconPosition.y, 'at', dx, dy);
+
 							globalCommandDispatcher.player.clearPluginsCache();
 							globalCommandDispatcher.reStartPlayIfPlay();//true);
 						} else {
 
 							let xx = dx;
-							/*console.log('drop x', xx
-								, 'screen left', globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().x / globalCommandDispatcher.renderer.tiler.tapPxSize()
-								, 'padGridFan', globalCommandDispatcher.cfg().padGridFan
-								, 'fan left', globalCommandDispatcher.cfg().fanPluginLeft()
-							);*/
+
 							if (xx < globalCommandDispatcher.cfg().padGridFan) {
 								xx = globalCommandDispatcher.cfg().padGridFan;
 							}
-							//console.log(position.x, -globalCommandDispatcher.cfg().padGridFan * globalCommandDispatcher.renderer.tiler.tapPxSize(),globalCommandDispatcher.cfg().padGridFan);
-
 
 							globalCommandDispatcher.exe.commitProjectChanges(['tracks'], () => {
 								globalCommandDispatcher.cfg().data.tracks.push({
@@ -768,15 +1013,7 @@ function fillPluginsLists() {
 									, measures: []
 									, title: MZXBX_currentPlugins()[ii].label
 								});
-								/*let position = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
-								if (position.x > -globalCommandDispatcher.cfg().timelineWidth() * globalCommandDispatcher.renderer.tiler.tapPxSize()) {
-									position = {
-										x: -globalCommandDispatcher.cfg().timelineWidth() * globalCommandDispatcher.renderer.tiler.tapPxSize()
-										, y: position.y
-										, z: position.z
-									};
-								}
-								globalCommandDispatcher.cfg().data.position = position;*/
+
 								setProjectPositionFanArea();
 								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
 							});
@@ -784,21 +1021,19 @@ function fillPluginsLists() {
 						refreshMixerItemFocus.currentID = -1;
 
 						globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
-						//square.css = 'rectangleDragItem';
-						//console.log('done drop 1');
+
 						globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
-						//console.log('done drop 2');
+
 					}, (dx: number, dy: number, zz: number) => {
 						refreshMixerItemFocus.start(200, () => {
 							let trackNo = findPerformerIdxByXYcurZ(dx, dy);
 							if (trackNo > -1) {
 								let toPerformerTrack: Zvoog_MusicTrack = globalCommandDispatcher.cfg().data.tracks[trackNo];
 								let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
-								//console.log('drag over', toPerformerTrack.title);
-								//console.log('xyz', globalCommandDispatcher.renderer.tiler.getCurrentPointPosition());
-								//console.log('icon', toPerformerTrack.performer.iconPosition);
+
+
 								let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
-								//focusSquare.css = 'rectangleDragFocus';
+
 								let sz = globalCommandDispatcher.cfg().fanPluginIconSize
 									(zoomIndexFromZoom
 										(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
@@ -807,11 +1042,11 @@ function fillPluginsLists() {
 								if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
 									left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
 								}
-								//console.log('left', left * globalCommandDispatcher.renderer.tiler.tapPxSize());
+
 								let top = globalCommandDispatcher.cfg().gridTop();
-								//console.log(window.innerHeight / tapPx, globalCommandDispatcher.cfg().wholeHeight() / xyz.z);
+
 								if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
-									//console.log('reset top');
+
 									top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
 								}
 								let fx = left + toPerformerTrack.performer.iconPosition.x + xyz.x / tapPx;
@@ -823,11 +1058,8 @@ function fillPluginsLists() {
 								focusSquare.h = sz * 1.5;
 								focusSquare.rx = sz * 1.5 / 20;
 								focusSquare.ry = sz * 1.5 / 20
-								//console.log(focusSquare);
+
 							} else {
-								//console.log('drag anywhere');
-								//focusSquare.css = 'rectangleDragItem';
-								//globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
 								globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
 							}
 
@@ -839,81 +1071,46 @@ function fillPluginsLists() {
 
 					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);
-					menuPointAddPlugin.children.push(info);
+					menuPointAddPlugin.children.push(info);*/
 				} else {
 					if (purpose == 'Filter') {
-						let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
-						let circle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
-						//let focuscircle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragFocus' };
-						let dragger: DragMenuItemUtil = new DragMenuItemUtil(circle, info, (dx: number, yy: number) => {
-							//let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-							let xx = dx;
-							if (xx < globalCommandDispatcher.cfg().padGridFan) {
-								xx = globalCommandDispatcher.cfg().padGridFan;
-							}
-							globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-								globalCommandDispatcher.cfg().data.filters.push({
-									id: '' + Math.random()
-									, kind: MZXBX_currentPlugins()[ii].kind
-									, data: ''
-									, outputs: ['']
-									, automation: []
-									, iconPosition: { x: xx, y: yy }
-									, state: 0
-									, title: MZXBX_currentPlugins()[ii].label
-								});
-								setProjectPositionFanArea();
-								globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
-							});
-						}, null, (zz: number) => { });
-						info.onMenuItemDrag = dragger.doDrag.bind(dragger);
-						menuPointAddPlugin.children.push(info);
-						/*let dragStarted = false;
-						let info: MenuInfo;
-						info = {
-							text: label
-							, noLocalization: true
-							, onDrag: (x: number, y: number) => {
-								if (!dragStarted) {
-									let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
-									let ss = globalCommandDispatcher.renderer.menu.scrollY;
-									let tt = info.menuTop ? info.menuTop : 0;
-									let yy = (tt + ss - 0.0) * zz;
-									let xx = (1 + globalCommandDispatcher.renderer.menu.shiftX) * zz;
-									dragStarted = true;
-									globalCommandDispatcher.hideRightMenu();
-									let sz = 1;
-									globalCommandDispatcher.renderer.menu.showDragMenuItem(xx, yy, {
-										x: 0, y: 0
-										, w: sz, h: sz
-										, rx: sz / 2, ry: sz / 2
-										, css: 'rectangleDragItem'
-									});
-								}
-								globalCommandDispatcher.renderer.menu.moveDragMenuItem(x, y);
-								if (x == 0 && y == 0) {
-									dragStarted = false;
-									let newPos = globalCommandDispatcher.renderer.menu.hideDragMenuItem();
-									globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
-										globalCommandDispatcher.cfg().data.filters.push({
-											id: '' + Math.random()
-											, kind: MZXBX_currentPlugins()[ii].kind
-											, data: ''
-											, outputs: ['']
-											, automation: []
-											, iconPosition: newPos
-											, state: 0
-											, title: MZXBX_currentPlugins()[ii].label
-										});
-										globalCommandDispatcher.adjustTimelineContent(globalCommandDispatcher.cfg().data);
-									});
-								}
-							}
-							, itemKind: kindDraggableCircle
-						};
-						menuPointAddPlugin.children.push(info);*/
+						menuPointAddPlugin.children.push(addMenuItemFilter(MZXBX_currentPlugins()[ii]));
+						/*
+												let info: MenuInfo = { text: label, noLocalization: true, itemKind: kindDraggableCircle };
+												let circle: TileRectangle = { x: 0, y: 0, w: 1, h: 1, rx: 1 / 2, ry: 1 / 2, css: 'rectangleDragItem' };
+						
+												let dragger: DragMenuItemUtil = new DragMenuItemUtil(circle, info, (dx: number, yy: number) => {
+						
+													let xx = dx;
+													if (xx < globalCommandDispatcher.cfg().padGridFan) {
+														xx = globalCommandDispatcher.cfg().padGridFan;
+													}
+													globalCommandDispatcher.exe.commitProjectChanges(['filters'], () => {
+														globalCommandDispatcher.cfg().data.filters.push({
+															id: '' + Math.random()
+															, kind: MZXBX_currentPlugins()[ii].kind
+															, data: ''
+															, outputs: ['']
+															, automation: []
+															, iconPosition: { x: xx, y: yy }
+															, state: 0
+															, title: MZXBX_currentPlugins()[ii].label
+														});
+														setProjectPositionFanArea();
+														globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+													});
+												}, null, (zz: number) => { });
+												info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+												menuPointAddPlugin.children.push(info);
+						*/
 					} else {
-						console.log('unknown plugin kind');
+						if (purpose == 'ActiveStem') {
+							menuPointAddPlugin.children.push(addMenuItemStem(MZXBX_currentPlugins()[ii]));
+
+						} else {
+
+							console.log('unknown plugin kind', MZXBX_currentPlugins()[ii]);
+						}
 					}
 				}
 			}

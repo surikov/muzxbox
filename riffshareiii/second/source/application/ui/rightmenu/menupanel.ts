@@ -354,6 +354,21 @@ class RightMenuPanel {
 					it.menuTop = this.items.length - 1;
 					break;
 				}
+				case kindDraggableDiamond: {
+					this.items.push(new RightMenuItem(kindDraggableDiamond, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					}, (x: number, y: number) => {
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
+						}
+						me.setFocus(it, infos);
+						me.resetAllAnchors();
+					}));
+					it.menuTop = this.items.length - 1;
+					break;
+				}
 
 
 
@@ -387,6 +402,21 @@ class RightMenuPanel {
 				}
 				case kindDraggableTriangle2: {
 					this.items.push(new RightMenuItem(kindDraggableTriangle, it, pad, () => { }, () => {
+						if (it.onSubClick) {
+							it.onSubClick();
+						}
+					}, (x: number, y: number) => {
+						if (it.onMenuItemDrag) {
+							it.onMenuItemDrag(x, y);
+						}
+						me.setFocus(it, infos);
+						me.resetAllAnchors();
+					}));
+					it.menuTop = this.items.length - 1;
+					break;
+				}
+				case kindDraggableDiamond2: {
+					this.items.push(new RightMenuItem(kindDraggableDiamond, it, pad, () => { }, () => {
 						if (it.onSubClick) {
 							it.onSubClick();
 						}

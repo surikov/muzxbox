@@ -11,6 +11,8 @@ const kindActionDisabled: 9 = 9;
 const kindDraggableCircle2: 10 = 10;
 const kindDraggableSquare2: 11 = 11;
 const kindDraggableTriangle2: 12 = 12;
+const kindDraggableDiamond: 13 = 13;
+const kindDraggableDiamond2: 14 = 14;
 class RightMenuItem {
 	/*
 		kindAction: 1 = 1;
@@ -31,7 +33,7 @@ class RightMenuItem {
 	top: number;
 	info: MenuInfo;
 
-	constructor(newkind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9, info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void) {
+	constructor(newkind: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 13, info: MenuInfo, pad: number, tap?: () => void, tap2?: () => void, drag?: (x: number, y: number) => void) {
 		this.info = info;
 		this.pad = pad;
 		this.action = tap;
@@ -184,6 +186,27 @@ class RightMenuItem {
 				, css: 'rightMenuItemDragBG'
 			};
 			anchor.content.push(tri);
+			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
+		}
+
+
+		if (this.info.itemKind == kindDraggableDiamond || this.info.itemKind == kindDraggableDiamond2) {
+			spot.draggable = true;
+			spot.activation = this.drag;
+			//anchor.content.push({ x: 0.1 + this.pad, y: itemTop + 0.1, w: 0.8, h: 0.8, rx: 0.4, ry: 0.4, css: 'rightMenuItemDragBG' });
+			let sz = 0.42;
+			let dmnd: TilePolygon = {
+				x: 0.2 + this.pad
+				, y: itemTop + 0.1
+				, dots: [
+					0, sz
+					, sz, 0
+					, sz * 2, sz
+					, sz, sz * 2
+				]
+				, css: 'rightMenuItemDragBG'
+			};
+			anchor.content.push(dmnd);
 			anchor.content.push({ x: 0.3 + this.pad, y: itemTop + 0.7, text: label, css: labelCss });
 		}
 

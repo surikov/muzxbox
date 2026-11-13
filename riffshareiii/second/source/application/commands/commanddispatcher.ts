@@ -1387,6 +1387,7 @@ console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBas
 				count: project.timeline[project.timeline.length - 1].metre.count
 				, part: project.timeline[project.timeline.length - 1].metre.part
 			}
+			,chordNameHint:''
 		});
 		this.adjustTimeLineLength(project);
 	}
