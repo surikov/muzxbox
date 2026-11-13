@@ -219,7 +219,7 @@ type Zvoog_Project = {
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
 	farorder: number[];
-	modeNameHint: '';
+	modeNameHint: string;
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];
