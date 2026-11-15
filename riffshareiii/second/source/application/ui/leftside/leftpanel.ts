@@ -47,7 +47,7 @@ class LeftPanel {
 					this.leftZoomAnchors[zz].content.push({ x: xx, y: yy + 12 * ph, text: 'C' + octaveNum, css: labelCSS });
 
 				}
-				if (zz < 5 && zz >=globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+				if (zz < 5 && zz >= globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 					let olabel = '' + (globalCommandDispatcher.cfg().drawOctaveCount() - oo);
 					let nm3: TileText = {
 						x: 1
@@ -110,6 +110,13 @@ class LeftPanel {
 				}
 			};
 			this.leftZoomAnchors[zz].content.push(titleButton);
+			let modeLabel: TileText = {
+				x: butsize * 0.2+1.5*zoomPrefixLevelsCSS[zz].minZoom
+				, y: globalCommandDispatcher.cfg().gridTop() - 1.5*zoomPrefixLevelsCSS[zz].minZoom
+				, text: '' + globalCommandDispatcher.cfg().data.modeNameHint
+				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
+			};
+			this.leftZoomAnchors[zz].content.push(modeLabel);
 			let titleLabel: TileText = {
 				x: butsize * 0.2
 				, y: globalCommandDispatcher.cfg().gridTop()

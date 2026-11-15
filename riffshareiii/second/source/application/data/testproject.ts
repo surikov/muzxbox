@@ -1,7 +1,7 @@
 function createNewEmptyProjectData(): Zvoog_Project {
 	let pianoID = 'piano' + Math.random();
 	let newEmptyProject: Zvoog_Project = {
-		title: 'New Project'
+		title: 'DAW1024 Project'
 		, versionCode: '1'
 		, farorder: []
 		, list: false
