@@ -34,13 +34,25 @@ function createNewEmptyProjectData(): Zvoog_Project {
 			{
 				title: 'test stem'
 				, measures: [
-					{ points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 8 }, duration: { count: 9, part: 4 } }] }, { points: [] }
+					{ points: [] }, { points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 16 }, duration: { count: 1, part: 4 } }] }
 				]
 				, arpeggiator: {
 					id: 'test' + Math.random()
 					, data: ''
 					, kind: 'miniumactivestem1'
 					, iconPosition: { x: 20, y: 20 }
+					, state: 0
+				}
+			}, {
+				title: 'test 222'
+				, measures: [
+					{ points: [] }, { points: [{ skip: { count: 7, part: 8 }, duration: { count: 5, part: 4 } }] }, { points: [] }, { points: [] }
+				]
+				, arpeggiator: {
+					id: 'test' + Math.random()
+					, data: ''
+					, kind: 'miniumactivestem1'
+					, iconPosition: { x: 30, y: 27 }
 					, state: 0
 				}
 			}

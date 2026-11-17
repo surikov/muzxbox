@@ -24,19 +24,7 @@ class OctaveContent {
 		, zoomLevel: number
 	) {
 		if (globalCommandDispatcher.cfg().data.tracks.length) {
-			let soloOnly = false;
-			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-					soloOnly = true;
-					break;
-				}
-
-			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-					soloOnly = true;
-					break;
-				}
-			}
+			let soloOnly = globalCommandDispatcher.soloOnly();
 
 
 			//let track = globalCommandDispatcher.cfg().data.tracks[0];

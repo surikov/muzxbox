@@ -56,6 +56,7 @@ class MixerUI {
 
 			this.levels[ii].reCreateBars();
 		}
+		this.resetPatternMark();
 		this.resetEditMark();
 		this.resetSliderMark();
 		this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
@@ -176,6 +177,43 @@ class MixerUI {
 			this.markRectangle.css = 'markPointNone';
 		}
 		//console.log('done resetEditMark', mark,Date.now()%10000);
+	}
+	resetPatternMark() {
+		console.log('resetPatternMark',globalCommandDispatcher.cfg().editPatternMark);
+		let mark = globalCommandDispatcher.cfg().editPatternMark;
+		if (mark) {
+			
+			let mm: Zvoog_MetreMathType = MMUtil();
+			let barX = 0;
+			let cubar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
+			for (let ii = 0; ii < mark.barIdx; ii++) {
+				cubar = globalCommandDispatcher.cfg().data.timeline[ii];
+				barX = barX + mm.set(cubar.metre).duration(cubar.tempo)
+					* globalCommandDispatcher.cfg().widthDurationRatio
+					;
+			}
+
+			let top = globalCommandDispatcher.cfg().patternTop()
+				+  mark.rowIdx;
+			let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
+			let rr = globalCommandDispatcher.cfg().samplerDotHeight;
+			let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
+			
+			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
+			this.markAnchor.yy = top - rr / 2;
+			this.markAnchor.ww = rr;
+			this.markAnchor.hh = rr;
+			this.markRectangle.x = this.markAnchor.xx;
+			this.markRectangle.y = this.markAnchor.yy;
+			this.markRectangle.w = rr * 2;
+			this.markRectangle.h = rr * 2;
+			this.markRectangle.rx = rr;
+			this.markRectangle.ry = rr;
+			this.markRectangle.css = 'markPointFill';
+			
+		} else {
+			this.markRectangle.css = 'markPointNone';
+		}
 	}
 	createMixerLayers(): TileLayerDefinition[] {
 		let tracksLayerZoom: SVGElement = (document.getElementById('tracksLayerZoom') as any) as SVGElement;

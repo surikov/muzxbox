@@ -148,10 +148,19 @@ class MixerZoomLevel {
 					, css: 'octaveBottomBorder'
 				});
 			}
+			for (let gg = 1; gg < globalCommandDispatcher.cfg().data.patterns.length; gg++) {
+				barOctaveAnchor.content.push({
+					x: globalCommandDispatcher.cfg().leftPad
+					, y: globalCommandDispatcher.cfg().patternTop() + gg * globalCommandDispatcher.cfg().samplerDotHeight
+					, w: globalCommandDispatcher.cfg().timelineWidth()
+					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0
+					, css: 'octaveBottomBorder'
+				});
+			}
 			for (let aa = 1; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
 				barOctaveAnchor.content.push({
 					x: globalCommandDispatcher.cfg().leftPad
-					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight
+					, y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().samplerDotHeight
 					, w: globalCommandDispatcher.cfg().timelineWidth()
 					, h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0
 					, css: 'octaveBottomBorder'

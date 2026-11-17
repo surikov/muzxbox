@@ -12,9 +12,9 @@ class AutomationBarContent {
 				x: barOctaveAnchor.xx
 				, y: globalCommandDispatcher.cfg().automationTop()
 				, w: barOctaveAnchor.ww
-				, h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().autoPointHeight
+				, h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().samplerDotHeight
 				//, rx: barOctaveAnchor.ww / 2
-				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().autoPointHeight / 2
+				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().samplerDotHeight / 2
 				, css: 'commentPaneForClick'
 				, activation: (x: number, y: number) => { this.autoCellClick(barIdx, x, y, zIndex); }
 			};
@@ -32,20 +32,20 @@ class AutomationBarContent {
 					let change = measure.changes[ii];
 					let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
 					/*let aubtn: TilePolygon = {
-						dots: [xx, top + globalCommandDispatcher.cfg().autoPointHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
-							, xx + globalCommandDispatcher.cfg().autoPointHeight, top + globalCommandDispatcher.cfg().autoPointHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
-							, xx, top + globalCommandDispatcher.cfg().autoPointHeight * (aa + 1)//globalCommandDispatcher.cfg().notePathHeight * (ff + 1)
+						dots: [xx, top + globalCommandDispatcher.cfg().samplerDotHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
+							, xx + globalCommandDispatcher.cfg().samplerDotHeight, top + globalCommandDispatcher.cfg().samplerDotHeight * aa//globalCommandDispatcher.cfg().notePathHeight * ff
+							, xx, top + globalCommandDispatcher.cfg().samplerDotHeight * (aa + 1)//globalCommandDispatcher.cfg().notePathHeight * (ff + 1)
 						]
 						, css: css
 					};
 					*/
 					let aubtn: TileRectangle = {
 						x: xx
-						, y: top + globalCommandDispatcher.cfg().autoPointHeight * aa
-						, w: globalCommandDispatcher.cfg().autoPointHeight * 0.95
-						, h: globalCommandDispatcher.cfg().autoPointHeight * 0.95
-						//, rx: globalCommandDispatcher.cfg().autoPointHeight/2
-						//, ry: globalCommandDispatcher.cfg().autoPointHeight/2
+						, y: top + globalCommandDispatcher.cfg().samplerDotHeight * aa
+						, w: globalCommandDispatcher.cfg().samplerDotHeight * 0.95
+						, h: globalCommandDispatcher.cfg().samplerDotHeight * 0.95
+						//, rx: globalCommandDispatcher.cfg().samplerDotHeight/2
+						//, ry: globalCommandDispatcher.cfg().samplerDotHeight/2
 						,css:css
 					};
 					barOctaveAnchor.content.push(aubtn);
@@ -55,9 +55,10 @@ class AutomationBarContent {
 						if (zIndex < 1) yShift = 2 * 0.20;
 
 						let editIcon: TileText = {
-							x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16
-							, y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift
-							, text: icon_sliders
+							x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16
+							, y: top + globalCommandDispatcher.cfg().samplerDotHeight / 16 + globalCommandDispatcher.cfg().samplerDotHeight * aa + yShift
+							//, text: icon_sliders
+							, text: icon_check_circle
 							, css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
 						};
 						barOctaveAnchor.content.push(editIcon);
@@ -73,7 +74,7 @@ class AutomationBarContent {
 		
 		//globalCommandDispatcher.adjustTimeline();
 
-		let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
+		let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
 		let filter = globalCommandDispatcher.cfg().data.filters[row];
 		let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
 		let change: null | Zvoog_FilterStateChange = null;

@@ -47,11 +47,7 @@ class SamplerIcon {
 			, dots: [0, 0, sz * 2 * 0.8, sz, 0, sz * 2]
 		};
 
-		let showSoloOnly = false;
-		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
-			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) showSoloOnly = true;
-		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
-			if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2) showSoloOnly = true;
+		let showSoloOnly = globalCommandDispatcher.soloOnly();
 
 		if (zidx < 7) {
 
@@ -156,6 +152,9 @@ class SamplerIcon {
 			rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
 			if (zidx < 4) {
 				let interSamplerCss = 'fanSamplerInteractionIcon';
+				if (samplerTrack.sampler.state == 0 && showSoloOnly) interSamplerCss = 'fanSamplerInterDisabledIcon';
+				if (samplerTrack.sampler.state == 1) interSamplerCss = 'fanSamplerInterDisabledIcon';
+
 				rec.css = interSamplerCss + ' fanButton' + zidx;
 				rec.activation = (x: number, y: number) => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);

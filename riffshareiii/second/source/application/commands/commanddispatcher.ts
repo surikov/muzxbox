@@ -24,6 +24,28 @@ class CommandDispatcher {
 			this.reDrawPlayPosition();
 		}
 	};
+	soloOnly(): boolean {
+		let soloOnly = false;
+		for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+			if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+				soloOnly = true;
+				break;
+			}
+
+		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+				soloOnly = true;
+				break;
+			}
+		}
+		for (let pp = 0; pp < globalCommandDispatcher.cfg().data.patterns.length; pp++) {
+			if (globalCommandDispatcher.cfg().data.patterns[pp].arpeggiator.state == 2) {
+				soloOnly = true;
+				break;
+			}
+		}
+		return soloOnly;
+	}
 	calculatePitchColorCSS(pitch: number): string {
 		if (this.colorizedNoteLines) {
 			let halfToneStep = 1 + pitch % 12;
@@ -106,12 +128,12 @@ class CommandDispatcher {
 					}
 				}
 			}
-console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBase0_11,durations);
+			console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBase0_11, durations);
 
 		} else {
 			this.colorizedNoteLines = false;
 		}
-		
+
 	}
 
 	_mixerDataMathUtility: MixerDataMathUtility;
@@ -1236,15 +1258,15 @@ console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBas
 	setPlayPositionFromSelectedPart() {
 		//console.log('setPlayPositionFromSelectedPart');
 		if (this.cfg().data.selectedPart.startMeasure >= 0) {
-			if (this.cfg().data.selectedPart.startMeasure <this.cfg().data.timeline.length) {
-			this.playPosition = 0;
-			for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
-				let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
-				let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
-				this.playPosition = this.playPosition + cuDuration;
+			if (this.cfg().data.selectedPart.startMeasure < this.cfg().data.timeline.length) {
+				this.playPosition = 0;
+				for (let mm = 0; mm < this.cfg().data.selectedPart.startMeasure; mm++) {
+					let measure: Zvoog_SongMeasure = this.cfg().data.timeline[mm];
+					let cuDuration = MMUtil().set(measure.metre).duration(measure.tempo);
+					this.playPosition = this.playPosition + cuDuration;
+				}
+				//console.log('playPosition', this.playPosition);
 			}
-			//console.log('playPosition', this.playPosition);
-		}
 		}
 	}
 	rollTracksClick(left: number, top: number) {
@@ -1387,7 +1409,7 @@ console.log('setupColorizedMode', this.colorizedNoteLines, this.colorizedToneBas
 				count: project.timeline[project.timeline.length - 1].metre.count
 				, part: project.timeline[project.timeline.length - 1].metre.part
 			}
-			,chordNameHint:''
+			, chordNameHint: ''
 		});
 		this.adjustTimeLineLength(project);
 	}

@@ -8,6 +8,21 @@
 	font-size: var(--label-1cm);
 }
 
+.mixArpeggiatorLine {
+	stroke: var(--main-color);
+	stroke-width: calc(1.8*var(--tapSize));
+	stroke-opacity: 90%;
+	stroke-linecap: butt;
+	pointer-events: none;
+}
+.mixArpeggiatorMutedLine {
+	stroke: var(--main-color);
+	stroke-width: calc(1.8*var(--tapSize));
+	stroke-opacity: 10%;
+	stroke-linecap: butt;
+	pointer-events: none;
+}
+
 .mixNoteLine {
 	stroke: var(--main-color);
 	stroke-linejoin: round;
@@ -18,6 +33,8 @@
   filter66: drop-shadow( 0.1cm 0.9cm 0.75cm var(--click-color)); 
 
 }
+
+
 .coloredMixNoteLine {
 	stroke11111: var(--main-color);
 	stroke-linejoin: round;

@@ -49,11 +49,7 @@ class PerformerIcon {
 		};
 
 		//console.log(this.performerFocusRetangle);
-		let showSoloOnly = false;
-		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
-			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) showSoloOnly = true;
-		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
-			if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2) showSoloOnly = true;
+		let showSoloOnly = globalCommandDispatcher.soloOnly();
 
 		if (zidx < 7) {
 			itemrec.draggable = true;
@@ -172,6 +168,8 @@ class PerformerIcon {
 			itemrec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
 			if (zidx < 4) {
 				let interSamplerCss = 'fanSamplerInteractionIcon';
+				if (track.performer.state == 0 && showSoloOnly) interSamplerCss = 'fanSamplerInterDisabledIcon';
+				if (track.performer.state == 1) interSamplerCss = 'fanSamplerInterDisabledIcon';
 				itemrec.css = interSamplerCss + ' fanButton' + zidx;
 				itemrec.activation = (x: number, y: number) => {
 					let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);

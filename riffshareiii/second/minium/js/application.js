@@ -439,7 +439,8 @@ let icon_block = '&#xf119;';
 let icon_equalizer = '&#xf39e;';
 let icon_sliders = '&#xf3b8;';
 let icon_play_circle = '&#xf3a8;';
-let icon_close_circle = '&#xf134;';
+let icon_close_circle_0 = '&#xf134;';
+let icon_close_circle = '&#xf135;';
 let icon_delete = '&#xf154;';
 let icon_power = '&#xf1af;';
 let icon_leftright = '&#xf30d';
@@ -454,6 +455,8 @@ let icon_time = '&#xf337';
 let icon_hourglass = '&#xf179';
 let icon_valigntop = '&#xf252';
 let icon_valignbottom = '&#xf250';
+let icon_check_circle = '&#xf269';
+let icon_star_circle = '&#xf27a';
 class Plugin__DialogPrompt2 {
 }
 class FilterPluginDialog {
@@ -1357,6 +1360,27 @@ class CommandDispatcher {
         this.samplerPluginDialog = new SamplerPluginDialog();
         this.actionPluginDialog = new ActionPluginDialog();
         this.sequencerPluginDialog = new SequencerPluginDialog();
+    }
+    soloOnly() {
+        let soloOnly = false;
+        for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
+            if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
+            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        }
+        for (let pp = 0; pp < globalCommandDispatcher.cfg().data.patterns.length; pp++) {
+            if (globalCommandDispatcher.cfg().data.patterns[pp].arpeggiator.state == 2) {
+                soloOnly = true;
+                break;
+            }
+        }
+        return soloOnly;
     }
     calculatePitchColorCSS(pitch) {
         if (this.colorizedNoteLines) {
@@ -4256,11 +4280,7 @@ function fillClipboardList() {
                                 break;
                             }
                         }
-                        let startY = Math.round((yy
-                            - globalCommandDispatcher.cfg().padGrid2Sampler
-                            - globalCommandDispatcher.cfg().gridHeight()
-                            - globalCommandDispatcher.cfg().padSampler2Automation
-                            - globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().samplerDotHeight) / globalCommandDispatcher.cfg().autoPointHeight);
+                        let startY = Math.round((yy - globalCommandDispatcher.cfg().automationTop()) / globalCommandDispatcher.cfg().samplerDotHeight);
                         if (startY < 0) {
                             startY = 0;
                         }
@@ -4288,7 +4308,7 @@ function fillClipboardList() {
                             });
                         }
                     }, (xx, yy, zz) => {
-                        tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
+                        tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
                         tri.w = pasteWidth / zz;
                     }, (zz) => { });
                     info.onMenuItemDrag = dragger.doDrag.bind(dragger);
@@ -4747,7 +4767,7 @@ class LeftPanel {
             };
             this.leftZoomAnchors[zz].content.push(titleButton);
             let modeLabel = {
-                x: butsize * 0.2 + 1.5 * zoomPrefixLevelsCSS[zz].minZoom,
+                x: butsize * 0.2,
                 y: globalCommandDispatcher.cfg().gridTop() - 1.5 * zoomPrefixLevelsCSS[zz].minZoom,
                 text: '' + globalCommandDispatcher.cfg().data.modeNameHint,
                 css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
@@ -4760,18 +4780,7 @@ class LeftPanel {
                 css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
             };
             this.leftZoomAnchors[zz].content.push(titleLabel);
-            let soloOnly = false;
-            for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-                if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-                    soloOnly = true;
-                    break;
-                }
-            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-                if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-                    soloOnly = true;
-                    break;
-                }
-            }
+            let soloOnly = globalCommandDispatcher.soloOnly();
             if (zz < 5) {
                 if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
                     let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
@@ -4821,6 +4830,24 @@ class LeftPanel {
                 }
             }
             if (zz < 5) {
+                for (let ss = 0; ss < globalCommandDispatcher.cfg().data.patterns.length; ss++) {
+                    let preCSS = 'samplerRowLabel';
+                    if ((soloOnly && globalCommandDispatcher.cfg().data.patterns[ss].arpeggiator.state != 2)
+                        || ((!soloOnly) && globalCommandDispatcher.cfg().data.patterns[ss].arpeggiator.state == 1)) {
+                        preCSS = 'samplerMuteLabel';
+                    }
+                    let arpegLabel = {
+                        text: '' + globalCommandDispatcher.cfg().data.patterns[ss].title,
+                        x: 0,
+                        y: globalCommandDispatcher.cfg().patternTop()
+                            + globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
+                            - globalCommandDispatcher.cfg().samplerDotHeight * 0.3,
+                        css: preCSS + zoomPrefixLevelsCSS[zz].prefix
+                    };
+                    this.leftZoomAnchors[zz].content.push(arpegLabel);
+                }
+            }
+            if (zz < 5) {
                 for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
                     let filter = globalCommandDispatcher.cfg().data.filters[ff];
                     let preCSS = 'autoRowLabel';
@@ -4831,8 +4858,8 @@ class LeftPanel {
                         text: '' + filter.title,
                         x: 0,
                         y: globalCommandDispatcher.cfg().automationTop()
-                            + (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
-                            - 0.3 * globalCommandDispatcher.cfg().autoPointHeight,
+                            + (1 + ff) * globalCommandDispatcher.cfg().samplerDotHeight
+                            - 0.3 * globalCommandDispatcher.cfg().samplerDotHeight,
                         css: preCSS + zoomPrefixLevelsCSS[zz].prefix
                     };
                     this.leftZoomAnchors[zz].content.push(autoLabel);
@@ -4850,18 +4877,7 @@ class SamplerBar {
         let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
         let cucss = 'samplerDrumDotBg';
         let licss = 'samplerDrumDotLine';
-        let soloOnly = false;
-        for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-            if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-                soloOnly = true;
-                break;
-            }
-        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-                soloOnly = true;
-                break;
-            }
-        }
+        let soloOnly = globalCommandDispatcher.soloOnly();
         if ((soloOnly && drum.sampler.state != 2) || ((!soloOnly) && drum.sampler.state == 1)) {
             cucss = 'samplerDrumMuteBg';
             licss = 'samplerDrumMuteLine';
@@ -4961,18 +4977,7 @@ class OctaveContent {
     }
     addUpperNotes(barIdx, octaveIdx, left, top, width, height, barOctaveAnchor, transpose, zoomLevel) {
         if (globalCommandDispatcher.cfg().data.tracks.length) {
-            let soloOnly = false;
-            for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-                if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-                    soloOnly = true;
-                    break;
-                }
-            for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-                if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-                    soloOnly = true;
-                    break;
-                }
-            }
+            let soloOnly = globalCommandDispatcher.soloOnly();
             let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
             let track = globalCommandDispatcher.cfg().data.tracks[farorder[0]];
             let css = globalCommandDispatcher.calculateCSSforMixNoteLine();
@@ -5188,6 +5193,9 @@ class MixerBar {
         if (zoomLevel < 7) {
             new AutomationBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
         }
+        if (zoomLevel < 7) {
+            new PatternBarContent(barIdx, left, gridZoomBarAnchor, zoomLevel);
+        }
     }
     findDurationOfSample(samplerId) {
         if (globalCommandDispatcher.player) {
@@ -5239,9 +5247,23 @@ class MixerBar {
             });
             barOctaveAnchor.content.push({
                 x: barLeft + width,
+                y: globalCommandDispatcher.cfg().patternTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
+                h: globalCommandDispatcher.cfg().patternHeight(),
+                css: 'barRightBorder'
+            });
+            barOctaveAnchor.content.push({
+                x: barLeft + width,
                 y: globalCommandDispatcher.cfg().automationTop(),
                 w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
                 h: globalCommandDispatcher.cfg().automationHeight(),
+                css: 'barRightBorder'
+            });
+            barOctaveAnchor.content.push({
+                x: barLeft + width,
+                y: globalCommandDispatcher.cfg().commentsTop(),
+                w: zoomPrefixLevelsCSS[zIndex].minZoom * 0.8,
+                h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
                 css: 'barRightBorder'
             });
             if (zoomInfo.gridLines.length > 0) {
@@ -5272,6 +5294,13 @@ class MixerBar {
                     });
                     barOctaveAnchor.content.push({
                         x: xx,
+                        y: globalCommandDispatcher.cfg().patternTop(),
+                        w: line.ratio * zoomInfo.minZoom / 4,
+                        h: globalCommandDispatcher.cfg().patternHeight(),
+                        css: css
+                    });
+                    barOctaveAnchor.content.push({
+                        x: xx,
                         y: globalCommandDispatcher.cfg().automationTop(),
                         w: line.ratio * zoomInfo.minZoom / 4,
                         h: globalCommandDispatcher.cfg().automationHeight(),
@@ -5290,17 +5319,6 @@ class MixerBar {
                     if (lineCount >= zoomInfo.gridLines.length) {
                         lineCount = 0;
                     }
-                }
-                if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
-                    let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-                    let line = zoomInfo.gridLines[lineCount];
-                    barOctaveAnchor.content.push({
-                        x: xx,
-                        y: globalCommandDispatcher.cfg().commentsTop(),
-                        w: line.ratio * zoomInfo.minZoom / 4,
-                        h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex),
-                        css: css
-                    });
                 }
             }
         }
@@ -5538,7 +5556,7 @@ class AutomationBarContent {
                 x: barOctaveAnchor.xx,
                 y: globalCommandDispatcher.cfg().automationTop(),
                 w: barOctaveAnchor.ww,
-                h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().autoPointHeight,
+                h: globalCommandDispatcher.cfg().data.filters.length * globalCommandDispatcher.cfg().samplerDotHeight,
                 css: 'commentPaneForClick',
                 activation: (x, y) => { this.autoCellClick(barIdx, x, y, zIndex); }
             };
@@ -5557,9 +5575,9 @@ class AutomationBarContent {
                     let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
                     let aubtn = {
                         x: xx,
-                        y: top + globalCommandDispatcher.cfg().autoPointHeight * aa,
-                        w: globalCommandDispatcher.cfg().autoPointHeight * 0.95,
-                        h: globalCommandDispatcher.cfg().autoPointHeight * 0.95,
+                        y: top + globalCommandDispatcher.cfg().samplerDotHeight * aa,
+                        w: globalCommandDispatcher.cfg().samplerDotHeight * 0.95,
+                        h: globalCommandDispatcher.cfg().samplerDotHeight * 0.95,
                         css: css
                     };
                     barOctaveAnchor.content.push(aubtn);
@@ -5570,9 +5588,9 @@ class AutomationBarContent {
                         if (zIndex < 1)
                             yShift = 2 * 0.20;
                         let editIcon = {
-                            x: xx + globalCommandDispatcher.cfg().autoPointHeight / 16,
-                            y: top + globalCommandDispatcher.cfg().autoPointHeight / 16 + globalCommandDispatcher.cfg().autoPointHeight * aa + yShift,
-                            text: icon_sliders,
+                            x: xx + globalCommandDispatcher.cfg().samplerDotHeight / 16,
+                            y: top + globalCommandDispatcher.cfg().samplerDotHeight / 16 + globalCommandDispatcher.cfg().samplerDotHeight * aa + yShift,
+                            text: icon_check_circle,
                             css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
                         };
                         barOctaveAnchor.content.push(editIcon);
@@ -5582,7 +5600,7 @@ class AutomationBarContent {
         }
     }
     autoCellClick(barIdx, barX, yy, zz) {
-        let row = Math.floor(yy / globalCommandDispatcher.cfg().autoPointHeight);
+        let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
         let filter = globalCommandDispatcher.cfg().data.filters[row];
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
         let change = null;
@@ -5616,6 +5634,135 @@ class AutomationBarContent {
         }
     }
 }
+class PatternBarContent {
+    constructor(barIdx, barLeft, barOctaveAnchor, zIndex) {
+        let curBar = globalCommandDispatcher.cfg().data.timeline[barIdx];
+        let top = globalCommandDispatcher.cfg().patternTop();
+        if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+            let interpane = {
+                x: barOctaveAnchor.xx,
+                y: globalCommandDispatcher.cfg().patternTop(),
+                w: barOctaveAnchor.ww,
+                h: globalCommandDispatcher.cfg().data.patterns.length * globalCommandDispatcher.cfg().samplerDotHeight,
+                css: 'commentPaneForClick',
+                activation: (x, y) => { this.patternCellClick(barIdx, x, y, zIndex); }
+            };
+            barOctaveAnchor.content.push(interpane);
+        }
+        for (let aa = 0; aa < globalCommandDispatcher.cfg().data.patterns.length; aa++) {
+            let arp = globalCommandDispatcher.cfg().data.patterns[aa];
+            if (arp.measures[barIdx]) {
+                let css = 'automationBgDot';
+                if (arp.arpeggiator.state > 0) {
+                    css = 'automationMuteDot';
+                }
+                let cucss = 'samplerDrumDotBg';
+                let licss = 'mixArpeggiatorLine';
+                let soloOnly = globalCommandDispatcher.soloOnly();
+                if ((soloOnly && arp.arpeggiator.state != 2) || ((!soloOnly) && arp.arpeggiator.state == 1)) {
+                    cucss = 'samplerDrumMuteBg';
+                    licss = 'mixArpeggiatorMutedLine';
+                }
+                let measure = arp.measures[barIdx];
+                for (let ii = 0; ii < measure.points.length; ii++) {
+                    let change = measure.points[ii];
+                    let xx = barLeft + MMUtil().set(change.skip).duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+                    let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * aa + 0.05 * globalCommandDispatcher.cfg().samplerDotHeight / 2;
+                    let dot2 = 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2;
+                    let aubtn = {
+                        dots: [xx, yy + dot2,
+                            xx + dot2, yy,
+                            xx + dot2, yy + dot2 * 2
+                        ],
+                        css: cucss
+                    };
+                    barOctaveAnchor.content.push(aubtn);
+                    if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
+                        let yShift = 0.24;
+                        let xShift = 0.20;
+                        if (zIndex < 2) {
+                            yShift = 0.29;
+                            xShift = 0.29;
+                        }
+                        if (zIndex < 1) {
+                            yShift = 0.37;
+                            xShift = 0.37;
+                        }
+                        let editIcon = {
+                            x: xx + xShift,
+                            y: yy - yShift + 1.4,
+                            text: icon_close_circle,
+                            css: 'samplerDrumDeleteIcon samplerDrumDeleteSize' + zIndex
+                        };
+                        barOctaveAnchor.content.push(editIcon);
+                    }
+                    let remains = MMUtil().set(change.duration);
+                    let lastSkip = MMUtil().set(change.skip);
+                    let seconds = 0;
+                    for (let ibar = barIdx; ibar < globalCommandDispatcher.cfg().data.timeline.length && remains.more({ count: 0, part: 1 }); ibar++) {
+                        let lastBar = globalCommandDispatcher.cfg().data.timeline[ibar];
+                        if (lastSkip.plus(remains).less(lastBar.metre)) {
+                            seconds = seconds + remains.duration(lastBar.tempo);
+                            break;
+                        }
+                        else {
+                            seconds = seconds + MMUtil().set(lastBar.metre).minus(lastSkip).duration(lastBar.tempo);
+                            remains = remains.minus(lastBar.metre).plus(lastSkip);
+                            lastSkip = lastSkip.set({ count: 0, part: 1 });
+                        }
+                    }
+                    let linelen = seconds * globalCommandDispatcher.cfg().widthDurationRatio;
+                    if (linelen > dot2) {
+                        let line = {
+                            x1: xx + 0.995 * dot2,
+                            y1: yy + dot2,
+                            x2: xx + linelen,
+                            y2: yy + dot2,
+                            css: licss
+                        };
+                        barOctaveAnchor.content.push(line);
+                        if (barOctaveAnchor.ww < xx + linelen) {
+                            barOctaveAnchor.ww = xx + linelen;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    patternCellClick(barIdx, barX, yy, zz) {
+        let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
+        let arp = globalCommandDispatcher.cfg().data.patterns[row];
+        let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
+        let change = null;
+        let muStart = MMUtil().set(info.start);
+        let muEnd = MMUtil().set(info.end);
+        let changeIdx = 0;
+        for (changeIdx = 0; changeIdx < arp.measures[barIdx].points.length; changeIdx++) {
+            let testChange = arp.measures[barIdx].points[changeIdx];
+            if (muStart.more(testChange.skip)) {
+            }
+            else {
+                if (muEnd.more(testChange.skip)) {
+                    change = testChange;
+                    globalCommandDispatcher.exe.commitProjectChanges(['patterns', row], () => {
+                        arp.measures[barIdx].points.splice(changeIdx, 1);
+                        globalCommandDispatcher.resetProject();
+                    });
+                    break;
+                }
+            }
+        }
+        if (!(change)) {
+            if (globalCommandDispatcher.cfg().editPatternMark) {
+                globalCommandDispatcher.cfg().editPatternMark = null;
+            }
+            else {
+                globalCommandDispatcher.cfg().editPatternMark = { barIdx: barIdx, skip: muStart.metre(), rowIdx: row };
+            }
+            globalCommandDispatcher.renderer.mixer.resetPatternMark();
+        }
+    }
+}
 class MixerUI {
     constructor() {
         this.levels = [];
@@ -5639,6 +5786,7 @@ class MixerUI {
             this.spearsLayer.anchors[ii].content = [];
             this.levels[ii].reCreateBars();
         }
+        this.resetPatternMark();
         this.resetEditMark();
         this.resetSliderMark();
         this.fanPane.resetPlates(this.fanLayer.anchors, this.spearsLayer.anchors);
@@ -5714,6 +5862,39 @@ class MixerUI {
                 - mark.pitch;
             let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
             let rr = globalCommandDispatcher.cfg().notePathHeight;
+            let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
+            this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
+            this.markAnchor.yy = top - rr / 2;
+            this.markAnchor.ww = rr;
+            this.markAnchor.hh = rr;
+            this.markRectangle.x = this.markAnchor.xx;
+            this.markRectangle.y = this.markAnchor.yy;
+            this.markRectangle.w = rr * 2;
+            this.markRectangle.h = rr * 2;
+            this.markRectangle.rx = rr;
+            this.markRectangle.ry = rr;
+            this.markRectangle.css = 'markPointFill';
+        }
+        else {
+            this.markRectangle.css = 'markPointNone';
+        }
+    }
+    resetPatternMark() {
+        console.log('resetPatternMark', globalCommandDispatcher.cfg().editPatternMark);
+        let mark = globalCommandDispatcher.cfg().editPatternMark;
+        if (mark) {
+            let mm = MMUtil();
+            let barX = 0;
+            let cubar = globalCommandDispatcher.cfg().data.timeline[0];
+            for (let ii = 0; ii < mark.barIdx; ii++) {
+                cubar = globalCommandDispatcher.cfg().data.timeline[ii];
+                barX = barX + mm.set(cubar.metre).duration(cubar.tempo)
+                    * globalCommandDispatcher.cfg().widthDurationRatio;
+            }
+            let top = globalCommandDispatcher.cfg().patternTop()
+                + mark.rowIdx;
+            let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
+            let rr = globalCommandDispatcher.cfg().samplerDotHeight;
             let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
             this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
             this.markAnchor.yy = top - rr / 2;
@@ -5990,10 +6171,19 @@ class MixerZoomLevel {
                     css: 'octaveBottomBorder'
                 });
             }
+            for (let gg = 1; gg < globalCommandDispatcher.cfg().data.patterns.length; gg++) {
+                barOctaveAnchor.content.push({
+                    x: globalCommandDispatcher.cfg().leftPad,
+                    y: globalCommandDispatcher.cfg().patternTop() + gg * globalCommandDispatcher.cfg().samplerDotHeight,
+                    w: globalCommandDispatcher.cfg().timelineWidth(),
+                    h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0,
+                    css: 'octaveBottomBorder'
+                });
+            }
             for (let aa = 1; aa < globalCommandDispatcher.cfg().data.filters.length; aa++) {
                 barOctaveAnchor.content.push({
                     x: globalCommandDispatcher.cfg().leftPad,
-                    y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().autoPointHeight,
+                    y: globalCommandDispatcher.cfg().automationTop() + aa * globalCommandDispatcher.cfg().samplerDotHeight,
                     w: globalCommandDispatcher.cfg().timelineWidth(),
                     h: zoomPrefixLevelsCSS[this.zoomLevelIndex].minZoom / 64.0,
                     css: 'octaveBottomBorder'
@@ -6028,36 +6218,6 @@ class FanPane {
             this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
         }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-            let css = 'fanConnectionBase fanConnection' + ii;
-            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
-            let gridBorder = {
-                x1: left,
-                x2: left,
-                y1: globalCommandDispatcher.cfg().gridTop(),
-                y2: globalCommandDispatcher.cfg().gridTop() + globalCommandDispatcher.cfg().gridHeight(),
-                css: css
-            };
-            spearsAnchors[ii].content.push(gridBorder);
-            if (globalCommandDispatcher.cfg().data.percussions.length) {
-                let samplerBorder = {
-                    x1: left,
-                    x2: left,
-                    y1: globalCommandDispatcher.cfg().samplerTop(),
-                    y2: globalCommandDispatcher.cfg().samplerTop() + globalCommandDispatcher.cfg().samplerHeight(),
-                    css: css
-                };
-                spearsAnchors[ii].content.push(samplerBorder);
-            }
-            if (globalCommandDispatcher.cfg().data.filters.length) {
-                let autoBorder = {
-                    x1: left,
-                    x2: left,
-                    y1: globalCommandDispatcher.cfg().automationTop(),
-                    y2: globalCommandDispatcher.cfg().automationTop() + globalCommandDispatcher.cfg().automationHeight(),
-                    css: css
-                };
-                spearsAnchors[ii].content.push(autoBorder);
-            }
             this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
@@ -6131,13 +6291,7 @@ class PerformerIcon {
             x: xx - sz / 2, y: yy - sz / 2,
             w: sz, h: sz
         };
-        let showSoloOnly = false;
-        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
-            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2)
-                showSoloOnly = true;
-        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
-            if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2)
-                showSoloOnly = true;
+        let showSoloOnly = globalCommandDispatcher.soloOnly();
         if (zidx < 7) {
             itemrec.draggable = true;
             let toFilter = null;
@@ -6252,6 +6406,10 @@ class PerformerIcon {
             itemrec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
             if (zidx < 4) {
                 let interSamplerCss = 'fanSamplerInteractionIcon';
+                if (track.performer.state == 0 && showSoloOnly)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
+                if (track.performer.state == 1)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
                 itemrec.css = interSamplerCss + ' fanButton' + zidx;
                 itemrec.activation = (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(track.performer.kind);
@@ -6349,13 +6507,7 @@ class SamplerIcon {
             y: yy - sz,
             dots: [0, 0, sz * 2 * 0.8, sz, 0, sz * 2]
         };
-        let showSoloOnly = false;
-        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++)
-            if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2)
-                showSoloOnly = true;
-        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++)
-            if (globalCommandDispatcher.cfg().data.percussions[tt].sampler.state == 2)
-                showSoloOnly = true;
+        let showSoloOnly = globalCommandDispatcher.soloOnly();
         if (zidx < 7) {
             let dragSamplerCss = 'fanSamplerMoveIconBase';
             if (samplerTrack.sampler.state == 0 && showSoloOnly)
@@ -6459,6 +6611,10 @@ class SamplerIcon {
             rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
             if (zidx < 4) {
                 let interSamplerCss = 'fanSamplerInteractionIcon';
+                if (samplerTrack.sampler.state == 0 && showSoloOnly)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
+                if (samplerTrack.sampler.state == 1)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
                 rec.css = interSamplerCss + ' fanButton' + zidx;
                 rec.activation = (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(samplerTrack.sampler.kind);
@@ -6785,7 +6941,7 @@ class FilterIcon {
             };
             dragAnchor.content.push(txt);
         }
-        let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
+        let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
         let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         let css = 'fanConnectionBase fanConnection' + zidx;
         let hoLine = { x1: start, x2: xx, y1: filterFromY, y2: filterFromY, css: css };
@@ -6833,7 +6989,7 @@ class FilterIcon {
         }
         let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         let top = globalCommandDispatcher.cfg().automationTop();
-        let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (order + 0.5);
         let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
         let zoomReorderAutoButton = {
             x: xx - 0.5 * sz,
@@ -6856,7 +7012,7 @@ class FilterIcon {
         let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
         let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
         let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-        let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (order + 0.5);
         let dragOrderFilterAnchor = {
             xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
             minZoom: fanLevelAnchor.minZoom,
@@ -6900,7 +7056,7 @@ class FilterIcon {
                 else {
                     dragOrderFilterAnchor.translation.x = sz / 3;
                     aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
-                        / globalCommandDispatcher.cfg().autoPointHeight) + order;
+                        / globalCommandDispatcher.cfg().samplerDotHeight) + order;
                     if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
                         dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
                     }
@@ -7403,13 +7559,25 @@ function createNewEmptyProjectData() {
             {
                 title: 'test stem',
                 measures: [
-                    { points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 8 }, duration: { count: 9, part: 4 } }] }, { points: [] }
+                    { points: [] }, { points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 16 }, duration: { count: 1, part: 4 } }] }
                 ],
                 arpeggiator: {
                     id: 'test' + Math.random(),
                     data: '',
                     kind: 'miniumactivestem1',
                     iconPosition: { x: 20, y: 20 },
+                    state: 0
+                }
+            }, {
+                title: 'test 222',
+                measures: [
+                    { points: [] }, { points: [{ skip: { count: 7, part: 8 }, duration: { count: 5, part: 4 } }] }, { points: [] }, { points: [] }
+                ],
+                arpeggiator: {
+                    id: 'test' + Math.random(),
+                    data: '',
+                    kind: 'miniumactivestem1',
+                    iconPosition: { x: 30, y: 27 },
                     state: 0
                 }
             }
@@ -7427,13 +7595,13 @@ class MixerDataMathUtility {
         this.rightPad = 50;
         this.topPad = 12;
         this.parTitleGrid = 5;
-        this.padGrid2Sampler = 1;
-        this.padSampler2Automation = 1;
-        this.padAutomation2Comments = 1;
+        this.padGrid2Sampler = 0.1;
+        this.padSampler2Pattern = 0.1;
+        this.padPattern2Automation = 0.1;
+        this.padAutomation2Comments = 0.1;
         this.bottomPad = 11;
         this.notePathHeight = 1.00;
         this.samplerDotHeight = 2;
-        this.autoPointHeight = 4;
         this.widthDurationRatio = 27;
         this.octaveDrawCount = 8;
         this.octaveTransposeCount = -1;
@@ -7445,6 +7613,7 @@ class MixerDataMathUtility {
         this.zoomEditZoomIdxLess = 3;
         this.editGridMark = null;
         this.slidemark = null;
+        this.editPatternMark = null;
         this.data = data;
         this.recalculateCommentMax();
     }
@@ -7572,13 +7741,10 @@ class MixerDataMathUtility {
             + this.bottomPad;
     }
     workHeight() {
-        return this.gridHeight()
-            + this.padGrid2Sampler + this.samplerHeight()
-            + this.padSampler2Automation + this.automationHeight()
-            + this.padAutomation2Comments + this.commentsMaxHeight();
+        this.commentsTop() + this.commentsMaxHeight();
     }
     automationHeight() {
-        return this.data.filters.length * this.autoPointHeight;
+        return this.data.filters.length * this.samplerDotHeight;
     }
     commentsZoomHeight(zIndex) {
         return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
@@ -7596,7 +7762,7 @@ class MixerDataMathUtility {
         return (2 + rcount) * this.notePathHeight * 8;
     }
     automationTop() {
-        return this.samplerTop() + this.samplerHeight() + this.padSampler2Automation;
+        return this.patternTop() + this.patternHeight() + this.padPattern2Automation;
     }
     commentsTop() {
         return this.automationTop()
@@ -7620,6 +7786,12 @@ class MixerDataMathUtility {
     }
     samplerTop() {
         return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
+    }
+    patternHeight() {
+        return this.data.patterns.length * this.samplerDotHeight;
+    }
+    patternTop() {
+        return this.samplerTop() + this.samplerHeight() + this.padSampler2Pattern;
     }
     findFilterTarget(filterId) {
         if (this.data) {

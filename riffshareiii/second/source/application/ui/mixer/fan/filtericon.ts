@@ -189,7 +189,7 @@ class FilterIcon {
 			};
 			dragAnchor.content.push(txt);
 		}
-		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().autoPointHeight;
+		let filterFromY = globalCommandDispatcher.cfg().automationTop() + (order + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
 		let start = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		let css = 'fanConnectionBase fanConnection' + zidx;
 		//if (order) {
@@ -233,12 +233,12 @@ class FilterIcon {
 		}
 		/*if (zidx < 5) {
 			let sbuttn: TileRectangle = {
-				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
-				, y: filterFromY - 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
-				, w: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
-				, h: 0.9 * globalCommandDispatcher.cfg().autoPointHeight
-				, rx: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
-				, ry: 0.9 * globalCommandDispatcher.cfg().autoPointHeight / 2
+				x: globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() - 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, y: filterFromY - 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, w: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight
+				, h: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight
+				, rx: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2
+				, ry: 0.9 * globalCommandDispatcher.cfg().samplerDotHeight / 2
 				, css: 'fanFilterDrragger'
 				, draggable: true
 			};
@@ -256,7 +256,7 @@ class FilterIcon {
 				if (x == 0 && y == 0) {
 					let dy = btnAnchor.translation.y;
 					btnAnchor.translation.y = 0;
-					let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().autoPointHeight);
+					let newOrder = order + Math.round(dy / globalCommandDispatcher.cfg().samplerDotHeight);
 					if (newOrder < 0) newOrder = 0;
 					if (newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1) newOrder > globalCommandDispatcher.cfg().data.percussions.length - 1;
 					if (order != newOrder) {
@@ -292,7 +292,7 @@ class FilterIcon {
 		}
 		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		let top = globalCommandDispatcher.cfg().automationTop();
-		let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+		let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (order + 0.5);
 		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
 		let zoomReorderAutoButton: TileRectangle = {
 			x: xx - 0.5 * sz
@@ -318,7 +318,7 @@ class FilterIcon {
 		let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 		let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
 		let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
-		let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+		let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (order + 0.5);
 		let dragOrderFilterAnchor: TileAnchor = {
 			xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz
 			, minZoom: fanLevelAnchor.minZoom
@@ -363,7 +363,7 @@ class FilterIcon {
 				} else {
 					dragOrderFilterAnchor.translation.x = sz / 3;
 					aim = Math.round((dragOrderFilterAnchor.translation.y + yy)
-						/ globalCommandDispatcher.cfg().autoPointHeight) + order;
+						/ globalCommandDispatcher.cfg().samplerDotHeight) + order;
 					//console.log(aim);
 					if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.filters.length) {
 						dragOrderFilterAnchor.translation.y = dragOrderFilterAnchor.translation.y + yy;
@@ -384,7 +384,7 @@ class FilterIcon {
 				}
 				let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 				let top = globalCommandDispatcher.cfg().automationTop();
-				let yy = top + globalCommandDispatcher.cfg().autoPointHeight * (order + 0.5);
+				let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (order + 0.5);
 				let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
 				let zoomReorderAutoButton: TileRectangle = {
 					x: xx - 0.5 * sz

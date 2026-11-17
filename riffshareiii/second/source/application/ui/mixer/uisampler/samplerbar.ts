@@ -7,19 +7,7 @@ class SamplerBar {
 		let tempo = globalCommandDispatcher.cfg().data.timeline[barIdx].tempo;
 		let cucss = 'samplerDrumDotBg';
 		let licss = 'samplerDrumDotLine';
-		let soloOnly = false;
-		for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-			if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-				soloOnly = true;
-				break;
-			}
-
-		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-			if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-				soloOnly = true;
-				break;
-			}
-		}
+		let soloOnly = globalCommandDispatcher.soloOnly();
 		if ((soloOnly && drum.sampler.state != 2) || ((!soloOnly) && drum.sampler.state == 1)) {
 			cucss = 'samplerDrumMuteBg';
 			licss = 'samplerDrumMuteLine';
@@ -32,7 +20,7 @@ class SamplerBar {
 				, w: anchor.ww
 				, h: globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().samplerDotHeight
 				//, rx: barOctaveAnchor.ww / 2
-				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().autoPointHeight / 2
+				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().samplerDotHeight / 2
 				, css: 'commentPaneForClick'
 				, activation: (x: number, y: number) => { this.drumCellClick(barIdx, x, y, zoomLevel); }
 			};
@@ -42,7 +30,7 @@ class SamplerBar {
 			let skip: Zvoog_Metre = measure.skips[ss];
 			let xx = left + MMUtil().set(skip).duration(tempo) * globalCommandDispatcher.cfg().widthDurationRatio
 			//console.log('durationLen',durationLen);
-			if (durationLen>0.01) {
+			if (durationLen > 0.01) {
 				let bgline: TilePolygon = {
 					dots: [xx, yy
 						, xx, yy + globalCommandDispatcher.cfg().samplerDotHeight

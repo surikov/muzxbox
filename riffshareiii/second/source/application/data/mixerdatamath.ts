@@ -7,15 +7,18 @@ class MixerDataMathUtility {
 
 	topPad = 12;
 	parTitleGrid = 5;
-	padGrid2Sampler = 1;
-	padSampler2Automation = 1;
-	padAutomation2Comments = 1;
+
+	padGrid2Sampler = 0.1;
+	padSampler2Pattern = 0.1;
+	padPattern2Automation = 0.1;
+	padAutomation2Comments = 0.1;
+
 	bottomPad = 11;
 
 
 	notePathHeight = 1.00;
 	samplerDotHeight = 2;
-	autoPointHeight = 4;
+	//autoPointHeight = 4;
 	//commentPointHeight = 9;
 
 	widthDurationRatio = 27;
@@ -44,6 +47,7 @@ class MixerDataMathUtility {
 
 	editGridMark: null | { barIdx: number, skip: Zvoog_Metre, pitch: number } = null;// { barIdx: 2, skip: { count: 3, part: 4 }, pitch: 36 };
 	slidemark: null | { barIdx: number, chord: Zvoog_Chord, pitch: number } = null;
+	editPatternMark: null | { barIdx: number, skip: Zvoog_Metre, rowIdx: number } = null;
 
 	constructor(data: Zvoog_Project) {
 		this.data = data;
@@ -250,14 +254,15 @@ class MixerDataMathUtility {
 			;
 	}
 	workHeight() {
-		return this.gridHeight()
+		/*return this.gridHeight()
 			+ this.padGrid2Sampler + this.samplerHeight()
 			+ this.padSampler2Automation + this.automationHeight()
 			+ this.padAutomation2Comments + this.commentsMaxHeight()
-			;
+			;*/
+		this.commentsTop() + this.commentsMaxHeight();
 	}
 	automationHeight(): number {
-		return this.data.filters.length * this.autoPointHeight;
+		return this.data.filters.length * this.samplerDotHeight;
 	}
 	commentsZoomHeight(zIndex: number): number {
 		return (2 + this.maxCommentRowCount) * this.notePathHeight * this.textZoomRatio(zIndex);
@@ -276,7 +281,7 @@ class MixerDataMathUtility {
 
 	}
 	automationTop(): number {
-		return this.samplerTop() + this.samplerHeight() + this.padSampler2Automation;
+		return this.patternTop() + this.patternHeight() + this.padPattern2Automation;
 	}
 
 
@@ -308,6 +313,13 @@ class MixerDataMathUtility {
 	samplerTop(): number {
 		return this.gridTop() + this.gridHeight() + this.padGrid2Sampler;
 	}
+	patternHeight(): number {
+		return this.data.patterns.length * this.samplerDotHeight;
+	}
+	patternTop(): number {
+		return this.samplerTop() + this.samplerHeight() + this.padSampler2Pattern;
+	}
+
 	findFilterTarget(filterId: string): Zvoog_FilterTarget | null {
 		//console.log('findFilterTarget start -----------------------------------------------------');
 		if (this.data) {

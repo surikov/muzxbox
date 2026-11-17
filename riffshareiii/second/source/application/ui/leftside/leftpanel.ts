@@ -111,7 +111,7 @@ class LeftPanel {
 			};
 			this.leftZoomAnchors[zz].content.push(titleButton);
 			let modeLabel: TileText = {
-				x: butsize * 0.2+1.5*zoomPrefixLevelsCSS[zz].minZoom
+				x: butsize * 0.2//+1.5*zoomPrefixLevelsCSS[zz].minZoom
 				, y: globalCommandDispatcher.cfg().gridTop() - 1.5*zoomPrefixLevelsCSS[zz].minZoom
 				, text: '' + globalCommandDispatcher.cfg().data.modeNameHint
 				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
@@ -124,19 +124,8 @@ class LeftPanel {
 				, css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
 			};
 			this.leftZoomAnchors[zz].content.push(titleLabel);
-			let soloOnly = false;
-			for (let ss = 0; ss < globalCommandDispatcher.cfg().data.percussions.length; ss++)
-				if (globalCommandDispatcher.cfg().data.percussions[ss].sampler.state == 2) {
-					soloOnly = true;
-					break;
-				}
-
-			for (let tt = 0; tt < globalCommandDispatcher.cfg().data.tracks.length; tt++) {
-				if (globalCommandDispatcher.cfg().data.tracks[tt].performer.state == 2) {
-					soloOnly = true;
-					break;
-				}
-			}
+			let soloOnly = globalCommandDispatcher.soloOnly();
+			
 			if (zz < 5) {
 				if (globalCommandDispatcher.cfg().data.tracks.length > 0) {
 					let farorder = globalCommandDispatcher.calculateRealTrackFarOrder();
@@ -186,6 +175,24 @@ class LeftPanel {
 				}
 			}
 			if (zz < 5) {
+				for (let ss = 0; ss < globalCommandDispatcher.cfg().data.patterns.length; ss++) {
+					let preCSS = 'samplerRowLabel';
+					if ((soloOnly && globalCommandDispatcher.cfg().data.patterns[ss].arpeggiator.state != 2) 
+						|| ((!soloOnly) && globalCommandDispatcher.cfg().data.patterns[ss].arpeggiator.state == 1)) {
+						preCSS = 'samplerMuteLabel';
+					}
+					let arpegLabel: TileText = {
+						text: '' + globalCommandDispatcher.cfg().data.patterns[ss].title
+						, x: 0
+						, y: globalCommandDispatcher.cfg().patternTop()
+							+ globalCommandDispatcher.cfg().samplerDotHeight * (1 + ss)
+							- globalCommandDispatcher.cfg().samplerDotHeight * 0.3
+						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
+					};
+					this.leftZoomAnchors[zz].content.push(arpegLabel);
+				}
+			}
+			if (zz < 5) {
 				for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 					let filter = globalCommandDispatcher.cfg().data.filters[ff];
 					let preCSS = 'autoRowLabel';
@@ -196,8 +203,8 @@ class LeftPanel {
 						text: '' + filter.title
 						, x: 0
 						, y: globalCommandDispatcher.cfg().automationTop()
-							+ (1 + ff) * globalCommandDispatcher.cfg().autoPointHeight
-							- 0.3 * globalCommandDispatcher.cfg().autoPointHeight
+							+ (1 + ff) * globalCommandDispatcher.cfg().samplerDotHeight
+							- 0.3 * globalCommandDispatcher.cfg().samplerDotHeight
 						, css: preCSS + zoomPrefixLevelsCSS[zz].prefix
 					};
 					this.leftZoomAnchors[zz].content.push(autoLabel);

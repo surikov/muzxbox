@@ -10,7 +10,7 @@
 }
 .samplerDrumDotBg{
 	fill: var(--main-color);
-	fill-opacity2:75%;
+	fill-opacity:90%;
     stroke: none;
 	pointer-events: none;
 }

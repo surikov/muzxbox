@@ -54,6 +54,7 @@
 		,"ui/mixer/grid/mixerbar.ts"
 		,"ui/mixer/grid/textCommentsContent.ts"
 		,"ui/mixer/grid/autoBar.ts"
+		,"ui/mixer/grid/patternBar.ts"
         ,"ui/mixer/uimixer.ts"
         ,"ui/mixer/grid/mixerzoomlevel.ts"
 		,"ui/mixer/fan/fanpane.ts"

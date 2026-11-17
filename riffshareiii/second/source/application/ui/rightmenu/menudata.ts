@@ -537,14 +537,16 @@ function fillClipboardList() {
 								barIdx = jj;
 								break;
 							}
-						}
+						}/*
 						let startY = Math.round((yy
 							- globalCommandDispatcher.cfg().padGrid2Sampler
 							- globalCommandDispatcher.cfg().gridHeight()
 							- globalCommandDispatcher.cfg().padSampler2Automation
 							- globalCommandDispatcher.cfg().data.percussions.length * globalCommandDispatcher.cfg().samplerDotHeight
 
-						) / globalCommandDispatcher.cfg().autoPointHeight);
+						) / globalCommandDispatcher.cfg().samplerDotHeight);
+						*/
+						let startY = Math.round((yy - globalCommandDispatcher.cfg().automationTop()) / globalCommandDispatcher.cfg().samplerDotHeight);
 						if (startY < 0) {
 							startY = 0;
 						}
@@ -581,7 +583,7 @@ function fillClipboardList() {
 
 
 					}, (xx: number, yy: number, zz: number) => {
-						tri.h = globalCommandDispatcher.cfg().autoPointHeight / zz;
+						tri.h = globalCommandDispatcher.cfg().samplerDotHeight / zz;
 						tri.w = pasteWidth / zz;
 					}, (zz: number) => { });
 					info.onMenuItemDrag = dragger.doDrag.bind(dragger);

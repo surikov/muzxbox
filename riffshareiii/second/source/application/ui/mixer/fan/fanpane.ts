@@ -32,7 +32,7 @@ class FanPane {
 		}
 
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
-			let css = 'fanConnectionBase fanConnection' + ii;
+			/*let css = 'fanConnectionBase fanConnection' + ii;
 			let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
 			let gridBorder: TileLine = {
 				x1: left
@@ -61,7 +61,7 @@ class FanPane {
 					, css: css
 				};
 				spearsAnchors[ii].content.push(autoBorder);
-			}
+			}*/
 			this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			//this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);

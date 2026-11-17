@@ -46,7 +46,8 @@ let icon_equalizer = '&#xf39e;';
 let icon_sliders = '&#xf3b8;';
 
 let icon_play_circle = '&#xf3a8;';
-let icon_close_circle = '&#xf134;';
+let icon_close_circle_0 = '&#xf134;';
+let icon_close_circle = '&#xf135;';
 
 let icon_delete = '&#xf154;';
 let icon_power = '&#xf1af;';
@@ -69,3 +70,6 @@ let icon_hourglass= '&#xf179';
 
 let icon_valigntop= '&#xf252';
 let icon_valignbottom= '&#xf250';
+
+let icon_check_circle= '&#xf269';
+let icon_star_circle= '&#xf27a';
