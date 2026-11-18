@@ -6237,6 +6237,7 @@ class FanPane {
         this.filterIcons = [];
         this.performerIcons = [];
         this.samplerIcons = [];
+        this.patternIcons = [];
         for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
             this.filterIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
         }
@@ -6246,10 +6247,14 @@ class FanPane {
         for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
             this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
         }
+        for (let tt = 0; tt < globalCommandDispatcher.cfg().data.patterns.length; tt++) {
+            this.patternIcons.push(new PatternIcon(globalCommandDispatcher.cfg().data.patterns[tt].arpeggiator.id));
+        }
         for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
             this.buildPerformerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+            this.buildPatternIcons(fanAnchors[ii], spearsAnchors[ii], ii);
             this.buildOutIcon(fanAnchors[ii], ii);
         }
     }
@@ -6261,6 +6266,11 @@ class FanPane {
     buildSamplerIcons(fanAnchor, spearsAnchor, zidx) {
         for (let ii = 0; ii < this.samplerIcons.length; ii++) {
             this.samplerIcons[ii].buildSamplerSpot(ii, fanAnchor, spearsAnchor, zidx);
+        }
+    }
+    buildPatternIcons(fanAnchor, spearsAnchor, zidx) {
+        for (let ii = 0; ii < this.patternIcons.length; ii++) {
+            this.patternIcons[ii].buildPatternSpot(ii, fanAnchor, spearsAnchor, zidx);
         }
     }
     buildAutoIcons(fanAnchor, spearsAnchor, zidx) {
@@ -6790,6 +6800,315 @@ class SamplerIcon {
                     aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
                         / globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
                     if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.percussions.length) {
+                        dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
+                    }
+                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
+                }
+            }
+        };
+        dragOrderSampleAnchor.content.push(reorderSamplerButton);
+        fanLevelAnchor.content.push(dragOrderSampleAnchor);
+    }
+}
+class PatternIcon {
+    constructor(samplerId) {
+        this.samplerId = samplerId;
+    }
+    buildPatternSpot(percnum, fanLevelAnchor, spearsAnchor, zidx) {
+        for (let ii = 0; ii < globalCommandDispatcher.cfg().data.patterns.length; ii++) {
+            if (globalCommandDispatcher.cfg().data.patterns[ii].arpeggiator.id == this.samplerId) {
+                this.addPatternSpot(percnum, fanLevelAnchor, spearsAnchor, zidx);
+                break;
+            }
+        }
+    }
+    addPatternSpot(percnum, fanLevelAnchor, spearsAnchor, zidx) {
+        let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx) * 0.66;
+        let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+        let top = globalCommandDispatcher.cfg().gridTop();
+        let xx = left;
+        let yy = top;
+        let patternTrack = globalCommandDispatcher.cfg().data.patterns[percnum];
+        if (patternTrack.arpeggiator.iconPosition) {
+            xx = left + patternTrack.arpeggiator.iconPosition.x;
+            yy = top + patternTrack.arpeggiator.iconPosition.y;
+        }
+        let dragAnchor = {
+            xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
+        };
+        fanLevelAnchor.content.push(dragAnchor);
+        let dropAnchor = {
+            xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+            minZoom: fanLevelAnchor.minZoom, beforeZoom: fanLevelAnchor.beforeZoom, content: [], translation: { x: 0, y: 0 }
+        };
+        fanLevelAnchor.content.push(dropAnchor);
+        let rec = {
+            x: xx - sz * 0.6,
+            y: yy - sz,
+            dots: [0, sz,
+                sz, 0,
+                sz * 2, sz,
+                sz, sz * 2
+            ]
+        };
+        let showSoloOnly = globalCommandDispatcher.soloOnly();
+        if (zidx < 7) {
+            let dragSamplerCss = 'fanSamplerMoveIconBase';
+            if (patternTrack.arpeggiator.state == 0 && showSoloOnly)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
+            if (patternTrack.arpeggiator.state == 1)
+                dragSamplerCss = 'fanSamplerMoveIconDisabled';
+            rec.draggable = true;
+            let toFilter = null;
+            let toSpeaker = false;
+            let needReset = false;
+            rec.activation = (x, y) => {
+                if (!dragAnchor.translation) {
+                    dragAnchor.translation = { x: 0, y: 0 };
+                }
+                dropAnchor.content = [];
+                if (x == 0 && y == 0) {
+                    if (!patternTrack.arpeggiator.iconPosition) {
+                        patternTrack.arpeggiator.iconPosition = { x: 0, y: 0 };
+                    }
+                    if (toSpeaker) {
+                        globalCommandDispatcher.exe.commitProjectChanges(['patterns', percnum, 'arpeggiator', 'outputs'], () => {
+                            patternTrack.arpeggiator.outputs.push('');
+                        });
+                    }
+                    else {
+                        if (toFilter) {
+                            globalCommandDispatcher.exe.commitProjectChanges(['patterns', percnum, 'arpeggiator', 'outputs'], () => {
+                                if (toFilter)
+                                    patternTrack.arpeggiator.outputs.push(toFilter.id);
+                            });
+                        }
+                        else {
+                            globalCommandDispatcher.exe.commitProjectChanges(['patterns', percnum, 'arpeggiator'], () => {
+                                if (dragAnchor.translation) {
+                                    patternTrack.arpeggiator.iconPosition.x = patternTrack.arpeggiator.iconPosition.x + dragAnchor.translation.x;
+                                    patternTrack.arpeggiator.iconPosition.y = patternTrack.arpeggiator.iconPosition.y + dragAnchor.translation.y;
+                                }
+                            });
+                        }
+                    }
+                    dragAnchor.translation = { x: 0, y: 0 };
+                }
+                else {
+                    toSpeaker = false;
+                    toFilter = null;
+                    dragAnchor.translation.x = dragAnchor.translation.x + x;
+                    dragAnchor.translation.y = dragAnchor.translation.y + y;
+                    if (patternTrack.arpeggiator.iconPosition) {
+                        let xx = patternTrack.arpeggiator.iconPosition.x + dragAnchor.translation.x;
+                        let yy = patternTrack.arpeggiator.iconPosition.y + dragAnchor.translation.y;
+                        toFilter = globalCommandDispatcher.cfg().dragFindPluginFilterIcon(xx, yy, zidx, patternTrack.arpeggiator.id, patternTrack.arpeggiator.outputs);
+                        if (toFilter) {
+                            needReset = true;
+                            let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+                            let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                            let top = globalCommandDispatcher.cfg().gridTop();
+                            let fx = left;
+                            let fy = top;
+                            if (toFilter.iconPosition) {
+                                fx = left + toFilter.iconPosition.x;
+                                fy = top + toFilter.iconPosition.y;
+                            }
+                            dropAnchor.content.push({
+                                x: fx - sz * 0.75, y: fy - sz * 0.75,
+                                w: sz * 1.5, h: sz * 1.5,
+                                rx: sz * 0.75, ry: sz * 0.75,
+                                css: 'fanConnectionBase  fanConnection' + zidx
+                            });
+                            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                        }
+                        else {
+                            if (globalCommandDispatcher.cfg().dragCollisionSpeaker(xx, yy, patternTrack.arpeggiator.outputs)) {
+                                toSpeaker = true;
+                                needReset = true;
+                                let speakerCenter = globalCommandDispatcher.cfg().speakerFanPosition();
+                                let rec = {
+                                    x: speakerCenter.x - globalCommandDispatcher.cfg().speakerIconSize * 0.55,
+                                    y: speakerCenter.y - globalCommandDispatcher.cfg().speakerIconSize * 0.55,
+                                    w: globalCommandDispatcher.cfg().speakerIconSize * 1.1,
+                                    h: globalCommandDispatcher.cfg().speakerIconSize * 1.1,
+                                    rx: globalCommandDispatcher.cfg().speakerIconSize * 0.55,
+                                    ry: globalCommandDispatcher.cfg().speakerIconSize * 0.55,
+                                    css: 'fanConnectionBase  fanConnection' + zidx
+                                };
+                                dropAnchor.content = [rec];
+                                globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                            }
+                            else {
+                                if (needReset) {
+                                    globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.mixer.fanSVGgroup, fanLevelAnchor, LevelModes.normal);
+                                    needReset = false;
+                                }
+                                else {
+                                    globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragAnchor);
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            rec.css = dragSamplerCss + ' fanSamplerMoveIcon' + zidx;
+            if (zidx < 4) {
+                let interSamplerCss = 'fanSamplerInteractionIcon';
+                if (patternTrack.arpeggiator.state == 0 && showSoloOnly)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
+                if (patternTrack.arpeggiator.state == 1)
+                    interSamplerCss = 'fanSamplerInterDisabledIcon';
+                rec.css = interSamplerCss + ' fanButton' + zidx;
+                rec.activation = (x, y) => {
+                    let info = globalCommandDispatcher.findPluginRegistrationByKind(patternTrack.arpeggiator.kind);
+                    console.log('patternPluginDialog');
+                };
+                rec.draggable = false;
+            }
+        }
+        else {
+            rec.css = 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx;
+        }
+        dragAnchor.content.push(rec);
+        spearsAnchor.content.push({
+            x: xx - sz * 0.6 * 0.9,
+            y: yy - sz * 0.9,
+            dots: [0, sz,
+                sz, 0,
+                sz * 2, sz,
+                sz, sz * 2],
+            css: 'fanConnectionBase fanConnectionSecondary fanConnection' + zidx
+        });
+        if (zidx <= 5) {
+            let labelSamplerCss = 'fanIconLabel';
+            if (patternTrack.arpeggiator.state == 0 && showSoloOnly)
+                labelSamplerCss = 'fanDisabledLabel';
+            if (patternTrack.arpeggiator.state == 1)
+                labelSamplerCss = 'fanDisabledLabel';
+            let txt = {
+                text: patternTrack.title,
+                x: xx - sz * 0.5,
+                y: yy - sz * 0.2,
+                css: labelSamplerCss + ' fanIconLabelSize' + zidx
+            };
+            dragAnchor.content.push(txt);
+        }
+        let patternFromY = globalCommandDispatcher.cfg().patternTop()
+            + (percnum + 0.5) * globalCommandDispatcher.cfg().samplerDotHeight;
+        new ControlConnection().addAudioStreamLineFlow(false, zidx, patternFromY, xx, yy, spearsAnchor);
+        let fol = new FanOutputLine();
+        for (let oo = 0; oo < patternTrack.arpeggiator.outputs.length; oo++) {
+            let outId = patternTrack.arpeggiator.outputs[oo];
+            if (outId) {
+                fol.connectOutput(outId, patternTrack.arpeggiator.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, patternTrack.arpeggiator.outputs, (x, y) => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['patterns', percnum, 'arpeggiator', 'outputs'], () => {
+                        let nn = patternTrack.arpeggiator.outputs.indexOf(outId);
+                        if (nn > -1) {
+                            patternTrack.arpeggiator.outputs.splice(nn, 1);
+                        }
+                    });
+                });
+            }
+            else {
+                fol.connectSpeaker(patternTrack.arpeggiator.id, xx, yy, spearsAnchor, fanLevelAnchor, zidx, patternTrack.arpeggiator.outputs, (x, y) => {
+                    globalCommandDispatcher.exe.commitProjectChanges(['patterns', percnum, 'arpeggiator', 'outputs'], () => {
+                        let nn = patternTrack.arpeggiator.outputs.indexOf('');
+                        if (nn > -1) {
+                            patternTrack.arpeggiator.outputs.splice(nn, 1);
+                        }
+                    });
+                });
+            }
+        }
+        if (zidx < 4) {
+            this.addReorderPatternIcon(zidx, percnum, fanLevelAnchor);
+        }
+        else {
+            if (percnum == 0) {
+                if (zidx < 7) {
+                    this.addZoomReorderPatternIcon(zidx, percnum, fanLevelAnchor);
+                }
+            }
+        }
+    }
+    addZoomReorderPatternIcon(zidx, percnum, fanLevelAnchor) {
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let top = globalCommandDispatcher.cfg().patternTop();
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+        let zoomReorderSamplerButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: 'fanEmptySymbol fanButton' + zidx,
+            draggable: true
+        };
+        fanLevelAnchor.content.push(zoomReorderSamplerButton);
+    }
+    addReorderPatternIcon(zidx, percnum, fanLevelAnchor) {
+        let ratio = zoomPrefixLevelsCSS[zidx].minZoom;
+        if (zidx >= 3) {
+            ratio = ratio / 2;
+        }
+        let top = globalCommandDispatcher.cfg().patternTop();
+        let xx = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth();
+        let sz = globalCommandDispatcher.cfg().samplerDotHeight * 0.75 * ratio;
+        let css = 'fanSamplerMoveIconBase fanSamplerMoveIcon' + zidx;
+        let yy = top + globalCommandDispatcher.cfg().samplerDotHeight * (percnum + 0.5);
+        let dragOrderSampleAnchor = {
+            xx: xx - sz / 2, yy: yy - sz / 2, ww: sz, hh: sz,
+            minZoom: fanLevelAnchor.minZoom,
+            beforeZoom: fanLevelAnchor.beforeZoom,
+            content: [],
+            translation: { x: 0, y: 0 }
+        };
+        let reorderSamplerButton = {
+            x: xx - 0.5 * sz,
+            y: yy - 0.5 * sz,
+            w: sz,
+            h: sz,
+            rx: 0.5 * sz,
+            ry: 0.5 * sz,
+            css: css,
+            draggable: true
+        };
+        let aim = percnum;
+        reorderSamplerButton.activation = (xx, yy) => {
+            if (dragOrderSampleAnchor.translation) {
+                if (xx == 0 && yy == 0) {
+                    dragOrderSampleAnchor.translation.x = 0;
+                    dragOrderSampleAnchor.translation.y = 0;
+                    if (aim < 0) {
+                        aim = 0;
+                    }
+                    if (aim > globalCommandDispatcher.cfg().data.patterns.length - 1) {
+                        aim = globalCommandDispatcher.cfg().data.patterns.length - 1;
+                    }
+                    if (aim == percnum) {
+                        globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
+                    }
+                    else {
+                        globalCommandDispatcher.exe.commitProjectChanges(['patterns'], () => {
+                            let percTrack = globalCommandDispatcher.cfg().data.patterns.splice(percnum, 1)[0];
+                            globalCommandDispatcher.cfg().data.patterns.splice(aim, 0, percTrack);
+                        });
+                        globalCommandDispatcher.resetProject();
+                    }
+                }
+                else {
+                    dragOrderSampleAnchor.translation.x = sz / 3;
+                    aim = Math.round((dragOrderSampleAnchor.translation.y + yy)
+                        / globalCommandDispatcher.cfg().samplerDotHeight) + percnum;
+                    if (aim >= 0 && aim < globalCommandDispatcher.cfg().data.patterns.length) {
                         dragOrderSampleAnchor.translation.y = dragOrderSampleAnchor.translation.y + yy;
                     }
                     globalCommandDispatcher.renderer.tiler.updateAnchorStyle(dragOrderSampleAnchor);
@@ -7594,6 +7913,7 @@ function createNewEmptyProjectData() {
                     id: 'test' + Math.random(),
                     data: '',
                     kind: 'miniumactivestem1',
+                    outputs: [''],
                     iconPosition: { x: 20, y: 20 },
                     state: 0
                 }
@@ -7606,6 +7926,7 @@ function createNewEmptyProjectData() {
                     id: 'test' + Math.random(),
                     data: '',
                     kind: 'miniumactivestem1',
+                    outputs: [''],
                     iconPosition: { x: 30, y: 27 },
                     state: 0
                 }
@@ -7624,10 +7945,10 @@ class MixerDataMathUtility {
         this.rightPad = 50;
         this.topPad = 12;
         this.parTitleGrid = 5;
-        this.padGrid2Sampler = 0.1;
-        this.padSampler2Pattern = 0.1;
-        this.padPattern2Automation = 0.1;
-        this.padAutomation2Comments = 0.1;
+        this.padGrid2Sampler = 0.33;
+        this.padSampler2Pattern = 0.33;
+        this.padPattern2Automation = 0.33;
+        this.padAutomation2Comments = 0.33;
         this.bottomPad = 11;
         this.notePathHeight = 1.00;
         this.samplerDotHeight = 2;

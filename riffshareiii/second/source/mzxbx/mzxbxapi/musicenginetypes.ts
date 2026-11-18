@@ -76,6 +76,7 @@ type Zvoog_Arpeggiator = {
 	id: string;
 	data: string;
 	kind: string;
+	outputs: string[];
 	iconPosition: { x: number, y: number };
 	state: 0 | 1 | 2;//on|mute|solo
 };
@@ -335,6 +336,7 @@ type MZXBX_ChannelSampler = {
 */
 type MZXBX_ActivePatternPlugin = {
 	launch: (parameters: string, base: Zvoog_Project) => Zvoog_Project;
+	output: () => AudioNode | null;
 	busy: () => null | string;
 };
 type MZXBX_AudioSamplerPlugin = {

@@ -3,6 +3,7 @@ class FanPane {
 	//autoIcons: FilterIcon[];
 	performerIcons: PerformerIcon[];
 	samplerIcons: SamplerIcon[];
+	patternIcons: PatternIcon[];
 	//connectionspears: SpearConnection[];
 	
 	resetPlates(fanAnchors: TileAnchor[], spearsAnchors: TileAnchor[]): void {
@@ -11,6 +12,7 @@ class FanPane {
 		this.filterIcons = [];
 		this.performerIcons = [];
 		this.samplerIcons = [];
+		this.patternIcons = [];
 		for (let ff = 0; ff < globalCommandDispatcher.cfg().data.filters.length; ff++) {
 			/*if (globalCommandDispatcher.cfg().data.filters[ff].automation) {
 				this.autoIcons.push(new FilterIcon(globalCommandDispatcher.cfg().data.filters[ff].id));
@@ -29,6 +31,9 @@ class FanPane {
 		//console.log(this.performerIcons.length);
 		for (let tt = 0; tt < globalCommandDispatcher.cfg().data.percussions.length; tt++) {
 			this.samplerIcons.push(new SamplerIcon(globalCommandDispatcher.cfg().data.percussions[tt].sampler.id));
+		}
+for (let tt = 0; tt < globalCommandDispatcher.cfg().data.patterns.length; tt++) {
+			this.patternIcons.push(new PatternIcon(globalCommandDispatcher.cfg().data.patterns[tt].arpeggiator.id));
 		}
 
 		for (let ii = 0; ii < zoomPrefixLevelsCSS.length - 1; ii++) {
@@ -66,6 +71,7 @@ class FanPane {
 			//this.buildFilterIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			this.buildAutoIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			this.buildSamplerIcons(fanAnchors[ii], spearsAnchors[ii], ii);
+			this.buildPatternIcons(fanAnchors[ii], spearsAnchors[ii], ii);
 			this.buildOutIcon(fanAnchors[ii], ii);
 			//this.connectPlugins(cfg, fanAnchors[ii], ii);
 		}
@@ -81,6 +87,11 @@ class FanPane {
 	buildSamplerIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
 		for (let ii = 0; ii < this.samplerIcons.length; ii++) {
 			this.samplerIcons[ii].buildSamplerSpot(ii, fanAnchor, spearsAnchor, zidx);
+		}
+	}
+	buildPatternIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {
+		for (let ii = 0; ii < this.patternIcons.length; ii++) {
+			this.patternIcons[ii].buildPatternSpot(ii, fanAnchor, spearsAnchor, zidx);
 		}
 	}
 	buildAutoIcons(fanAnchor: TileAnchor, spearsAnchor: TileAnchor, zidx: number) {

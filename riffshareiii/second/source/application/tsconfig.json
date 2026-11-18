@@ -60,6 +60,7 @@
 		,"ui/mixer/fan/fanpane.ts"
 		,"ui/mixer/fan/performericon.ts"
 		,"ui/mixer/fan/samplericon.ts"
+		,"ui/mixer/fan/patternicon.ts"
 		,"ui/mixer/fan/filtericon.ts"
 		,"ui/mixer/fan/controlconnection.ts"
 		,"ui/mixer/fan/spearconnection.ts"

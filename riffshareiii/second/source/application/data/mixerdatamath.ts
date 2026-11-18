@@ -8,10 +8,10 @@ class MixerDataMathUtility {
 	topPad = 12;
 	parTitleGrid = 5;
 
-	padGrid2Sampler = 0.1;
-	padSampler2Pattern = 0.1;
-	padPattern2Automation = 0.1;
-	padAutomation2Comments = 0.1;
+	padGrid2Sampler = 0.33;
+	padSampler2Pattern = 0.33;
+	padPattern2Automation = 0.33;
+	padAutomation2Comments = 0.33;
 
 	bottomPad = 11;
 

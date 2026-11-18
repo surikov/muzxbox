@@ -40,6 +40,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 					id: 'test' + Math.random()
 					, data: ''
 					, kind: 'miniumactivestem1'
+					,outputs:['']
 					, iconPosition: { x: 20, y: 20 }
 					, state: 0
 				}
@@ -52,6 +53,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 					id: 'test' + Math.random()
 					, data: ''
 					, kind: 'miniumactivestem1'
+					,outputs:['']
 					, iconPosition: { x: 30, y: 27 }
 					, state: 0
 				}
