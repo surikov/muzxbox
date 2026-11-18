@@ -32,6 +32,23 @@
 	border-radius2: 0.25cm;
 	background-color2: #888888ee;
 }
+#pluginPatternDiv {
+	position: absolute;
+	z-index: 1999;
+	left: 0.0cm;
+	right: 0.0cm;
+	top: 0.0cm;
+	bottom: 0.0cm;
+	border-style: solid;
+	border-width: 0.0cm;
+	border-width2: 0.125cm;
+	border-color2: var(--shadow-color);
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	border-radius2: 0.25cm;
+	background-color2: #888888ee;
+}
 #pluginSequencerDiv {
 	position: absolute;
 	z-index: 1999;

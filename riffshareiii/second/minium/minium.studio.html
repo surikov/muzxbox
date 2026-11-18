@@ -101,6 +101,20 @@
 		</div>
 	</div>
 	
+	<div id="pluginPatternDiv">
+		<div id="pluginPatternHeader" class='pluginOtherHeader'>
+			<div id="pluginPatternTitle" class='pluginPromptTitle' onclick="globalCommandDispatcher.patternPluginDialog.promptDrumTitle();">&nbsp;&nbsp;Pattern plugin UI</div>
+			<div class="pluginCancel" onclick="globalCommandDispatcher.patternPluginDialog.closePatternDialogFrame();">&#xf136;</div>
+		</div>
+		<iframe id="pluginPatternFrame" class="pluginFrame" src="plugins/pluginplaceholder.html"></iframe>
+		<div id="pluginPatternBottom" class='pluginBottom'>
+			<div id="pluginPatternSetPlay" class='pluginDoButton' onclick="globalCommandDispatcher.patternPluginDialog.setPatternOn();">&#xf3bc;</div>
+			<div id="pluginPatternSetPasstrough" class='pluginDoButton' onclick="globalCommandDispatcher.patternPluginDialog.setPatternMute();">&#xf1af;</div>
+			<div id="pluginPatternSetSolo" class='pluginDoButton' onclick="globalCommandDispatcher.patternPluginDialog.setPatternSolo();">&#xf166;</div>
+			<div id="pluginPatternDelete" class='pluginDoButton' onclick="globalCommandDispatcher.patternPluginDialog.dropPattern();">&#xf154;</div>
+		</div>
+	</div>
+	
 	<div id='pagediv'>
 		<!--
 		<input type="file" id="file_midi_input" accept="audio/midi, audio/x-midi" />

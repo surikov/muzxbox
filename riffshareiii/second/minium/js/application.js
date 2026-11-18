@@ -1160,6 +1160,114 @@ class PointPluginDialog {
         }
     }
 }
+class PatternPluginDialog {
+    constructor() {
+        this.dialogID = '?';
+        this.waitSamplerPluginInit = false;
+        window.addEventListener('message', this.receiveMessageFromSamplerPlugin.bind(this), false);
+    }
+    promptDrumTitle() {
+    }
+    resetDrumTitle() {
+        let pluginTitle = document.getElementById("pluginSamplerTitle");
+    }
+    resetStateButtons() {
+    }
+    setDrumOn() {
+    }
+    setDrumMute() {
+    }
+    setDrumSolo() {
+    }
+    dropDrum() {
+        globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
+            globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
+        });
+        this.closeDrumDialogFrame();
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    openEmptyDrumPluginDialogFrame(order, drum) {
+    }
+    openPatternPluginDialogFrame(order, patt, fplugin) {
+        this.patternTrack = patt;
+        this.order = order;
+        this.pluginRawData = patt.arpeggiator.data;
+        this.resetDrumTitle();
+        let pluginFrame = document.getElementById("pluginPatternFrame");
+        let pluginDiv = document.getElementById("pluginPatternDiv");
+        if (pluginFrame) {
+            if (pluginFrame.contentWindow) {
+                this.waitSamplerPluginInit = true;
+                if (fplugin) {
+                    pluginFrame.contentWindow.window.location.replace(fplugin.ui);
+                }
+                pluginDiv.style.visibility = "visible";
+                this.resetStateButtons();
+            }
+        }
+    }
+    closePatternDialogFrame() {
+        let pluginDiv = document.getElementById("pluginPatternDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginPatternFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    closeDrumDialogFrame() {
+        let pluginDiv = document.getElementById("pluginSamplerDiv");
+        if (pluginDiv) {
+            pluginDiv.style.visibility = "hidden";
+        }
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            pluginFrame.src = "plugins/pluginplaceholder.html";
+        }
+    }
+    sendNewIdToPlugin() {
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            this.dialogID = '' + Math.random();
+            let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    sendPointToPlugin() {
+        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        if (pluginFrame) {
+            let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
+            pluginFrame.contentWindow.postMessage(message, '*');
+        }
+    }
+    setFilterValue() {
+    }
+    receiveMessageFromSamplerPlugin(event) {
+        if (!(event.data)) {
+        }
+        else {
+            let message = event.data;
+            if (message.dialogID) {
+                if (message.dialogID == this.dialogID) {
+                    this.pluginRawData = message.pluginData;
+                    this.setFilterValue();
+                }
+                else {
+                }
+            }
+            else {
+                if (this.waitSamplerPluginInit) {
+                    this.waitSamplerPluginInit = false;
+                    this.sendNewIdToPlugin();
+                    this.sendPointToPlugin();
+                }
+                else {
+                }
+            }
+        }
+    }
+}
 class CommandExe {
     constructor() {
         this.lockUndoRedo = false;
@@ -1360,6 +1468,7 @@ class CommandDispatcher {
         this.samplerPluginDialog = new SamplerPluginDialog();
         this.actionPluginDialog = new ActionPluginDialog();
         this.sequencerPluginDialog = new SequencerPluginDialog();
+        this.patternPluginDialog = new PatternPluginDialog();
     }
     soloOnly() {
         let soloOnly = false;
@@ -6964,6 +7073,7 @@ class PatternIcon {
                 rec.activation = (x, y) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(patternTrack.arpeggiator.kind);
                     console.log('patternPluginDialog');
+                    globalCommandDispatcher.patternPluginDialog.openPatternPluginDialogFrame(percnum, patternTrack, info);
                 };
                 rec.draggable = false;
             }

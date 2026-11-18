@@ -150,6 +150,7 @@ class CommandDispatcher {
 	samplerPluginDialog = new SamplerPluginDialog();
 	actionPluginDialog = new ActionPluginDialog();
 	sequencerPluginDialog = new SequencerPluginDialog();
+	patternPluginDialog = new PatternPluginDialog();
 	cfg(): MixerDataMathUtility {
 		return this._mixerDataMathUtility;
 	}

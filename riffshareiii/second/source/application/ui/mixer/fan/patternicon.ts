@@ -168,7 +168,7 @@ class PatternIcon {
                 rec.activation = (x: number, y: number) => {
                     let info = globalCommandDispatcher.findPluginRegistrationByKind(patternTrack.arpeggiator.kind);
                     console.log('patternPluginDialog');
-                    //globalCommandDispatcher.samplerPluginDialog.openDrumPluginDialogFrame(percnum, samplerTrack, info);
+                    globalCommandDispatcher.patternPluginDialog.openPatternPluginDialogFrame(percnum, patternTrack, info);
                 }
                 rec.draggable = false;
             }

@@ -34,6 +34,7 @@
 		,"ui/pluginprompt/actionPluginDialog.ts"
 		,"ui/pluginprompt/sequencerPluginDialog.ts"
 		,"ui/pluginprompt/pointPluginDialog.ts"
+		,"ui/pluginprompt/patternPluginDialog.ts"
 
 		,"commands/execommand.ts"
         ,"commands/commanddispatcher.ts"
