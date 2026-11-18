@@ -12,7 +12,6 @@ class MixerBar {
 		//, durationLen: number
 
 	) {
-		//let durationLen = 1 * globalCommandDispatcher.cfg().widthDurationRatio;
 		let h12 = 12 * globalCommandDispatcher.cfg().notePathHeight;
 		let transpose = globalCommandDispatcher.cfg().transposeOctaveCount() * 12;
 		if (zoomLevel < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
@@ -21,16 +20,12 @@ class MixerBar {
 				, y: globalCommandDispatcher.cfg().gridTop()
 				, w: gridZoomBarAnchor.ww
 				, h: globalCommandDispatcher.cfg().gridHeight()
-				//, rx: barOctaveAnchor.ww / 2
-				//, ry: globalCommandDispatcher.cfg().data.filters.length*globalCommandDispatcher.cfg().samplerDotHeight / 2
 				, css: 'commentPaneForClick'
 				, activation: (x: number, y: number) => {
-
 					this.trackCellClick(barIdx, x, y, zoomLevel);
 				}
 			};
 			gridZoomBarAnchor.content.push(interpane);
-
 		}
 
 		for (let oo = globalCommandDispatcher.cfg().transposeOctaveCount(); oo < globalCommandDispatcher.cfg().drawOctaveCount(); oo++) {
@@ -90,7 +85,6 @@ class MixerBar {
 				if (!(durationLen > 0)) {
 					durationLen = 1;
 				}
-				//console.log('durationLen',durationLen,drum.sampler.id);
 				if (drum) {
 					let measure: Zvoog_PercussionMeasure = drum.measures[barIdx];
 					if (measure) {
@@ -112,13 +106,10 @@ class MixerBar {
 	findDurationOfSample(samplerId: string): number {
 		if (globalCommandDispatcher.player) {
 			let arr = globalCommandDispatcher.player.allPerformersSamplers();
-			//console.log('findDurationOfSample', samplerId,arr);
 			for (let ii = 0; ii < arr.length; ii++) {
 				if (arr[ii].channel.id == samplerId) {
 					try {
 						let pluginImplementation = arr[ii].pluginPerformerSampler as any;// as MZXBX_AudioSamplerPlugin;
-						//console.log('findDurationOfSample',smplr.duration(),'for', samplerId);
-						//return smplr.duration();
 						if (pluginImplementation) {
 							if (pluginImplementation.duration) {
 								return pluginImplementation.duration();
@@ -135,7 +126,6 @@ class MixerBar {
 				}
 			}
 		}
-		//console.log('findDurationOfSample unknown for', samplerId);
 		return 0.0001;
 	}
 	addOctaveGridSteps(
@@ -190,7 +180,6 @@ class MixerBar {
 				if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
 					css = 'interactiveTimeMeasureMark';
 				}
-				//css='debug';
 				while (true) {
 					let line = zoomInfo.gridLines[lineCount];
 					skip = skip.plus(line.duration).simplyfy();
@@ -240,21 +229,11 @@ class MixerBar {
 						lineCount = 0;
 					}
 				}
-				/*if (zIndex < globalCommandDispatcher.cfg().zoomEditZoomIdxLess) {
-					let xx = barLeft + skip.duration(curBar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
-					let line = zoomInfo.gridLines[lineCount];
-					barOctaveAnchor.content.push({
-						x: xx
-						, y: globalCommandDispatcher.cfg().commentsTop()
-						, w: line.ratio * zoomInfo.minZoom / 4
-						, h: globalCommandDispatcher.cfg().commentsZoomHeight(zIndex)
-						, css: css
-					});
-				}*/
 			}
 		}
 	}
 	trackCellClick(barIdx: number, barX: number, yy: number, zz: number) {
+		console.log('trackCellClick');
 		let upperTrackIdx: number = globalCommandDispatcher.calculateRealTrackFarOrder()[0];
 		let trMeasure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[barIdx];
 		let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
@@ -311,12 +290,9 @@ class MixerBar {
 				chord.slides = [{ duration: duration, delta: shift }];
 			});
 			globalCommandDispatcher.cfg().editGridMark = null;
-			//console.log('trackCellClick barIdx',barIdx);
-			//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 		} else {
 			let cuslidemark = globalCommandDispatcher.cfg().slidemark;
 			if (cuslidemark) {
-				//console.log('trackCellClick slie');
 				let from = MMUtil().set(cuslidemark.chord.skip);
 				let toStart = MMUtil().set(info.start);
 				let toEnd = MMUtil().set(info.end);
@@ -345,12 +321,12 @@ class MixerBar {
 					globalCommandDispatcher.exe.commitProjectChanges(['tracks', upperTrackIdx, 'measures', barIdx], () => {
 						if (cuslidemark) {
 							cuslidemark.chord.slides.push({ duration: duration, delta: pitch - cuslidemark.pitch + 11 });
-							//console.log(cuslidemark, pitch);
 						}
 					});
 					globalCommandDispatcher.cfg().slidemark = null;
 				}
 			} else {
+				console.log('trackCellClick set');
 				let muStart = MMUtil().set(info.start);
 				let muEnd = MMUtil().set(info.end);
 				let drop = false;
@@ -369,18 +345,14 @@ class MixerBar {
 					}
 				});
 				if (!drop) {
-					//console.log('trackCellClick new');
 					globalCommandDispatcher.cfg().editGridMark = { barIdx: barIdx, skip: muStart.metre(), pitch };
 				} else {
-					//console.log('trackCellClick drop');
-					//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
+					//
 				}
-				//globalCommandDispatcher.renderer.mixer.resetEditMark();
 			}
 		}
-		//globalCommandDispatcher.resetProject();
+		console.log('trackCellClick done');
 		globalCommandDispatcher.renderer.mixer.resetEditMark();
-		//globalCommandDispatcher.updateSingleBarPlayerSchedule(barIdx);
 		globalCommandDispatcher.updatePlayerSchedule();
 	}
 

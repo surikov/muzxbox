@@ -116,54 +116,75 @@ class PatternBarContent {
         let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
         let arp = globalCommandDispatcher.cfg().data.patterns[row];
         let info: BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-        let change: null | Zvoog_PatternPoint = null;
+        let existedPoint: null | Zvoog_PatternPoint = null;
         let muStart = MMUtil().set(info.start);
         let muEnd = MMUtil().set(info.end);
-        let changeIdx = 0;
-
-        for (changeIdx = 0; changeIdx < arp.measures[barIdx].points.length; changeIdx++) {
-            let testChange = arp.measures[barIdx].points[changeIdx];
+        //let exstdIdx = 0;
+        //console.log(info);
+        for (let exstdIdx = 0; exstdIdx < arp.measures[barIdx].points.length; exstdIdx++) {
+            let testChange = arp.measures[barIdx].points[exstdIdx];
             if (muStart.more(testChange.skip)) {
                 //
             } else {
                 if (muEnd.more(testChange.skip)) {
-                    change = testChange;
+                    existedPoint = testChange;
                     globalCommandDispatcher.exe.commitProjectChanges(['patterns', row], () => {
-                        arp.measures[barIdx].points.splice(changeIdx, 1);
-                        globalCommandDispatcher.resetProject();
+                        arp.measures[barIdx].points.splice(exstdIdx, 1);
+                        //globalCommandDispatcher.resetProject();
+                        globalCommandDispatcher.renderer.mixer.resetPatternMark();
                     });
                     break;
                 }
             }
         }
-        // console.log('change', change);
-        //  console.log('info', info);
-        if (!(change)) {
-            
+        //console.log('patternCellClick bar', barIdx, 'x', barX, 'y', yy, 'z', zz, existedPoint);
+        if (existedPoint) {
+            //globalCommandDispatcher.cfg().editPatternMark = null;
+        } else {
+
             if (globalCommandDispatcher.cfg().editPatternMark) {
+                //console.log('patternCellClick add line');
+                let mark = globalCommandDispatcher.cfg().editPatternMark;
+
+                globalCommandDispatcher.exe.commitProjectChanges(['patterns', row], () => {
+                    if (mark) {
+                        let startBarIdx = mark.barIdx;
+                        let startSkip = MMUtil().set(mark.skip);
+                        let endBarIdx = barIdx;
+                        let endSkip = MMUtil().set(info.end);
+                        if ((startBarIdx == endBarIdx && MMUtil().set(mark.skip).more(info.start)) || (mark.barIdx > barIdx)) {
+                            console.log('flip');
+                            startBarIdx = barIdx;
+                            startSkip = MMUtil().set(info.start);
+                            endBarIdx = mark.barIdx;
+                            endSkip = MMUtil().set(mark.skip).plus(info.length);
+                        }
+                        let duration = MMUtil().set({ count: 0, part: 4 });
+                        for (let tt = startBarIdx; tt < endBarIdx; tt++) {
+                            duration = duration.plus(globalCommandDispatcher.cfg().data.timeline[tt].metre);
+                        }
+                        duration = duration.plus(endSkip).minus(startSkip);
+                        //console.log('duration', duration, 'mark', mark, 'info', info);
+                        //console.log(startSkip,endSkip);
+                        globalCommandDispatcher.cfg().data
+                            .patterns[mark.rowIdx]
+                            .measures[startBarIdx]
+                            .points.push({ skip: startSkip, duration: duration.metre() });
+                        globalCommandDispatcher.resetProject();
+                    }
+                });
                 globalCommandDispatcher.cfg().editPatternMark = null;
-                //console.log('remove mark');
+
             } else {
+                //console.log('patternCellClick start line');
                 globalCommandDispatcher.cfg().editPatternMark = { barIdx: barIdx, skip: muStart.metre(), rowIdx: row };
+
                 //console.log('mark', globalCommandDispatcher.cfg().editPatternMark);
+                globalCommandDispatcher.resetProject();
+                globalCommandDispatcher.renderer.mixer.resetPatternMark();
             }
-            globalCommandDispatcher.renderer.mixer.resetPatternMark();
+            //globalCommandDispatcher.renderer.mixer.resetPatternMark();
 
         }
-        /*
-                if (change) {
-                    //
-                } else {
-                    globalCommandDispatcher.exe.commitProjectChanges(['filters', row, 'automation', barIdx], () => {
-                        change = { skip: info.start, stateBlob: '' };
-                        arp.measures[barIdx].points.push(change);
-                    });
-                }
-                let finfo = globalCommandDispatcher.findPluginRegistrationByKind(arp.kind);
-                if (finfo) {
-                    if (change) {
-                        globalCommandDispatcher.pointPluginDialog.openPointPluginDialogFrame(row, barIdx, info, changeIdx, change, filter, finfo);
-                    }
-                }*/
     }
 }

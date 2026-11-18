@@ -30,7 +30,7 @@ class MixerUI {
 	reFillMixerUI(//data: Zvoog_Project
 
 	) {
-
+		//console.log('reFillMixerUI');
 		//let mixm: MixerDataMath = new MixerDataMath(data);
 		let ww = globalCommandDispatcher.cfg().wholeWidth();
 		let hh = globalCommandDispatcher.cfg().wholeHeight();
@@ -142,7 +142,7 @@ class MixerUI {
 	}
 	resetEditMark() {
 		let mark = globalCommandDispatcher.cfg().editGridMark;
-		//console.log('resetEditMark', mark,Date.now()%10000);
+		//console.log('resetEditMark', mark);
 		if (mark) {
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
@@ -179,10 +179,10 @@ class MixerUI {
 		//console.log('done resetEditMark', mark,Date.now()%10000);
 	}
 	resetPatternMark() {
-		console.log('resetPatternMark',globalCommandDispatcher.cfg().editPatternMark);
+		//console.log('resetPatternMark', globalCommandDispatcher.cfg().editPatternMark);
 		let mark = globalCommandDispatcher.cfg().editPatternMark;
 		if (mark) {
-			
+
 			let mm: Zvoog_MetreMathType = MMUtil();
 			let barX = 0;
 			let cubar: Zvoog_SongMeasure = globalCommandDispatcher.cfg().data.timeline[0];
@@ -193,12 +193,11 @@ class MixerUI {
 					;
 			}
 
-			let top = globalCommandDispatcher.cfg().patternTop()
-				+  mark.rowIdx;
+			let top = globalCommandDispatcher.cfg().patternTop()				+ mark.rowIdx*globalCommandDispatcher.cfg().samplerDotHeight;
 			let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
 			let rr = globalCommandDispatcher.cfg().samplerDotHeight;
 			let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio
-			
+
 			this.markAnchor.xx = globalCommandDispatcher.cfg().leftPad + barX + skipX;
 			this.markAnchor.yy = top - rr / 2;
 			this.markAnchor.ww = rr;
@@ -210,7 +209,7 @@ class MixerUI {
 			this.markRectangle.rx = rr;
 			this.markRectangle.ry = rr;
 			this.markRectangle.css = 'markPointFill';
-			
+
 		} else {
 			this.markRectangle.css = 'markPointNone';
 		}

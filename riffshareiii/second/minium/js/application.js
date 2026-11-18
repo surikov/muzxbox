@@ -5324,6 +5324,7 @@ class MixerBar {
         }
     }
     trackCellClick(barIdx, barX, yy, zz) {
+        console.log('trackCellClick');
         let upperTrackIdx = globalCommandDispatcher.calculateRealTrackFarOrder()[0];
         let trMeasure = globalCommandDispatcher.cfg().data.tracks[upperTrackIdx].measures[barIdx];
         let pitch = Math.ceil(globalCommandDispatcher.cfg().gridHeight() - yy);
@@ -5417,6 +5418,7 @@ class MixerBar {
                 }
             }
             else {
+                console.log('trackCellClick set');
                 let muStart = MMUtil().set(info.start);
                 let muEnd = MMUtil().set(info.end);
                 let drop = false;
@@ -5441,6 +5443,7 @@ class MixerBar {
                 }
             }
         }
+        console.log('trackCellClick done');
         globalCommandDispatcher.renderer.mixer.resetEditMark();
         globalCommandDispatcher.updatePlayerSchedule();
     }
@@ -5733,33 +5736,61 @@ class PatternBarContent {
         let row = Math.floor(yy / globalCommandDispatcher.cfg().samplerDotHeight);
         let arp = globalCommandDispatcher.cfg().data.patterns[row];
         let info = globalCommandDispatcher.cfg().gridClickInfo(barIdx, barX, zz);
-        let change = null;
+        let existedPoint = null;
         let muStart = MMUtil().set(info.start);
         let muEnd = MMUtil().set(info.end);
-        let changeIdx = 0;
-        for (changeIdx = 0; changeIdx < arp.measures[barIdx].points.length; changeIdx++) {
-            let testChange = arp.measures[barIdx].points[changeIdx];
+        for (let exstdIdx = 0; exstdIdx < arp.measures[barIdx].points.length; exstdIdx++) {
+            let testChange = arp.measures[barIdx].points[exstdIdx];
             if (muStart.more(testChange.skip)) {
             }
             else {
                 if (muEnd.more(testChange.skip)) {
-                    change = testChange;
+                    existedPoint = testChange;
                     globalCommandDispatcher.exe.commitProjectChanges(['patterns', row], () => {
-                        arp.measures[barIdx].points.splice(changeIdx, 1);
-                        globalCommandDispatcher.resetProject();
+                        arp.measures[barIdx].points.splice(exstdIdx, 1);
+                        globalCommandDispatcher.renderer.mixer.resetPatternMark();
                     });
                     break;
                 }
             }
         }
-        if (!(change)) {
+        if (existedPoint) {
+        }
+        else {
             if (globalCommandDispatcher.cfg().editPatternMark) {
+                let mark = globalCommandDispatcher.cfg().editPatternMark;
+                globalCommandDispatcher.exe.commitProjectChanges(['patterns', row], () => {
+                    if (mark) {
+                        let startBarIdx = mark.barIdx;
+                        let startSkip = MMUtil().set(mark.skip);
+                        let endBarIdx = barIdx;
+                        let endSkip = MMUtil().set(info.end);
+                        if ((startBarIdx == endBarIdx && MMUtil().set(mark.skip).more(info.start)) || (mark.barIdx > barIdx)) {
+                            console.log('flip');
+                            startBarIdx = barIdx;
+                            startSkip = MMUtil().set(info.start);
+                            endBarIdx = mark.barIdx;
+                            endSkip = MMUtil().set(mark.skip).plus(info.length);
+                        }
+                        let duration = MMUtil().set({ count: 0, part: 4 });
+                        for (let tt = startBarIdx; tt < endBarIdx; tt++) {
+                            duration = duration.plus(globalCommandDispatcher.cfg().data.timeline[tt].metre);
+                        }
+                        duration = duration.plus(endSkip).minus(startSkip);
+                        globalCommandDispatcher.cfg().data
+                            .patterns[mark.rowIdx]
+                            .measures[startBarIdx]
+                            .points.push({ skip: startSkip, duration: duration.metre() });
+                        globalCommandDispatcher.resetProject();
+                    }
+                });
                 globalCommandDispatcher.cfg().editPatternMark = null;
             }
             else {
                 globalCommandDispatcher.cfg().editPatternMark = { barIdx: barIdx, skip: muStart.metre(), rowIdx: row };
+                globalCommandDispatcher.resetProject();
+                globalCommandDispatcher.renderer.mixer.resetPatternMark();
             }
-            globalCommandDispatcher.renderer.mixer.resetPatternMark();
         }
     }
 }
@@ -5880,7 +5911,6 @@ class MixerUI {
         }
     }
     resetPatternMark() {
-        console.log('resetPatternMark', globalCommandDispatcher.cfg().editPatternMark);
         let mark = globalCommandDispatcher.cfg().editPatternMark;
         if (mark) {
             let mm = MMUtil();
@@ -5891,8 +5921,7 @@ class MixerUI {
                 barX = barX + mm.set(cubar.metre).duration(cubar.tempo)
                     * globalCommandDispatcher.cfg().widthDurationRatio;
             }
-            let top = globalCommandDispatcher.cfg().patternTop()
-                + mark.rowIdx;
+            let top = globalCommandDispatcher.cfg().patternTop() + mark.rowIdx * globalCommandDispatcher.cfg().samplerDotHeight;
             let markbar = globalCommandDispatcher.cfg().data.timeline[mark.barIdx];
             let rr = globalCommandDispatcher.cfg().samplerDotHeight;
             let skipX = mm.set(mark.skip).duration(markbar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
