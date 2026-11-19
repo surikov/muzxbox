@@ -5,77 +5,77 @@ class PatternPluginDialog {
 	dialogID: string = '?';
 	waitSamplerPluginInit: boolean = false;
 	constructor() {
-		window.addEventListener('message', this.receiveMessageFromSamplerPlugin.bind(this), false);
+		window.addEventListener('message', this.receiveMessageFromPatternPlugin.bind(this), false);
 	}
-	promptDrumTitle() {
-		/*let newTitle = prompt(this.drum.title, this.drum.title);
-		if (newTitle == this.drum.title) {
+	promptPatternTitle() {
+		let newTitle = prompt(this.patternTrack.title, this.patternTrack.title);
+		if (newTitle == this.patternTrack.title) {
 			//
 		} else {
 			if (newTitle != null) {
-				globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
+				globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
 					if (newTitle) {
-						this.drum.title = newTitle;
+						this.patternTrack.title = newTitle;
 					};
 				});
-				this.resetDrumTitle();
+				this.resetPatternTitle();
 			}
-		}*/
+		}
 	}
-	resetDrumTitle() {
-		let pluginTitle = document.getElementById("pluginSamplerTitle") as any;
-		//pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.drum.title;
+	resetPatternTitle() {
+		let pluginTitle = document.getElementById("pluginPatternTitle") as any;
+		pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.patternTrack.title;
 	}
 	resetStateButtons() {
-		/*if (this.drum.sampler.state == 1) {//0 | 1 | 2;//on|mute|solo
-			(document.getElementById("pluginSamplerSetPlay") as any).className = 'pluginDoButton';
-			(document.getElementById("pluginSamplerSetPasstrough") as any).className = 'pluginNoneButton';
-			(document.getElementById("pluginSamplerSetSolo") as any).className = 'pluginDoButton';
+		if (this.patternTrack.arpeggiator.state == 1) {//0 | 1 | 2;//on|mute|solo
+			(document.getElementById("pluginPatternSetPlay") as any).className = 'pluginDoButton';
+			(document.getElementById("pluginPatternSetPasstrough") as any).className = 'pluginNoneButton';
+			(document.getElementById("pluginPatternSetSolo") as any).className = 'pluginDoButton';
 		} else {
-			if (this.drum.sampler.state == 2) {
-				(document.getElementById("pluginSamplerSetPlay") as any).className = 'pluginDoButton';
-				(document.getElementById("pluginSamplerSetPasstrough") as any).className = 'pluginDoButton';
-				(document.getElementById("pluginSamplerSetSolo") as any).className = 'pluginNoneButton';
+			if (this.patternTrack.arpeggiator.state == 2) {
+				(document.getElementById("pluginPatternSetPlay") as any).className = 'pluginDoButton';
+				(document.getElementById("pluginPatternSetPasstrough") as any).className = 'pluginDoButton';
+				(document.getElementById("pluginPatternSetSolo") as any).className = 'pluginNoneButton';
 			} else {
-				(document.getElementById("pluginSamplerSetPlay") as any).className = 'pluginNoneButton';
-				(document.getElementById("pluginSamplerSetPasstrough") as any).className = 'pluginDoButton';
-				(document.getElementById("pluginSamplerSetSolo") as any).className = 'pluginDoButton';
+				(document.getElementById("pluginPatternSetPlay") as any).className = 'pluginNoneButton';
+				(document.getElementById("pluginPatternSetPasstrough") as any).className = 'pluginDoButton';
+				(document.getElementById("pluginPatternSetSolo") as any).className = 'pluginDoButton';
 			}
-		}*/
+		}
 	}
-	setDrumOn() {
-		/*globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
-			this.drum.sampler.state = 0;
+	setPatternOn() {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+			this.patternTrack.arpeggiator.state = 0;
 		});
 		this.resetStateButtons();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
 		globalCommandDispatcher.reStartPlayIfPlay();//false);*/
 	}
-	setDrumMute() {
-		/*globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
-			this.drum.sampler.state = 1;
+	setPatternMute() {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+			this.patternTrack.arpeggiator.state = 1;
 		});
 		this.resetStateButtons();
-		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay();//false);*/
-	}
-	setDrumSolo() {
-		/*globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
-			this.drum.sampler.state = 2;
-		});
-		this.resetStateButtons();
-		//globalCommandDispatcher.reConnectPluginsIfPlay();
-		globalCommandDispatcher.reStartPlayIfPlay();//false);*/
-	}
-	dropDrum() {
-		globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-			globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
-		});
-		this.closeDrumDialogFrame();
 		//globalCommandDispatcher.reConnectPluginsIfPlay();
 		globalCommandDispatcher.reStartPlayIfPlay();//false);
 	}
-	openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack) {
+	setPatternSolo() {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+			this.patternTrack.arpeggiator.state = 2;
+		});
+		this.resetStateButtons();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
+	}
+	dropPattern() {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns'], () => {
+			globalCommandDispatcher.cfg().data.patterns.splice(this.order, 1);
+		});
+		this.closePatternDialogFrame();
+		//globalCommandDispatcher.reConnectPluginsIfPlay();
+		globalCommandDispatcher.reStartPlayIfPlay();//false);
+	}
+	//openEmptyDrumPluginDialogFrame(order: number, drum: Zvoog_PercussionTrack) {
 		/*this.drum = drum;
 		this.order = order;
 		this.resetDrumTitle();
@@ -87,13 +87,13 @@ class PatternPluginDialog {
 		}
 		pluginDiv.style.visibility = "visible";
 		this.resetStateButtons();*/
-	}
+	//}
 	openPatternPluginDialogFrame(order: number, patt: Zvoog_PatternTrack, fplugin: null | MZXBX_PluginRegistrationInformation) {
 		//console.log('openDrumPluginDialogFrame',order, drum, fplugin);
 		this.patternTrack = patt;
 		this.order = order;
 		this.pluginRawData = patt.arpeggiator.data;
-		this.resetDrumTitle();
+		this.resetPatternTitle();
 		let pluginFrame = document.getElementById("pluginPatternFrame") as HTMLIFrameElement;
 		let pluginDiv = document.getElementById("pluginPatternDiv") as any;
 		if (pluginFrame) {
@@ -118,7 +118,7 @@ class PatternPluginDialog {
 			pluginFrame.src = "plugins/pluginplaceholder.html";
 		}
 	}
-	closeDrumDialogFrame(): void {
+	/*closeDrumDialogFrame(): void {
 		let pluginDiv = document.getElementById("pluginSamplerDiv") as any;
 		if (pluginDiv) {
 			pluginDiv.style.visibility = "hidden";
@@ -127,9 +127,9 @@ class PatternPluginDialog {
 		if (pluginFrame) {
 			pluginFrame.src = "plugins/pluginplaceholder.html";
 		}
-	}
+	}*/
 	sendNewIdToPlugin() {
-		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
+		let pluginFrame = document.getElementById("pluginPatternFrame") as any;
 		if (pluginFrame) {
 			this.dialogID = '' + Math.random();
 			let message: MZXBX_MessageToPlugin = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
@@ -137,21 +137,21 @@ class PatternPluginDialog {
 		}
 	}
 	sendPointToPlugin() {
-		let pluginFrame = document.getElementById("pluginSamplerFrame") as any;
+		let pluginFrame = document.getElementById("pluginPatternFrame") as any;
 		if (pluginFrame) {
 			let message: MZXBX_MessageToPlugin = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
 			pluginFrame.contentWindow.postMessage(message, '*');
 			//console.log('sendPointToPlugin', message);
 		}
 	}
-	setFilterValue() {
-		/*globalCommandDispatcher.exe.commitProjectChanges(['percussions', this.order], () => {
-			this.drum.sampler.data = this.pluginRawData;
+	setPatternValue() {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+			this.patternTrack.arpeggiator.data = this.pluginRawData;
 		});
 		globalCommandDispatcher.reStartPlayIfPlay();//false);
-        */
+        
 	}
-	receiveMessageFromSamplerPlugin(event) {
+	receiveMessageFromPatternPlugin(event) {
 		//console.log('receiveMessageFromPlugin', event);
 		if (!(event.data)) {
 			//console.log('empty message data');
@@ -161,7 +161,7 @@ class PatternPluginDialog {
 				//console.log('receiveMessageFromPlugin', message);
 				if (message.dialogID == this.dialogID) {
 					this.pluginRawData = message.pluginData;
-					this.setFilterValue();
+					this.setPatternValue();
 				} else {
 					//console.log('wrong received message id', message.dialogID, this.dialogID);
 				}

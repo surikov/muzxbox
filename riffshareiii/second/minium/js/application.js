@@ -1164,35 +1164,80 @@ class PatternPluginDialog {
     constructor() {
         this.dialogID = '?';
         this.waitSamplerPluginInit = false;
-        window.addEventListener('message', this.receiveMessageFromSamplerPlugin.bind(this), false);
+        window.addEventListener('message', this.receiveMessageFromPatternPlugin.bind(this), false);
     }
-    promptDrumTitle() {
+    promptPatternTitle() {
+        let newTitle = prompt(this.patternTrack.title, this.patternTrack.title);
+        if (newTitle == this.patternTrack.title) {
+        }
+        else {
+            if (newTitle != null) {
+                globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+                    if (newTitle) {
+                        this.patternTrack.title = newTitle;
+                    }
+                    ;
+                });
+                this.resetPatternTitle();
+            }
+        }
     }
-    resetDrumTitle() {
-        let pluginTitle = document.getElementById("pluginSamplerTitle");
+    resetPatternTitle() {
+        let pluginTitle = document.getElementById("pluginPatternTitle");
+        pluginTitle.innerHTML = '&nbsp;&nbsp;' + this.patternTrack.title;
     }
     resetStateButtons() {
+        if (this.patternTrack.arpeggiator.state == 1) {
+            document.getElementById("pluginPatternSetPlay").className = 'pluginDoButton';
+            document.getElementById("pluginPatternSetPasstrough").className = 'pluginNoneButton';
+            document.getElementById("pluginPatternSetSolo").className = 'pluginDoButton';
+        }
+        else {
+            if (this.patternTrack.arpeggiator.state == 2) {
+                document.getElementById("pluginPatternSetPlay").className = 'pluginDoButton';
+                document.getElementById("pluginPatternSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginPatternSetSolo").className = 'pluginNoneButton';
+            }
+            else {
+                document.getElementById("pluginPatternSetPlay").className = 'pluginNoneButton';
+                document.getElementById("pluginPatternSetPasstrough").className = 'pluginDoButton';
+                document.getElementById("pluginPatternSetSolo").className = 'pluginDoButton';
+            }
+        }
     }
-    setDrumOn() {
-    }
-    setDrumMute() {
-    }
-    setDrumSolo() {
-    }
-    dropDrum() {
-        globalCommandDispatcher.exe.commitProjectChanges(['percussions'], () => {
-            globalCommandDispatcher.cfg().data.percussions.splice(this.order, 1);
+    setPatternOn() {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+            this.patternTrack.arpeggiator.state = 0;
         });
-        this.closeDrumDialogFrame();
+        this.resetStateButtons();
         globalCommandDispatcher.reStartPlayIfPlay();
     }
-    openEmptyDrumPluginDialogFrame(order, drum) {
+    setPatternMute() {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+            this.patternTrack.arpeggiator.state = 1;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    setPatternSolo() {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+            this.patternTrack.arpeggiator.state = 2;
+        });
+        this.resetStateButtons();
+        globalCommandDispatcher.reStartPlayIfPlay();
+    }
+    dropPattern() {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns'], () => {
+            globalCommandDispatcher.cfg().data.patterns.splice(this.order, 1);
+        });
+        this.closePatternDialogFrame();
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
     openPatternPluginDialogFrame(order, patt, fplugin) {
         this.patternTrack = patt;
         this.order = order;
         this.pluginRawData = patt.arpeggiator.data;
-        this.resetDrumTitle();
+        this.resetPatternTitle();
         let pluginFrame = document.getElementById("pluginPatternFrame");
         let pluginDiv = document.getElementById("pluginPatternDiv");
         if (pluginFrame) {
@@ -1216,18 +1261,8 @@ class PatternPluginDialog {
             pluginFrame.src = "plugins/pluginplaceholder.html";
         }
     }
-    closeDrumDialogFrame() {
-        let pluginDiv = document.getElementById("pluginSamplerDiv");
-        if (pluginDiv) {
-            pluginDiv.style.visibility = "hidden";
-        }
-        let pluginFrame = document.getElementById("pluginSamplerFrame");
-        if (pluginFrame) {
-            pluginFrame.src = "plugins/pluginplaceholder.html";
-        }
-    }
     sendNewIdToPlugin() {
-        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        let pluginFrame = document.getElementById("pluginPatternFrame");
         if (pluginFrame) {
             this.dialogID = '' + Math.random();
             let message = { hostData: this.dialogID, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
@@ -1235,15 +1270,19 @@ class PatternPluginDialog {
         }
     }
     sendPointToPlugin() {
-        let pluginFrame = document.getElementById("pluginSamplerFrame");
+        let pluginFrame = document.getElementById("pluginPatternFrame");
         if (pluginFrame) {
             let message = { hostData: this.pluginRawData, colors: globalCommandDispatcher.readThemeColors(), screenData: null, langID: labelLocaleDictionary };
             pluginFrame.contentWindow.postMessage(message, '*');
         }
     }
-    setFilterValue() {
+    setPatternValue() {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns', this.order], () => {
+            this.patternTrack.arpeggiator.data = this.pluginRawData;
+        });
+        globalCommandDispatcher.reStartPlayIfPlay();
     }
-    receiveMessageFromSamplerPlugin(event) {
+    receiveMessageFromPatternPlugin(event) {
         if (!(event.data)) {
         }
         else {
@@ -1251,7 +1290,7 @@ class PatternPluginDialog {
             if (message.dialogID) {
                 if (message.dialogID == this.dialogID) {
                     this.pluginRawData = message.pluginData;
-                    this.setFilterValue();
+                    this.setPatternValue();
                 }
                 else {
                 }
@@ -4647,6 +4686,88 @@ function addMenuItemFilter(reg) {
 }
 function addMenuItemStem(reg) {
     let info = { text: reg.label, noLocalization: true, itemKind: kindDraggableDiamond };
+    let diamond = {
+        x: 0, y: 0, dots: [
+            0, 0.5,
+            0.5, 0,
+            1, 0.5,
+            0.5, 1
+        ], css: 'rectangleDragItem'
+    };
+    let focusDiamond = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
+    let dragger = new DragMenuItemUtil(diamond, info, (dx, yy) => {
+        globalCommandDispatcher.exe.commitProjectChanges(['patterns'], () => {
+            let patternNo = findPatternIdxByXYcurZ(dx, yy);
+            let xx = dx;
+            if (xx < globalCommandDispatcher.cfg().padGridFan) {
+                xx = globalCommandDispatcher.cfg().padGridFan;
+            }
+            if (patternNo > -1) {
+                let toStemTrack = globalCommandDispatcher.cfg().data.patterns[patternNo];
+                toStemTrack.arpeggiator.kind = reg.kind;
+                toStemTrack.arpeggiator.data = '';
+                toStemTrack.arpeggiator.id = '' + Math.random();
+                let info = globalCommandDispatcher.findPluginRegistrationByKind(toStemTrack.arpeggiator.kind);
+                globalCommandDispatcher.patternPluginDialog.openPatternPluginDialogFrame(patternNo, toStemTrack, info);
+                globalCommandDispatcher.player.clearPluginsCache();
+                globalCommandDispatcher.reStartPlayIfPlay();
+            }
+            else {
+                globalCommandDispatcher.cfg().data.patterns.push({
+                    arpeggiator: {
+                        id: '' + Math.random(),
+                        kind: reg.kind,
+                        data: '',
+                        outputs: [''],
+                        iconPosition: { x: xx, y: yy },
+                        state: 0
+                    },
+                    measures: [],
+                    title: reg.label
+                });
+                setProjectPositionFanArea();
+                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+            }
+            refreshMixerItemFocus.currentID = -1;
+            globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+            globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+        });
+    }, (dx, dy, zz) => {
+        refreshMixerItemFocus.start(200, () => {
+            let patNo = findPatternIdxByXYcurZ(dx, dy);
+            if (patNo > -1) {
+                let toPatTrack = globalCommandDispatcher.cfg().data.patterns[patNo];
+                let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+                let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+                let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zoomIndexFromZoom(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+                    / xyz.z;
+                let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+                if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+                    left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+                }
+                let top = globalCommandDispatcher.cfg().gridTop();
+                if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+                    top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+                }
+                let fx = left + toPatTrack.arpeggiator.iconPosition.x + xyz.x / tapPx;
+                let fy = top + toPatTrack.arpeggiator.iconPosition.y + xyz.y / tapPx;
+                globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [focusDiamond];
+                focusDiamond.x = fx / xyz.z - sz * 0.75;
+                focusDiamond.y = fy / xyz.z - sz * 1.0;
+                focusDiamond.dots = [
+                    0, sz,
+                    sz, 0,
+                    2 * sz, sz,
+                    sz, 2 * sz
+                ];
+            }
+            else {
+                globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+            }
+            globalCommandDispatcher.renderer.tiler.resetAnchor(globalCommandDispatcher.renderer.menu.menuPanelInteraction, globalCommandDispatcher.renderer.menu.focusTargetAnchor, LevelModes.overlay);
+        });
+    }, (zz) => { });
+    info.onMenuItemDrag = dragger.doDrag.bind(dragger);
     return info;
 }
 function fillPluginsLists() {
@@ -4705,6 +4826,22 @@ function findSamplerIdxByXYcurZ(dx, dy) {
     let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
     for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
         let plugin = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
+        if (plugin.iconPosition) {
+            if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+                if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+                    return ii;
+                }
+            }
+        }
+    }
+    return -1;
+}
+function findPatternIdxByXYcurZ(dx, dy) {
+    let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+    let zidx = zoomIndexFromZoom(zz);
+    let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+    for (let ii = 0; ii < globalCommandDispatcher.cfg().data.patterns.length; ii++) {
+        let plugin = globalCommandDispatcher.cfg().data.patterns[ii].arpeggiator;
         if (plugin.iconPosition) {
             if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
                 if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {

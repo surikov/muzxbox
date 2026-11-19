@@ -849,6 +849,105 @@ function addMenuItemFilter(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
 function addMenuItemStem(reg: MZXBX_PluginRegistrationInformation): MenuInfo {
 	let info: MenuInfo = { text: reg.label, noLocalization: true, itemKind: kindDraggableDiamond };
 
+
+	let diamond: TilePolygon = {
+		x: 0, y: 0, dots: [
+			//0, 0
+			//, 2 * 0.8 * 0.9, 0.9
+			//, 0, 2 * 0.9
+			0, 0.5
+			, 0.5, 0
+			, 1, 0.5
+			, 0.5, 1
+		], css: 'rectangleDragItem'
+	};
+	let focusDiamond: TilePolygon = { x: 0, y: 0, dots: [0, -0.5, 2, 0.6, 0, 1.8], css: 'rectangleDragFocus' };
+	let dragger: DragMenuItemUtil = new DragMenuItemUtil(diamond, info, (dx: number, yy: number) => {
+		globalCommandDispatcher.exe.commitProjectChanges(['patterns'], () => {
+			let patternNo = findPatternIdxByXYcurZ(dx, yy);
+			let xx = dx;
+			if (xx < globalCommandDispatcher.cfg().padGridFan) {
+				xx = globalCommandDispatcher.cfg().padGridFan;
+			}
+			if (patternNo > -1) {
+				let toStemTrack = globalCommandDispatcher.cfg().data.patterns[patternNo];
+				toStemTrack.arpeggiator.kind = reg.kind;
+				toStemTrack.arpeggiator.data = '';
+				toStemTrack.arpeggiator.id = '' + Math.random();
+				let info = globalCommandDispatcher.findPluginRegistrationByKind(toStemTrack.arpeggiator.kind);
+				globalCommandDispatcher.patternPluginDialog.openPatternPluginDialogFrame(patternNo, toStemTrack, info);
+				globalCommandDispatcher.player.clearPluginsCache();
+				globalCommandDispatcher.reStartPlayIfPlay();//true);
+			} else {
+				globalCommandDispatcher.cfg().data.patterns.push({
+					arpeggiator: {
+						id: '' + Math.random()
+						, kind: reg.kind
+						, data: ''
+						, outputs: ['']
+						, iconPosition: { x: xx, y: yy }
+						, state: 0
+
+					}
+					, measures: []
+					, title: reg.label
+				});
+				setProjectPositionFanArea();
+				globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+			}
+
+			refreshMixerItemFocus.currentID = -1;
+			globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+
+			globalCommandDispatcher.renderer.tiler.updateAnchorStyle(globalCommandDispatcher.renderer.menu.dragAnchor);
+
+		});
+	}, (dx: number, dy: number, zz: number) => {
+		refreshMixerItemFocus.start(200, () => {
+			let patNo = findPatternIdxByXYcurZ(dx, dy);
+			if (patNo > -1) {
+				let toPatTrack: Zvoog_PatternTrack = globalCommandDispatcher.cfg().data.patterns[patNo];
+				let xyz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition();
+				let tapPx = globalCommandDispatcher.renderer.tiler.tapPxSize();
+				let sz = globalCommandDispatcher.cfg().fanPluginIconSize
+					(zoomIndexFromZoom
+						(globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z))
+					/ xyz.z;
+				let left = globalCommandDispatcher.cfg().leftPad + globalCommandDispatcher.cfg().timelineWidth() + globalCommandDispatcher.cfg().padGridFan;
+				if (window.innerWidth / tapPx > globalCommandDispatcher.cfg().wholeWidth() / xyz.z) {
+					left = left + xyz.z * (window.innerWidth / tapPx - globalCommandDispatcher.cfg().wholeWidth() / xyz.z) / 2;
+				}
+				let top = globalCommandDispatcher.cfg().gridTop();
+				if (window.innerHeight / tapPx > globalCommandDispatcher.cfg().wholeHeight() / xyz.z) {
+					top = top + xyz.z * (window.innerHeight / tapPx - globalCommandDispatcher.cfg().wholeHeight() / xyz.z) / 2;
+				}
+				let fx = left + toPatTrack.arpeggiator.iconPosition.x + xyz.x / tapPx;
+				let fy = top + toPatTrack.arpeggiator.iconPosition.y + xyz.y / tapPx;
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [focusDiamond];
+				focusDiamond.x = fx / xyz.z - sz * 0.75;
+				focusDiamond.y = fy / xyz.z - sz * 1.0;
+				//fotri.dots = [0 * sz, -0.5 * sz, 2 * sz, 0.75 * sz, 0 * sz, 2 * sz];
+				focusDiamond.dots = [
+					0, sz
+					, sz, 0
+					, 2 * sz, sz
+					, sz, 2 * sz
+				];
+			} else {
+				globalCommandDispatcher.renderer.menu.focusTargetAnchor.content = [];
+			}
+
+
+			globalCommandDispatcher.renderer.tiler.resetAnchor(
+				globalCommandDispatcher.renderer.menu.menuPanelInteraction
+				, globalCommandDispatcher.renderer.menu.focusTargetAnchor
+				, LevelModes.overlay);
+
+		});
+	}, (zz: number) => { });
+	info.onMenuItemDrag = dragger.doDrag.bind(dragger);
+
+
 	return info;
 }
 function fillPluginsLists() {
@@ -1141,6 +1240,22 @@ function findSamplerIdxByXYcurZ(dx: number, dy: number): number {
 	let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
 	for (let ii = 0; ii < globalCommandDispatcher.cfg().data.percussions.length; ii++) {
 		let plugin = globalCommandDispatcher.cfg().data.percussions[ii].sampler;
+		if (plugin.iconPosition) {
+			if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
+				if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
+					return ii;
+				}
+			}
+		}
+	}
+	return -1;
+}
+function findPatternIdxByXYcurZ(dx: number, dy: number): number {
+	let zz = globalCommandDispatcher.renderer.tiler.getCurrentPointPosition().z;
+	let zidx = zoomIndexFromZoom(zz);
+	let sz = globalCommandDispatcher.cfg().fanPluginIconSize(zidx);
+	for (let ii = 0; ii < globalCommandDispatcher.cfg().data.patterns.length; ii++) {
+		let plugin = globalCommandDispatcher.cfg().data.patterns[ii].arpeggiator;
 		if (plugin.iconPosition) {
 			if (Math.abs(dx - plugin.iconPosition.x) < sz * 0.75) {
 				if (Math.abs(dy - plugin.iconPosition.y) < sz * 0.75) {
