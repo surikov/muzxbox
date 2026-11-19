@@ -1351,6 +1351,7 @@ class CommandDispatcher {
 		this.adjustTimelineEmptyEnd(project);
 
 		for (let tt = 0; tt < project.timeline.length; tt++) {
+			project.timeline[tt].chordNameHint = (project.timeline[tt].chordNameHint) ? project.timeline[tt].chordNameHint : '';
 			for (let nn = 0; nn < project.tracks.length; nn++) {
 				let track = project.tracks[nn];
 				if (!(track.measures[tt])) {
@@ -1689,6 +1690,10 @@ class CommandDispatcher {
 	//adjustTimelineContent(project: Zvoog_Project) {
 	fullProjectCheckUp(project: Zvoog_Project) {
 		//console.log('adjustTimelineContent');
+		if (!Array.isArray(project.patterns)) {
+			project.patterns = [];
+		}
+		project.modeNameHint = (project.modeNameHint) ? project.modeNameHint : '';
 		this.adjustTimeLineLength(project);
 		this.adjustContentByMeter(project);
 

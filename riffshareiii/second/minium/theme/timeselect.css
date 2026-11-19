@@ -415,6 +415,7 @@
 	fill-opacity: 90%;
 	font-size: calc(0.1*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo05 {
@@ -422,6 +423,7 @@
 	fill-opacity: 90%;
 	font-size: calc(0.2*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo1 {
@@ -429,6 +431,7 @@
 	fill-opacity: 90%;
 	font-size: calc(0.4*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo2 {
@@ -436,6 +439,7 @@
 	fill-opacity: 90%;
 	font-size: calc(0.8*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo4 {
@@ -443,6 +447,7 @@
 	fill-opacity: 90%;
 	font-size: calc(1.6*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo8 {
@@ -450,6 +455,7 @@
 	fill-opacity: 90%;
 	font-size: calc(3.2*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo16 {
@@ -457,6 +463,7 @@
 	fill-opacity: 90%;
 	font-size: calc(6.4*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo32 {
@@ -464,6 +471,7 @@
 	fill-opacity: 90%;
 	font-size: calc(12.8*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo64 {
@@ -471,6 +479,7 @@
 	fill-opacity: 90%;
 	font-size: calc(25.6*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }
 
 .timeBarInfo128 {
@@ -478,4 +487,5 @@
 	fill-opacity: 90%;
 	font-size: calc(51.2*var(--tapSize));
 	text-anchor2: end;
+	pointer-events: none;
 }

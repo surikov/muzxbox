@@ -99,6 +99,8 @@ class EventsConverter {
 				startMeasure: -1
 				, endMeasure: -1
 			}
+			, modeNameHint: '?'
+			, patterns: []
 			, farorder: []
 			, versionCode: '1'
 			, list: false
@@ -658,7 +660,7 @@ class EventsConverter {
 			//console.log(tempo, meter);
 			let barDurationMs = meter.duration(tempo) * 1000;
 			let nextBar: Zvoog_SongMeasure = {
-				tempo: tempo, metre: meter.metre()
+				tempo: tempo, metre: meter.metre(), chordNameHint: '?'
 				//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
 			};
 			project.timeline.push(nextBar);

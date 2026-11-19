@@ -5,21 +5,21 @@ function createNewEmptyProjectData(): Zvoog_Project {
 		, versionCode: '1'
 		, farorder: []
 		, list: false
-		, modeNameHint: 'Aeolian F#'
+		, modeNameHint: ''
 		, selectedPart: { startMeasure: -1, endMeasure: -1 }
 		, position: { x: 0, y: -0, z: 33 }
 		, timeline: [
 			{
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'Dm'//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'C'//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'G'//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'Am'//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 
 		]
@@ -31,7 +31,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 			}
 		]
 		, patterns: [
-			{
+			/*{
 				title: 'test stem'
 				, measures: [
 					{ points: [] }, { points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 16 }, duration: { count: 1, part: 4 } }] }
@@ -57,7 +57,7 @@ function createNewEmptyProjectData(): Zvoog_Project {
 					, iconPosition: { x: 30, y: 27 }
 					, state: 0
 				}
-			}
+			}*/
 		]
 		, percussions: []
 		, comments: []

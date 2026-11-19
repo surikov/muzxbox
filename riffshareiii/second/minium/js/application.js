@@ -2488,6 +2488,7 @@ class CommandDispatcher {
         this.adjustTimelineEmptyEnd(project);
         this.adjustTimelineEmptyEnd(project);
         for (let tt = 0; tt < project.timeline.length; tt++) {
+            project.timeline[tt].chordNameHint = (project.timeline[tt].chordNameHint) ? project.timeline[tt].chordNameHint : '';
             for (let nn = 0; nn < project.tracks.length; nn++) {
                 let track = project.tracks[nn];
                 if (!(track.measures[tt])) {
@@ -2733,6 +2734,10 @@ class CommandDispatcher {
         }
     }
     fullProjectCheckUp(project) {
+        if (!Array.isArray(project.patterns)) {
+            project.patterns = [];
+        }
+        project.modeNameHint = (project.modeNameHint) ? project.modeNameHint : '';
         this.adjustTimeLineLength(project);
         this.adjustContentByMeter(project);
         this.adjustTracksChords(project);
@@ -3176,6 +3181,13 @@ class TimeSelectBar {
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
+        let chordName = {
+            x: barLeft + size / 4,
+            y: zoomPrefixLevelsCSS[zz].minZoom * 3,
+            text: '' + curBar.chordNameHint,
+            css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
+        };
+        measureAnchor.content.push(chordName);
     }
     ___addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, labelCSS, action) {
         let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
@@ -4989,29 +5001,6 @@ class LeftPanel {
                 }
             }
             let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-            let titleButton = {
-                x: 0,
-                y: globalCommandDispatcher.cfg().gridTop() - butsize + butsize * 0.2,
-                w: butsize, h: butsize,
-                rx: butsize / 2, ry: butsize / 2,
-                css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
-                activation: (x, y) => {
-                    let old = globalCommandDispatcher.cfg().data.title;
-                    let newTitle = prompt('', old);
-                    if (newTitle) {
-                        if (newTitle == old) {
-                        }
-                        else {
-                            globalCommandDispatcher.exe.commitProjectChanges([], () => {
-                                globalCommandDispatcher.cfg().data.title = newTitle;
-                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
-                            });
-                            globalCommandDispatcher.resetProject();
-                        }
-                    }
-                }
-            };
-            this.leftZoomAnchors[zz].content.push(titleButton);
             let modeLabel = {
                 x: butsize * 0.2,
                 y: globalCommandDispatcher.cfg().gridTop() - 1.5 * zoomPrefixLevelsCSS[zz].minZoom,
@@ -8126,21 +8115,21 @@ function createNewEmptyProjectData() {
         versionCode: '1',
         farorder: [],
         list: false,
-        modeNameHint: 'Aeolian F#',
+        modeNameHint: '',
         selectedPart: { startMeasure: -1, endMeasure: -1 },
         position: { x: 0, y: -0, z: 33 },
         timeline: [
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'Dm'
+                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'C'
+                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'G'
+                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: 'Am'
+                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
             }
         ],
         tracks: [
@@ -8150,35 +8139,7 @@ function createNewEmptyProjectData() {
                 performer: { id: pianoID, data: '85/14/0', kind: 'miniumpitchchord1', outputs: [''], iconPosition: { x: 50 * Math.random(), y: 100 * Math.random() }, state: 0, hint1_128: 0 }
             }
         ],
-        patterns: [
-            {
-                title: 'test stem',
-                measures: [
-                    { points: [] }, { points: [] }, { points: [] }, { points: [{ skip: { count: 1, part: 16 }, duration: { count: 1, part: 4 } }] }
-                ],
-                arpeggiator: {
-                    id: 'test' + Math.random(),
-                    data: '',
-                    kind: 'miniumactivestem1',
-                    outputs: [''],
-                    iconPosition: { x: 20, y: 20 },
-                    state: 0
-                }
-            }, {
-                title: 'test 222',
-                measures: [
-                    { points: [] }, { points: [{ skip: { count: 7, part: 8 }, duration: { count: 5, part: 4 } }] }, { points: [] }, { points: [] }
-                ],
-                arpeggiator: {
-                    id: 'test' + Math.random(),
-                    data: '',
-                    kind: 'miniumactivestem1',
-                    outputs: [''],
-                    iconPosition: { x: 30, y: 27 },
-                    state: 0
-                }
-            }
-        ],
+        patterns: [],
         percussions: [],
         comments: [],
         filters: [],

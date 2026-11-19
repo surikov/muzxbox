@@ -87,7 +87,7 @@ class LeftPanel {
 				}
 			}
 			let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-			let titleButton: TileRectangle = {
+			/*let titleButton: TileRectangle = {
 				x: 0
 				, y: globalCommandDispatcher.cfg().gridTop() - butsize + butsize * 0.2
 				, w: butsize, h: butsize
@@ -110,6 +110,7 @@ class LeftPanel {
 				}
 			};
 			this.leftZoomAnchors[zz].content.push(titleButton);
+			*/
 			let modeLabel: TileText = {
 				x: butsize * 0.2//+1.5*zoomPrefixLevelsCSS[zz].minZoom
 				, y: globalCommandDispatcher.cfg().gridTop() - 1.5*zoomPrefixLevelsCSS[zz].minZoom

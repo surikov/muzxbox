@@ -113,6 +113,8 @@ class FileLoaderAlpha {
 			, selectedPart: { startMeasure: -1, endMeasure: -1 }
 			, position: { x: 0, y: 0, z: 30 }
 			, list: false
+			, modeNameHint: '?'
+			, patterns: []
 			, menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 		};
 		let tempo = 120;
@@ -132,6 +134,7 @@ class FileLoaderAlpha {
 					count: maBar.timeSignatureNumerator
 					, part: maBar.timeSignatureDenominator
 				}
+				, chordNameHint: '?'
 			};
 			project.timeline.push(measure);
 
@@ -199,7 +202,7 @@ class FileLoaderAlpha {
 	dumpProjectInfo(project: Zvoog_Project | null) {
 		console.log('dumpProjectInfo--------------------------------------', project);
 		if (project) {
-			console.log(//'tracks', project.tracks.length, 
+			/*console.log(//'tracks', project.tracks.length, 
 				'bars', project.timeline.length);
 
 			let allChordCount = project.tracks.reduce((sum: number, track, currentIndex: number, arr: Zvoog_MusicTrack[]) => {
@@ -229,6 +232,7 @@ class FileLoaderAlpha {
 			}, 0);
 
 			console.log('all drums', allDrumCount);
+			*/
 
 			let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
 			/*
@@ -259,7 +263,7 @@ class FileLoaderAlpha {
 				console.log(ii, pitchesLine);
 			}
 */
-			let durations: Zvoog_Metre[] = [];
+			/*let durations: Zvoog_Metre[] = [];
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				//let pitches: { pitch: number, count: number }[] = [];
 				for (let tt = 0; tt < project.tracks.length; tt++) {
@@ -283,12 +287,60 @@ class FileLoaderAlpha {
 				} else {
 					console.log(noteNames[ii]);
 				}
+			}*/
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				let counts = this.countNotes(ii, ii, project);
+				let tonic = this.findTonic(counts);
+				//console.log(''+(1+ii),  noteNames[tonic]);
+				project.timeline[ii].chordNameHint=noteNames[tonic];
 			}
+			let counts = this.countNotes(0, project.timeline.length - 1, project);
+			for (let ii = 0; ii < noteNames.length; ii++) {
+				let qN = (ii + 7) % 12;
+				if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+					//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
+				} else {
+					//console.log(noteNames[ii], counts[ii]);
+				}
+			}
+
+
 		}
 
 		console.log('-------------------');
 	}
-
+	findTonic(counts: number[]): number {
+		let maxCount = -1;
+		let halfNum = -1;
+		for (let ii = 0; ii < 12; ii++) {
+			let qN = (ii + 7) % 12;
+			if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+				//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
+				if (maxCount < counts[ii] + counts[qN]) {
+					maxCount = counts[ii] + counts[qN];
+					halfNum = ii;
+				}
+			}
+		}
+		return halfNum;
+	}
+	countNotes(from: number, to: number, project: Zvoog_Project): number[] {
+		let counts: number[] = [];
+		for (let ii = from; ii <= to; ii++) {
+			for (let tt = 0; tt < project.tracks.length; tt++) {
+				let trackMeasure = project.tracks[tt].measures[ii];
+				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+					let trackMeasureChord = trackMeasure.chords[cc];
+					for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+						let halftone = trackMeasureChord.pitches[pp] % 12;
+						counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
+						counts[halftone]++;
+					}
+				}
+			}
+		}
+		return counts;
+	}
 
 	addRepeats(project: Zvoog_Project, score: Score) {
 		let startLoop = -1;

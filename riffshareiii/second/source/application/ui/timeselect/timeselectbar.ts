@@ -198,6 +198,14 @@ class TimeSelectBar {
 		};
 		measureAnchor.content.push(bpm);
 
+		let chordName: TileText = {
+			x: barLeft + size / 4
+			, y: zoomPrefixLevelsCSS[zz].minZoom * 3
+			, text: '' +curBar.chordNameHint
+			, css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
+		};
+		measureAnchor.content.push(chordName);
+
 	}
 	___addSelectionMenuButton(label: string, left: number, order: number, zz: number, selectLevelAnchor: TileAnchor, labelCSS: string, action: () => void) {
 		let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;

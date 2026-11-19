@@ -15460,6 +15460,8 @@ class EventsConverter {
                 startMeasure: -1,
                 endMeasure: -1
             },
+            modeNameHint: '?',
+            patterns: [],
             farorder: [],
             versionCode: '1',
             list: false,
@@ -15857,7 +15859,7 @@ class EventsConverter {
             }
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = {
-                tempo: tempo, metre: meter.metre()
+                tempo: tempo, metre: meter.metre(), chordNameHint: '?'
             };
             project.timeline.push(nextBar);
             if (barDurationMs < 100)
@@ -16381,6 +16383,7 @@ class AlphaTabImportMusicPlugin {
         else {
             this.callbackID = message.hostData;
             this.setupColors(message.colors);
+            this.onLanguaga(message.langID);
         }
     }
     setupColors(colors) {
@@ -16389,6 +16392,16 @@ class AlphaTabImportMusicPlugin {
         document.documentElement.style.setProperty('--drag-color', colors.drag);
         document.documentElement.style.setProperty('--line-color', colors.line);
         document.documentElement.style.setProperty('--click-color', colors.click);
+    }
+    onLanguaga(enruzhId) {
+        if (enruzhId == 'zh') {
+        }
+        else {
+            if (enruzhId == 'ru') {
+            }
+            else {
+            }
+        }
     }
     loadMusicfile(inputFile) {
         let loader = new FileLoaderAlpha(inputFile);
@@ -16502,6 +16515,8 @@ class FileLoaderAlpha {
             selectedPart: { startMeasure: -1, endMeasure: -1 },
             position: { x: 0, y: 0, z: 30 },
             list: false,
+            modeNameHint: '?',
+            patterns: [],
             menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
         };
         let tempo = 120;
@@ -16517,7 +16532,8 @@ class FileLoaderAlpha {
                 metre: {
                     count: maBar.timeSignatureNumerator,
                     part: maBar.timeSignatureDenominator
-                }
+                },
+                chordNameHint: '?'
             };
             project.timeline.push(measure);
         }
@@ -16577,59 +16593,53 @@ class FileLoaderAlpha {
     dumpProjectInfo(project) {
         console.log('dumpProjectInfo--------------------------------------', project);
         if (project) {
-            console.log('bars', project.timeline.length);
-            let allChordCount = project.tracks.reduce((sum, track, currentIndex, arr) => {
-                let trackChordCount = track.measures.reduce((ss, msr, idx, arr) => {
-                    return ss + msr.chords.length;
-                }, 0);
-                let usedMeasureSCount = track.measures.reduce((smm, curmsr, idx, arr) => {
-                    let nn = curmsr.chords.length > 0 ? 1 : 0;
-                    return smm + nn;
-                }, 0);
-                console.log(trackChordCount, '/', usedMeasureSCount, '=', Math.round(trackChordCount / usedMeasureSCount), track.title);
-                return sum + trackChordCount;
-            }, 0);
-            console.log('all chords', allChordCount);
-            let allDrumCount = project.percussions.reduce((sum, track, currentIndex, arr) => {
-                let drm = track.measures.reduce((ss, msr, idx, arr) => {
-                    return ss + msr.skips.length;
-                }, 0);
-                let usdr = track.measures.reduce((ss, msr, idx, arr) => {
-                    let dnu = msr.skips.length > 0 ? 1 : 0;
-                    return ss + dnu;
-                }, 0);
-                console.log(drm, '/', usdr, '=', Math.round(drm / usdr), track.title);
-                return sum + drm;
-            }, 0);
-            console.log('all drums', allDrumCount);
             let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
-            let durations = [];
             for (let ii = 0; ii < project.timeline.length; ii++) {
-                for (let tt = 0; tt < project.tracks.length; tt++) {
-                    let trackMeasure = project.tracks[tt].measures[ii];
-                    for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-                        let trackMeasureChord = trackMeasure.chords[cc];
-                        for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-                            let halftone = trackMeasureChord.pitches[pp] % 12;
-                            if (!(durations[halftone])) {
-                                durations[halftone] = { count: 0, part: 1 };
-                            }
-                            durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
-                        }
-                    }
-                }
+                let counts = this.countNotes(ii, ii, project);
+                let tonic = this.findTonic(counts);
+                project.timeline[ii].chordNameHint = noteNames[tonic];
             }
-            durations = durations.map(value => MMUtil().set(value).strip(1));
-            for (let ii = 0; ii < durations.length; ii++) {
-                if (durations[ii]) {
-                    console.log(noteNames[ii], durations[ii].count);
+            let counts = this.countNotes(0, project.timeline.length - 1, project);
+            for (let ii = 0; ii < noteNames.length; ii++) {
+                let qN = (ii + 7) % 12;
+                if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
                 }
                 else {
-                    console.log(noteNames[ii]);
                 }
             }
         }
         console.log('-------------------');
+    }
+    findTonic(counts) {
+        let maxCount = -1;
+        let halfNum = -1;
+        for (let ii = 0; ii < 12; ii++) {
+            let qN = (ii + 7) % 12;
+            if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+                if (maxCount < counts[ii] + counts[qN]) {
+                    maxCount = counts[ii] + counts[qN];
+                    halfNum = ii;
+                }
+            }
+        }
+        return halfNum;
+    }
+    countNotes(from, to, project) {
+        let counts = [];
+        for (let ii = from; ii <= to; ii++) {
+            for (let tt = 0; tt < project.tracks.length; tt++) {
+                let trackMeasure = project.tracks[tt].measures[ii];
+                for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                    let trackMeasureChord = trackMeasure.chords[cc];
+                    for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+                        let halftone = trackMeasureChord.pitches[pp] % 12;
+                        counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
+                        counts[halftone]++;
+                    }
+                }
+            }
+        }
+        return counts;
     }
     addRepeats(project, score) {
         let startLoop = -1;
