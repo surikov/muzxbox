@@ -234,7 +234,7 @@ class FileLoaderAlpha {
 			console.log('all drums', allDrumCount);
 			*/
 
-			let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+			let noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
 			/*
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				let pitches: { pitch: number, count: number }[] = [];
@@ -291,36 +291,45 @@ class FileLoaderAlpha {
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				let counts = this.countNotes(ii, ii, project);
 				let tonic = this.findTonic(counts);
-				//console.log(''+(1+ii),  noteNames[tonic]);
-				project.timeline[ii].chordNameHint=noteNames[tonic];
-			}
-			let counts = this.countNotes(0, project.timeline.length - 1, project);
-			for (let ii = 0; ii < noteNames.length; ii++) {
-				let qN = (ii + 7) % 12;
-				if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
-					//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
-				} else {
-					//console.log(noteNames[ii], counts[ii]);
+				let label = noteNames[tonic];
+				if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
+					label = label + 'm';
 				}
+				console.log('' + (1 + ii), label, counts[(tonic + 3) % 12], counts[(tonic + 4) % 12], counts);
+				project.timeline[ii].chordNameHint = label;
 			}
+			/*for (let kk = 0; kk < project.timeline.length && kk < 4; kk++) {
+				console.log('bar-------------------', (1 + kk));
+				let counts = this.countNotes(kk, kk, project);
+				for (let ii = 0; ii < noteNames.length; ii++) {
+					let qN = (ii + 7) % 12;
+					//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+					console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
+					//} else {
+					//	console.log(noteNames[ii], counts[ii]);
+					//}
+				}
+			}*/
 
 
 		}
 
 		console.log('-------------------');
 	}
+
 	findTonic(counts: number[]): number {
 		let maxCount = -1;
 		let halfNum = -1;
 		for (let ii = 0; ii < 12; ii++) {
 			let qN = (ii + 7) % 12;
-			if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
-				//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
-				if (maxCount < counts[ii] + counts[qN]) {
-					maxCount = counts[ii] + counts[qN];
-					halfNum = ii;
-				}
+			//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+			//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+			//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
+			if (maxCount < counts[ii] + counts[qN]) {
+				maxCount = counts[ii] + counts[qN];
+				halfNum = ii;
 			}
+			//}
 		}
 		return halfNum;
 	}
@@ -338,6 +347,9 @@ class FileLoaderAlpha {
 					}
 				}
 			}
+		}
+		for (let ii = 0; ii < 12; ii++) {
+			counts[ii] = counts[ii] ? counts[ii] : 0;
 		}
 		return counts;
 	}

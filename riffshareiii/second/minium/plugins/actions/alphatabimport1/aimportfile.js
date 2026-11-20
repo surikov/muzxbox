@@ -16593,19 +16593,16 @@ class FileLoaderAlpha {
     dumpProjectInfo(project) {
         console.log('dumpProjectInfo--------------------------------------', project);
         if (project) {
-            let noteNames = ['C ', 'C#', 'D ', 'D#', 'E ', 'F ', 'F#', 'G ', 'G#', 'A ', 'A#', 'H '];
+            let noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
             for (let ii = 0; ii < project.timeline.length; ii++) {
                 let counts = this.countNotes(ii, ii, project);
                 let tonic = this.findTonic(counts);
-                project.timeline[ii].chordNameHint = noteNames[tonic];
-            }
-            let counts = this.countNotes(0, project.timeline.length - 1, project);
-            for (let ii = 0; ii < noteNames.length; ii++) {
-                let qN = (ii + 7) % 12;
-                if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
+                let label = noteNames[tonic];
+                if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
+                    label = label + 'm';
                 }
-                else {
-                }
+                console.log('' + (1 + ii), label, counts[(tonic + 3) % 12], counts[(tonic + 4) % 12], counts);
+                project.timeline[ii].chordNameHint = label;
             }
         }
         console.log('-------------------');
@@ -16615,11 +16612,9 @@ class FileLoaderAlpha {
         let halfNum = -1;
         for (let ii = 0; ii < 12; ii++) {
             let qN = (ii + 7) % 12;
-            if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
-                if (maxCount < counts[ii] + counts[qN]) {
-                    maxCount = counts[ii] + counts[qN];
-                    halfNum = ii;
-                }
+            if (maxCount < counts[ii] + counts[qN]) {
+                maxCount = counts[ii] + counts[qN];
+                halfNum = ii;
             }
         }
         return halfNum;
@@ -16638,6 +16633,9 @@ class FileLoaderAlpha {
                     }
                 }
             }
+        }
+        for (let ii = 0; ii < 12; ii++) {
+            counts[ii] = counts[ii] ? counts[ii] : 0;
         }
         return counts;
     }
