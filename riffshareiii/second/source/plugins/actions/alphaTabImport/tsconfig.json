@@ -21,6 +21,7 @@
             "ES2016",
             "ES2017",
             "ES2021",
+			"ES2022",
             //"es2022.regexp",
             //"es2022.error",
             //"ES2024.Promise",
@@ -156,7 +157,8 @@
 		,"midiimport/midiimport.ts"
 		,"midiimport/eventsconvert.ts"
 		
-
+,"chorddetect/cxchord.ts"
+		
 
         ,"./fileimport/aimportplugin.ts"
 		,"./fileimport/fileloader.ts"

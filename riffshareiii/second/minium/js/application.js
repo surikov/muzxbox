@@ -245,7 +245,7 @@ class StateDiff {
     }
 }
 let goHomeBackURL = '';
-let applicationVersion = '1.8.34';
+let applicationVersion = '1.8.35';
 function startApplication() {
     console.log('startApplication v', applicationVersion);
     document.title = 'v' + applicationVersion + ' DAW1024';

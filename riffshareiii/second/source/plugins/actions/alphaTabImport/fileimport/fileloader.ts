@@ -202,115 +202,44 @@ class FileLoaderAlpha {
 	dumpProjectInfo(project: Zvoog_Project | null) {
 		console.log('dumpProjectInfo--------------------------------------', project);
 		if (project) {
-			/*console.log(//'tracks', project.tracks.length, 
-				'bars', project.timeline.length);
 
-			let allChordCount = project.tracks.reduce((sum: number, track, currentIndex: number, arr: Zvoog_MusicTrack[]) => {
-				let trackChordCount = track.measures.reduce((ss, msr, idx, arr) => {
-					return ss + msr.chords.length;
-				}, 0);
-				let usedMeasureSCount = track.measures.reduce((smm, curmsr, idx, arr) => {
-					let nn = curmsr.chords.length > 0 ? 1 : 0;
-					//console.log( idx,smm,curmsr.chords.length,nn);
-					return smm + nn;
-				}, 0);
-				console.log(trackChordCount, '/', usedMeasureSCount, '=', Math.round(trackChordCount / usedMeasureSCount), track.title);
-				return sum + trackChordCount;
-			}, 0);
-
-			console.log('all chords', allChordCount);
-			let allDrumCount = project.percussions.reduce((sum: number, track, currentIndex: number, arr: Zvoog_PercussionTrack[]) => {
-				let drm = track.measures.reduce((ss, msr, idx, arr) => {
-					return ss + msr.skips.length;
-				}, 0);
-				let usdr = track.measures.reduce((ss, msr, idx, arr) => {
-					let dnu = msr.skips.length > 0 ? 1 : 0;
-					return ss + dnu;
-				}, 0);
-				console.log(drm, '/', usdr, '=', Math.round(drm / usdr), track.title);
-				return sum + drm;
-			}, 0);
-
-			console.log('all drums', allDrumCount);
-			*/
-
-			let noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
+			let cxchord = new ChordMatcher();
 			/*
+			cxchord.match([64, 67, 71, 72, 74, 78, 81]);
+			var mached = cxchord.getMatch();
+			console.log('mached', mached );
+			*/
+			//let noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
+			let noteNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+
 			for (let ii = 0; ii < project.timeline.length; ii++) {
-				let pitches: { pitch: number, count: number }[] = [];
-				for (let tt = 0; tt < project.tracks.length; tt++) {
-					let trackMeasure = project.tracks[tt].measures[ii];
-					for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-						let trackMeasureChord = trackMeasure.chords[cc];
-						for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-							let pitch = trackMeasureChord.pitches[pp] % 12;
-							//pitches[pitch] = pitches[pitch] ? pitches[pitch] : 0;
-							//pitches[pitch]++;
-							let it = pitches.find((value) => value.pitch == pitch);
-							if (!(it)) {
-								it = { pitch: pitch, count: 0 };
-								pitches.push(it);
-							}
-							it.count++;
-						}
-					}
+				let counts = this.countNotes2(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
+				//console.log(ii);
+				let label = '';
+				if (counts.length > 1) {
+					cxchord.match(counts);
+					label = label + cxchord.getMatch().chord;
 				}
-				pitches.sort((aa, bb) => bb.count - aa.count);
-				let pitchesLine = '';
-				for (let pp = 0; pp < pitches.length; pp++) {
-					pitchesLine = pitchesLine + '  ' + noteNames[pitches[pp].pitch] + ':' + pitches[pp].count;
+
+				//console.log( counts,cxchord.getMatch().chord);
+				counts = this.countNotes2(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
+				if (counts.length > 1) {
+					cxchord.match(counts);
+					//console.log( counts,cxchord.getMatch().chord);
+					label = label + ' - ' + cxchord.getMatch().chord;
 				}
-				console.log(ii, pitchesLine);
-			}
-*/
-			/*let durations: Zvoog_Metre[] = [];
-			for (let ii = 0; ii < project.timeline.length; ii++) {
-				//let pitches: { pitch: number, count: number }[] = [];
-				for (let tt = 0; tt < project.tracks.length; tt++) {
-					let trackMeasure = project.tracks[tt].measures[ii];
-					for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-						let trackMeasureChord = trackMeasure.chords[cc];
-						for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-							let halftone = trackMeasureChord.pitches[pp] % 12;
-							if (!(durations[halftone])) {
-								durations[halftone] = { count: 0, part: 1 };
-							}
-							durations[halftone] = MMUtil().set(durations[halftone]).plus(trackMeasureChord.slides[0].duration).simplyfy();
-						}
-					}
-				}
-			}
-			durations = durations.map(value => MMUtil().set(value).strip(1));
-			for (let ii = 0; ii < durations.length; ii++) {
-				if (durations[ii]) {
-					console.log(noteNames[ii], durations[ii].count);
-				} else {
-					console.log(noteNames[ii]);
-				}
-			}*/
-			for (let ii = 0; ii < project.timeline.length; ii++) {
+				/*
 				let counts = this.countNotes(ii, ii, project);
 				let tonic = this.findTonic(counts);
 				let label = noteNames[tonic];
 				if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
 					label = label + 'm';
 				}
-				console.log('' + (1 + ii), label, counts[(tonic + 3) % 12], counts[(tonic + 4) % 12], counts);
+				console.log('' + (1 + ii), label, counts[(tonic + 10) % 12], counts[(tonic + 11) % 12], counts);
+				
+				*/
 				project.timeline[ii].chordNameHint = label;
 			}
-			/*for (let kk = 0; kk < project.timeline.length && kk < 4; kk++) {
-				console.log('bar-------------------', (1 + kk));
-				let counts = this.countNotes(kk, kk, project);
-				for (let ii = 0; ii < noteNames.length; ii++) {
-					let qN = (ii + 7) % 12;
-					//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
-					console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
-					//} else {
-					//	console.log(noteNames[ii], counts[ii]);
-					//}
-				}
-			}*/
-
 
 		}
 
@@ -352,6 +281,29 @@ class FileLoaderAlpha {
 			counts[ii] = counts[ii] ? counts[ii] : 0;
 		}
 		return counts;
+	}
+	countNotes2(barNo: number, from: Zvoog_Metre, to: Zvoog_Metre, project: Zvoog_Project): number[] {
+		let counts: number[] = [];
+		for (let tt = 0; tt < project.tracks.length; tt++) {
+			let trackMeasure = project.tracks[tt].measures[barNo];
+			for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+				let trackMeasureChord = trackMeasure.chords[cc];
+				let mm = MMUtil().set(trackMeasureChord.skip);
+				if ((!mm.less(from)) && mm.less(to)) {
+					for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+						let halftone = trackMeasureChord.pitches[pp];
+						counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
+						counts[halftone]++;
+					}
+				}
+			}
+		}
+		let res: number[] = [];
+		for (let ii = 0; ii < counts.length; ii++) {
+			if (counts[ii]) res.push(ii);//txt = txt + ',' + ii;
+		}
+		//console.log(txt);
+		return res;//counts;
 	}
 
 	addRepeats(project: Zvoog_Project, score: Score) {
