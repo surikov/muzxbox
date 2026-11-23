@@ -323,7 +323,7 @@ function fillClipboardList() {
 				timebar = {
 					tempo: 120, metre: { count: 4, part: 4 }
 					//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] } 
-					, chordNameHint: ''
+					//, chordNameHint: ''
 				}
 			}
 			pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;

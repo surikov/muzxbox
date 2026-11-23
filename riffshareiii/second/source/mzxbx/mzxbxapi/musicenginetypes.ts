@@ -121,7 +121,7 @@ type Zvoog_SongMeasure = {
 	tempo: number;
 	metre: Zvoog_Metre;
 	//modality: Zvoog_ChordMode;
-	chordNameHint: string;
+	//chordNameHint: string;
 };
 /*
 type Zvoog_AutomationTrack = {
@@ -220,7 +220,7 @@ type Zvoog_Project = {
 	timeline: Zvoog_SongMeasure[];
 	tracks: Zvoog_MusicTrack[];
 	farorder: number[];
-	modeNameHint: string;
+	//modeNameHint: string;
 	percussions: Zvoog_PercussionTrack[];
 	comments: Zvoog_CommentMeasure[];
 	filters: Zvoog_FilterTarget[];

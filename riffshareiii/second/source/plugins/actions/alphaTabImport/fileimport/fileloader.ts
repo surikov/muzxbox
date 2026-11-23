@@ -113,7 +113,7 @@ class FileLoaderAlpha {
 			, selectedPart: { startMeasure: -1, endMeasure: -1 }
 			, position: { x: 0, y: 0, z: 30 }
 			, list: false
-			, modeNameHint: '?'
+			//, modeNameHint: '?'
 			, patterns: []
 			, menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
 		};
@@ -134,7 +134,7 @@ class FileLoaderAlpha {
 					count: maBar.timeSignatureNumerator
 					, part: maBar.timeSignatureDenominator
 				}
-				, chordNameHint: '?'
+				//, chordNameHint: '?'
 			};
 			project.timeline.push(measure);
 
@@ -199,55 +199,101 @@ class FileLoaderAlpha {
 
 
 	}
+
 	dumpProjectInfo(project: Zvoog_Project | null) {
-		console.log('dumpProjectInfo--------------------------------------', project);
+		//console.log('dumpProjectInfo--------------------------------------', project);
 		if (project) {
-
-			let cxchord = new ChordMatcher();
-			/*
-			cxchord.match([64, 67, 71, 72, 74, 78, 81]);
-			var mached = cxchord.getMatch();
-			console.log('mached', mached );
-			*/
-			//let noteNames = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'H'];
-			let noteNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
-
 			for (let ii = 0; ii < project.timeline.length; ii++) {
-				let counts = this.countNotes2(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
-				//console.log(ii);
-				let label = '';
-				if (counts.length > 1) {
-					cxchord.match(counts);
-					label = label + cxchord.getMatch().chord;
+				project.comments[ii].points.map(vv => vv.row++);
+			}
+			let lastLabel = '';
+			let step = { count: 1, part: 2 };
+			for (let ii = 0; ii < project.timeline.length ; ii++) {
+				let measure = project.timeline[ii];
+				let point = MMUtil().set({ count: 0, part: 1 });
+				while (point.less(measure.metre)) {
+					let allnotes = this.countNotesAll(ii, point, point.plus(step), project);
+
+					let label = this.notes2Chord(allnotes);
+					//console.log(ii, label, allnotes);
+					if (label != lastLabel) {
+						project.comments[ii].points.push({
+							skip: point.metre()
+							, text: label
+							, row: 0
+						});
+						lastLabel = label;
+					}
+					point = point.plus(step);
 				}
 
-				//console.log( counts,cxchord.getMatch().chord);
-				counts = this.countNotes2(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
-				if (counts.length > 1) {
-					cxchord.match(counts);
-					//console.log( counts,cxchord.getMatch().chord);
-					label = label + ' - ' + cxchord.getMatch().chord;
-				}
 				/*
-				let counts = this.countNotes(ii, ii, project);
-				let tonic = this.findTonic(counts);
-				let label = noteNames[tonic];
-				if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
-					label = label + 'm';
-				}
-				console.log('' + (1 + ii), label, counts[(tonic + 10) % 12], counts[(tonic + 11) % 12], counts);
-				
-				*/
-				project.timeline[ii].chordNameHint = label;
+								let allnotes = this.countNotesAll(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
+								let label = '';
+								label = label + this.notes2Chord(allnotes);
+								allnotes = this.countNotesAll(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
+								label = label + '-' + this.notes2Chord(allnotes);
+								project.comments[ii].points.push({
+									skip: { count: 0, part: 1 }
+									, text: label
+									, row: 0
+								});*/
 			}
 
 		}
-
-		console.log('-------------------');
+		//console.log('-------------------');
 	}
+	notes2Chord(allNotes: number[]): string {
+		let tonic = this.findTonic(allNotes);
+		if (tonic < 0) {
+			return '?';
+		}
+		return this.halfStepNames[tonic] + this.findTriadLabel(tonic, allNotes) + this.find7Label(tonic, allNotes);
+	}
+	halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+	notesText(notes: number[]) {
 
-	findTonic(counts: number[]): number {
-		let maxCount = -1;
+		let txt = ''
+		for (let ii = 0; ii < notes.length; ii++) {
+			if (notes[ii]) {
+				txt = txt + ' ' + Math.floor(ii / 12) + this.halfStepNames[ii % 12];
+			}
+		}
+		return txt;
+	}
+	allNotes2base(allNotes: number[]): number[] {
+		let base: number[] = [];
+		for (let ii = 0; ii < allNotes.length; ii++) {
+			if (allNotes[ii]) {
+				let half = ii % 12;
+				base[half] = (base[half]) ? base[half] : 0;
+				base[half]++;
+			}
+		}
+		for (let ii = 0; ii < 12; ii++) {
+			base[ii] = (base[ii]) ? base[ii] : 0;
+		}
+		return base;
+	}
+	findTriadLabel(tonic: number, allNotes: number[]): string {
+		let counts = this.allNotes2base(allNotes);
+		if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
+			return 'm';
+		} else {
+			return '';
+		}
+	}
+	find7Label(tonic: number, allNotes: number[]): string {
+		let counts = this.allNotes2base(allNotes);
+		if (counts[(tonic + 10) % 12] > 0) {
+			return '7';
+		} else {
+			return '';
+		}
+	}
+	findTonic(allNotes: number[]): number {
+		let counts = this.allNotes2base(allNotes);
+		let maxCount = 0;
 		let halfNum = -1;
 		for (let ii = 0; ii < 12; ii++) {
 			let qN = (ii + 7) % 12;
@@ -260,29 +306,11 @@ class FileLoaderAlpha {
 			}
 			//}
 		}
+		//console.log(halfNum,counts);
 		return halfNum;
 	}
-	countNotes(from: number, to: number, project: Zvoog_Project): number[] {
-		let counts: number[] = [];
-		for (let ii = from; ii <= to; ii++) {
-			for (let tt = 0; tt < project.tracks.length; tt++) {
-				let trackMeasure = project.tracks[tt].measures[ii];
-				for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-					let trackMeasureChord = trackMeasure.chords[cc];
-					for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-						let halftone = trackMeasureChord.pitches[pp] % 12;
-						counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
-						counts[halftone]++;
-					}
-				}
-			}
-		}
-		for (let ii = 0; ii < 12; ii++) {
-			counts[ii] = counts[ii] ? counts[ii] : 0;
-		}
-		return counts;
-	}
-	countNotes2(barNo: number, from: Zvoog_Metre, to: Zvoog_Metre, project: Zvoog_Project): number[] {
+
+	countNotesAll(barNo: number, from: Zvoog_Metre, to: Zvoog_Metre, project: Zvoog_Project): number[] {
 		let counts: number[] = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {
 			let trackMeasure = project.tracks[tt].measures[barNo];
@@ -298,14 +326,8 @@ class FileLoaderAlpha {
 				}
 			}
 		}
-		let res: number[] = [];
-		for (let ii = 0; ii < counts.length; ii++) {
-			if (counts[ii]) res.push(ii);//txt = txt + ',' + ii;
-		}
-		//console.log(txt);
-		return res;//counts;
+		return counts;
 	}
-
 	addRepeats(project: Zvoog_Project, score: Score) {
 		let startLoop = -1;
 		let altStart = -1;

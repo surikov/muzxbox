@@ -15460,7 +15460,6 @@ class EventsConverter {
                 startMeasure: -1,
                 endMeasure: -1
             },
-            modeNameHint: '?',
             patterns: [],
             farorder: [],
             versionCode: '1',
@@ -15859,7 +15858,7 @@ class EventsConverter {
             }
             let barDurationMs = meter.duration(tempo) * 1000;
             let nextBar = {
-                tempo: tempo, metre: meter.metre(), chordNameHint: '?'
+                tempo: tempo, metre: meter.metre()
             };
             project.timeline.push(nextBar);
             if (barDurationMs < 100)
@@ -16344,1014 +16343,7 @@ class EventsConverter {
         return allPercussions.length - 1;
     }
 }
-class lodash {
-    constructor() {
-        this.difference = (arr, ...others) => {
-            const exclude = new Set(others.flat());
-            return arr.filter((item) => !exclude.has(item));
-        };
-    }
-    has11(chordMap, chordName) {
-        if (chordMap[chordName]) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    sortedUniq(arr) {
-        return arr.filter((item, index) => index === 0 || item !== arr[index - 1]);
-    }
-    isNumber(value) {
-        return typeof value === 'number' ||
-            (typeof value === 'object' && value !== null && Object.prototype.toString.call(value) === '[object Number]');
-    }
-    filter(arr, func) {
-        arr.filter((element, index, array) => {
-            return func(element);
-        });
-    }
-    sum(arr) {
-        return arr.reduce((acc, val) => acc + val, 0);
-    }
-    take(arr, n = 1) {
-        return arr.slice(0, n);
-    }
-    isUndefined(value) {
-        return value === undefined;
-    }
-    drop(array, n = 1) {
-        array.slice(n);
-        return array;
-    }
-    head(arr) {
-        return arr[0];
-    }
-    intersection(...arrays) {
-        if (arrays.length === 0)
-            return [];
-        const sets = arrays.slice(1).map(arr => new Set(arr));
-        const result = arrays[0].filter(item => sets.every(set => set.has(item)));
-        return [...new Set(result)];
-    }
-    isEmpty(value) {
-        if (value == null) {
-            return true;
-        }
-        if (Array.isArray(value) || typeof value === 'string' || typeof value.splice === 'function') {
-            return value.length === 0;
-        }
-        if (value instanceof Map || value instanceof Set) {
-            return value.size === 0;
-        }
-        if (typeof value === 'object') {
-            return Object.keys(value).length === 0;
-        }
-        return true;
-    }
-    forEach(collection, iteratee) {
-        if (!collection)
-            return collection;
-        if (Array.isArray(collection) || typeof collection === 'string') {
-            for (let i = 0; i < collection.length; i++) {
-                if (iteratee(collection[i], i, collection) === false) {
-                    break;
-                }
-            }
-        }
-        else if (typeof collection === 'object') {
-            const keys = Object.keys(collection);
-            for (let i = 0; i < keys.length; i++) {
-                const key = keys[i];
-                if (iteratee(collection[key], key, collection) === false) {
-                    break;
-                }
-            }
-        }
-        return collection;
-    }
-    orderBy(collection, iteratees = [], orders = []) {
-        const keys = Array.isArray(iteratees) ? iteratees : [iteratees];
-        const sortOrders = Array.isArray(orders) ? orders : [orders];
-        return [...collection].sort((a, b) => {
-            for (let i = 0; i < keys.length; i++) {
-                const iteratee = keys[i];
-                const direction = sortOrders[i] === 'desc' ? -1 : 1;
-                const valA = typeof iteratee === 'function' ? iteratee(a) : a[iteratee];
-                const valB = typeof iteratee === 'function' ? iteratee(b) : b[iteratee];
-                if (valA < valB)
-                    return -1 * direction;
-                if (valA > valB)
-                    return 1 * direction;
-            }
-            return 0;
-        });
-    }
-    map(datacollection, fiteratee = (ival) => ival) {
-        if (!datacollection)
-            return [];
-        if (Array.isArray(datacollection)) {
-            return datacollection.map(fiteratee);
-        }
-        let res = Object.entries(datacollection).map(([key, value]) => fiteratee(value));
-        return res;
-    }
-    has(obj, path) {
-        if (obj == null || !path)
-            return false;
-        const keys = Array.isArray(path)
-            ? path
-            : path.replace(/\[(\d+)\]/g, '.$1').split('.').filter(Boolean);
-        let current = obj;
-        for (const key of keys) {
-            if (current == null || !Object.hasOwn(current, key)) {
-                return false;
-            }
-            current = current[key];
-        }
-        return true;
-    }
-    forIn(object, iteratee) {
-        for (const key in object) {
-            if (iteratee(object[key], key, object) === false) {
-                break;
-            }
-        }
-        return object;
-    }
-    isEqual(a, b, visited = new WeakMap()) {
-        if (Object.is(a, b))
-            return true;
-        if (a === null || b === null || typeof a !== 'object' || typeof b !== 'object') {
-            return false;
-        }
-        if (visited.has(a))
-            return visited.get(a) === b;
-        visited.set(a, b);
-        if (a.constructor !== b.constructor)
-            return false;
-        if (a instanceof Date) {
-            return Object.is(a.getTime(), b.getTime());
-        }
-        if (a instanceof RegExp) {
-            return a.source === b.source && a.flags === b.flags;
-        }
-        if (a instanceof Map) {
-            if (a.size !== b.size)
-                return false;
-            for (const [key, val] of a) {
-                if (!b.has(key) || !this.isEqual(val, b.get(key), visited))
-                    return false;
-            }
-            return true;
-        }
-        if (a instanceof Set) {
-            if (a.size !== b.size)
-                return false;
-            for (const val of a) {
-                if (!b.has(val))
-                    return false;
-            }
-            return true;
-        }
-        if (Array.isArray(a)) {
-            if (a.length !== b.length)
-                return false;
-            for (let i = 0; i < a.length; i++) {
-                if (!this.isEqual(a[i], b[i], visited))
-                    return false;
-            }
-            return true;
-        }
-        const keysA = Object.keys(a);
-        const keysB = Object.keys(b);
-        if (keysA.length !== keysB.length)
-            return false;
-        for (const key of keysA) {
-            if (!Object.prototype.hasOwnProperty.call(b, key))
-                return false;
-            if (!this.isEqual(a[key], b[key], visited))
-                return false;
-        }
-        return true;
-    }
-    isArray(value) {
-        return Object.prototype.toString.call(value) === '[object Array]';
-    }
-}
-;
-let _ = new lodash();
-var GR;
-(function (GR) {
-    GR[GR["shell"] = 1] = "shell";
-    GR[GR["standard"] = 2] = "standard";
-    GR[GR["altered"] = 4] = "altered";
-    GR[GR["extented"] = 8] = "extented";
-    GR[GR["rootLess"] = 16] = "rootLess";
-    GR[GR["reduced"] = 32] = "reduced";
-    GR[GR["cluster"] = 64] = "cluster";
-    GR[GR["passing"] = 128] = "passing";
-})(GR || (GR = {}));
-const rootNoteNames = {
-    sharp: ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"],
-    flat: ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"]
-};
-const conflicts = {
-    "Maj,#5": [[7, 8]],
-    "Min": [[5, 6], [7, 8]],
-    "Min,6": [[5, 6], [7, 8]],
-    "Min,6,9": [[5, 6], [7, 8]],
-    "Min,6,9,-1": [[5, 6], [7, 8]],
-    "Min,7": [[5, 6], [7, 8]],
-    "Min,7,9": [[5, 6], [7, 8]],
-    "Min,7,9,-1": [[5, 6], [7, 8]],
-    "Min,7,b5": [[5, 6], [7, 8]],
-    "Min,M7": [[5, 6], [7, 8]],
-};
-const knockouts = {
-    "Maj": [1, 3, 5, 8, 10],
-    "Maj,7": [1, 3, 5, 8, 10],
-    "Maj,7,9": [1, 3, 5, 8, 10],
-    "Maj,7,9,#11": [1, 3, 5, 8, 10],
-    "Maj,7,9,#11,13": [1, 3, 5, 8, 10],
-    "Maj,6": [1, 3, 5, 8, 10],
-    "Maj,6,9": [1, 3, 5, 8, 10],
-    "Maj,7,b5": [1, 3, 5, 7, 8, 10],
-    "Maj,add2": [1, 3, 5, 8, 10, 11, 14],
-    "Maj,add9": [1, 3, 5, 8, 9, 10, 11],
-    "Maj,#5": [1, 3, 5, 7, 10],
-    "5": [1, 2, 3, 4, 5, 6, 8, 9, 10, 11],
-    "Min": [1, 4, 6, 8, 11],
-    "Min,6": [1, 4, 6, 8],
-    "Min,6,9": [1, 4, 6, 8],
-    "Min,7": [1, 4, 6, 8, 11],
-    "Min,7,9": [1, 4, 6, 8, 11],
-    "Min,7,b5": [4, 7, 8, 11],
-    "Min,M7": [1, 4, 6, 8, 10],
-    "MinCluster,7,9,-1": [1, 4, 8],
-    "Dim": [4, 7, 9, 10, 11],
-    "Dim,7": [1, 2, 4, 5, 7, 8, 10, 11],
-    "Dim,7(HW)": [2, 5, 8, 11],
-    "Dim,7(WH)": [1, 4, 7, 10],
-    "Dom,7": [5, 11],
-    "Dom,7,#5": [5, 11],
-    "Dom,7,sus4": [4, 11],
-    "Dom,7,b5": [5, 7, 11],
-    "Sus2": [1, 3, 4, 5, 8],
-    "Sus4": [1, 3, 4, 6, 8],
-    "Maj,7,-5": [1, 3, 5, 6, 7, 8, 10],
-    "Maj,6,-5": [1, 3, 5, 6, 7, 8, 10],
-    "Min,6,-5": [1, 4, 6, 7, 8],
-    "Min,7,-5": [1, 4, 6, 7, 8, 11],
-    "Maj,6,9,-1(A)": [0, 1, 3, 5, 6, 8, 10],
-    "Maj,6,9,-1(B)": [0, 1, 3, 5, 6, 8, 10],
-    "Maj,7,9,-1(A)": [0, 1, 3, 5, 6, 8, 10],
-    "Maj,7,9,-1(B)": [0, 1, 3, 5, 6, 8, 10],
-    "Maj,7,9,-1": [0, 1, 3, 5, 6, 8, 10],
-    "Min,6,9,-1(A)": [0, 4, 6, 8, 10, 11],
-    "Min,6,9,-1(B)": [0, 4, 6, 8, 10, 11],
-    "Min,7,9,-1(A)": [0, 4, 6, 8, 11],
-    "Min,7,9,-1(B)": [0, 4, 6, 8, 11],
-    "Min,6,9,-1": [1, 4, 8],
-    "Min,7,9,-1": [1, 4, 8],
-    "Dom,7,9,-1(A)": [0, 1, 3, 5, 8, 11],
-    "Dom,7,9,-1(B)": [0, 1, 3, 5, 8, 11],
-    "Dom,7,b9,b13,-1(A)": [0, 2, 5, 8, 11],
-    "Dom,7,b9,b13,-1(B)": [0, 2, 5, 8, 11],
-    "Dom,7,9,13,-1,-5": [0, 5, 7, 11],
-    "Dom,7,9,-1": [0, 5, 7, 11],
-    "Dom,7,b9,-1": [0, 5, 7, 11],
-    "Dom,7,#9,-1": [0, 5, 7, 11],
-};
-const extensions = {
-    "Maj": [14, 18, 21],
-    "Maj,7": [14, 18, 21],
-    "Min": [14, 17, 21, 13, 18],
-    "Min,M7": [14, 17, 21, 18],
-    "Maj,#5": [14, 18],
-    "Dom,7": [13, 14, 18, 21],
-    "Dom,7,#5": [13, 14, 15, 18, 19],
-    "Dom,7,b5": [13, 14, 15, 19, 20, 21]
-};
-const mustHave = {
-    "Maj": [4],
-    "Maj,7": [4, 11],
-    "Maj,7,9": [4, 11],
-    "Maj,7,9,#11": [4, 11],
-    "Maj,7,9,#11,13": [4, 11],
-    "Maj,6": [4, 9],
-    "Maj,6,9": [4, 9],
-    "Maj,6,9,-1": [4, 9],
-    "Maj,add2": [2, 4],
-    "Maj,add9": [4, 14],
-    "Maj,#5": [0, 4, 8],
-    "Sus2": [0, 2, 7],
-    "Sus4": [0, 5, 7],
-    "Min": [3],
-    "Min,6": [3, 9],
-    "Min,6,9": [3, 9],
-    "Min,6,9,-1": [3, 9],
-    "Min,7": [3, 10],
-    "Min,7,9": [3, 10],
-    "Min,7,9,-1": [3, 10],
-    "Min,7,b5": [3, 6, 10],
-    "Min,M7": [3, 11],
-    "Dom,7": [4, 10],
-    "Dom,7,9": [4, 10],
-    "Dom,7,#5": [4, 8, 10],
-    "Dom,7,b5": [4, 6, 10],
-    "Dom,7,sus4": [5, 10],
-    "Dom,7,sus2": [2, 10],
-    "Dim": [0, 3, 6],
-    "Dim,7(WH)": [0, 3, 6, 9],
-    "Dim,7(HW)": [0, 3, 6, 9],
-    "Dom,7,9,-1": [4, 10],
-    "Dom,7,b9,-1": [4, 10],
-    "Dom,7,#9,-1": [4, 10],
-    "Dom,7,9,13,-1,-5": [4, 10, 21],
-};
-const chordMap = {
-    "Maj": { notes: [0, 4, 7], root: 0, inv: 0, group: GR.standard },
-    "Maj,7": { notes: [0, 4, 7, 11], root: 0, inv: 0, group: GR.standard },
-    "Maj,7,9": { notes: [0, 4, 7, 11, 14], root: 0, inv: 0, group: GR.extented },
-    "Maj,7,9,#11": { notes: [0, 4, 7, 11, 14, 18], root: 0, inv: 0, group: GR.extented },
-    "Maj,7,9,#11,13": { notes: [0, 4, 7, 11, 14, 18, 21], root: 0, inv: 0, group: GR.extented },
-    "Maj,6": { notes: [0, 4, 7, 9], root: 0, inv: 0, group: GR.standard },
-    "Maj,6,9": { notes: [0, 4, 7, 9, 14], root: 0, inv: 0, group: GR.extented },
-    "Maj,add2": { notes: [0, 2, 4, 7], root: 0, inv: 0, group: GR.cluster },
-    "Maj,add9": { notes: [0, 4, 7, 14], root: 0, inv: 0, group: GR.extented },
-    "5": { notes: [0, 7], root: 0, inv: 0, group: GR.shell },
-    "Min": { notes: [0, 3, 7], root: 0, inv: 0, group: GR.standard },
-    "Min,7": { notes: [0, 3, 7, 10], root: 0, inv: 0, group: GR.standard },
-    "Min,7,9": { notes: [0, 3, 7, 10], root: 0, inv: 0, group: GR.altered },
-    "Min,7,b5": { notes: [0, 3, 6, 10], root: 0, inv: 0, group: GR.standard },
-    "Min,6": { notes: [0, 3, 7, 9], root: 0, inv: 0, group: GR.standard },
-    "Min,6,9": { notes: [0, 3, 7, 9, 14], root: 0, inv: 0, group: GR.extented },
-    "Min,M7": { notes: [0, 3, 7, 11], root: 0, inv: 0, group: GR.standard },
-    "Dom,7": { notes: [0, 4, 7, 10], root: 0, inv: 0, group: GR.altered },
-    "Dom,7,9": { notes: [0, 4, 7, 10, 14], root: 0, inv: 0, group: GR.extented },
-    "Dom,7,#5": { notes: [0, 4, 8, 10], root: 0, inv: 0, group: GR.altered },
-    "Dom,7,b5": { notes: [0, 4, 6, 10], root: 0, inv: 0, group: GR.altered },
-    "Dom,7,sus4": { notes: [0, 5, 7, 10], root: 0, inv: 0, group: GR.altered },
-    "Dom,7,sus2": { notes: [0, 2, 7, 10], root: 0, inv: 0, group: GR.altered },
-    "Dim": { notes: [0, 3, 6], root: 0, inv: 0, group: GR.passing },
-    "Dim,7": { notes: [0, 3, 6, 9], root: 0, inv: 0, group: GR.passing },
-    "Dim,7(HW)": { notes: [0, 3, 6, 9], root: 0, inv: 0, group: GR.passing },
-    "Dim,7(WH)": { notes: [0, 3, 6, 9], root: 0, inv: 0, group: GR.passing },
-    "Maj,#5": { notes: [0, 4, 8], root: 0, inv: 0, group: GR.altered },
-    "Sus2": { notes: [0, 2, 7], root: 0, inv: 0, group: GR.altered },
-    "Sus4": { notes: [0, 5, 7], root: 0, inv: 0, group: GR.altered },
-    "Maj,7,-5": { notes: [0, 4, 11], root: 0, inv: 0, group: GR.reduced },
-    "Maj,6,-5": { notes: [0, 4, 9], root: 0, inv: 0, group: GR.reduced },
-    "Min,6,-5": { notes: [0, 3, 9], root: 0, inv: 0, group: GR.reduced },
-    "Min,7,-5": { notes: [0, 3, 10], root: 0, inv: 0, group: GR.reduced },
-    "Maj,6,9,-1(A)": { notes: [0, 3, 5, 10], root: -4, inv: 0, group: GR.rootLess },
-    "Maj,6,9,-1(B)": { notes: [0, 5, 7, 10], root: -9, inv: 0, group: GR.rootLess },
-    "Maj,7,9,-1(A)": { notes: [0, 3, 7, 10], root: -4, inv: 0, group: GR.rootLess },
-    "Maj,7,9,-1(B)": { notes: [0, 3, 5, 8], root: -11, inv: 0, group: GR.rootLess },
-    "Min,6,9,-1(A)": { notes: [0, 4, 6, 11], root: -3, inv: 0, group: GR.rootLess },
-    "Min,7,9,-1(A)": { notes: [0, 4, 7, 11], root: -3, inv: 0, group: GR.rootLess },
-    "Min,7,9,-1(B)": { notes: [0, 4, 5, 9], root: -10, inv: 0, group: GR.rootLess },
-    "Dom,7,9,-1(A)": { notes: [0, 4, 6, 11], root: -10, inv: 0, group: GR.rootLess },
-    "Dom,7,9,-1(B)": { notes: [0, 5, 6, 10], root: -4, inv: 0, group: GR.rootLess },
-    "Dom,7,b9,b13,-1(A)": { notes: [0, 5, 6, 10], root: -4, inv: 0, group: GR.rootLess },
-    "Dom,7,b9,b13,-1(B)": { notes: [0, 4, 6, 9], root: -4, inv: 0, group: GR.rootLess },
-    "Dom,7,b9,-1": { notes: [0, 3, 6, 9], root: -4, inv: 0, group: GR.rootLess },
-    "Dom,7,#9,-1": { notes: [0, 3, 6, 11], root: -4, inv: 0, group: GR.rootLess },
-};
-class ChordInstance {
-    constructor(midiChord, normalizeChord = true) {
-        this.midiChord = midiChord;
-        this.normalizeChord = normalizeChord;
-        this.offset = [];
-        this.chordInv = [];
-        this.matchedNotes = {};
-        this.favorJazzChords = false;
-        this.validate(midiChord);
-        for (let i = 0; i < midiChord.length; i++) {
-            this.offset.push(midiChord[i]);
-        }
-        this.chordInv = this.invert(midiChord);
-    }
-    addOffset(chord, offset) {
-        const res = [];
-        for (var i = 0; i < chord.length; i++) {
-            res.push(chord[i] + offset);
-        }
-        return res;
-    }
-    addRootOffset(chord, root) {
-        const offset = (root < 0 ? 12 + root : root) % 12;
-        return this.normalize(this.addOffset(chord, offset));
-    }
-    getOffset(inv) {
-        if (inv < 0 || inv >= this.offset.length)
-            throw Error("getRootOffset inversion is out of range");
-        else
-            return this.offset[inv];
-    }
-    getBassName(_hypo, sharpOrFlat = 'flat') {
-        const bass = this.offset[0] % 12;
-        const bassName = rootNoteNames[sharpOrFlat][bass];
-        return bassName;
-    }
-    getBassNumber() { return this.offset[0]; }
-    getRootName(hypo, sharpOrFlat = 'flat') {
-        const _offset = (this.offset[0] + hypo.root) % 12;
-        var root = _offset < 0 ? _offset + 12 : _offset;
-        var rootName = rootNoteNames[sharpOrFlat][root];
-        return rootName;
-    }
-    getInversion(inv) {
-        return _.isUndefined(this.chordInv[inv]) ? [] : this.chordInv[inv];
-    }
-    validate(notes) {
-        if (notes.length == 0) {
-            throw Error("No notes in notes array");
-        }
-        for (var i = 0; i < notes.length; i++) {
-            if (notes[i] < 0 || notes[i] > 127) {
-                throw Error("Illegal midi note value:" + notes[i]);
-            }
-        }
-    }
-    normalize(notes) {
-        var target = [];
-        try {
-            var offset = notes[0];
-            for (var i = 0; i < notes.length; i++) {
-                var note = notes[i] - offset;
-                while (note > 21)
-                    note -= 12;
-                target[i] = note;
-            }
-        }
-        catch (e) {
-            throw Error(e);
-        }
-        return target;
-    }
-    invert(notes) {
-        if (notes.length < 2) {
-            console.log("Cannot invert less than 2 notes", notes);
-            return [[]];
-        }
-        var target = [];
-        target[0] = this.normalizeChord ? this.normalize(notes) : notes;
-        this.offset[0] = notes[0];
-        for (var d = 1; d < notes.length; d++) {
-            var currNotes = _.drop(target[d - 1]);
-            var invNote = _.head(target[d - 1]);
-            invNote += 12;
-            currNotes.push(invNote);
-            target[d] = this.normalizeChord ? this.normalize(currNotes) : currNotes;
-        }
-        if (target.length < notes.length)
-            throw Error("Bad invertion");
-        return target;
-    }
-}
-class ChordForms {
-    constructor() {
-        this.chordMapWithInv = {};
-        this.buildInversions();
-    }
-    getInvariants(chordName) {
-        const invariants = [];
-        if (_.has(chordMap, chordName)) {
-            const chord = chordMap[chordName];
-            _.forIn(chordMap, function (value, key) {
-                if (key !== chordName && _.isEqual(value.notes, chord.notes)) {
-                    invariants.push(key);
-                }
-            });
-        }
-        return invariants;
-    }
-    buildInversions() {
-        const mapWithInv = this.chordMapWithInv;
-        _.forIn(chordMap, function (value, key) {
-            mapWithInv[key] = [];
-            const chord = new ChordInstance(value.notes);
-            const interval = chord.getInversion(0);
-            for (let i = 0; i < value.notes.length; i++) {
-                const _notes = chord.getInversion(i);
-                const rootNote = (-(Math.abs(value.root) + interval[i])) % 12;
-                mapWithInv[key].push({ notes: _notes, root: rootNote, inv: i, group: value.group });
-            }
-        });
-    }
-}
-class BayesChordCalculator {
-    constructor(bayesChordMap) {
-        this.bayesChordMap = bayesChordMap;
-        this.self = this;
-        this.hypothesis = [];
-        this.rules = [];
-        this.likelyhoods = [];
-        this.normalizingConst = [];
-        this.posterior = [];
-        this.chartsCount = 0;
-        this.randomColorFactor = function () {
-            return Math.round(Math.random() * 255);
-        };
-        this.createHypothesis();
-    }
-    createHypothesis() {
-        let idx = 0;
-        const _self = this.self;
-        for (const key in this.bayesChordMap) {
-            for (let inv = 0; inv < this.bayesChordMap[key].length; inv++) {
-                _self.hypothesis.push({
-                    idx: idx++,
-                    key: key,
-                    inv: inv,
-                    group: this.bayesChordMap[key][inv].group,
-                    len: this.bayesChordMap[key][inv].notes.length,
-                    root: this.bayesChordMap[key][inv].root
-                });
-            }
-        }
-    }
-    getChordMapNotes(idx) {
-        return this.bayesChordMap[this.hypothesis[idx].key][this.hypothesis[idx].inv].notes;
-    }
-    standardDeriviation(data) {
-        const sum = _.sum(data);
-        const avg = sum / data.length;
-        const squaredDiffs = _.map(data, function (value) {
-            const diff = value - avg;
-            return diff * diff;
-        });
-        const avgSquaredDiff = _.sum(squaredDiffs) / squaredDiffs.length;
-        const stdDev = Math.sqrt(avgSquaredDiff);
-        return stdDev;
-    }
-    applyRule(rule) {
-        const _self = this.self;
-        const row = this.likelyhoods.length;
-        const firstRow = (row == 0);
-        let normalizingConst = 0;
-        this.rules.push(rule);
-        if (_.isUndefined(this.likelyhoods[row]))
-            this.likelyhoods[row] = [];
-        for (let col = 0; col < this.hypothesis.length; col++) {
-            const likelyhood = rule.ruleFx(rule.chord, _self, row, col);
-            this.likelyhoods[row].push(likelyhood);
-            const prior = firstRow ? 1 : this.posterior[row - 1][col].post;
-            normalizingConst += (prior * likelyhood);
-        }
-        this.likelyhoods[row].push(normalizingConst);
-        this.calcPosterior(row);
-    }
-    calcPosterior(_row) {
-        for (let row = _row < 0 ? 0 : _row; row < this.likelyhoods.length; row++) {
-            const firstRow = (row == 0);
-            const colIdx = this.likelyhoods[row].length - 1;
-            const normalizingConst = this.likelyhoods[row][colIdx];
-            if (_.isUndefined(this.posterior[row]))
-                this.posterior[row] = [];
-            for (let col = 0; col < this.hypothesis.length; col++) {
-                const prior = firstRow ? 1 : this.posterior[row - 1][col].post;
-                const likelyhood = this.likelyhoods[row][col];
-                const posterior = (prior * likelyhood) / (firstRow ? 1 : normalizingConst);
-                this.posterior[row].push({ post: posterior, idx: col });
-            }
-        }
-    }
-    getPosteriorByRow(rowIdx) {
-        if (rowIdx < 0 || rowIdx >= this.posterior.length || _.isUndefined(this.posterior[rowIdx]))
-            throw Error("getPosteriorByRow index: " + rowIdx + " is out of range or undefined");
-        for (let col = 0; col < this.hypothesis.length; col++) {
-            this.posterior[rowIdx][col].hypo = this.hypothesis[col];
-        }
-        return _.orderBy(this.posterior[rowIdx], ['post', 'hypo.len', 'hypo.inv'], 'desc');
-    }
-    getPosterior() {
-        const lastRow = this.posterior.length - 1;
-        if (lastRow < 0)
-            return [];
-        else
-            return this.getPosteriorByRow(lastRow);
-    }
-    getHypothesis(posterior) {
-        return this.hypothesis[posterior.idx];
-    }
-    getHypothesisByIdx(idx) {
-        if (idx < 0 || idx >= this.hypothesis.length)
-            throw Error("getHypothesisByIdx index: " + idx + " is out of range");
-        return this.hypothesis[idx];
-    }
-    getBestPosterior(idx = 0) {
-        const res = this.getPosterior();
-        if (idx < 0 || idx >= res.length)
-            throw Error("getBestPosterior index: " + idx + " is out of range");
-        return res[idx];
-    }
-    normalize(posterior) {
-        const postArr = [];
-        _.forEach(posterior, function (val) {
-            postArr.push(val.post);
-        });
-        const sum = _.sum(postArr);
-        let checkSum = 0;
-        for (let i = 0; i < postArr.length; i++) {
-            posterior[i].post = postArr[i] / sum;
-            checkSum += posterior[i].post;
-        }
-    }
-    getTopX(topX = 10, row = this.posterior.length - 1, normalize = true) {
-        const posterior = this.getPosteriorByRow(row);
-        const postTopX = _.take(posterior, topX);
-        if (normalize) {
-            this.normalize(postTopX);
-        }
-        return postTopX;
-    }
-    getRandomIntInclusive(min, max) {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-}
-class Rules {
-    get(key) {
-        return this.ruleMap.get(key);
-    }
-    has(key) {
-        return this.ruleMap.has(key);
-    }
-    set(key, rule) {
-        rule.rule = key;
-        this.ruleMap.set(key, rule);
-        return this.ruleMap.get(key);
-    }
-    constructor(_chord, debugKey = 'Maj') {
-        this.debugKey = debugKey;
-        this.ruleMap = new Map();
-        this.set('EvenDistribution', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                if (bayes.hypothesis.length) {
-                    return 1 / bayes.hypothesis.length;
-                }
-                else {
-                    return 0;
-                }
-            }
-        });
-        this.set('CountNotes', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const hypoLen = bayes.hypothesis[col].len;
-                const chordLen = chord.chordInv[0].length;
-                let score = 0.1;
-                if (hypoLen == chordLen)
-                    score = 1;
-                else if (hypoLen > chordLen)
-                    score = 1 / (hypoLen - chordLen) * 2;
-                else if (hypoLen < chordLen)
-                    score = 1 / (chordLen - hypoLen) * 2;
-                return score;
-            }
-        });
-        this.set('MustHave', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const inv = bayes.hypothesis[col].inv;
-                const mustHave = chord.matchedNotes[key].mustHave[inv];
-                const score = 1 / (mustHave == 0 ? 1 : Math.abs(mustHave) * 2);
-                return score;
-            }
-        });
-        this.set('Knockouts', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const inv = bayes.hypothesis[col].inv;
-                const knockouts = chord.matchedNotes[key].knockouts[inv].length;
-                const score = 1 / (knockouts == 0 ? 1 : knockouts * 10);
-                return score;
-            }
-        });
-        this.set('MatchedNotes', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const inv = bayes.hypothesis[col].inv;
-                const chordLen = chord.chordInv[0].length;
-                const matches = chord.matchedNotes[key].invertions[inv].length;
-                const missing = chordLen - matches;
-                const missingTax = 2;
-                const score = matches / (bayes.hypothesis[col].len + (missing * missingTax));
-                return score;
-            }
-        });
-        this.set('RootFound', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const inv = bayes.hypothesis[col].inv;
-                const indexOfRoot = chord.matchedNotes[key].roots[inv];
-                const favorJazz = chord.favorJazzChords;
-                let score;
-                const flavor = bayes.hypothesis[col].group;
-                const jazzChord = (flavor == GR.rootLess);
-                let inversionTax = 0.1 * inv;
-                inversionTax = inversionTax < 1 ? inversionTax : 0.8;
-                if (jazzChord) {
-                    if (jazzChord && !favorJazz) {
-                        score = 0.2;
-                    }
-                    else {
-                        score = indexOfRoot >= 0 ? 0.2 : 1 - inversionTax;
-                    }
-                }
-                else if (indexOfRoot == 0) {
-                    score = favorJazz ? 0.7 : 1;
-                }
-                else if (indexOfRoot > 0) {
-                    score = favorJazz ? 0.7 - inversionTax : 1 - inversionTax;
-                }
-                else {
-                    score = 0.6 - inversionTax;
-                }
-                return score;
-            }
-        });
-        this.set('FavorJazz', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const flavor = bayes.hypothesis[col].group;
-                const jazzChord = (flavor == GR.rootLess || flavor == GR.reduced);
-                if (key == "Maj,7,-5") {
-                    const debug = true;
-                }
-                const score = jazzChord ? 1 : 0.70;
-                return score;
-            }
-        });
-        this.set('Conflicts', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const key = bayes.hypothesis[col].key;
-                const inv = bayes.hypothesis[col].inv;
-                const conflicts = chord.matchedNotes[key].conflicts[inv];
-                const score = 1 / (conflicts == 0 ? 1 : conflicts * 10);
-                return score;
-            }
-        });
-        this.set('ChordGroup', {
-            chord: _chord,
-            ruleFx: function (chord, bayes, row, col) {
-                const score = 1 / chord.matchedNotes[bayes.hypothesis[col].key].group;
-                return score;
-            }
-        });
-    }
-}
-function getExtName(nameWithCommas) {
-    const extName = nameWithCommas.replace(/,/g, "").replace(/-1/g, "-no-root").replace(/-5/g, "-no-fifth");
-    return extName;
-}
-const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
-    "c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b",
-    "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B",
-    "c", "db", "d", "eb", "e", "f", "gb", "g", "ab", "a", "bb", "b"];
-function getNoteNumber(note) {
-    let octave = 5;
-    const _oct = note.replace(/^[A-Ga-g]+[#b]*/, '');
-    if (!_.isEmpty(_oct)) {
-        const _octave = _oct.replace(/[^0-9]+/g, '');
-        if (_octave.match(/^[0-9]0{0,1}/))
-            octave = parseInt(_octave);
-        else
-            throw Error("getNoteNumber: Illegal octave number. Legal octaves are 0-10");
-    }
-    const noteName = note.replace(/[0-9]/g, '');
-    const noteNum = noteNames.indexOf(noteName) % 12;
-    if (noteNum < 0)
-        throw Error("getNoteNumber: Unknown note name");
-    else
-        return noteNum + (octave * 12);
-}
-class ChordMatch {
-    constructor(hypo, chordEntry, _mapEntry, sharpOrFlat = 'flat') {
-        this.hypo = hypo;
-        this.notes = [];
-        this.inv = hypo.inv;
-        this.type = hypo.key;
-        for (let i = 0; i < chordEntry.chordInv[0].length; i++) {
-            const note = chordEntry.chordInv[0][i] + chordEntry.offset[0];
-            this.notes.push(note);
-        }
-        this.bass = chordEntry.getBassName(hypo, sharpOrFlat);
-        this.root = chordEntry.getRootName(hypo, sharpOrFlat);
-        this.list = this.root + "," + this.hypo.key;
-        if (this.bass !== this.root) {
-            this.list += ",/" + this.bass;
-        }
-        this.chord = getExtName(this.list);
-    }
-}
-function isNoRootChord(chordSym) {
-    return _.isUndefined(chordSym) ? false : (chordSym.indexOf("-1") > 0);
-}
-function getKnockouts(key) {
-    let _key = key;
-    if (_.isUndefined(knockouts[_key])) {
-        _key = _key.split(',')[0];
-    }
-    return _.isUndefined(knockouts[_key]) ? [] : knockouts[_key];
-}
-class ChordMatcher extends ChordForms {
-    constructor(debugKey = "Maj") {
-        super();
-        this.debugKey = debugKey;
-        this.chord = null;
-        this.bayes = null;
-        this.rules = null;
-        this.favorJazzChords = false;
-        this.priorChords = [];
-    }
-    getMatches(sharpOrFlat = 'flat') {
-        if (this.bayes) {
-            const post = this.bayes.getPosterior();
-            const res = [];
-            for (let i = 0; i < post.length; i++)
-                if (i == 0 || post[i].post == post[i - 1].post) {
-                    const chordEntry = this.chord;
-                    const chordMapEntry = this.chordMapWithInv[post[i].hypo.key][post[i].hypo.inv];
-                    const entry = new ChordMatch(post[i].hypo, chordEntry, chordMapEntry, sharpOrFlat);
-                    res.push(entry);
-                }
-                else {
-                    break;
-                }
-            return res;
-        }
-        else {
-            return [];
-        }
-    }
-    getMatch(idx = 0, sharpOrFlat = 'flat') {
-        const res = this.getMatches(sharpOrFlat);
-        if (idx < 0 || idx >= res.length)
-            throw Error("getMatch index: " + idx + " is out of range");
-        else
-            return res[idx];
-    }
-    getPosterior() { return this.bayes.getPosterior(); }
-    getChord() { return this.chord; }
-    favorJazz(favor = true) {
-        this.favorJazzChords = favor;
-        if (this.chord !== null) {
-            this.chord.favorJazzChords = favor;
-        }
-    }
-    addRootOffset(_arr = [], root, _addOctave = true) {
-        let arr = [];
-        if (root == 0) {
-            arr = _arr;
-        }
-        else {
-            for (let i = 0; i < _arr.length; i++) {
-                let note = _arr[i] + root % 12;
-                note = note < 0 ? note + 12 : note;
-                arr.push(note);
-            }
-        }
-        return _.sortedUniq(arr);
-    }
-    addToArray(_arr, value) {
-        const arr = [];
-        for (let i = 0; i < _arr.length; i++) {
-            arr.push(_arr[i] + value);
-        }
-        return arr;
-    }
-    doMatch(chord, _limit = chord.chordInv[0].length) {
-        const self = this;
-        let idx = 0;
-        _.forIn(this.chordMapWithInv, function (hypothesis, key) {
-            idx++;
-            for (let inv = 0; inv < hypothesis.length; inv++) {
-                idx += inv;
-                if (!_.has(chord.matchedNotes, key)) {
-                    chord.matchedNotes[key] = {
-                        invertions: [],
-                        extensions: [],
-                        knockouts: [],
-                        mustHave: [],
-                        rootNotes: [],
-                        conflicts: [],
-                        roots: [],
-                        group: hypothesis[inv].group
-                    };
-                }
-                chord.matchedNotes[key].rootNotes.push(hypothesis[inv].root);
-                const intersection = _.intersection(chord.chordInv[0], hypothesis[inv].notes);
-                if (!_.isArray(intersection))
-                    throw Error('inversion Intersection is not an array');
-                chord.matchedNotes[key].invertions.push(intersection);
-                let _hypoToMatch = [];
-                let chordToMatch = [];
-                const invRoot = (hypothesis[inv].root < 0 ? 12 + hypothesis[inv].root : hypothesis[inv].root) % 12;
-                if (isNoRootChord(key) && hypothesis[inv].root < 0) {
-                    const tmpArr = [];
-                    tmpArr.push(invRoot);
-                    _hypoToMatch = tmpArr.concat(hypothesis[inv].notes).sort();
-                    chordToMatch = chord.addRootOffset(chord.chordInv[0], hypothesis[inv].root);
-                }
-                else {
-                    _hypoToMatch = hypothesis[inv].notes;
-                    chordToMatch = chord.chordInv[0];
-                }
-                const indexOfRoot = chordToMatch.indexOf(invRoot) >= 0 ? chordToMatch.indexOf(invRoot) : chordToMatch.indexOf(invRoot + 12);
-                chord.matchedNotes[key].roots.push(indexOfRoot);
-                let mustHaveTrans;
-                let mustHaveMatch;
-                if (!_.isUndefined(mustHave[key])) {
-                    mustHaveTrans = self.addRootOffset(mustHave[key], hypothesis[inv].root, false);
-                    mustHaveMatch = _.intersection(chordToMatch, mustHaveTrans);
-                    chord.matchedNotes[key].mustHave.push(mustHaveMatch.length - mustHaveTrans.length);
-                }
-                else
-                    chord.matchedNotes[key].mustHave.push(0);
-                const extensionNotes = extensions[key];
-                const remainingNotes = _.difference(chord.chordInv[0], intersection);
-                const extensionMatch = _.intersection(remainingNotes, extensionNotes);
-                chord.matchedNotes[key].extensions.push(extensionMatch);
-                let knockoutTrans;
-                let knockoutMatch;
-                const KOs = getKnockouts(key);
-                if (KOs.length > 0) {
-                    knockoutTrans = self.addRootOffset(knockouts[key], hypothesis[inv].root);
-                    knockoutMatch = _.intersection(chord.chordInv[0], knockoutTrans);
-                }
-                chord.matchedNotes[key].knockouts.push(knockoutMatch ?? []);
-                let conflictCount = 0;
-                let conflictTrans;
-                if (!_.isUndefined(conflicts[key])) {
-                    for (let i = 0; i < conflicts[key].length; i++) {
-                        conflictTrans = self.addRootOffset(conflicts[key][i], hypothesis[inv].root);
-                        let conflictMatch = _.intersection(chordToMatch, conflictTrans);
-                        if (conflictMatch.length == conflictTrans.length) {
-                            conflictCount += 1;
-                        }
-                        conflictTrans = self.addToArray(conflictTrans, 12);
-                        conflictMatch = _.intersection(chord.chordInv[0], conflictTrans);
-                        if (conflictMatch.length == conflictTrans.length) {
-                            conflictCount += 1;
-                        }
-                    }
-                }
-                chord.matchedNotes[key].conflicts.push(conflictCount);
-            }
-        });
-        return chord;
-    }
-    match(midiChord) {
-        if (_.isUndefined(midiChord) || _.isEmpty(midiChord)) {
-            return new ChordInstance([0], false);
-        }
-        if (_.isNumber(midiChord[0]))
-            return this.matchNotes(midiChord);
-        return this.matchNoteNames(midiChord);
-    }
-    matchNoteNames(midiNames) {
-        const midiChord = [];
-        for (let i = 0; i < midiNames.length; i++)
-            try {
-                const noteNo = getNoteNumber(midiNames[i]);
-                midiChord.push(noteNo);
-            }
-            catch (e) {
-                throw e;
-            }
-        return this.matchNotes(midiChord);
-    }
-    matchNotes(midiChord) {
-        this.bayes = new BayesChordCalculator(this.chordMapWithInv);
-        this.chord = new ChordInstance(midiChord);
-        this.chord.favorJazzChords = this.favorJazzChords;
-        this.doMatch(this.chord);
-        this.rules = new Rules(this.chord, this.debugKey);
-        const ruleE = this.rules.get('EvenDistribution');
-        this.bayes.applyRule(ruleE);
-        var ruleK = this.rules.get('Knockouts');
-        this.bayes.applyRule(ruleK);
-        var ruleM = this.rules.get('MatchedNotes');
-        this.bayes.applyRule(ruleM);
-        var ruleH = this.rules.get('MustHave');
-        this.bayes.applyRule(ruleH);
-        var ruleR = this.rules.get('RootFound');
-        this.bayes.applyRule(ruleR);
-        return this.chord;
-    }
-}
-class CxChord {
-}
+let aacffgbfg = 1;
 console.log('Alpha Tab Import *.mid v1.0.21');
 let parsedProject = null;
 class AlphaTabImportMusicPlugin {
@@ -17418,6 +16410,7 @@ class AlphaTabImportMusicPlugin {
 class FileLoaderAlpha {
     constructor(inputFile) {
         this.inames = new ChordPitchPerformerUtilMIDI();
+        this.halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
@@ -17523,7 +16516,6 @@ class FileLoaderAlpha {
             selectedPart: { startMeasure: -1, endMeasure: -1 },
             position: { x: 0, y: 0, z: 30 },
             list: false,
-            modeNameHint: '?',
             patterns: [],
             menuPerformers: false, menuSamplers: false, menuFilters: false, menuActions: false, menuPlugins: false, menuClipboard: false, menuSettings: false
         };
@@ -17540,8 +16532,7 @@ class FileLoaderAlpha {
                 metre: {
                     count: maBar.timeSignatureNumerator,
                     part: maBar.timeSignatureDenominator
-                },
-                chordNameHint: '?'
+                }
             };
             project.timeline.push(measure);
         }
@@ -17599,29 +16590,82 @@ class FileLoaderAlpha {
         parsedProject = project;
     }
     dumpProjectInfo(project) {
-        console.log('dumpProjectInfo--------------------------------------', project);
         if (project) {
-            let cxchord = new ChordMatcher();
-            let noteNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
             for (let ii = 0; ii < project.timeline.length; ii++) {
-                let counts = this.countNotes2(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
-                let label = '';
-                if (counts.length > 1) {
-                    cxchord.match(counts);
-                    label = label + cxchord.getMatch().chord;
+                project.comments[ii].points.map(vv => vv.row++);
+            }
+            let lastLabel = '';
+            let step = { count: 1, part: 2 };
+            for (let ii = 0; ii < project.timeline.length; ii++) {
+                let measure = project.timeline[ii];
+                let point = MMUtil().set({ count: 0, part: 1 });
+                while (point.less(measure.metre)) {
+                    let allnotes = this.countNotesAll(ii, point, point.plus(step), project);
+                    let label = this.notes2Chord(allnotes);
+                    if (label != lastLabel) {
+                        project.comments[ii].points.push({
+                            skip: point.metre(),
+                            text: label,
+                            row: 0
+                        });
+                        lastLabel = label;
+                    }
+                    point = point.plus(step);
                 }
-                counts = this.countNotes2(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
-                if (counts.length > 1) {
-                    cxchord.match(counts);
-                    label = label + ' - ' + cxchord.getMatch().chord;
-                }
-                project.timeline[ii].chordNameHint = label;
             }
         }
-        console.log('-------------------');
     }
-    findTonic(counts) {
-        let maxCount = -1;
+    notes2Chord(allNotes) {
+        let tonic = this.findTonic(allNotes);
+        if (tonic < 0) {
+            return '?';
+        }
+        return this.halfStepNames[tonic] + this.findTriadLabel(tonic, allNotes) + this.find7Label(tonic, allNotes);
+    }
+    notesText(notes) {
+        let txt = '';
+        for (let ii = 0; ii < notes.length; ii++) {
+            if (notes[ii]) {
+                txt = txt + ' ' + Math.floor(ii / 12) + this.halfStepNames[ii % 12];
+            }
+        }
+        return txt;
+    }
+    allNotes2base(allNotes) {
+        let base = [];
+        for (let ii = 0; ii < allNotes.length; ii++) {
+            if (allNotes[ii]) {
+                let half = ii % 12;
+                base[half] = (base[half]) ? base[half] : 0;
+                base[half]++;
+            }
+        }
+        for (let ii = 0; ii < 12; ii++) {
+            base[ii] = (base[ii]) ? base[ii] : 0;
+        }
+        return base;
+    }
+    findTriadLabel(tonic, allNotes) {
+        let counts = this.allNotes2base(allNotes);
+        if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
+            return 'm';
+        }
+        else {
+            return '';
+        }
+    }
+    find7Label(tonic, allNotes) {
+        let counts = this.allNotes2base(allNotes);
+        if (counts[(tonic + 10) % 12] > 0) {
+            return '7';
+        }
+        else {
+            return '';
+        }
+    }
+    findTonic(allNotes) {
+        let counts = this.allNotes2base(allNotes);
+        let maxCount = 0;
         let halfNum = -1;
         for (let ii = 0; ii < 12; ii++) {
             let qN = (ii + 7) % 12;
@@ -17632,27 +16676,7 @@ class FileLoaderAlpha {
         }
         return halfNum;
     }
-    countNotes(from, to, project) {
-        let counts = [];
-        for (let ii = from; ii <= to; ii++) {
-            for (let tt = 0; tt < project.tracks.length; tt++) {
-                let trackMeasure = project.tracks[tt].measures[ii];
-                for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-                    let trackMeasureChord = trackMeasure.chords[cc];
-                    for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-                        let halftone = trackMeasureChord.pitches[pp] % 12;
-                        counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
-                        counts[halftone]++;
-                    }
-                }
-            }
-        }
-        for (let ii = 0; ii < 12; ii++) {
-            counts[ii] = counts[ii] ? counts[ii] : 0;
-        }
-        return counts;
-    }
-    countNotes2(barNo, from, to, project) {
+    countNotesAll(barNo, from, to, project) {
         let counts = [];
         for (let tt = 0; tt < project.tracks.length; tt++) {
             let trackMeasure = project.tracks[tt].measures[barNo];
@@ -17668,12 +16692,7 @@ class FileLoaderAlpha {
                 }
             }
         }
-        let res = [];
-        for (let ii = 0; ii < counts.length; ii++) {
-            if (counts[ii])
-                res.push(ii);
-        }
-        return res;
+        return counts;
     }
     addRepeats(project, score) {
         let startLoop = -1;

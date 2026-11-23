@@ -2488,7 +2488,6 @@ class CommandDispatcher {
         this.adjustTimelineEmptyEnd(project);
         this.adjustTimelineEmptyEnd(project);
         for (let tt = 0; tt < project.timeline.length; tt++) {
-            project.timeline[tt].chordNameHint = (project.timeline[tt].chordNameHint) ? project.timeline[tt].chordNameHint : '';
             for (let nn = 0; nn < project.tracks.length; nn++) {
                 let track = project.tracks[nn];
                 if (!(track.measures[tt])) {
@@ -2545,8 +2544,7 @@ class CommandDispatcher {
             metre: {
                 count: project.timeline[project.timeline.length - 1].metre.count,
                 part: project.timeline[project.timeline.length - 1].metre.part
-            },
-            chordNameHint: ''
+            }
         });
         this.adjustTimeLineLength(project);
     }
@@ -2737,7 +2735,6 @@ class CommandDispatcher {
         if (!Array.isArray(project.patterns)) {
             project.patterns = [];
         }
-        project.modeNameHint = (project.modeNameHint) ? project.modeNameHint : '';
         this.adjustTimeLineLength(project);
         this.adjustContentByMeter(project);
         this.adjustTracksChords(project);
@@ -3181,13 +3178,6 @@ class TimeSelectBar {
             css: 'timeBarInfo' + zoomPrefixLevelsCSS[zz].prefix
         };
         measureAnchor.content.push(bpm);
-        let chordName = {
-            x: barLeft + size / 4,
-            y: zoomPrefixLevelsCSS[zz].minZoom * 3,
-            text: '' + curBar.chordNameHint,
-            css: 'timeBarNum' + zoomPrefixLevelsCSS[zz].prefix
-        };
-        measureAnchor.content.push(chordName);
     }
     ___addSelectionMenuButton(label, left, order, zz, selectLevelAnchor, labelCSS, action) {
         let size = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
@@ -4260,8 +4250,7 @@ function fillClipboardList() {
             let timebar = globalCommandDispatcher.clipboardData.timeline[ii];
             if (!(timebar)) {
                 timebar = {
-                    tempo: 120, metre: { count: 4, part: 4 },
-                    chordNameHint: ''
+                    tempo: 120, metre: { count: 4, part: 4 }
                 };
             }
             pasteWidth = pasteWidth + mm.set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -5001,13 +4990,29 @@ class LeftPanel {
                 }
             }
             let butsize = zoomPrefixLevelsCSS[zz].minZoom * 1.5;
-            let modeLabel = {
-                x: butsize * 0.2,
-                y: globalCommandDispatcher.cfg().gridTop() - 1.5 * zoomPrefixLevelsCSS[zz].minZoom,
-                text: '' + globalCommandDispatcher.cfg().data.modeNameHint,
-                css: 'titleLabel' + zoomPrefixLevelsCSS[zz].prefix
+            let titleButton = {
+                x: 0,
+                y: globalCommandDispatcher.cfg().gridTop() - butsize + butsize * 0.2,
+                w: butsize, h: butsize,
+                rx: butsize / 2, ry: butsize / 2,
+                css: 'timeMarkButtonCircle' + zoomPrefixLevelsCSS[zz].prefix,
+                activation: (x, y) => {
+                    let old = globalCommandDispatcher.cfg().data.title;
+                    let newTitle = prompt('', old);
+                    if (newTitle) {
+                        if (newTitle == old) {
+                        }
+                        else {
+                            globalCommandDispatcher.exe.commitProjectChanges([], () => {
+                                globalCommandDispatcher.cfg().data.title = newTitle;
+                                globalCommandDispatcher.fullProjectCheckUp(globalCommandDispatcher.cfg().data);
+                            });
+                            globalCommandDispatcher.resetProject();
+                        }
+                    }
+                }
             };
-            this.leftZoomAnchors[zz].content.push(modeLabel);
+            this.leftZoomAnchors[zz].content.push(titleButton);
             let titleLabel = {
                 x: butsize * 0.2,
                 y: globalCommandDispatcher.cfg().gridTop(),
@@ -6288,7 +6293,7 @@ class MixerUI {
             let timebar = globalCommandDispatcher.cfg().data.timeline[bb];
             if (!(timebar)) {
                 timebar = {
-                    tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                    tempo: 120, metre: { count: 4, part: 4 }
                 };
             }
             let barwidth = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -6368,7 +6373,7 @@ class MixerZoomLevel {
             let timebar = globalCommandDispatcher.cfg().data.timeline[ii];
             if (!(timebar)) {
                 timebar = {
-                    tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                    tempo: 120, metre: { count: 4, part: 4 }
                 };
             }
             width = MMUtil().set(timebar.metre).duration(timebar.tempo) * globalCommandDispatcher.cfg().widthDurationRatio;
@@ -8115,21 +8120,20 @@ function createNewEmptyProjectData() {
         versionCode: '1',
         farorder: [],
         list: false,
-        modeNameHint: '',
         selectedPart: { startMeasure: -1, endMeasure: -1 },
         position: { x: 0, y: -0, z: 33 },
         timeline: [
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                tempo: 120, metre: { count: 4, part: 4 }
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                tempo: 120, metre: { count: 4, part: 4 }
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                tempo: 120, metre: { count: 4, part: 4 }
             },
             {
-                tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                tempo: 120, metre: { count: 4, part: 4 }
             }
         ],
         tracks: [
@@ -8283,7 +8287,7 @@ class MixerDataMathUtility {
             let timebar = this.data.timeline[ii];
             if (!(timebar)) {
                 timebar = {
-                    tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''
+                    tempo: 120, metre: { count: 4, part: 4 }
                 };
             }
             ww = ww + mm.set(timebar.metre).duration(timebar.tempo) * this.widthDurationRatio;

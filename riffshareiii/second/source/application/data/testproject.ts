@@ -5,21 +5,21 @@ function createNewEmptyProjectData(): Zvoog_Project {
 		, versionCode: '1'
 		, farorder: []
 		, list: false
-		, modeNameHint: ''
+		//, modeNameHint: ''
 		, selectedPart: { startMeasure: -1, endMeasure: -1 }
 		, position: { x: 0, y: -0, z: 33 }
 		, timeline: [
 			{
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }//, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }//, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }//, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 			, {
-				tempo: 120, metre: { count: 4, part: 4 }, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
+				tempo: 120, metre: { count: 4, part: 4 }//, chordNameHint: ''//, modality: { tonic: { step: 0, shift: 0 }, mode: [], chord: [] }
 			}
 
 		]
