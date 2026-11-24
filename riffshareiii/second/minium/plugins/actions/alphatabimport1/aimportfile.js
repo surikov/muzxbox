@@ -16343,7 +16343,99 @@ class EventsConverter {
         return allPercussions.length - 1;
     }
 }
-let aacffgbfg = 1;
+class ChordFinder {
+    constructor(pretonic, preminor, pre7, barNo, from, to, project) {
+        this.halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
+        this.tonic = -1;
+        this.pretonic = -1;
+        this.avg = -1;
+        this.minor = false;
+        this.seventh = false;
+        this.pretonic = pretonic;
+        this.minor = preminor;
+        this.seventh = pre7;
+        this.counts = [];
+        this.steps12 = [];
+        for (let ii = 0; ii < 128; ii++) {
+            this.counts[ii] = 0;
+        }
+        for (let ii = 0; ii < 12; ii++) {
+            this.steps12[ii] = 0;
+        }
+        for (let tt = 0; tt < project.tracks.length; tt++) {
+            let trackMeasure = project.tracks[tt].measures[barNo];
+            for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
+                let trackMeasureChord = trackMeasure.chords[cc];
+                let mm = MMUtil().set(trackMeasureChord.skip);
+                if ((!mm.less(from)) && mm.less(to)) {
+                    for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
+                        let halftone = trackMeasureChord.pitches[pp];
+                        this.counts[halftone]++;
+                        this.steps12[halftone % 12]++;
+                    }
+                }
+            }
+        }
+        let sum = 0;
+        let cnt = 0;
+        for (let ii = 0; ii < 128; ii++) {
+            if (this.counts[ii] > 0) {
+                sum = sum + ii * this.counts[ii];
+                cnt = cnt + this.counts[ii];
+            }
+        }
+        this.avg = Math.round(sum / cnt);
+        this.findTonic();
+    }
+    findTonic() {
+        this.tonic = this.pretonic;
+        for (let ii = 0; ii < 12; ii++) {
+            if (this.steps12[ii] > 0) {
+                if (this.tonic < 0) {
+                    this.tonic = ii;
+                }
+                else {
+                    if (this.steps12[ii] > this.steps12[this.tonic]) {
+                        this.tonic = ii;
+                    }
+                    else {
+                        if (this.steps12[ii] == this.steps12[this.tonic] && this.steps12[(ii + 7) % 12] > this.steps12[(this.tonic + 7) % 12]) {
+                            this.tonic = ii;
+                        }
+                    }
+                }
+            }
+        }
+        if (this.tonic == this.pretonic) {
+        }
+        else {
+            this.seventh = false;
+            this.minor = false;
+        }
+        if (this.steps12[(this.tonic + 10) % 12] > 0) {
+            this.seventh = true;
+        }
+        if (this.steps12[(this.tonic + 3) % 12] > this.steps12[(this.tonic + 4) % 12]) {
+            this.minor = true;
+        }
+    }
+    chordLabel() {
+        let label = '';
+        if (this.tonic < 0) {
+            label = '?';
+        }
+        else {
+            label = this.halfStepNames[this.tonic];
+            if (this.minor) {
+                label = label + 'm';
+            }
+            if (this.seventh) {
+                label = label + '7';
+            }
+        }
+        return label;
+    }
+}
 console.log('Alpha Tab Import *.mid v1.0.21');
 let parsedProject = null;
 class AlphaTabImportMusicPlugin {
@@ -16596,12 +16688,18 @@ class FileLoaderAlpha {
             }
             let lastLabel = '';
             let step = { count: 1, part: 2 };
+            let lastTonic = -1;
+            let lastMinor = false;
+            let last7 = false;
             for (let ii = 0; ii < project.timeline.length; ii++) {
                 let measure = project.timeline[ii];
                 let point = MMUtil().set({ count: 0, part: 1 });
                 while (point.less(measure.metre)) {
-                    let allnotes = this.countNotesAll(ii, point, point.plus(step), project);
-                    let label = this.notes2Chord(allnotes);
+                    let chord = new ChordFinder(lastTonic, lastMinor, last7, ii, point, point.plus(step), project);
+                    lastTonic = chord.tonic;
+                    lastMinor = chord.minor;
+                    last7 = chord.seventh;
+                    let label = chord.chordLabel();
                     if (label != lastLabel) {
                         project.comments[ii].points.push({
                             skip: point.metre(),
@@ -16615,12 +16713,13 @@ class FileLoaderAlpha {
             }
         }
     }
-    notes2Chord(allNotes) {
-        let tonic = this.findTonic(allNotes);
+    notes2Chord(counts) {
+        let tonic = this.findTonic(counts);
         if (tonic < 0) {
             return '?';
         }
-        return this.halfStepNames[tonic] + this.findTriadLabel(tonic, allNotes) + this.find7Label(tonic, allNotes);
+        let label = this.halfStepNames[tonic] + this.findTriadLabel(tonic, counts) + this.find7Label(tonic, counts);
+        return label;
     }
     notesText(notes) {
         let txt = '';
@@ -16632,22 +16731,21 @@ class FileLoaderAlpha {
         return txt;
     }
     allNotes2base(allNotes) {
-        let base = [];
+        let base12 = [];
+        for (let ii = 0; ii < 12; ii++) {
+            base12[ii] = 0;
+        }
         for (let ii = 0; ii < allNotes.length; ii++) {
             if (allNotes[ii]) {
                 let half = ii % 12;
-                base[half] = (base[half]) ? base[half] : 0;
-                base[half]++;
+                base12[half] = base12[half] + allNotes[ii];
             }
         }
-        for (let ii = 0; ii < 12; ii++) {
-            base[ii] = (base[ii]) ? base[ii] : 0;
-        }
-        return base;
+        return base12;
     }
     findTriadLabel(tonic, allNotes) {
-        let counts = this.allNotes2base(allNotes);
-        if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
+        let base12 = this.allNotes2base(allNotes);
+        if (base12[(tonic + 3) % 12] > base12[(tonic + 4) % 12]) {
             return 'm';
         }
         else {
@@ -16664,17 +16762,62 @@ class FileLoaderAlpha {
         }
     }
     findTonic(allNotes) {
-        let counts = this.allNotes2base(allNotes);
+        let notes12 = this.allNotes2base(allNotes);
         let maxCount = 0;
         let halfNum = -1;
         for (let ii = 0; ii < 12; ii++) {
             let qN = (ii + 7) % 12;
-            if (maxCount < counts[ii] + counts[qN]) {
-                maxCount = counts[ii] + counts[qN];
+            if (maxCount < notes12[ii] + notes12[qN]) {
+                maxCount = notes12[ii] + notes12[qN];
                 halfNum = ii;
             }
         }
         return halfNum;
+    }
+    findNearChord(allNotes) {
+        let notes12 = this.allNotes2base(allNotes);
+        let maxCount = 0;
+        let halfNum = -1;
+        for (let ii = 0; ii < 12; ii++) {
+            let qN = (ii + 7) % 12;
+            if (maxCount < notes12[ii] + notes12[qN]) {
+                maxCount = notes12[ii] + notes12[qN];
+                halfNum = ii;
+            }
+        }
+        return halfNum;
+    }
+    isChordConsists(base, another) {
+        if (base.tone == another.tone) {
+            if (base.sept > 0) {
+                if (base.min > 0 && another.maj == 0) {
+                    if (base.maj > 0 && another.min == 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    fillChordInfo(tone12, counts) {
+        let rz = { tone: tone12, nI: 0, nIV: 0, nV: 0, min: 0, maj: 0, sept: 0 };
+        for (let ii = 0; ii < counts.length; ii++) {
+            if (counts[ii]) {
+                if ((ii % 12) == tone12)
+                    rz.nI = rz.nI + counts[ii];
+                if ((ii % 12) == ((tone12 + 5) % 12))
+                    rz.nIV = rz.nIV + counts[ii];
+                if ((ii % 12) == ((tone12 + 7) % 12))
+                    rz.nV = rz.nV + counts[ii];
+                if ((ii % 12) == ((tone12 + 3) % 12))
+                    rz.min = rz.min + counts[ii];
+                if ((ii % 12) == ((tone12 + 4) % 12))
+                    rz.maj = rz.maj + counts[ii];
+                if ((ii % 12) == ((tone12 + 10) % 12))
+                    rz.sept = rz.sept + counts[ii];
+            }
+        }
+        return rz;
     }
     countNotesAll(barNo, from, to, project) {
         let counts = [];

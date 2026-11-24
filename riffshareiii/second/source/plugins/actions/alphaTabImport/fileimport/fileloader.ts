@@ -1,4 +1,13 @@
 //console.log('alphatabimport1');
+type PitchesStatistics = {
+	tone: number;
+	nI: number;
+	nIV: number;
+	nV: number;
+	min: number;
+	maj: number;
+	sept: number;
+};
 class FileLoaderAlpha {
 	inames: ChordPitchPerformerUtilMIDI = new ChordPitchPerformerUtilMIDI();
 
@@ -208,47 +217,76 @@ class FileLoaderAlpha {
 			}
 			let lastLabel = '';
 			let step = { count: 1, part: 2 };
-			for (let ii = 0; ii < project.timeline.length ; ii++) {
-				let measure = project.timeline[ii];
-				let point = MMUtil().set({ count: 0, part: 1 });
-				while (point.less(measure.metre)) {
-					let allnotes = this.countNotesAll(ii, point, point.plus(step), project);
+			let lastTonic = -1;
+			let lastMinor = false;
+			let last7 = false;
+			for (let ii = 0; ii < project.timeline.length; ii++) {
+				//if (ii >= 40 && ii <= 43) {
+					let measure = project.timeline[ii];
+					let point = MMUtil().set({ count: 0, part: 1 });
+					while (point.less(measure.metre)) {
 
-					let label = this.notes2Chord(allnotes);
-					//console.log(ii, label, allnotes);
-					if (label != lastLabel) {
-						project.comments[ii].points.push({
-							skip: point.metre()
-							, text: label
-							, row: 0
-						});
-						lastLabel = label;
+
+						/*
+												let counts = this.countNotesAll(ii, point, point.plus(step), project);
+												console.log(ii, point.metre(), counts);
+												for (let nn = 0; nn < 12; nn++) {
+													console.log(this.fillChordInfo(nn, counts));
+												}*/
+
+						//let label = this.notes2Chord(counts);
+						//console.log(lastMinor);
+						let chord = new ChordFinder(lastTonic, lastMinor, last7, ii, point, point.plus(step), project);
+						lastTonic = chord.tonic;
+						lastMinor = chord.minor;
+						last7 = chord.seventh;
+						let label = chord.chordLabel();
+						/*
+						console.log(lastMinor,label);
+						if (lastTonic == chord.tonic) {
+							lastMinor = chord.minor;
+							last7 = chord.seventh;
+						} else {
+							lastMinor = false;
+							lastTonic = chord.tonic;
+							last7=false;
+						}
+						*/
+						//console.log(ii, label, allnotes);
+						if (label != lastLabel) {
+							project.comments[ii].points.push({
+								skip: point.metre()
+								, text: label
+								, row: 0
+							});
+							lastLabel = label;
+						}
+						point = point.plus(step);
 					}
-					point = point.plus(step);
-				}
 
-				/*
-								let allnotes = this.countNotesAll(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
-								let label = '';
-								label = label + this.notes2Chord(allnotes);
-								allnotes = this.countNotesAll(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
-								label = label + '-' + this.notes2Chord(allnotes);
-								project.comments[ii].points.push({
-									skip: { count: 0, part: 1 }
-									, text: label
-									, row: 0
-								});*/
+					/*
+									let allnotes = this.countNotesAll(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
+									let label = '';
+									label = label + this.notes2Chord(allnotes);
+									allnotes = this.countNotesAll(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
+									label = label + '-' + this.notes2Chord(allnotes);
+									project.comments[ii].points.push({
+										skip: { count: 0, part: 1 }
+										, text: label
+										, row: 0
+									});*/
+				//}
 			}
-
 		}
 		//console.log('-------------------');
 	}
-	notes2Chord(allNotes: number[]): string {
-		let tonic = this.findTonic(allNotes);
+	notes2Chord(counts: number[]): string {
+		let tonic = this.findTonic(counts);
 		if (tonic < 0) {
 			return '?';
 		}
-		return this.halfStepNames[tonic] + this.findTriadLabel(tonic, allNotes) + this.find7Label(tonic, allNotes);
+		let label = this.halfStepNames[tonic] + this.findTriadLabel(tonic, counts) + this.find7Label(tonic, counts);
+		return label;
 	}
 	halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 	notesText(notes: number[]) {
@@ -262,25 +300,24 @@ class FileLoaderAlpha {
 		return txt;
 	}
 	allNotes2base(allNotes: number[]): number[] {
-		let base: number[] = [];
+		let base12: number[] = [];
+		for (let ii = 0; ii < 12; ii++) {
+			base12[ii] = 0;
+		}
 		for (let ii = 0; ii < allNotes.length; ii++) {
 			if (allNotes[ii]) {
 				let half = ii % 12;
-				base[half] = (base[half]) ? base[half] : 0;
-				base[half]++;
+				base12[half] = base12[half] + allNotes[ii];
 			}
 		}
-		for (let ii = 0; ii < 12; ii++) {
-			base[ii] = (base[ii]) ? base[ii] : 0;
-		}
-		return base;
+		return base12;
 	}
 	findTriadLabel(tonic: number, allNotes: number[]): string {
-		let counts = this.allNotes2base(allNotes);
-		if (counts[(tonic + 3) % 12] > counts[(tonic + 4) % 12]) {
-			return 'm';
+		let base12 = this.allNotes2base(allNotes);
+		if (base12[(tonic + 3) % 12] > base12[(tonic + 4) % 12]) {
+			return 'm';//+'['+base12[(tonic + 3) % 12]+':'+base12[(tonic + 4) % 12]+']';
 		} else {
-			return '';
+			return '';//+'['+base12[(tonic + 3) % 12]+':'+base12[(tonic + 4) % 12]+']';
 		}
 	}
 	find7Label(tonic: number, allNotes: number[]): string {
@@ -292,7 +329,7 @@ class FileLoaderAlpha {
 		}
 	}
 	findTonic(allNotes: number[]): number {
-		let counts = this.allNotes2base(allNotes);
+		let notes12 = this.allNotes2base(allNotes);
 		let maxCount = 0;
 		let halfNum = -1;
 		for (let ii = 0; ii < 12; ii++) {
@@ -300,8 +337,8 @@ class FileLoaderAlpha {
 			//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
 			//if (counts[ii] > 0 && counts[qN] > 0 && counts[ii] > 1.1 * counts[qN]) {
 			//console.log(noteNames[ii], counts[ii] + '+' + counts[qN] + '=' + (counts[ii] + counts[qN]));
-			if (maxCount < counts[ii] + counts[qN]) {
-				maxCount = counts[ii] + counts[qN];
+			if (maxCount < notes12[ii] + notes12[qN]) {
+				maxCount = notes12[ii] + notes12[qN];
 				halfNum = ii;
 			}
 			//}
@@ -310,6 +347,47 @@ class FileLoaderAlpha {
 		return halfNum;
 	}
 
+	findNearChord(allNotes: number[]): number {
+		let notes12 = this.allNotes2base(allNotes);
+		let maxCount = 0;
+		let halfNum = -1;
+		for (let ii = 0; ii < 12; ii++) {
+			let qN = (ii + 7) % 12;
+			if (maxCount < notes12[ii] + notes12[qN]) {
+				maxCount = notes12[ii] + notes12[qN];
+				halfNum = ii;
+			}
+			//}
+		}
+		//console.log(halfNum,counts);
+		return halfNum;
+	}
+	isChordConsists(base: PitchesStatistics, another: PitchesStatistics): boolean {
+		if (base.tone == another.tone) {
+			if (base.sept > 0) {
+				if (base.min > 0 && another.maj == 0) {
+					if (base.maj > 0 && another.min == 0) {
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	fillChordInfo(tone12: number, counts: number[]): PitchesStatistics {
+		let rz: PitchesStatistics = { tone: tone12, nI: 0, nIV: 0, nV: 0, min: 0, maj: 0, sept: 0 };
+		for (let ii = 0; ii < counts.length; ii++) {
+			if (counts[ii]) {
+				if ((ii % 12) == tone12) rz.nI = rz.nI + counts[ii];
+				if ((ii % 12) == ((tone12 + 5) % 12)) rz.nIV = rz.nIV + counts[ii];
+				if ((ii % 12) == ((tone12 + 7) % 12)) rz.nV = rz.nV + counts[ii];
+				if ((ii % 12) == ((tone12 + 3) % 12)) rz.min = rz.min + counts[ii];
+				if ((ii % 12) == ((tone12 + 4) % 12)) rz.maj = rz.maj + counts[ii];
+				if ((ii % 12) == ((tone12 + 10) % 12)) rz.sept = rz.sept + counts[ii];
+			}
+		}
+		return rz;
+	}
 	countNotesAll(barNo: number, from: Zvoog_Metre, to: Zvoog_Metre, project: Zvoog_Project): number[] {
 		let counts: number[] = [];
 		for (let tt = 0; tt < project.tracks.length; tt++) {
