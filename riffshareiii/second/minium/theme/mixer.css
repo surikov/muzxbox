@@ -120,41 +120,49 @@
 .mixFiller1 {
 	fill: var(--line-color);
 	fill-opacity: 5%;
+	pointer-events: none;
 }
 
 .mixFiller2 {
 	fill: var(--line-color);
 	fill-opacity: 10%;
+	pointer-events: none;
 }
 
 .mixFiller3 {
 	fill: var(--line-color);
 	fill-opacity: 15%;
+	pointer-events: none;
 }
 
 .mixFiller4 {
 	fill: var(--line-color);
 	fill-opacity: 20%;
+	pointer-events: none;
 }
 
 .mixFiller5 {
 	fill: var(--line-color);
 	fill-opacity: 25%;
+	pointer-events: none;
 }
 
 .mixFiller6 {
 	fill: var(--line-color);
 	fill-opacity: 30%;
+	pointer-events: none;
 }
 
 .mixFiller7 {
 	fill: var(--line-color);
 	fill-opacity: 35%;
+	pointer-events: none;
 }
 
 .mixFiller8 {
 	fill: var(--line-color);
 	fill-opacity: 40%;
+	pointer-events: none;
 }
 
 
@@ -334,7 +342,11 @@
 	stroke: none;
 	pointer-events: none;
 }
-
+.commentChordBackGround {
+	fill: var(--line-color);
+	fill-opacity: 10%;
+	pointer-events: none;
+}
 .commentLineText025 {
 	fill: var(--main-color);
 	font-size: calc(0.25*var(--tapSize));

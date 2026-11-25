@@ -16344,15 +16344,15 @@ class EventsConverter {
     }
 }
 class ChordFinder {
-    constructor(pretonic, preminor, pre7, barNo, from, to, project) {
+    constructor(pretonic, triadPrefs, pre7, barNo, from, to, project) {
         this.halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
         this.tonic = -1;
         this.pretonic = -1;
         this.avg = -1;
-        this.minor = false;
+        this.isminor = false;
         this.seventh = false;
         this.pretonic = pretonic;
-        this.minor = preminor;
+        this.triadPrefs = triadPrefs;
         this.seventh = pre7;
         this.counts = [];
         this.steps12 = [];
@@ -16370,8 +16370,9 @@ class ChordFinder {
                 if ((!mm.less(from)) && mm.less(to)) {
                     for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
                         let halftone = trackMeasureChord.pitches[pp];
-                        this.counts[halftone]++;
-                        this.steps12[halftone % 12]++;
+                        let weight = this.pitchWeight(halftone);
+                        this.counts[halftone] = this.counts[halftone] + weight;
+                        this.steps12[halftone % 12] = this.steps12[halftone % 12] + weight;
                     }
                 }
             }
@@ -16387,6 +16388,11 @@ class ChordFinder {
         this.avg = Math.round(sum / cnt);
         this.findTonic();
     }
+    pitchWeight(half) {
+        let oct = Math.floor(half / 12);
+        let rr = 10 - oct;
+        return 1 + rr * 0.123;
+    }
     findTonic() {
         this.tonic = this.pretonic;
         for (let ii = 0; ii < 12; ii++) {
@@ -16395,13 +16401,8 @@ class ChordFinder {
                     this.tonic = ii;
                 }
                 else {
-                    if (this.steps12[ii] > this.steps12[this.tonic]) {
+                    if (this.steps12[ii] + 0.5 * this.steps12[(ii + 7) % 12] > this.steps12[this.tonic] + 0.5 * this.steps12[(this.tonic + 7) % 12]) {
                         this.tonic = ii;
-                    }
-                    else {
-                        if (this.steps12[ii] == this.steps12[this.tonic] && this.steps12[(ii + 7) % 12] > this.steps12[(this.tonic + 7) % 12]) {
-                            this.tonic = ii;
-                        }
                     }
                 }
             }
@@ -16410,13 +16411,24 @@ class ChordFinder {
         }
         else {
             this.seventh = false;
-            this.minor = false;
         }
         if (this.steps12[(this.tonic + 10) % 12] > 0) {
             this.seventh = true;
         }
         if (this.steps12[(this.tonic + 3) % 12] > this.steps12[(this.tonic + 4) % 12]) {
-            this.minor = true;
+            this.isminor = true;
+            this.triadPrefs[this.tonic] = -1;
+        }
+        else {
+            if (this.steps12[(this.tonic + 3) % 12] < this.steps12[(this.tonic + 4) % 12]) {
+                this.isminor = false;
+                this.triadPrefs[this.tonic] = 1;
+            }
+            else {
+                if (this.triadPrefs[this.tonic] < 0) {
+                    this.isminor = true;
+                }
+            }
         }
     }
     chordLabel() {
@@ -16426,7 +16438,7 @@ class ChordFinder {
         }
         else {
             label = this.halfStepNames[this.tonic];
-            if (this.minor) {
+            if (this.isminor) {
                 label = label + 'm';
             }
             if (this.seventh) {
@@ -16502,7 +16514,6 @@ class AlphaTabImportMusicPlugin {
 class FileLoaderAlpha {
     constructor(inputFile) {
         this.inames = new ChordPitchPerformerUtilMIDI();
-        this.halfStepNames = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
         var file = inputFile.files[0];
         var fileReader = new FileReader();
         let me = this;
@@ -16589,7 +16600,7 @@ class FileLoaderAlpha {
                         }
                     }
                 }
-                me.dumpProjectInfo(parsedProject);
+                me.setupProjectCHordHints(parsedProject);
             }
         };
         fileReader.readAsArrayBuffer(file);
@@ -16681,23 +16692,26 @@ class FileLoaderAlpha {
         this.arrangeFilters(project);
         parsedProject = project;
     }
-    dumpProjectInfo(project) {
+    setupProjectCHordHints(project) {
         if (project) {
+            this.adjustContentByMeter(project);
             for (let ii = 0; ii < project.timeline.length; ii++) {
                 project.comments[ii].points.map(vv => vv.row++);
             }
             let lastLabel = '';
             let step = { count: 1, part: 2 };
             let lastTonic = -1;
-            let lastMinor = false;
             let last7 = false;
+            let triadPrefs = [];
+            for (let hh = 0; hh < 12; hh++) {
+                triadPrefs[hh] = 0;
+            }
             for (let ii = 0; ii < project.timeline.length; ii++) {
                 let measure = project.timeline[ii];
                 let point = MMUtil().set({ count: 0, part: 1 });
                 while (point.less(measure.metre)) {
-                    let chord = new ChordFinder(lastTonic, lastMinor, last7, ii, point, point.plus(step), project);
+                    let chord = new ChordFinder(lastTonic, triadPrefs, last7, ii, point, point.plus(step), project);
                     lastTonic = chord.tonic;
-                    lastMinor = chord.minor;
                     last7 = chord.seventh;
                     let label = chord.chordLabel();
                     if (label != lastLabel) {
@@ -16713,129 +16727,85 @@ class FileLoaderAlpha {
             }
         }
     }
-    notes2Chord(counts) {
-        let tonic = this.findTonic(counts);
-        if (tonic < 0) {
-            return '?';
-        }
-        let label = this.halfStepNames[tonic] + this.findTriadLabel(tonic, counts) + this.find7Label(tonic, counts);
-        return label;
-    }
-    notesText(notes) {
-        let txt = '';
-        for (let ii = 0; ii < notes.length; ii++) {
-            if (notes[ii]) {
-                txt = txt + ' ' + Math.floor(ii / 12) + this.halfStepNames[ii % 12];
+    adjustContentByMeter(currentProject) {
+        for (let ii = 0; ii < currentProject.timeline.length; ii++) {
+            let barMetre = MMUtil().set(currentProject.timeline[ii].metre);
+            for (let nn = 0; nn < currentProject.tracks.length; nn++) {
+                if (!(currentProject.tracks[nn].measures[ii]))
+                    currentProject.tracks[nn].measures[ii] = { chords: [] };
+                let trackBar = currentProject.tracks[nn].measures[ii];
+                for (let kk = 0; kk < trackBar.chords.length; kk++) {
+                    let chord = trackBar.chords[kk];
+                    if (!barMetre.more(chord.skip)) {
+                        if (ii + 1 < currentProject.timeline.length) {
+                            chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
+                            trackBar.chords.splice(kk, 1);
+                            kk--;
+                            currentProject.tracks[nn].measures[ii + 1].chords.push(chord);
+                        }
+                        else {
+                            currentProject.timeline[ii].metre = MMUtil().set(chord.skip).plus({ count: 1, part: 8 }).metre();
+                        }
+                    }
+                }
             }
-        }
-        return txt;
-    }
-    allNotes2base(allNotes) {
-        let base12 = [];
-        for (let ii = 0; ii < 12; ii++) {
-            base12[ii] = 0;
-        }
-        for (let ii = 0; ii < allNotes.length; ii++) {
-            if (allNotes[ii]) {
-                let half = ii % 12;
-                base12[half] = base12[half] + allNotes[ii];
+            for (let nn = 0; nn < currentProject.percussions.length; nn++) {
+                if (!(currentProject.percussions[nn].measures[ii]))
+                    currentProject.percussions[nn].measures[ii] = { skips: [] };
+                let percuBar = currentProject.percussions[nn].measures[ii];
+                for (let kk = 0; kk < percuBar.skips.length; kk++) {
+                    let skip = percuBar.skips[kk];
+                    if (!barMetre.more(skip)) {
+                        if (ii + 1 < currentProject.timeline.length) {
+                            let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
+                            percuBar.skips.splice(kk, 1);
+                            kk--;
+                            currentProject.percussions[nn].measures[ii + 1].skips.push(newSkip);
+                        }
+                        else {
+                            currentProject.timeline[ii].metre = MMUtil().set(skip).plus({ count: 1, part: 8 }).metre();
+                        }
+                    }
+                }
             }
-        }
-        return base12;
-    }
-    findTriadLabel(tonic, allNotes) {
-        let base12 = this.allNotes2base(allNotes);
-        if (base12[(tonic + 3) % 12] > base12[(tonic + 4) % 12]) {
-            return 'm';
-        }
-        else {
-            return '';
-        }
-    }
-    find7Label(tonic, allNotes) {
-        let counts = this.allNotes2base(allNotes);
-        if (counts[(tonic + 10) % 12] > 0) {
-            return '7';
-        }
-        else {
-            return '';
-        }
-    }
-    findTonic(allNotes) {
-        let notes12 = this.allNotes2base(allNotes);
-        let maxCount = 0;
-        let halfNum = -1;
-        for (let ii = 0; ii < 12; ii++) {
-            let qN = (ii + 7) % 12;
-            if (maxCount < notes12[ii] + notes12[qN]) {
-                maxCount = notes12[ii] + notes12[qN];
-                halfNum = ii;
+            for (let nn = 0; nn < currentProject.filters.length; nn++) {
+                if (!(currentProject.filters[nn].automation[ii]))
+                    currentProject.filters[nn].automation[ii] = { changes: [] };
+                let autoBar = currentProject.filters[nn].automation[ii];
+                for (let kk = 0; kk < autoBar.changes.length; kk++) {
+                    let change = autoBar.changes[kk];
+                    if (!barMetre.more(change.skip)) {
+                        if (ii + 1 < currentProject.timeline.length) {
+                            change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
+                            autoBar.changes.splice(kk, 1);
+                            kk--;
+                            currentProject.filters[nn].automation[ii + 1].changes.push(change);
+                        }
+                        else {
+                            currentProject.timeline[ii].metre = MMUtil().set(change.skip).plus({ count: 1, part: 8 }).metre();
+                        }
+                    }
+                }
             }
-        }
-        return halfNum;
-    }
-    findNearChord(allNotes) {
-        let notes12 = this.allNotes2base(allNotes);
-        let maxCount = 0;
-        let halfNum = -1;
-        for (let ii = 0; ii < 12; ii++) {
-            let qN = (ii + 7) % 12;
-            if (maxCount < notes12[ii] + notes12[qN]) {
-                maxCount = notes12[ii] + notes12[qN];
-                halfNum = ii;
-            }
-        }
-        return halfNum;
-    }
-    isChordConsists(base, another) {
-        if (base.tone == another.tone) {
-            if (base.sept > 0) {
-                if (base.min > 0 && another.maj == 0) {
-                    if (base.maj > 0 && another.min == 0) {
-                        return true;
+            if (!(currentProject.comments[ii]))
+                currentProject.comments[ii] = { points: [] };
+            let textBar = currentProject.comments[ii];
+            for (let kk = 0; kk < textBar.points.length; kk++) {
+                let point = textBar.points[kk];
+                if (!barMetre.more(point.skip)) {
+                    if (ii + 1 < currentProject.timeline.length) {
+                        point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
+                        textBar.points.splice(kk, 1);
+                        kk--;
+                        console.log();
+                        currentProject.comments[ii + 1].points.push(point);
+                    }
+                    else {
+                        currentProject.timeline[ii].metre = MMUtil().set(point.skip).plus({ count: 1, part: 8 }).metre();
                     }
                 }
             }
         }
-        return false;
-    }
-    fillChordInfo(tone12, counts) {
-        let rz = { tone: tone12, nI: 0, nIV: 0, nV: 0, min: 0, maj: 0, sept: 0 };
-        for (let ii = 0; ii < counts.length; ii++) {
-            if (counts[ii]) {
-                if ((ii % 12) == tone12)
-                    rz.nI = rz.nI + counts[ii];
-                if ((ii % 12) == ((tone12 + 5) % 12))
-                    rz.nIV = rz.nIV + counts[ii];
-                if ((ii % 12) == ((tone12 + 7) % 12))
-                    rz.nV = rz.nV + counts[ii];
-                if ((ii % 12) == ((tone12 + 3) % 12))
-                    rz.min = rz.min + counts[ii];
-                if ((ii % 12) == ((tone12 + 4) % 12))
-                    rz.maj = rz.maj + counts[ii];
-                if ((ii % 12) == ((tone12 + 10) % 12))
-                    rz.sept = rz.sept + counts[ii];
-            }
-        }
-        return rz;
-    }
-    countNotesAll(barNo, from, to, project) {
-        let counts = [];
-        for (let tt = 0; tt < project.tracks.length; tt++) {
-            let trackMeasure = project.tracks[tt].measures[barNo];
-            for (let cc = 0; cc < trackMeasure.chords.length; cc++) {
-                let trackMeasureChord = trackMeasure.chords[cc];
-                let mm = MMUtil().set(trackMeasureChord.skip);
-                if ((!mm.less(from)) && mm.less(to)) {
-                    for (let pp = 0; pp < trackMeasureChord.pitches.length; pp++) {
-                        let halftone = trackMeasureChord.pitches[pp];
-                        counts[halftone] = (counts[halftone]) ? counts[halftone] : 0;
-                        counts[halftone]++;
-                    }
-                }
-            }
-        }
-        return counts;
     }
     addRepeats(project, score) {
         let startLoop = -1;

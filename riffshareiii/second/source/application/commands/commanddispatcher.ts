@@ -1373,6 +1373,12 @@ class CommandDispatcher {
 			if (!(project.comments[tt])) {
 				project.comments[tt] = { points: [] };
 			}
+			for (let nn = 0; nn < project.patterns.length; nn++) {
+				let pattern = project.patterns[nn];
+				if (!(pattern.measures[tt])) {
+					pattern.measures[tt] = { points: [] };
+				}
+			}
 		}
 		for (let nn = 0; nn < project.tracks.length; nn++) {
 			project.tracks[nn].measures.length = project.timeline.length;

@@ -2509,6 +2509,12 @@ class CommandDispatcher {
             if (!(project.comments[tt])) {
                 project.comments[tt] = { points: [] };
             }
+            for (let nn = 0; nn < project.patterns.length; nn++) {
+                let pattern = project.patterns[nn];
+                if (!(pattern.measures[tt])) {
+                    pattern.measures[tt] = { points: [] };
+                }
+            }
         }
         for (let nn = 0; nn < project.tracks.length; nn++) {
             project.tracks[nn].measures.length = project.timeline.length;
@@ -5742,6 +5748,9 @@ class TextCommentsBar {
             }
             row++;
         }
+        if (row == 0 && y > globalCommandDispatcher.cfg().commentsZoomLineY(zz, 0)) {
+            row = 1;
+        }
         let info = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
         this.testBars();
         let commentBar = globalCommandDispatcher.cfg().data.comments[idx];
@@ -6403,6 +6412,17 @@ class MixerZoomLevel {
     addDrumLines() {
     }
     addCommentLines() {
+        if (this.zoomLevelIndex < 6) {
+            let hh = globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, 0);
+            let line = {
+                x: globalCommandDispatcher.cfg().leftPad,
+                y: globalCommandDispatcher.cfg().commentsTop(),
+                h: hh,
+                w: globalCommandDispatcher.cfg().timelineWidth(),
+                css: 'commentChordBackGround'
+            };
+            this.zoomGridAnchor.content.push(line);
+        }
     }
     addGridLines(barOctaveAnchor) {
         if (this.zoomLevelIndex < 6) {

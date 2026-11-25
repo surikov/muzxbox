@@ -66,6 +66,14 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
+        "label": "Harmony",
+        "purpose": "Action",
+        "kind": "mihar1",
+        "ui": _t_plugin_root_folder + "actions/miniumharmony/miha.html",
+        "evaluate": "",
+        "script": ""
+    },
+    {
         "label": "Import",
         "purpose": "Action",
         "kind": "alphatabimport1",
@@ -114,12 +122,12 @@ let _t_all_registerd_plugins_list = [
         "script": ""
     },
     {
-        "label": "Minium Active Stem",
+        "label": "Minium Loop",
         "purpose": "ActiveStem",
-        "kind": "miniumactivestem1",
-        "ui": _t_plugin_root_folder + "activestems/miniumactivestem/ui/ui.html",
-        "evaluate": "createMiniumActiveStem",
-        "script": _t_plugin_root_folder + "activestems/miniumactivestem/audio/prg.js"
+        "kind": "miniumlooper1",
+        "ui": _t_plugin_root_folder + "loopers/minium.loop1/ui/ui.html",
+        "evaluate": "newMiniumLoopPlugin",
+        "script": _t_plugin_root_folder + "loopers/minium.loop1/audio/loopplugin1.js"
     }
 ];
 function MZXBX_currentPlugins() {

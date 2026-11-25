@@ -65,6 +65,9 @@ class TextCommentsBar {
 			}
 			row++;
 		}
+		if(row==0 && y>globalCommandDispatcher.cfg().commentsZoomLineY(zz, 0)){
+row=1;
+		}
 		let info:BarStepStartEnd = globalCommandDispatcher.cfg().gridClickInfo(idx, x, zz);
 		this.testBars();
 		let commentBar = globalCommandDispatcher.cfg().data.comments[idx];

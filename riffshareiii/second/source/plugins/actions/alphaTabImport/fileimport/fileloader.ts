@@ -98,7 +98,7 @@ class FileLoaderAlpha {
 						}
 					}
 				}
-				me.dumpProjectInfo(parsedProject);
+				me.setupProjectCHordHints(parsedProject);
 
 				//let proj = new Projectr();
 				//me.parsedProject = proj.parseRawMIDIdata(arrayBuffer, title, comment);
@@ -209,77 +209,84 @@ class FileLoaderAlpha {
 
 	}
 
-	dumpProjectInfo(project: Zvoog_Project | null) {
+	setupProjectCHordHints(project: Zvoog_Project | null) {
 		//console.log('dumpProjectInfo--------------------------------------', project);
 		if (project) {
+			this.adjustContentByMeter(project);
 			for (let ii = 0; ii < project.timeline.length; ii++) {
 				project.comments[ii].points.map(vv => vv.row++);
 			}
 			let lastLabel = '';
 			let step = { count: 1, part: 2 };
 			let lastTonic = -1;
-			let lastMinor = false;
+			//let lastMinor = false;
+
 			let last7 = false;
+			let triadPrefs: number[] = [];
+			for (let hh = 0; hh < 12; hh++) {
+				triadPrefs[hh] = 0;
+			}
 			for (let ii = 0; ii < project.timeline.length; ii++) {
-				//if (ii >= 40 && ii <= 43) {
-					let measure = project.timeline[ii];
-					let point = MMUtil().set({ count: 0, part: 1 });
-					while (point.less(measure.metre)) {
+				//if (ii >= 28 && ii <= 28) {
+				let measure = project.timeline[ii];
+				let point = MMUtil().set({ count: 0, part: 1 });
+				while (point.less(measure.metre)) {
 
-
-						/*
-												let counts = this.countNotesAll(ii, point, point.plus(step), project);
-												console.log(ii, point.metre(), counts);
-												for (let nn = 0; nn < 12; nn++) {
-													console.log(this.fillChordInfo(nn, counts));
-												}*/
-
-						//let label = this.notes2Chord(counts);
-						//console.log(lastMinor);
-						let chord = new ChordFinder(lastTonic, lastMinor, last7, ii, point, point.plus(step), project);
-						lastTonic = chord.tonic;
-						lastMinor = chord.minor;
-						last7 = chord.seventh;
-						let label = chord.chordLabel();
-						/*
-						console.log(lastMinor,label);
-						if (lastTonic == chord.tonic) {
-							lastMinor = chord.minor;
-							last7 = chord.seventh;
-						} else {
-							lastMinor = false;
-							lastTonic = chord.tonic;
-							last7=false;
-						}
-						*/
-						//console.log(ii, label, allnotes);
-						if (label != lastLabel) {
-							project.comments[ii].points.push({
-								skip: point.metre()
-								, text: label
-								, row: 0
-							});
-							lastLabel = label;
-						}
-						point = point.plus(step);
-					}
 
 					/*
-									let allnotes = this.countNotesAll(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
-									let label = '';
-									label = label + this.notes2Chord(allnotes);
-									allnotes = this.countNotesAll(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
-									label = label + '-' + this.notes2Chord(allnotes);
-									project.comments[ii].points.push({
-										skip: { count: 0, part: 1 }
-										, text: label
-										, row: 0
-									});*/
+											let counts = this.countNotesAll(ii, point, point.plus(step), project);
+											console.log(ii, point.metre(), counts);
+											for (let nn = 0; nn < 12; nn++) {
+												console.log(this.fillChordInfo(nn, counts));
+											}*/
+
+					//let label = this.notes2Chord(counts);
+					//console.log(lastMinor);
+					let chord = new ChordFinder(lastTonic, triadPrefs, last7, ii, point, point.plus(step), project);
+					lastTonic = chord.tonic;
+					//lastMinor = chord.minor;
+					last7 = chord.seventh;
+					let label = chord.chordLabel();
+					/*
+					console.log(lastMinor,label);
+					if (lastTonic == chord.tonic) {
+						lastMinor = chord.minor;
+						last7 = chord.seventh;
+					} else {
+						lastMinor = false;
+						lastTonic = chord.tonic;
+						last7=false;
+					}
+					*/
+					//console.log(ii, label, allnotes);
+					if (label != lastLabel) {
+						project.comments[ii].points.push({
+							skip: point.metre()
+							, text: label
+							, row: 0
+						});
+						lastLabel = label;
+					}
+					point = point.plus(step);
+				}
+
+				/*
+								let allnotes = this.countNotesAll(ii, { count: 0, part: 1 }, { count: 1, part: 2 }, project);
+								let label = '';
+								label = label + this.notes2Chord(allnotes);
+								allnotes = this.countNotesAll(ii, { count: 1, part: 2 }, { count: 1, part: 1 }, project);
+								label = label + '-' + this.notes2Chord(allnotes);
+								project.comments[ii].points.push({
+									skip: { count: 0, part: 1 }
+									, text: label
+									, row: 0
+								});*/
 				//}
 			}
 		}
 		//console.log('-------------------');
 	}
+	/*
 	notes2Chord(counts: number[]): string {
 		let tonic = this.findTonic(counts);
 		if (tonic < 0) {
@@ -405,6 +412,78 @@ class FileLoaderAlpha {
 			}
 		}
 		return counts;
+	}*/
+	adjustContentByMeter(currentProject: Zvoog_Project) {
+		for (let ii = 0; ii < currentProject.timeline.length; ii++) {
+			let barMetre = MMUtil().set(currentProject.timeline[ii].metre);
+			for (let nn = 0; nn < currentProject.tracks.length; nn++) {
+				if (!(currentProject.tracks[nn].measures[ii])) currentProject.tracks[nn].measures[ii] = { chords: [] };
+				let trackBar = currentProject.tracks[nn].measures[ii];
+				for (let kk = 0; kk < trackBar.chords.length; kk++) {
+					let chord = trackBar.chords[kk];
+					if (!barMetre.more(chord.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							chord.skip = MMUtil().set(chord.skip).minus(barMetre).simplyfy();
+							trackBar.chords.splice(kk, 1);
+							kk--;
+							currentProject.tracks[nn].measures[ii + 1].chords.push(chord);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(chord.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.percussions.length; nn++) {
+				if (!(currentProject.percussions[nn].measures[ii])) currentProject.percussions[nn].measures[ii] = { skips: [] };
+				let percuBar = currentProject.percussions[nn].measures[ii];
+				for (let kk = 0; kk < percuBar.skips.length; kk++) {
+					let skip = percuBar.skips[kk];
+					if (!barMetre.more(skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							let newSkip = MMUtil().set(skip).minus(barMetre).simplyfy();
+							percuBar.skips.splice(kk, 1);
+							kk--;
+							currentProject.percussions[nn].measures[ii + 1].skips.push(newSkip);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			for (let nn = 0; nn < currentProject.filters.length; nn++) {
+				if (!(currentProject.filters[nn].automation[ii])) currentProject.filters[nn].automation[ii] = { changes: [] };
+				let autoBar = currentProject.filters[nn].automation[ii];
+				for (let kk = 0; kk < autoBar.changes.length; kk++) {
+					let change = autoBar.changes[kk];
+					if (!barMetre.more(change.skip)) {
+						if (ii + 1 < currentProject.timeline.length) {
+							change.skip = MMUtil().set(change.skip).minus(barMetre).simplyfy();
+							autoBar.changes.splice(kk, 1);
+							kk--;
+							currentProject.filters[nn].automation[ii + 1].changes.push(change);
+						} else {
+							currentProject.timeline[ii].metre = MMUtil().set(change.skip).plus({ count: 1, part: 8 }).metre();
+						}
+					}
+				}
+			}
+			if (!(currentProject.comments[ii])) currentProject.comments[ii] = { points: [] };
+			let textBar = currentProject.comments[ii];
+			for (let kk = 0; kk < textBar.points.length; kk++) {
+				let point = textBar.points[kk];
+				if (!barMetre.more(point.skip)) {
+					if (ii + 1 < currentProject.timeline.length) {
+						point.skip = MMUtil().set(point.skip).minus(barMetre).simplyfy();
+						textBar.points.splice(kk, 1);
+						kk--;
+						console.log();
+						currentProject.comments[ii + 1].points.push(point);
+					} else {
+						currentProject.timeline[ii].metre = MMUtil().set(point.skip).plus({ count: 1, part: 8 }).metre();
+					}
+				}
+			}
+		}
 	}
 	addRepeats(project: Zvoog_Project, score: Score) {
 		let startLoop = -1;

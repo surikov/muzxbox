@@ -96,6 +96,17 @@ class MixerZoomLevel {
 				this.zoomGridAnchor.content.push(line);
 			}
 		}*/
+		if (this.zoomLevelIndex < 6) {
+			let hh = globalCommandDispatcher.cfg().commentsZoomLineY(this.zoomLevelIndex, 0);
+			let line: TileRectangle = {
+				x: globalCommandDispatcher.cfg().leftPad
+				, y: globalCommandDispatcher.cfg().commentsTop()
+				, h: hh
+				, w: globalCommandDispatcher.cfg().timelineWidth()
+				, css: 'commentChordBackGround'
+			};
+			this.zoomGridAnchor.content.push(line);
+		}
 	}
 	addGridLines(barOctaveAnchor: TileAnchor) {
 		if (this.zoomLevelIndex < 6) {

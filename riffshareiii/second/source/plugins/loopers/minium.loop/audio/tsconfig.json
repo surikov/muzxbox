@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "es2015",
+        "outFile": "../../../../../minium/plugins/loopers/minium.loop1/audio/loopplugin1.js",
+        "strictNullChecks": true,
+        "alwaysStrict": true,
+        "esModuleInterop": true,
+        "noResolve": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": false,
+        "experimentalDecorators": true,
+        "isolatedModules": false,
+        "module": "AMD",
+        "lib": [
+            "dom",
+            "es2015",
+            "es5"
+        ],
+        "declaration": false,
+        "types": []
+    },
+    "files": [
+		 "../../../../mzxbx/mzxbxapi/musicenginetypes.ts",
+       // "../../../../mzxbx/mzxbxapi/musicenginedeclarations.ts",
+        "miloplugin.ts"
+    ]
+}
