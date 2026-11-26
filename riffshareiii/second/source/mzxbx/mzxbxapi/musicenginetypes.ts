@@ -336,7 +336,7 @@ type MZXBX_ChannelSampler = {
 */
 type MZXBX_ActivePatternPlugin = {
 	launch: (parameters: string, base: Zvoog_Project) => Zvoog_Project;
-	busy: () => null | string;
+	//busy: () => null | string;
 };
 type MZXBX_AudioSamplerPlugin = {
 	launch: (context: AudioContext, parameters: string) => number;

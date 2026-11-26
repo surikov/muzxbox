@@ -7,6 +7,7 @@ class CommandDispatcher {
 	tapSizeRatio: number = 1;
 	clipboardData: Zvoog_Project | null = null;
 	lastUsedSchedule: MZXBX_Schedule | null = null;
+	arpeggiatorCache: { plugin: MZXBX_ActivePatternPlugin, id: string }[] = [];
 
 	colorizedNoteLines: boolean = true;
 	colorizedToneBase0_11: number = 10;
@@ -408,14 +409,88 @@ class CommandDispatcher {
 			this.player.replaceCurrentSchedule(this.lastUsedSchedule);
 		}
 	}
+	prefetchLoops(base: Zvoog_Project): Zvoog_Project[] {
+		let projects: Zvoog_Project[] = [];
+		for (let ii = 0; ii < base.patterns.length; ii++) {
+			let arpeggiator = base.patterns[ii].arpeggiator;
+			let found = false;
+			for (let ii = 0; ii < this.arpeggiatorCache.length; ii++) {
+				if (this.arpeggiatorCache[ii].id == arpeggiator.id) {
+					found = true;
+					let aux: Zvoog_Project = this.arpeggiatorCache[ii].plugin.launch(base.patterns[ii].arpeggiator.data, base);
+					projects.push(aux);
+					break;
+				}
+			}
+			if (!found) {
+				console.log('Not found arpeggiator for', base.patterns[ii].title);
+			}
+		}
+		return projects;
+	}
+	mergeAllLoops(base: Zvoog_Project, aux: Zvoog_Project[]) {
+		console.log('mergeAllLoops', aux);
+		for (let ii = 0; ii < aux.length; ii++) {
+
+		}
+	}
+	mergeSIngleLoops(base: Zvoog_Project, aux: Zvoog_Project) {
+		console.log(aux);
+	}
+	startLoalArpeggiators(prj: Zvoog_Project) {
+		for (let ii = 0; ii < prj.patterns.length; ii++) {
+			let arpeggiator = prj.patterns[ii].arpeggiator;
+			console.log(ii, arpeggiator);
+			for (let ll = 0; ll < MZXBX_currentPlugins().length; ll++) {
+				if (MZXBX_currentPlugins()[ll].kind == arpeggiator.kind) {
+					let info = MZXBX_currentPlugins()[ll];
+					if ((window[info.evaluate])) {
+						console.log('ready');
+						let exe = window[info.evaluate];
+						let plugin: MZXBX_ActivePatternPlugin = exe();
+						if (plugin) {
+							console.log('done', plugin);
+							this.arpeggiatorCache.push({ plugin: plugin, id: arpeggiator.id });
+						}
+					} else {
+						console.log('start load');
+						this.appendScriptURLifNotExists(info.script);
+					}
+					break;
+				}
+			}
+		}
+	}
+	appendScriptURLifNotExists(url: string): boolean {
+		let scripts: HTMLCollectionOf<HTMLScriptElement> = document.getElementsByTagName("script");
+		for (let ii = 0; ii < scripts.length; ii++) {
+			let script: HTMLScriptElement | null = scripts.item(ii);
+			if (script) {
+				if (url == (script as any).lockedLoaderURL) {
+					return false;
+				}
+			}
+		}
+		var scriptElement: HTMLScriptElement = document.createElement('script');
+		scriptElement.setAttribute("type", "text/javascript");
+		scriptElement.setAttribute("src", url);
+		(scriptElement as any).lockedLoaderURL = url;
+		let head: HTMLHeadElement = document.getElementsByTagName("head")[0];
+		head.appendChild(scriptElement);
+		return true;
+	}
 	//renderCurrentProjectForOutput(): MZXBX_Schedule {
 	renderZvoogProjectForOutput(prj: Zvoog_Project): MZXBX_Schedule {
+		console.log('renderZvoogProjectForOutput');
 		let forOutput: MZXBX_Schedule = {
 			series: []
 			, channels: []
 			, filters: []
 		};
 		//let prj: Zvoog_Project = this.cfg().data;
+		this.startLoalArpeggiators(prj);
+		let auxProjects = this.prefetchLoops(prj);
+		this.mergeAllLoops(prj, auxProjects);
 
 		let soloOnly = false;
 		for (let ss = 0; ss < prj.percussions.length; ss++) {

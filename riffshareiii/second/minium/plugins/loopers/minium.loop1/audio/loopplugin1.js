@@ -23,10 +23,11 @@ class MiniumLoopPlugin {
             menuClipboard: false,
             menuSettings: false
         };
+        this.fillProject(base, tt);
         return tt;
     }
-    busy() {
-        return null;
+    fillProject(from, to) {
+        console.log('fillProject');
     }
 }
 function newMiniumLoopPlugin() {

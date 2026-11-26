@@ -22,12 +22,12 @@ class MiniumLoopPlugin implements MZXBX_ActivePatternPlugin {
 			, menuClipboard: false
 			, menuSettings: false
 		};
+		this.fillProject(base,tt);
 		return tt;
 	}
-	busy(): null | string {
-		return null;
+	fillProject(from: Zvoog_Project,to: Zvoog_Project){
+console.log('fillProject');
 	}
-
 }
 function newMiniumLoopPlugin(): MZXBX_ActivePatternPlugin {
 	return new MiniumLoopPlugin();
