@@ -25,5 +25,6 @@
 		 "../../../../mzxbx/mzxbxapi/musicenginetypes.ts",
        // "../../../../mzxbx/mzxbxapi/musicenginedeclarations.ts",
         "miloplugin.ts"
+        , "chordutil.ts"
     ]
 }

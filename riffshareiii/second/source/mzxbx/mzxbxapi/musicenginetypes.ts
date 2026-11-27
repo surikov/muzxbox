@@ -335,7 +335,7 @@ type MZXBX_ChannelSampler = {
 };
 */
 type MZXBX_ActivePatternPlugin = {
-	launch: (parameters: string, base: Zvoog_Project) => Zvoog_Project;
+	launch: (stemtrack: Zvoog_PatternTrack, timeline: Zvoog_SongMeasure[], comments: Zvoog_CommentMeasure[]) => Zvoog_Project;
 	//busy: () => null | string;
 };
 type MZXBX_AudioSamplerPlugin = {

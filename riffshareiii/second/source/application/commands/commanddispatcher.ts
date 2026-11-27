@@ -417,7 +417,7 @@ class CommandDispatcher {
 			for (let ii = 0; ii < this.arpeggiatorCache.length; ii++) {
 				if (this.arpeggiatorCache[ii].id == arpeggiator.id) {
 					found = true;
-					let aux: Zvoog_Project = this.arpeggiatorCache[ii].plugin.launch(base.patterns[ii].arpeggiator.data, base);
+					let aux: Zvoog_Project = this.arpeggiatorCache[ii].plugin.launch(base.patterns[ii], base.timeline, base.comments);
 					projects.push(aux);
 					break;
 				}
